@@ -142,7 +142,7 @@ export default function Home() {
               <div>
                 <h1 className="text-xl font-bold md:text-2xl">Tesla Bestellungen und Statistiken</h1>
                 <p className="hidden text-sm text-muted-foreground sm:block">
-                  Verfolge Tesla Model Y Bestellungen
+                  Verfolge Tesla Bestellungen
                 </p>
               </div>
             </div>

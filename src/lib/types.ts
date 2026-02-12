@@ -1,6 +1,15 @@
+// Vehicle types supported by the application
+export type VehicleType = 'Model Y' | 'Model 3'
+
+export const VEHICLE_TYPES: { value: VehicleType; label: string }[] = [
+  { value: 'Model Y', label: 'Model Y' },
+  { value: 'Model 3', label: 'Model 3' },
+]
+
 export interface Order {
   id: string
   name: string
+  vehicleType: string
   orderDate: string | null
   country: string | null
   model: string | null
@@ -33,6 +42,7 @@ export interface Order {
 
 export interface OrderFormData {
   name: string
+  vehicleType: VehicleType
   orderDate: string
   country: string
   model: string
@@ -121,9 +131,21 @@ export const COUNTRIES = [
   { value: 'cy', label: 'Zypern', flag: '🇨🇾' },
 ]
 
+// Model Y trims
 export const MODELS = [
   { value: 'standard', label: 'Standard' },
   { value: 'premium', label: 'Premium' },
+  { value: 'performance', label: 'Performance' },
+]
+
+// Alias for clarity
+export const MODEL_Y_TRIMS = MODELS
+
+// Model 3 trims (Tesla's actual naming - German market 2025)
+export const MODEL_3_TRIMS = [
+  { value: 'hinterradantrieb', label: 'Hinterradantrieb' },
+  { value: 'premium_lr_rwd', label: 'Premium Maximale Reichweite RWD' },
+  { value: 'premium_lr_awd', label: 'Premium Maximale Reichweite AWD' },
   { value: 'performance', label: 'Performance' },
 ]
 
@@ -159,12 +181,55 @@ export const INTERIORS = [
   { value: 'white', label: 'Weiß' },
 ]
 
+// Model Y wheels (all sizes)
 export const WHEELS = [
   { value: '18', label: "18\"" },
   { value: '19', label: "19\"" },
   { value: '20', label: "20\"" },
   { value: '21', label: "21\"" },
 ]
+
+// Alias for clarity
+export const MODEL_Y_WHEELS = WHEELS
+
+// Model 3 wheels
+export const MODEL_3_WHEELS = [
+  { value: '18', label: '18"' },
+  { value: '19', label: '19"' },
+  { value: '20', label: '20"' },
+]
+
+// Model 3 wheel constraints per trim
+export const MODEL_3_WHEEL_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['18'],
+  'premium_lr_rwd': ['18', '19'],
+  'premium_lr_awd': ['18', '19'],
+  'performance': ['20'],
+}
+
+// Model 3 color constraints per trim
+export const MODEL_3_COLOR_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['pearl_white', 'diamond_black', 'stealth_grey'],
+  'premium_lr_rwd': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+  'premium_lr_awd': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+  'performance': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+}
+
+// Model 3 interior constraints per trim
+export const MODEL_3_INTERIOR_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['black'],
+  'premium_lr_rwd': ['black', 'white'],
+  'premium_lr_awd': ['black', 'white'],
+  'performance': ['black', 'white'],
+}
+
+// Model 3 tow hitch availability per trim
+export const MODEL_3_TOW_HITCH_AVAILABLE: Record<string, boolean> = {
+  'hinterradantrieb': true,
+  'premium_lr_rwd': false,
+  'premium_lr_awd': false,
+  'performance': false,
+}
 
 export const AUTOPILOT_OPTIONS = [
   { value: 'none', label: 'Kein' },
@@ -177,4 +242,5 @@ export const AUTOPILOT_OPTIONS = [
 export const TOW_HITCH_OPTIONS = [
   { value: 'ja', label: 'Ja' },
   { value: 'nein', label: 'Nein' },
+  { value: 'nv', label: 'n.v.' },  // nicht verfügbar - for models without AHK option
 ]

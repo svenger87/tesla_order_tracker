@@ -43,6 +43,7 @@ function calculateTimePeriods(data: {
 const orderSelectFields = {
   id: true,
   name: true,
+  vehicleType: true,
   orderDate: true,
   country: true,
   model: true,
@@ -83,11 +84,13 @@ export const GET = withApiAuth(async (request: NextRequest) => {
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0)
 
     // Filters
+    const vehicleType = searchParams.get('vehicleType')
     const country = searchParams.get('country')
     const model = searchParams.get('model')
     const includeArchived = searchParams.get('archived') === 'true'
 
     const where = {
+      ...(vehicleType && { vehicleType }),
       ...(country && { country }),
       ...(model && { model }),
       ...(!includeArchived && { archived: false }),
@@ -173,6 +176,7 @@ export const POST = withApiAuth(async (request: NextRequest) => {
     const order = await prisma.order.create({
       data: {
         name: body.name.trim(),
+        vehicleType: body.vehicleType || 'Model Y',
         orderDate: body.orderDate || null,
         country: body.country || null,
         model: body.model || null,

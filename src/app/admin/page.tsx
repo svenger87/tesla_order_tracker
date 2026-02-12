@@ -12,6 +12,7 @@ import { LogOut, Save, Home, Key, Heart, RefreshCw, AlertTriangle, Database, Bug
 import { SyncResult } from '@/lib/types'
 import Link from 'next/link'
 import { OptionsManager } from '@/components/admin/OptionsManager'
+import { ConstraintManager } from '@/components/admin/ConstraintManager'
 
 // Extended sync result type for multi-sheet sync
 interface MultiSheetSyncResult extends SyncResult {
@@ -773,6 +774,9 @@ export default function AdminDashboard() {
 
         {/* Options Manager */}
         <OptionsManager />
+
+        {/* Constraint Manager */}
+        <ConstraintManager />
 
         {/* Excel Export */}
         <Card>

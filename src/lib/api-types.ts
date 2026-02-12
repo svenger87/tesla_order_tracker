@@ -2,6 +2,7 @@
 export interface ApiOrder {
   id: string
   name: string
+  vehicleType: string
   orderDate: string | null
   country: string | null
   model: string | null
@@ -35,6 +36,7 @@ export interface ApiOrder {
 // Create order request body
 export interface CreateOrderRequest {
   name: string
+  vehicleType?: string  // "Model Y" or "Model 3", defaults to "Model Y"
   orderDate?: string
   country?: string
   model?: string
@@ -61,6 +63,7 @@ export interface CreateOrderRequest {
 export interface UpdateOrderRequest {
   editCode: string // Required for authorization
   name?: string
+  vehicleType?: string  // "Model Y" or "Model 3"
   orderDate?: string
   country?: string
   model?: string
@@ -87,6 +90,7 @@ export interface UpdateOrderRequest {
 export interface ApiOption {
   value: string
   label: string
+  vehicleType?: string | null  // null = applies to all vehicles
   metadata?: Record<string, unknown>
 }
 
@@ -112,6 +116,7 @@ export interface PaginationParams {
 
 // Order filter parameters
 export interface OrderFilterParams extends PaginationParams {
+  vehicleType?: string  // "Model Y" or "Model 3"
   country?: string
   model?: string
   archived?: boolean

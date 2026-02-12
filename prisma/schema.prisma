@@ -11,9 +11,10 @@ model Order {
   id                    String   @id @default(cuid())
   editCode              String?  @unique  // Only set when user creates order or sets password
   name                  String
+  vehicleType           String   @default("Model Y")  // "Model Y" or "Model 3"
   orderDate             String?  // Bestelldatum
   country               String?  // Land
-  model                 String?  // Model
+  model                 String?  // Model (trim level: Standard/Premium/Performance for Y, Model 3/LR/Performance for 3)
   range                 String?  // Reichweite (Maximale Reichweite / Standard) - not applicable for Performance
   drive                 String?  // Antrieb
   color                 String?  // Farbe
@@ -42,6 +43,7 @@ model Order {
 
   @@unique([name, orderDate], name: "unique_name_orderDate")
   @@index([archived])
+  @@index([vehicleType])
 }
 
 model Admin {
@@ -68,16 +70,35 @@ model Settings {
 
 // Admin-manageable dropdown options
 model Option {
-  id        String   @id @default(cuid())
-  type      String   // country, model, drive, color, interior, wheels, autopilot, towHitch
-  value     String   // Internal value (e.g., 'de', 'pearl_white')
-  label     String   // Display label (e.g., 'Deutschland', 'Pearl White')
-  metadata  String?  // JSON for extra data (hex color, flag emoji, border, etc.)
-  sortOrder Int      @default(0) // For custom ordering
-  isActive  Boolean  @default(true) // Soft delete / disable
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  type        String   // country, model, drive, color, interior, wheels, autopilot, towHitch
+  value       String   // Internal value (e.g., 'de', 'pearl_white')
+  label       String   // Display label (e.g., 'Deutschland', 'Pearl White')
+  metadata    String?  // JSON for extra data (hex color, flag emoji, border, etc.)
+  vehicleType String?  // null = applies to all vehicles, "Model Y", "Model 3"
+  sortOrder   Int      @default(0) // For custom ordering
+  isActive    Boolean  @default(true) // Soft delete / disable
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@unique([type, value])
-  @@index([type, isActive, sortOrder])
+  @@unique([type, value, vehicleType])
+  @@index([type, vehicleType, isActive, sortOrder])
+}
+
+// Constraints between options (e.g., "Model 3 Hinterradantrieb can only have 18" wheels")
+model OptionConstraint {
+  id             String   @id @default(cuid())
+  sourceType     String   // Option type that triggers constraint (e.g., 'model')
+  sourceValue    String   // Option value that triggers constraint (e.g., 'hinterradantrieb')
+  vehicleType    String?  // Vehicle type for this constraint (e.g., 'Model 3'), null = all
+  targetType     String   // Field being constrained (e.g., 'wheels', 'color', 'interior')
+  constraintType String   // 'allow' = whitelist, 'fixed' = auto-set & disable, 'disable' = hide field
+  values         String   // JSON: array for 'allow' (["18","19"]), single value for 'fixed' ("Standard")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([sourceType, sourceValue, vehicleType, targetType])
+  @@index([sourceType, sourceValue, vehicleType, isActive])
+  @@index([vehicleType, isActive])
 }

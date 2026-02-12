@@ -4,12 +4,16 @@ import { useState, useEffect, useMemo } from 'react'
 import {
   COUNTRIES,
   MODELS,
+  MODEL_3_TRIMS,
+  RANGES,
   DRIVES,
   COLORS,
   INTERIORS,
   WHEELS,
+  MODEL_3_WHEELS,
   AUTOPILOT_OPTIONS,
   TOW_HITCH_OPTIONS,
+  VehicleType,
 } from '@/lib/types'
 
 interface OptionMetadata {
@@ -23,6 +27,7 @@ interface ApiOption {
   type: string
   value: string
   label: string
+  vehicleType: string | null  // null = applies to all vehicles
   metadata: OptionMetadata | null
   sortOrder: number
 }
@@ -60,19 +65,32 @@ function hardcodedToFormOptions(
   }))
 }
 
-// Fallback hardcoded options by type
+// Fallback hardcoded options by type (global options apply to all vehicles)
 const FALLBACK_OPTIONS: Record<string, FormOption[]> = {
   country: hardcodedToFormOptions(COUNTRIES.map(c => ({ value: c.value, label: c.label, flag: c.flag }))),
-  model: hardcodedToFormOptions(MODELS),
+  model: hardcodedToFormOptions(MODELS),  // Model Y trims
+  range: hardcodedToFormOptions(RANGES),
   drive: hardcodedToFormOptions(DRIVES),
   color: hardcodedToFormOptions(COLORS),
   interior: hardcodedToFormOptions(INTERIORS),
-  wheels: hardcodedToFormOptions(WHEELS),
+  wheels: hardcodedToFormOptions(WHEELS),  // Model Y wheels
   autopilot: hardcodedToFormOptions(AUTOPILOT_OPTIONS),
   towHitch: hardcodedToFormOptions(TOW_HITCH_OPTIONS),
 }
 
-export function useOptions() {
+// Vehicle-specific fallback overrides
+const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormOption[]>>> = {
+  'Model Y': {
+    model: hardcodedToFormOptions(MODELS),
+    wheels: hardcodedToFormOptions(WHEELS),
+  },
+  'Model 3': {
+    model: hardcodedToFormOptions(MODEL_3_TRIMS),
+    wheels: hardcodedToFormOptions(MODEL_3_WHEELS),
+  },
+}
+
+export function useOptions(vehicleType?: VehicleType) {
   const [apiOptions, setApiOptions] = useState<ApiOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -80,7 +98,13 @@ export function useOptions() {
   useEffect(() => {
     async function fetchOptions() {
       try {
-        const res = await fetch('/api/options')
+        // Fetch options, optionally filtered by vehicle type
+        const params = new URLSearchParams()
+        if (vehicleType) {
+          params.set('vehicleType', vehicleType)
+        }
+        const url = `/api/options${params.toString() ? `?${params}` : ''}`
+        const res = await fetch(url)
         if (res.ok) {
           const data = await res.json()
           setApiOptions(data)
@@ -95,14 +119,22 @@ export function useOptions() {
     }
 
     fetchOptions()
-  }, [])
+  }, [vehicleType])  // Re-fetch when vehicle type changes
 
   // Memoize options by type, falling back to hardcoded if API returns empty
   const options = useMemo(() => {
     const getOptionsForType = (type: string): FormOption[] => {
-      const typeOptions = apiOptions.filter(o => o.type === type)
+      // Filter API options by type and vehicle type (null matches all vehicles)
+      const typeOptions = apiOptions.filter(o =>
+        o.type === type &&
+        (o.vehicleType === null || o.vehicleType === vehicleType)
+      )
       if (typeOptions.length > 0) {
         return apiToFormOptions(typeOptions)
+      }
+      // Use vehicle-specific fallback if available, otherwise use global fallback
+      if (vehicleType && VEHICLE_FALLBACK_OPTIONS[vehicleType]?.[type]) {
+        return VEHICLE_FALLBACK_OPTIONS[vehicleType][type]!
       }
       return FALLBACK_OPTIONS[type] || []
     }
@@ -115,6 +147,7 @@ export function useOptions() {
     return {
       countries: sortedCountries,
       models: getOptionsForType('model'),
+      ranges: getOptionsForType('range'),
       drives: getOptionsForType('drive'),
       colors: getOptionsForType('color'),
       interiors: getOptionsForType('interior'),
@@ -123,7 +156,7 @@ export function useOptions() {
       towHitch: getOptionsForType('towHitch'),
       deliveryLocations: getOptionsForType('deliveryLocation'),
     }
-  }, [apiOptions])
+  }, [apiOptions, vehicleType])
 
   return {
     options,

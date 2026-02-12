@@ -1,4 +1,4 @@
-import { Order, COLORS } from './types'
+import { Order, COLORS, VehicleType } from './types'
 
 // Normalize country codes to full names
 const COUNTRY_NAMES: Record<string, string> = {
@@ -138,10 +138,31 @@ export function filterOrdersByPeriod(orders: Order[], period: StatsPeriod): Orde
   })
 }
 
-const MODEL_COLORS: Record<string, string> = {
+// Model Y trim colors
+const MODEL_Y_COLORS: Record<string, string> = {
   'Standard': 'var(--chart-2)',
   'Premium': 'var(--chart-3)',
   'Performance': 'var(--chart-1)',
+}
+
+// Model 3 trim colors (German market 2025)
+const MODEL_3_COLORS: Record<string, string> = {
+  'Hinterradantrieb': 'var(--chart-2)',
+  'Premium Maximale Reichweite RWD': 'var(--chart-3)',
+  'Premium Maximale Reichweite AWD': 'var(--chart-4)',
+  'Performance': 'var(--chart-1)',
+}
+
+// Combined colors - get the appropriate color based on trim name
+function getModelColor(trimName: string, vehicleType?: VehicleType): string {
+  if (vehicleType === 'Model 3' && MODEL_3_COLORS[trimName]) {
+    return MODEL_3_COLORS[trimName]
+  }
+  if (vehicleType === 'Model Y' && MODEL_Y_COLORS[trimName]) {
+    return MODEL_Y_COLORS[trimName]
+  }
+  // Fallback: check both maps
+  return MODEL_Y_COLORS[trimName] || MODEL_3_COLORS[trimName] || 'var(--chart-4)'
 }
 
 const COUNTRY_COLORS = [
@@ -233,9 +254,14 @@ function getMonthKey(date: Date): string {
   return `${months[date.getMonth()]} ${date.getFullYear()}`
 }
 
-export function calculateStatistics(orders: Order[], period?: StatsPeriod): OrderStatistics {
+export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehicleType?: VehicleType): OrderStatistics {
   // Filter orders by period if specified
-  const filteredOrders = period ? filterOrdersByPeriod(orders, period) : orders
+  let filteredOrders = period ? filterOrdersByPeriod(orders, period) : orders
+
+  // Filter orders by vehicle type if specified
+  if (vehicleType) {
+    filteredOrders = filteredOrders.filter(o => o.vehicleType === vehicleType)
+  }
 
   const totalOrders = filteredOrders.length
   const deliveredOrders = filteredOrders.filter(o => o.deliveryDate).length
@@ -279,7 +305,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod): Orde
     .map(([model, count]) => ({
       name: model,
       count,
-      fill: MODEL_COLORS[model] || 'var(--chart-4)',
+      fill: getModelColor(model, vehicleType),
     }))
     .sort((a, b) => b.count - a.count)
 

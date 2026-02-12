@@ -19,6 +19,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Settings2, Plus, Pencil, Trash2, GripVertical } from 'lucide-react'
 import { FlagEmojiPicker } from './FlagEmojiPicker'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -34,6 +41,7 @@ interface Option {
   type: string
   value: string
   label: string
+  vehicleType: string | null  // null = applies to all vehicles
   metadata: OptionMetadata | null
   sortOrder: number
 }
@@ -41,10 +49,17 @@ interface Option {
 interface OptionFormData {
   value: string
   label: string
+  vehicleType: string  // '' = all vehicles, 'Model Y', 'Model 3'
   flag?: string
   hex?: string
   border?: boolean
 }
+
+const VEHICLE_TYPE_OPTIONS = [
+  { value: 'all', label: 'Alle Fahrzeuge' },
+  { value: 'Model Y', label: 'Model Y' },
+  { value: 'Model 3', label: 'Model 3' },
+]
 
 const OPTION_TYPES = [
   { type: 'country', label: 'Länder', singular: 'Land', hasFlag: true, valueHint: 'deutschland', labelHint: 'Deutschland' },
@@ -69,7 +84,7 @@ export function OptionsManager() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<string | null>(null)
   const [editingOption, setEditingOption] = useState<Option | null>(null)
-  const [formData, setFormData] = useState<OptionFormData>({ value: '', label: '' })
+  const [formData, setFormData] = useState<OptionFormData>({ value: '', label: '', vehicleType: '' })
   const [saving, setSaving] = useState(false)
 
   const fetchOptions = useCallback(async () => {
@@ -106,7 +121,7 @@ export function OptionsManager() {
   const openAddDialog = (type: string) => {
     setDialogType(type)
     setEditingOption(null)
-    setFormData({ value: '', label: '' })
+    setFormData({ value: '', label: '', vehicleType: 'all' })
     setDialogOpen(true)
   }
 
@@ -116,6 +131,7 @@ export function OptionsManager() {
     setFormData({
       value: option.value,
       label: option.label,
+      vehicleType: option.vehicleType || 'all',
       flag: option.metadata?.flag,
       hex: option.metadata?.hex,
       border: option.metadata?.border,
@@ -141,6 +157,9 @@ export function OptionsManager() {
         if (formData.border !== undefined) metadata.border = formData.border
       }
 
+      // Convert 'all' to null for database storage
+      const vehicleTypeForDb = formData.vehicleType === 'all' ? null : formData.vehicleType
+
       if (editingOption) {
         // Update
         const res = await fetch('/api/options', {
@@ -149,6 +168,7 @@ export function OptionsManager() {
           body: JSON.stringify({
             id: editingOption.id,
             label: formData.label,
+            vehicleType: vehicleTypeForDb,
             metadata: Object.keys(metadata).length > 0 ? metadata : null,
           }),
         })
@@ -166,6 +186,7 @@ export function OptionsManager() {
             type: dialogType,
             value: formData.value,
             label: formData.label,
+            vehicleType: vehicleTypeForDb,
             metadata: Object.keys(metadata).length > 0 ? metadata : null,
             sortOrder: getOptionsForType(dialogType).length,
           }),
@@ -274,6 +295,11 @@ export function OptionsManager() {
                             <span className="text-xs text-muted-foreground">
                               ({option.value})
                             </span>
+                            {option.vehicleType && (
+                              <Badge variant="outline" className="text-xs ml-1">
+                                {option.vehicleType}
+                              </Badge>
+                            )}
                           </div>
                           <div className="flex items-center gap-1">
                             <Button
@@ -347,6 +373,28 @@ export function OptionsManager() {
                 onChange={(e) => setFormData(f => ({ ...f, label: e.target.value }))}
                 placeholder={`z.B. ${dialogType ? getTypeConfig(dialogType)?.labelHint || 'Anzeigename' : 'Anzeigename'}`}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="vehicleType">Fahrzeugtyp</Label>
+              <Select
+                value={formData.vehicleType}
+                onValueChange={(v) => setFormData(f => ({ ...f, vehicleType: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle Fahrzeuge" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPE_OPTIONS.map((vt) => (
+                    <SelectItem key={vt.value} value={vt.value}>
+                      {vt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Leer lassen für Optionen die für alle Fahrzeuge gelten
+              </p>
             </div>
 
             {dialogType && getTypeConfig(dialogType)?.hasFlag && (

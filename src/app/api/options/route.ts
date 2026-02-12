@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 // Valid option types
-const VALID_TYPES = ['country', 'model', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'deliveryLocation'] as const
+const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'deliveryLocation'] as const
+
+// Valid vehicle types
+const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const
 type OptionType = typeof VALID_TYPES[number]
 
 function isValidType(type: string): type is OptionType {
@@ -15,10 +18,19 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
+    const vehicleType = searchParams.get('vehicleType')
 
+    // Build where clause - include options that are global (null) OR match the specific vehicle type
     const where = {
       isActive: true,
       ...(type && isValidType(type) ? { type } : {}),
+      // If vehicleType is specified, include options that are global OR match that vehicle
+      ...(vehicleType ? {
+        OR: [
+          { vehicleType: null },
+          { vehicleType: vehicleType },
+        ],
+      } : {}),
     }
 
     const options = await prisma.option.findMany({
@@ -29,6 +41,7 @@ export async function GET(request: NextRequest) {
         type: true,
         value: true,
         label: true,
+        vehicleType: true,
         metadata: true,
         sortOrder: true,
       },
@@ -69,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { type, value, label, metadata, sortOrder } = body
+    const { type, value, label, vehicleType, metadata, sortOrder } = body
 
     if (!type || !value || !label) {
       return NextResponse.json({ error: 'type, value, and label are required' }, { status: 400 })
@@ -79,11 +92,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 })
     }
 
+    // Validate vehicleType if provided
+    if (vehicleType && !VALID_VEHICLE_TYPES.includes(vehicleType)) {
+      return NextResponse.json({ error: `Invalid vehicleType. Must be one of: ${VALID_VEHICLE_TYPES.join(', ')}` }, { status: 400 })
+    }
+
     const option = await prisma.option.create({
       data: {
         type,
         value,
         label,
+        vehicleType: vehicleType || null,  // null = applies to all vehicles
         metadata: metadata ? JSON.stringify(metadata) : null,
         sortOrder: sortOrder ?? 0,
       },
@@ -112,16 +131,22 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, label, metadata, sortOrder, isActive } = body
+    const { id, label, vehicleType, metadata, sortOrder, isActive } = body
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    }
+
+    // Validate vehicleType if provided
+    if (vehicleType !== undefined && vehicleType !== null && !VALID_VEHICLE_TYPES.includes(vehicleType)) {
+      return NextResponse.json({ error: `Invalid vehicleType. Must be one of: ${VALID_VEHICLE_TYPES.join(', ')}` }, { status: 400 })
     }
 
     const option = await prisma.option.update({
       where: { id },
       data: {
         ...(label !== undefined && { label }),
+        ...(vehicleType !== undefined && { vehicleType: vehicleType || null }),
         ...(metadata !== undefined && { metadata: metadata ? JSON.stringify(metadata) : null }),
         ...(sortOrder !== undefined && { sortOrder }),
         ...(isActive !== undefined && { isActive }),
