@@ -15,27 +15,21 @@ interface ConstraintDefinition {
 // All Model 3 constraints based on German market 2025
 // NOTE: Values must match exactly with types.ts (RANGES, DRIVES, INTERIORS, WHEELS)
 const MODEL_3_CONSTRAINTS: ConstraintDefinition[] = [
-  // Hinterradantrieb
-  { sourceType: 'model', sourceValue: 'hinterradantrieb', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '18' },
-  { sourceType: 'model', sourceValue: 'hinterradantrieb', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'standard' },
-  { sourceType: 'model', sourceValue: 'hinterradantrieb', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
-  { sourceType: 'model', sourceValue: 'hinterradantrieb', vehicleType: 'Model 3', targetType: 'interior', constraintType: 'fixed', values: 'black' },
-  { sourceType: 'model', sourceValue: 'hinterradantrieb', vehicleType: 'Model 3', targetType: 'color', constraintType: 'allow', values: ['pearl_white', 'diamond_black', 'stealth_grey'] },
-  // towHitch is available for Hinterradantrieb, so no constraint needed
+  // Standard (base model)
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '18' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'standard' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'interior', constraintType: 'fixed', values: 'black' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'color', constraintType: 'allow', values: ['pearl_white', 'diamond_black', 'stealth_grey'] },
+  // towHitch is available for Standard, so no constraint needed
 
-  // Premium Maximale Reichweite RWD
-  { sourceType: 'model', sourceValue: 'premium_lr_rwd', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'allow', values: ['18', '19'] },
-  { sourceType: 'model', sourceValue: 'premium_lr_rwd', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'premium_lr_rwd', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
-  { sourceType: 'model', sourceValue: 'premium_lr_rwd', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  // Premium
+  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'allow', values: ['18', '19'] },
+  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
+  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  // Note: Premium can be RWD or AWD, so no drive constraint
 
-  // Premium Maximale Reichweite AWD
-  { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'allow', values: ['18', '19'] },
-  { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
-
-  // Performance (value matches MODEL_3_TRIMS: 'performance', distinguished by vehicleType)
+  // Performance
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '20' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
@@ -57,7 +51,7 @@ const MODEL_Y_CONSTRAINTS: ConstraintDefinition[] = [
 
   // Premium - wheels constrained but user can choose
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'allow', values: ['19', '20'] },
-  // Note: Premium range is typically Max but was editable in Q3, so no constraint for now
+  // Note: Premium can be RWD or AWD, so no drive constraint
 ]
 
 const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS]
