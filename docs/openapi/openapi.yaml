@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: tff order stats API
   description: |
-    External REST API for Tesla Order Tracker.
+    External REST API for tff order stats.
 
     This API allows external systems to create, read, and update Tesla orders.
     All endpoints require API key authentication via the `X-API-Key` header.
@@ -30,7 +30,7 @@ info:
     All dates use German format: `DD.MM.YYYY` (e.g., `15.01.2025`)
   version: 1.0.0
   contact:
-    name: Tesla Order Tracker
+    name: tff order stats
 servers:
   - url: 'https://tff-order-stats.vercel.app/api/v1'
     description: Production

@@ -1,10 +1,10 @@
 #!/bin/bash
-# Tesla Order Tracker - Deployment Script
+# tff order stats - Deployment Script
 # Usage: ./deploy.sh [message]
 
 MESSAGE="${1:-Update deployment}"
 
-echo "🚀 Tesla Order Tracker - Deployment"
+echo "🚀 tff order stats - Deployment"
 echo "================================="
 
 # Check for uncommitted changes

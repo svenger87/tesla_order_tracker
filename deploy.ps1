@@ -1,11 +1,11 @@
-# Tesla Order Tracker - Deployment Script
+# tff order stats - Deployment Script
 # Usage: .\deploy.ps1 [message]
 
 param(
     [string]$Message = "Update deployment"
 )
 
-Write-Host "🚀 Tesla Order Tracker - Deployment" -ForegroundColor Cyan
+Write-Host "🚀 tff order stats - Deployment" -ForegroundColor Cyan
 Write-Host "=================================" -ForegroundColor Cyan
 
 # Check for uncommitted changes

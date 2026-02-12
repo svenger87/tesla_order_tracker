@@ -17,7 +17,7 @@ export async function GET() {
 
     // Create workbook
     const workbook = new ExcelJS.Workbook()
-    workbook.creator = 'Tesla Order Tracker'
+    workbook.creator = 'tff order stats'
     workbook.created = new Date()
 
     // ===== Sheet 1: All Orders =====
