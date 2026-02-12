@@ -1,0 +1,334 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  /* Tesla Red primary (#e82127) */
+  --primary: oklch(0.55 0.22 25);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.01 25);
+  --secondary-foreground: oklch(0.35 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.96 0.02 25);
+  --accent-foreground: oklch(0.55 0.22 25);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.55 0.22 25);
+  /* Chart colors - Tesla Red first */
+  --chart-1: oklch(0.55 0.22 25);
+  --chart-2: oklch(0.6 0.15 220);
+  --chart-3: oklch(0.65 0.12 160);
+  --chart-4: oklch(0.7 0.15 80);
+  --chart-5: oklch(0.6 0.18 280);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.55 0.22 25);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.96 0.01 25);
+  --sidebar-accent-foreground: oklch(0.35 0 0);
+  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-ring: oklch(0.55 0.22 25);
+
+  /* Tesla theme colors */
+  --tesla-red: oklch(0.55 0.22 25);
+  --tesla-red-light: oklch(0.62 0.20 25);
+  --tesla-red-dark: oklch(0.45 0.24 25);
+}
+
+.dark {
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.16 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.6 0.2 25);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.24 0 0);
+  --secondary-foreground: oklch(0.92 0 0);
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.72 0 0); /* Improved contrast */
+  --accent: oklch(0.6 0.2 25);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 15%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.6 0.2 25);
+  --chart-1: oklch(0.6 0.2 25);
+  --chart-2: oklch(0.7 0.15 220);
+  --chart-3: oklch(0.72 0.12 160);
+  --chart-4: oklch(0.78 0.15 80);
+  --chart-5: oklch(0.65 0.18 280);
+  --sidebar: oklch(0.16 0 0);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.6 0.2 25);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.24 0 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: oklch(0.6 0.2 25);
+
+  /* Tesla theme colors */
+  --tesla-red: oklch(0.6 0.2 25);
+  --tesla-red-light: oklch(0.68 0.18 25);
+  --tesla-red-dark: oklch(0.48 0.22 25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Tesla theme utilities */
+.text-tesla-red {
+  color: oklch(0.55 0.22 25);
+}
+
+.bg-tesla-red {
+  background-color: oklch(0.55 0.22 25);
+}
+
+.border-tesla-red {
+  border-color: oklch(0.55 0.22 25);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-tesla {
+  background: linear-gradient(135deg, oklch(0.12 0 0) 0%, oklch(0.18 0.02 25) 100%);
+}
+
+/* Glass effect */
+.glass {
+  background: oklch(0.16 0 0 / 80%);
+  backdrop-filter: blur(12px);
+}
+
+/* Animation keyframes */
+@keyframes slide-in-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px oklch(0.55 0.22 25 / 50%);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.55 0.22 25 / 80%);
+  }
+}
+
+@keyframes progress-shine {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.4s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Smooth scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: oklch(0.16 0 0);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0 0);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.4 0 0);
+}
+
+/* Dark mode table improvements */
+.dark table tbody tr:hover {
+  background-color: oklch(0.2 0.01 25 / 50%);
+}
+
+/* Dark mode badge improvements */
+.dark [data-slot="badge"] {
+  border-color: oklch(1 0 0 / 15%);
+}
+
+/* Dark mode select/dropdown improvements */
+.dark [role="listbox"],
+.dark [data-state="open"] > [data-slot="select-trigger"] {
+  border-color: oklch(1 0 0 / 20%);
+}
+
+/* Dark mode filter bar */
+.dark .bg-muted\/30 {
+  background-color: oklch(0.18 0 0);
+}
+
+/* Dark mode card hover */
+.dark .hover\:bg-muted\/50:hover {
+  background-color: oklch(0.22 0.01 25 / 40%);
+}
+
+/* Light mode improvements */
+:root table tbody tr:hover {
+  background-color: oklch(0.97 0.01 25 / 50%);
+}
+
+/* Light mode scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(0.96 0 0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.80 0 0);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.70 0 0);
+}
+
+/* Light mode filter bar */
+.bg-muted\/30 {
+  background-color: oklch(0.97 0.005 25 / 30%);
+}
+
+/* Light mode card subtle styling */
+.bg-card\/50 {
+  background-color: oklch(1 0 0 / 80%);
+  border: 1px solid oklch(0.92 0.01 25);
+}
+
+/* Cross-platform emoji support */
+.emoji,
+[class*="flag"] {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+}
+
+/* Ensure consistent emoji rendering */
+body {
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Hide horizontal scrollbar while keeping scroll functionality */
+.scrollbar-hide-horizontal {
+  overflow: auto;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.scrollbar-hide-horizontal::-webkit-scrollbar {
+  width: 8px;
+  height: 0px;
+}
+
+.scrollbar-hide-horizontal::-webkit-scrollbar-track {
+  background: oklch(0.96 0 0);
+}
+
+.scrollbar-hide-horizontal::-webkit-scrollbar-thumb {
+  background: oklch(0.80 0 0);
+  border-radius: 4px;
+}
+
+.dark .scrollbar-hide-horizontal::-webkit-scrollbar-track {
+  background: oklch(0.16 0 0);
+}
+
+.dark .scrollbar-hide-horizontal::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0 0);
+}

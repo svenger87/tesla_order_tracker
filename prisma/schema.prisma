@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Order {
+  id                    String   @id @default(cuid())
+  editCode              String?  @unique  // Only set when user creates order or sets password
+  name                  String
+  orderDate             String?  // Bestelldatum
+  country               String?  // Land
+  model                 String?  // Model
+  range                 String?  // Reichweite (Maximale Reichweite / Standard) - not applicable for Performance
+  drive                 String?  // Antrieb
+  color                 String?  // Farbe
+  interior              String?  // Innen
+  wheels                String?  // Felgen
+  towHitch              String?  // AHK (ja/nein)
+  autopilot             String?  // Autopilot
+  deliveryWindow        String?  // Lieferfenster
+  deliveryLocation      String?  // Ort (Auslieferung)
+  vin                   String?  // VIN
+  vinReceivedDate       String?  // VIN erhalten am
+  papersReceivedDate    String?  // Papiere erhalten am
+  productionDate        String?  // Produktionsdatum
+  typeApproval          String?  // Typgenehmigung
+  typeVariant           String?  // Typ-Variante
+  deliveryDate          String?  // Auslieferungs-datum
+  orderToProduction     Int?     // Bestellung bis Produktion
+  orderToVin            Int?     // Bestellung bis VIN
+  orderToDelivery       Int?     // Bestellung bis Lieferung
+  orderToPapers         Int?     // Bestellung bis Papiere
+  papersToDelivery      Int?     // Papiere bis Auslieferung
+  archived              Boolean  @default(false)
+  archivedAt            DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([name, orderDate], name: "unique_name_orderDate")
+  @@index([archived])
+}
+
+model Admin {
+  id                 String   @id @default(cuid())
+  username           String   @unique
+  passwordHash       String
+  resetToken         String?
+  resetTokenExpires  DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Settings {
+  id                 String    @id @default("default")
+  showDonation       Boolean   @default(true)
+  donationUrl        String    @default("https://buymeacoffee.com")
+  donationText       String    @default("Projekt unterstützen")
+  lastSyncTime       DateTime?
+  lastSyncCount      Int?
+  archiveEnabled     Boolean   @default(true) // Enable/disable archiving feature
+  archiveThreshold   Int       @default(180) // Days without updates to consider order "stale"
+  updatedAt          DateTime  @updatedAt
+}
+
+// Admin-manageable dropdown options
+model Option {
+  id        String   @id @default(cuid())
+  type      String   // country, model, drive, color, interior, wheels, autopilot, towHitch
+  value     String   // Internal value (e.g., 'de', 'pearl_white')
+  label     String   // Display label (e.g., 'Deutschland', 'Pearl White')
+  metadata  String?  // JSON for extra data (hex color, flag emoji, border, etc.)
+  sortOrder Int      @default(0) // For custom ordering
+  isActive  Boolean  @default(true) // Soft delete / disable
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, value])
+  @@index([type, isActive, sortOrder])
+}
