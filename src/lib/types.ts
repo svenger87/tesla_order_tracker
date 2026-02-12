@@ -192,20 +192,19 @@ export const WHEELS = [
 // Alias for clarity
 export const MODEL_Y_WHEELS = WHEELS
 
-// Model 3 wheels (with specific names per trim)
+// Model 3 wheels
 export const MODEL_3_WHEELS = [
-  { value: '18_prismata', label: '18" Prismata' },
-  { value: '18_photon', label: '18" Photon' },
-  { value: '19_nova', label: '19" Nova' },
-  { value: '20_warp', label: '20" Warp' },
+  { value: '18', label: '18"' },
+  { value: '19', label: '19"' },
+  { value: '20', label: '20"' },
 ]
 
 // Model 3 wheel constraints per trim
 export const MODEL_3_WHEEL_CONSTRAINTS: Record<string, string[]> = {
-  'hinterradantrieb': ['18_prismata'],
-  'premium_lr_rwd': ['18_photon', '19_nova'],
-  'premium_lr_awd': ['18_photon', '19_nova'],
-  'performance': ['20_warp'],
+  'hinterradantrieb': ['18'],
+  'premium_lr_rwd': ['18', '19'],
+  'premium_lr_awd': ['18', '19'],
+  'performance': ['20'],
 }
 
 // Model 3 color constraints per trim

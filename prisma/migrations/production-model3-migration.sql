@@ -46,10 +46,9 @@ INSERT INTO Option (id, type, value, label, vehicleType, sortOrder, isActive, cr
 
 -- Model 3 Wheels
 INSERT INTO Option (id, type, value, label, vehicleType, sortOrder, isActive, createdAt, updatedAt) VALUES
-(lower(hex(randomblob(16))), 'wheels', '18_prismata', '18" Prismata', 'Model 3', 1, 1, datetime('now'), datetime('now')),
-(lower(hex(randomblob(16))), 'wheels', '18_photon', '18" Photon', 'Model 3', 2, 1, datetime('now'), datetime('now')),
-(lower(hex(randomblob(16))), 'wheels', '19_nova', '19" Nova', 'Model 3', 3, 1, datetime('now'), datetime('now')),
-(lower(hex(randomblob(16))), 'wheels', '20_warp', '20" Warp', 'Model 3', 4, 1, datetime('now'), datetime('now'));
+(lower(hex(randomblob(16))), 'wheels', '18', '18"', 'Model 3', 1, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'wheels', '19', '19"', 'Model 3', 2, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'wheels', '20', '20"', 'Model 3', 3, 1, datetime('now'), datetime('now'));
 
 
 -- ============================================
