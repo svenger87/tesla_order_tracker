@@ -10,7 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 
-// Common country flags - sorted by likely usage for Tesla orders
+// Country flags - sorted by likely usage for Tesla orders
 const FLAG_EMOJIS = [
   // Most common Tesla markets
   { emoji: '🇩🇪', name: 'Deutschland', code: 'DE' },
@@ -38,6 +38,29 @@ const FLAG_EMOJIS = [
   { emoji: '🇸🇰', name: 'Slowakei', code: 'SK' },
   { emoji: '🇭🇷', name: 'Kroatien', code: 'HR' },
   { emoji: '🇧🇬', name: 'Bulgarien', code: 'BG' },
+  // Baltic states
+  { emoji: '🇪🇪', name: 'Estland', code: 'EE' },
+  { emoji: '🇱🇻', name: 'Lettland', code: 'LV' },
+  { emoji: '🇱🇹', name: 'Litauen', code: 'LT' },
+  // Other European countries
+  { emoji: '🇮🇸', name: 'Island', code: 'IS' },
+  { emoji: '🇨🇾', name: 'Zypern', code: 'CY' },
+  { emoji: '🇲🇹', name: 'Malta', code: 'MT' },
+  { emoji: '🇺🇦', name: 'Ukraine', code: 'UA' },
+  { emoji: '🇲🇩', name: 'Moldau', code: 'MD' },
+  { emoji: '🇧🇾', name: 'Belarus', code: 'BY' },
+  { emoji: '🇷🇸', name: 'Serbien', code: 'RS' },
+  { emoji: '🇲🇪', name: 'Montenegro', code: 'ME' },
+  { emoji: '🇧🇦', name: 'Bosnien-Herzegowina', code: 'BA' },
+  { emoji: '🇦🇱', name: 'Albanien', code: 'AL' },
+  { emoji: '🇲🇰', name: 'Nordmazedonien', code: 'MK' },
+  { emoji: '🇽🇰', name: 'Kosovo', code: 'XK' },
+  // European microstates
+  { emoji: '🇱🇮', name: 'Liechtenstein', code: 'LI' },
+  { emoji: '🇲🇨', name: 'Monaco', code: 'MC' },
+  { emoji: '🇦🇩', name: 'Andorra', code: 'AD' },
+  { emoji: '🇸🇲', name: 'San Marino', code: 'SM' },
+  { emoji: '🇻🇦', name: 'Vatikanstadt', code: 'VA' },
   // Other common countries
   { emoji: '🇺🇸', name: 'USA', code: 'US' },
   { emoji: '🇨🇦', name: 'Kanada', code: 'CA' },
