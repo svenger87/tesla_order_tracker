@@ -665,7 +665,11 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Länder</SelectItem>
-              {filterOptions.country.map(v => {
+              {[...filterOptions.country].sort((a, b) => {
+                const labelA = countries.find(c => c.value === a)?.label || a
+                const labelB = countries.find(c => c.value === b)?.label || b
+                return normalizeForSort(labelA).localeCompare(normalizeForSort(labelB))
+              }).map(v => {
                 const countryInfo = countries.find(c => c.value === v)
                 return (
                   <SelectItem key={v} value={v}>
