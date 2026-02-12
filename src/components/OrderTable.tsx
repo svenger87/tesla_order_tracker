@@ -196,12 +196,28 @@ function parseDate(dateStr: string | null): Date | null {
   return null
 }
 
+// Strip flag emoji from string for proper sorting
+function stripFlagEmoji(str: string): string {
+  // Remove regional indicator symbols (flag emojis) from start of string
+  return str.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '')
+}
+
 // Compare function for sorting
 function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection): number {
   if (!field) return 0
 
   let aVal = a[field]
   let bVal = b[field]
+
+  // Handle country field - strip flag emojis for proper alphabetical sorting
+  if (field === 'country') {
+    const aCountry = stripFlagEmoji((aVal as string | null) || '')
+    const bCountry = stripFlagEmoji((bVal as string | null) || '')
+    const collator = new Intl.Collator('de', { sensitivity: 'base' })
+    return direction === 'asc'
+      ? collator.compare(aCountry, bCountry)
+      : collator.compare(bCountry, aCountry)
+  }
 
   // Handle date fields
   const dateFields = ['orderDate', 'vinReceivedDate', 'papersReceivedDate', 'productionDate', 'deliveryDate']
