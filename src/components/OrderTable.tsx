@@ -342,6 +342,26 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
     return option?.label || value
   }
 
+  // Create a lookup map for country labels (for sorting)
+  const countryLabelMap = useMemo(() => {
+    const map = new Map<string, string>()
+    countries.forEach(c => map.set(c.value, c.label))
+    return map
+  }, [countries])
+
+  // Sort country codes by their labels with umlaut normalization
+  const sortCountryCodes = useCallback((codes: string[]) => {
+    return [...codes].sort((a, b) => {
+      const labelA = countryLabelMap.get(a) || a
+      const labelB = countryLabelMap.get(b) || b
+      const normA = normalizeForSort(labelA)
+      const normB = normalizeForSort(labelB)
+      if (normA < normB) return -1
+      if (normA > normB) return 1
+      return 0
+    })
+  }, [countryLabelMap])
+
   // Refs for sticky scrollbar sync
   const tableContainerRef = useRef<HTMLDivElement>(null)
   const scrollbarRef = useRef<HTMLDivElement>(null)
@@ -665,11 +685,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Länder</SelectItem>
-              {[...filterOptions.country].sort((a, b) => {
-                const labelA = countries.find(c => c.value === a)?.label || a
-                const labelB = countries.find(c => c.value === b)?.label || b
-                return normalizeForSort(labelA).localeCompare(normalizeForSort(labelB))
-              }).map(v => {
+              {sortCountryCodes(filterOptions.country).map(v => {
                 const countryInfo = countries.find(c => c.value === v)
                 return (
                   <SelectItem key={v} value={v}>
