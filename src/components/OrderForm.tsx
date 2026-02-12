@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_Y_WHEELS, MODEL_3_WHEELS } from '@/lib/types'
+import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_Y_WHEELS, MODEL_3_WHEELS, MODEL_3_WHEEL_CONSTRAINTS, MODEL_3_COLOR_CONSTRAINTS, MODEL_3_INTERIOR_CONSTRAINTS, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import {
   Dialog,
@@ -396,17 +396,36 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                     handleChange('range', 'Maximale Reichweite')
                   }
                 } else if (formData.vehicleType === 'Model 3') {
-                  if (v === 'Model 3 Performance') {
-                    handleChange('range', 'Maximale Reichweite')
-                    handleChange('wheels', '19"')
-                    handleChange('drive', 'AWD')
-                  } else if (v === 'Model 3') {
+                  // Model 3 constraints based on German market 2025
+                  if (v === 'Hinterradantrieb') {
                     handleChange('range', 'Standard')
-                    handleChange('wheels', '18"')
+                    handleChange('wheels', '18" Prismata')
                     handleChange('drive', 'RWD')
-                  } else if (v === 'Model 3 Long Range') {
+                    handleChange('interior', 'Schwarz')  // Only black interior available
+                  } else if (v === 'Premium Maximale Reichweite RWD') {
+                    handleChange('range', 'Maximale Reichweite')
+                    handleChange('drive', 'RWD')
+                    handleChange('wheels', '')  // User can choose 18" Photon or 19" Nova
+                  } else if (v === 'Premium Maximale Reichweite AWD') {
                     handleChange('range', 'Maximale Reichweite')
                     handleChange('drive', 'AWD')
+                    handleChange('wheels', '')  // User can choose 18" Photon or 19" Nova
+                  } else if (v === 'Performance') {
+                    handleChange('range', 'Maximale Reichweite')
+                    handleChange('wheels', '20" Warp')
+                    handleChange('drive', 'AWD')
+                  }
+                  // Reset color if not available for this trim
+                  const trimValue = MODEL_3_TRIMS.find(t => t.label === v)?.value
+                  if (trimValue && formData.color) {
+                    const colorValue = COLORS.find(c => c.label === formData.color)?.value
+                    if (colorValue && !MODEL_3_COLOR_CONSTRAINTS[trimValue]?.includes(colorValue)) {
+                      handleChange('color', '')
+                    }
+                  }
+                  // Reset tow hitch if not available for this trim
+                  if (trimValue && !MODEL_3_TOW_HITCH_AVAILABLE[trimValue]) {
+                    handleChange('towHitch', 'Nein')
                   }
                 }
               }}>
@@ -432,9 +451,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 disabled={
                   formData.model === 'Performance' ||
                   formData.model === 'Standard' ||
-                  formData.model === 'Model 3' ||
-                  formData.model === 'Model 3 Performance' ||
-                  formData.model === 'Model 3 Long Range'
+                  // Model 3 trims all have fixed range
+                  formData.model === 'Hinterradantrieb' ||
+                  formData.model === 'Premium Maximale Reichweite RWD' ||
+                  formData.model === 'Premium Maximale Reichweite AWD'
                 }
               >
                 <SelectTrigger>
@@ -459,11 +479,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 <p className="text-xs text-muted-foreground">Premium ist normalerweise Max. Reichweite (Q3: editierbar)</p>
               )}
               {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
-                <p className="text-xs text-muted-foreground">Model 3 ist immer Standard-Reichweite</p>
+              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
+                <p className="text-xs text-muted-foreground">Hinterradantrieb ist Standard-Reichweite</p>
               )}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Model 3 Long Range' || formData.model === 'Model 3 Performance') && (
-                <p className="text-xs text-muted-foreground">Long Range/Performance ist immer Max. Reichweite</p>
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite RWD' || formData.model === 'Premium Maximale Reichweite AWD' || formData.model === 'Performance') && (
+                <p className="text-xs text-muted-foreground">Premium/Performance ist immer Max. Reichweite</p>
               )}
             </div>
 
@@ -475,9 +495,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 disabled={
                   formData.model === 'Standard' ||
                   formData.model === 'Performance' ||
-                  formData.model === 'Model 3' ||
-                  formData.model === 'Model 3 Performance' ||
-                  formData.model === 'Model 3 Long Range'
+                  // Model 3 trims all have fixed drive
+                  formData.model === 'Hinterradantrieb' ||
+                  formData.model === 'Premium Maximale Reichweite RWD' ||
+                  formData.model === 'Premium Maximale Reichweite AWD'
                 }
               >
                 <SelectTrigger>
@@ -499,11 +520,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 <p className="text-xs text-muted-foreground">Performance hat immer AWD</p>
               )}
               {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
-                <p className="text-xs text-muted-foreground">Model 3 hat immer RWD</p>
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Hinterradantrieb' || formData.model === 'Premium Maximale Reichweite RWD') && (
+                <p className="text-xs text-muted-foreground">{formData.model} hat immer RWD</p>
               )}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Model 3 Long Range' || formData.model === 'Model 3 Performance') && (
-                <p className="text-xs text-muted-foreground">Long Range/Performance hat immer AWD</p>
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite AWD' || formData.model === 'Performance') && (
+                <p className="text-xs text-muted-foreground">{formData.model} hat immer AWD</p>
               )}
             </div>
 
@@ -532,40 +553,74 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {colors.map((c) => (
-                    <SelectItem key={c.value} value={c.label}>
-                      <div className="flex items-center gap-2">
-                        {c.hex && (
-                          <span
-                            className={cn(
-                              "w-4 h-4 rounded-full inline-block",
-                              c.border && "border border-border"
-                            )}
-                            style={{ backgroundColor: c.hex }}
-                          />
-                        )}
-                        {c.label}
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {colors
+                    .filter((c) => {
+                      // Model 3 color filtering based on trim
+                      if (formData.vehicleType === 'Model 3' && formData.model) {
+                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
+                        if (trimValue && MODEL_3_COLOR_CONSTRAINTS[trimValue]) {
+                          return MODEL_3_COLOR_CONSTRAINTS[trimValue].includes(c.value)
+                        }
+                      }
+                      return true
+                    })
+                    .map((c) => (
+                      <SelectItem key={c.value} value={c.label}>
+                        <div className="flex items-center gap-2">
+                          {c.hex && (
+                            <span
+                              className={cn(
+                                "w-4 h-4 rounded-full inline-block",
+                                c.border && "border border-border"
+                              )}
+                              style={{ backgroundColor: c.hex }}
+                            />
+                          )}
+                          {c.label}
+                        </div>
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
+              {/* Model 3 color hints */}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
+                <p className="text-xs text-muted-foreground">Hinterradantrieb: nur Pearl White, Diamond Black, Stealth Grey</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="interior">Innenraum *</Label>
-              <Select value={formData.interior} onValueChange={(v) => handleChange('interior', v)}>
+              <Select
+                value={formData.interior}
+                onValueChange={(v) => handleChange('interior', v)}
+                disabled={formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb'}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Innenraum wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {interiors.map((i) => (
-                    <SelectItem key={i.value} value={i.label}>
-                      {i.label}
-                    </SelectItem>
-                  ))}
+                  {interiors
+                    .filter((i) => {
+                      // Model 3 interior filtering based on trim
+                      if (formData.vehicleType === 'Model 3' && formData.model) {
+                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
+                        if (trimValue && MODEL_3_INTERIOR_CONSTRAINTS[trimValue]) {
+                          return MODEL_3_INTERIOR_CONSTRAINTS[trimValue].includes(i.value)
+                        }
+                      }
+                      return true
+                    })
+                    .map((i) => (
+                      <SelectItem key={i.value} value={i.label}>
+                        {i.label}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
+              {/* Model 3 interior hints */}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
+                <p className="text-xs text-muted-foreground">Hinterradantrieb: nur Schwarz verfügbar</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -574,10 +629,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 value={formData.wheels}
                 onValueChange={(v) => handleChange('wheels', v)}
                 disabled={
+                  // Model Y fixed wheels
                   formData.model === 'Standard' ||
                   formData.model === 'Performance' ||
-                  formData.model === 'Model 3' ||
-                  formData.model === 'Model 3 Performance'
+                  // Model 3 trims with only one wheel option
+                  formData.model === 'Hinterradantrieb' ||
+                  (formData.vehicleType === 'Model 3' && formData.model === 'Performance')
                 }
               >
                 <SelectTrigger>
@@ -589,6 +646,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                       // Model Y Premium only has 19" and 20"
                       if (formData.vehicleType === 'Model Y' && formData.model === 'Premium') {
                         return w.label.includes('19') || w.label.includes('20')
+                      }
+                      // Model 3 wheel filtering based on trim
+                      if (formData.vehicleType === 'Model 3' && formData.model) {
+                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
+                        if (trimValue && MODEL_3_WHEEL_CONSTRAINTS[trimValue]) {
+                          return MODEL_3_WHEEL_CONSTRAINTS[trimValue].includes(w.value)
+                        }
                       }
                       return true
                     })
@@ -610,20 +674,33 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 <p className="text-xs text-muted-foreground">Premium: nur 19" oder 20"</p>
               )}
               {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
-                <p className="text-xs text-muted-foreground">Model 3 hat immer 18"</p>
+              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
+                <p className="text-xs text-muted-foreground">Hinterradantrieb hat 18" Prismata</p>
               )}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3 Performance' && (
-                <p className="text-xs text-muted-foreground">Performance hat immer 19"</p>
+              {formData.vehicleType === 'Model 3' && formData.model === 'Performance' && (
+                <p className="text-xs text-muted-foreground">Performance hat 20" Warp</p>
               )}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3 Long Range' && (
-                <p className="text-xs text-muted-foreground">Long Range: 18" oder 19"</p>
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite RWD' || formData.model === 'Premium Maximale Reichweite AWD') && (
+                <p className="text-xs text-muted-foreground">Premium: 18" Photon oder 19" Nova</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="towHitch">AHK (Anhängerkupplung) *</Label>
-              <Select value={formData.towHitch} onValueChange={(v) => handleChange('towHitch', v)}>
+              <Select
+                value={formData.towHitch}
+                onValueChange={(v) => handleChange('towHitch', v)}
+                disabled={(() => {
+                  // Model 3: only Hinterradantrieb has tow hitch option
+                  if (formData.vehicleType === 'Model 3' && formData.model) {
+                    const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
+                    if (trimValue && !MODEL_3_TOW_HITCH_AVAILABLE[trimValue]) {
+                      return true
+                    }
+                  }
+                  return false
+                })()}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="AHK wählen" />
                 </SelectTrigger>
@@ -635,6 +712,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   ))}
                 </SelectContent>
               </Select>
+              {/* Model 3 tow hitch hints */}
+              {formData.vehicleType === 'Model 3' && formData.model && formData.model !== 'Hinterradantrieb' && (
+                <p className="text-xs text-muted-foreground">AHK nur für Hinterradantrieb verfügbar</p>
+              )}
             </div>
 
             <div className="space-y-2">

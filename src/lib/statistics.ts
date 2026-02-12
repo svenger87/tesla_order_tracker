@@ -145,11 +145,12 @@ const MODEL_Y_COLORS: Record<string, string> = {
   'Performance': 'var(--chart-1)',
 }
 
-// Model 3 trim colors
+// Model 3 trim colors (German market 2025)
 const MODEL_3_COLORS: Record<string, string> = {
-  'Model 3': 'var(--chart-2)',
-  'Model 3 Long Range': 'var(--chart-3)',
-  'Model 3 Performance': 'var(--chart-1)',
+  'Hinterradantrieb': 'var(--chart-2)',
+  'Premium Maximale Reichweite RWD': 'var(--chart-3)',
+  'Premium Maximale Reichweite AWD': 'var(--chart-4)',
+  'Performance': 'var(--chart-1)',
 }
 
 // Combined colors - get the appropriate color based on trim name

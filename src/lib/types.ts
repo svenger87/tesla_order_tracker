@@ -141,11 +141,12 @@ export const MODELS = [
 // Alias for clarity
 export const MODEL_Y_TRIMS = MODELS
 
-// Model 3 trims (Tesla's actual naming)
+// Model 3 trims (Tesla's actual naming - German market 2025)
 export const MODEL_3_TRIMS = [
-  { value: 'model_3', label: 'Model 3' },
-  { value: 'model_3_lr', label: 'Model 3 Long Range' },
-  { value: 'model_3_performance', label: 'Model 3 Performance' },
+  { value: 'hinterradantrieb', label: 'Hinterradantrieb' },
+  { value: 'premium_lr_rwd', label: 'Premium Maximale Reichweite RWD' },
+  { value: 'premium_lr_awd', label: 'Premium Maximale Reichweite AWD' },
+  { value: 'performance', label: 'Performance' },
 ]
 
 export const RANGES = [
@@ -191,11 +192,45 @@ export const WHEELS = [
 // Alias for clarity
 export const MODEL_Y_WHEELS = WHEELS
 
-// Model 3 wheels (only 18" and 19" available)
+// Model 3 wheels (with specific names per trim)
 export const MODEL_3_WHEELS = [
-  { value: '18', label: "18\"" },
-  { value: '19', label: "19\"" },
+  { value: '18_prismata', label: '18" Prismata' },
+  { value: '18_photon', label: '18" Photon' },
+  { value: '19_nova', label: '19" Nova' },
+  { value: '20_warp', label: '20" Warp' },
 ]
+
+// Model 3 wheel constraints per trim
+export const MODEL_3_WHEEL_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['18_prismata'],
+  'premium_lr_rwd': ['18_photon', '19_nova'],
+  'premium_lr_awd': ['18_photon', '19_nova'],
+  'performance': ['20_warp'],
+}
+
+// Model 3 color constraints per trim
+export const MODEL_3_COLOR_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['pearl_white', 'diamond_black', 'stealth_grey'],
+  'premium_lr_rwd': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+  'premium_lr_awd': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+  'performance': ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'],
+}
+
+// Model 3 interior constraints per trim
+export const MODEL_3_INTERIOR_CONSTRAINTS: Record<string, string[]> = {
+  'hinterradantrieb': ['black'],
+  'premium_lr_rwd': ['black', 'white'],
+  'premium_lr_awd': ['black', 'white'],
+  'performance': ['black', 'white'],
+}
+
+// Model 3 tow hitch availability per trim
+export const MODEL_3_TOW_HITCH_AVAILABLE: Record<string, boolean> = {
+  'hinterradantrieb': true,
+  'premium_lr_rwd': false,
+  'premium_lr_awd': false,
+  'performance': false,
+}
 
 export const AUTOPILOT_OPTIONS = [
   { value: 'none', label: 'Kein' },
