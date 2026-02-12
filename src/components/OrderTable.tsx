@@ -2,7 +2,7 @@
 
 import { useState, useMemo, memo, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Order, COLORS } from '@/lib/types'
+import { Order, COLORS, COUNTRIES } from '@/lib/types'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions } from '@/hooks/useOptions'
 
@@ -343,8 +343,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   }
 
   // Create a lookup map for country labels (for sorting)
+  // Use COUNTRIES constant as fallback if API countries not loaded yet
   const countryLabelMap = useMemo(() => {
     const map = new Map<string, string>()
+    // First add from hardcoded COUNTRIES (guaranteed to be available)
+    COUNTRIES.forEach(c => map.set(c.value, c.label))
+    // Then override with API countries (in case labels differ)
     countries.forEach(c => map.set(c.value, c.label))
     return map
   }, [countries])
