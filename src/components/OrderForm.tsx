@@ -418,7 +418,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   // Reset color if not available for this trim
                   const trimValue = MODEL_3_TRIMS.find(t => t.label === v)?.value
                   if (trimValue && formData.color) {
-                    const colorValue = COLORS.find(c => c.label === formData.color)?.value
+                    const colorValue = colors.find(c => c.label === formData.color)?.value
                     if (colorValue && !MODEL_3_COLOR_CONSTRAINTS[trimValue]?.includes(colorValue)) {
                       handleChange('color', '')
                     }
