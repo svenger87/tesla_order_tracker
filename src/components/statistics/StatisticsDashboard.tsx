@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Order } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES } from '@/lib/types'
 import { calculateStatistics, getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { StatCard } from './StatCard'
 import { CountryDistributionChart } from './CountryDistributionChart'
@@ -68,29 +68,39 @@ function formatQuarter(year: number, quarter: number): string {
 }
 
 const PERIOD_STORAGE_KEY = 'tesla-tracker-stats-period'
+const VEHICLE_STORAGE_KEY = 'tesla-tracker-stats-vehicle'
 
 export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<StatsPeriod>({ type: 'all' })
+  const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | 'all'>('all')
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Load from localStorage after hydration
   useEffect(() => {
-    const saved = localStorage.getItem(PERIOD_STORAGE_KEY)
-    if (saved) {
-      setSelectedPeriod(keyToPeriod(saved))
+    const savedPeriod = localStorage.getItem(PERIOD_STORAGE_KEY)
+    if (savedPeriod) {
+      setSelectedPeriod(keyToPeriod(savedPeriod))
+    }
+    const savedVehicle = localStorage.getItem(VEHICLE_STORAGE_KEY)
+    if (savedVehicle && (savedVehicle === 'all' || savedVehicle === 'Model Y' || savedVehicle === 'Model 3')) {
+      setSelectedVehicle(savedVehicle)
     }
     setIsHydrated(true)
   }, [])
 
-  // Save to localStorage whenever period changes (only after hydration)
+  // Save to localStorage whenever period or vehicle changes (only after hydration)
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(PERIOD_STORAGE_KEY, periodToKey(selectedPeriod))
+      localStorage.setItem(VEHICLE_STORAGE_KEY, selectedVehicle)
     }
-  }, [selectedPeriod, isHydrated])
+  }, [selectedPeriod, selectedVehicle, isHydrated])
 
   const availablePeriods = useMemo(() => getAvailablePeriods(orders), [orders])
-  const stats = useMemo(() => calculateStatistics(orders, selectedPeriod), [orders, selectedPeriod])
+  const stats = useMemo(
+    () => calculateStatistics(orders, selectedPeriod, selectedVehicle === 'all' ? undefined : selectedVehicle),
+    [orders, selectedPeriod, selectedVehicle]
+  )
 
   return (
     <motion.div
@@ -99,43 +109,68 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      {/* Period Selector */}
+      {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Zeitraum:</span>
-          <Select
-            value={periodToKey(selectedPeriod)}
-            onValueChange={(key) => setSelectedPeriod(keyToPeriod(key))}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Zeitraum wählen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Gesamte Zeit</SelectItem>
-              {availablePeriods.years.length > 0 && (
-                <>
-                  {availablePeriods.years.map((year) => (
-                    <SelectItem key={`year-${year}`} value={`year-${year}`}>
-                      Jahr {year}
-                    </SelectItem>
-                  ))}
-                </>
-              )}
-              {availablePeriods.quarters.length > 0 && (
-                <>
-                  {availablePeriods.quarters.map(({ year, quarter }) => (
-                    <SelectItem
-                      key={`quarter-${year}-${quarter}`}
-                      value={`quarter-${year}-${quarter}`}
-                    >
-                      {formatQuarter(year, quarter)}
-                    </SelectItem>
-                  ))}
-                </>
-              )}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Vehicle Type Selector */}
+          <div className="flex items-center gap-2">
+            <Car className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Fahrzeug:</span>
+            <Select
+              value={selectedVehicle}
+              onValueChange={(value) => setSelectedVehicle(value as VehicleType | 'all')}
+            >
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Fahrzeug wählen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle</SelectItem>
+                {VEHICLE_TYPES.map((vt) => (
+                  <SelectItem key={vt.value} value={vt.value}>
+                    {vt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Period Selector */}
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Zeitraum:</span>
+            <Select
+              value={periodToKey(selectedPeriod)}
+              onValueChange={(key) => setSelectedPeriod(keyToPeriod(key))}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Zeitraum wählen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Gesamte Zeit</SelectItem>
+                {availablePeriods.years.length > 0 && (
+                  <>
+                    {availablePeriods.years.map((year) => (
+                      <SelectItem key={`year-${year}`} value={`year-${year}`}>
+                        Jahr {year}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {availablePeriods.quarters.length > 0 && (
+                  <>
+                    {availablePeriods.quarters.map(({ year, quarter }) => (
+                      <SelectItem
+                        key={`quarter-${year}-${quarter}`}
+                        value={`quarter-${year}-${quarter}`}
+                      >
+                        {formatQuarter(year, quarter)}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Warning for orders without valid dates */}
