@@ -219,7 +219,7 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
       name,
       orderDate,
       country: cleanValue(row[cols.country]),
-      model: cleanValue(row[cols.model]),
+      model: cleanValue(row[cols.model])?.toLowerCase() || null,  // Normalize to lowercase
       drive: cleanValue(row[cols.drive]),
       color: cleanValue(row[cols.color]),
       interior: cleanValue(row[cols.interior]),
@@ -261,13 +261,10 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
         result.updated++
       } else {
         // Create new order - set default range based on model
-        const model = orderData.model?.toLowerCase() || ''
-        const isPerformance = model.includes('performance')
+        const model = orderData.model || ''
         const isStandard = model === 'standard'
-        let defaultRange = 'Maximale Reichweite'
-        if (isStandard) {
-          defaultRange = 'Standard'
-        }
+        // Use internal codes: 'maximale_reichweite' or 'standard'
+        const defaultRange = isStandard ? 'standard' : 'maximale_reichweite'
         await prisma.order.create({
           data: {
             ...orderData,

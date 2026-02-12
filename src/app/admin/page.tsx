@@ -17,6 +17,8 @@ import { ConstraintManager } from '@/components/admin/ConstraintManager'
 // Extended sync result type for multi-sheet sync
 interface MultiSheetSyncResult extends SyncResult {
   sheets?: Array<SyncResult & { sheetLabel: string }>
+  vehicleType?: string
+  message?: string
 }
 
 export default function AdminDashboard() {
@@ -38,7 +40,7 @@ export default function AdminDashboard() {
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<MultiSheetSyncResult | null>(null)
   const [syncError, setSyncError] = useState('')
-  const [syncMode, setSyncMode] = useState<'single' | 'all'>('single')
+  const [syncMode, setSyncMode] = useState<'single' | 'all' | 'm3'>('single')
 
   // Debug state
   const [debugging, setDebugging] = useState(false)
@@ -171,14 +173,21 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleSync = async (mode: 'single' | 'all' = 'single') => {
+  const handleSync = async (mode: 'single' | 'all' | 'm3' = 'single') => {
     setSyncing(true)
     setSyncResult(null)
     setSyncError('')
     setSyncMode(mode)
 
     try {
-      const url = mode === 'all' ? '/api/orders/sync?all=true' : '/api/orders/sync'
+      let url: string
+      if (mode === 'm3') {
+        url = '/api/orders/sync-m3'
+      } else if (mode === 'all') {
+        url = '/api/orders/sync?all=true'
+      } else {
+        url = '/api/orders/sync'
+      }
       const res = await fetch(url, { method: 'POST' })
       const data = await res.json()
 
@@ -549,7 +558,10 @@ export default function AdminDashboard() {
 
             {syncResult && (
               <div className="bg-green-500/10 text-green-600 dark:text-green-400 px-4 py-3 rounded-md text-sm space-y-2">
-                <p className="font-medium">Sync abgeschlossen!</p>
+                <p className="font-medium">
+                  {syncResult.message || 'Sync abgeschlossen!'}
+                  {syncResult.vehicleType && <span className="ml-2 px-2 py-0.5 bg-green-500/20 rounded text-xs">{syncResult.vehicleType}</span>}
+                </p>
 
                 {/* Per-sheet results for multi-sheet sync */}
                 {syncResult.sheets && syncResult.sheets.length > 0 && (
@@ -588,23 +600,44 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={() => handleSync('single')} disabled={syncing} variant="outline">
-                <RefreshCw className={`h-4 w-4 mr-2 ${syncing && syncMode === 'single' ? 'animate-spin' : ''}`} />
-                {syncing && syncMode === 'single' ? 'Synchronisiere...' : 'Aktuelles Quartal'}
-              </Button>
-              <Button onClick={() => handleSync('all')} disabled={syncing} variant="default">
-                <Database className={`h-4 w-4 mr-2 ${syncing && syncMode === 'all' ? 'animate-spin' : ''}`} />
-                {syncing && syncMode === 'all' ? 'Synchronisiere alle...' : 'Alle Quartale (Initial-Import)'}
-              </Button>
-              <Button onClick={handleDebugSheets} disabled={debugging} variant="ghost" size="sm">
-                <Bug className={`h-4 w-4 mr-2 ${debugging ? 'animate-pulse' : ''}`} />
-                {debugging ? 'Prüfe...' : 'Debug Sheets'}
-              </Button>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium mb-2">Model Y (TFF Tracker)</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button onClick={() => handleSync('single')} disabled={syncing} variant="outline">
+                    <RefreshCw className={`h-4 w-4 mr-2 ${syncing && syncMode === 'single' ? 'animate-spin' : ''}`} />
+                    {syncing && syncMode === 'single' ? 'Synchronisiere...' : 'Aktuelles Quartal'}
+                  </Button>
+                  <Button onClick={() => handleSync('all')} disabled={syncing} variant="default">
+                    <Database className={`h-4 w-4 mr-2 ${syncing && syncMode === 'all' ? 'animate-spin' : ''}`} />
+                    {syncing && syncMode === 'all' ? 'Synchronisiere alle...' : 'Alle Quartale (Initial-Import)'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  &quot;Alle Quartale&quot; importiert Q3 2025, Q4 2025 und das aktuelle Quartal für Model Y.
+                </p>
+              </div>
+
+              <div className="border-t pt-3">
+                <p className="text-sm font-medium mb-2">Model 3 (Separate Tabelle)</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button onClick={() => handleSync('m3')} disabled={syncing} variant="secondary">
+                    <Database className={`h-4 w-4 mr-2 ${syncing && syncMode === 'm3' ? 'animate-spin' : ''}`} />
+                    {syncing && syncMode === 'm3' ? 'Synchronisiere Model 3...' : 'Model 3 importieren'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Importiert Model 3 Daten aus der separaten Google Tabelle.
+                </p>
+              </div>
+
+              <div className="border-t pt-3">
+                <Button onClick={handleDebugSheets} disabled={debugging} variant="ghost" size="sm">
+                  <Bug className={`h-4 w-4 mr-2 ${debugging ? 'animate-pulse' : ''}`} />
+                  {debugging ? 'Prüfe...' : 'Debug Sheets'}
+                </Button>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              &quot;Alle Quartale&quot; importiert Q3 2025, Q4 2025 und das aktuelle Quartal.
-            </p>
 
             {/* Debug Results */}
             {debugResult && (

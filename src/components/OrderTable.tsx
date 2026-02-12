@@ -592,7 +592,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Models</SelectItem>
-              {filterOptions.model.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.model.map(v => <SelectItem key={v} value={v}>{getLabel(models, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -602,7 +602,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Reichweiten</SelectItem>
-              {filterOptions.range.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.range.map(v => <SelectItem key={v} value={v}>{getLabel(ranges, v) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 

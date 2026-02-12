@@ -2,6 +2,9 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { parse, differenceInDays, isValid } from 'date-fns'
+import {
+  MODEL_3_TOW_HITCH_AVAILABLE,
+} from '@/lib/types'
 
 // Helper to parse German date format (DD.MM.YYYY) and calculate days between dates
 function parseGermanDate(dateStr: string | null | undefined): Date | null {
@@ -15,6 +18,31 @@ function calculateDaysBetween(fromDate: string | null | undefined, toDate: strin
   const to = parseGermanDate(toDate)
   if (!from || !to) return null
   return differenceInDays(to, from)
+}
+
+// Apply Model 3 constraints - set unavailable options to "-"
+function applyModel3Constraints(data: Record<string, unknown>): Record<string, unknown> {
+  if (data.vehicleType !== 'Model 3') return data
+
+  const model = (data.model as string)?.toLowerCase() || ''
+  const result = { ...data }
+
+  // Performance models always have maximum range
+  if (model.includes('performance')) {
+    result.range = 'maximale_reichweite'
+  }
+
+  // Check tow hitch availability using ruleset
+  const trimKey = model.includes('performance') ? 'performance'
+    : model.includes('premium') ? 'premium'
+    : model.includes('standard') ? 'standard'
+    : null
+
+  if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
+    result.towHitch = '-'
+  }
+
+  return result
 }
 
 // Calculate all time period fields from dates
@@ -191,29 +219,32 @@ export async function POST(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(body)
 
+    // Apply Model 3 constraints (set unavailable options to "-")
+    const constrainedData = applyModel3Constraints(body)
+
     const order = await prisma.order.create({
       data: {
-        name: body.name,
-        vehicleType: body.vehicleType || 'Model Y',
-        orderDate: body.orderDate || null,
-        country: body.country || null,
-        model: body.model || null,
-        range: body.range || null,
-        drive: body.drive || null,
-        color: body.color || null,
-        interior: body.interior || null,
-        wheels: body.wheels || null,
-        towHitch: body.towHitch || null,
-        autopilot: body.autopilot || null,
-        deliveryWindow: body.deliveryWindow || null,
-        deliveryLocation: body.deliveryLocation || null,
-        vin: body.vin || null,
-        vinReceivedDate: body.vinReceivedDate || null,
-        papersReceivedDate: body.papersReceivedDate || null,
-        productionDate: body.productionDate || null,
-        typeApproval: body.typeApproval || null,
-        typeVariant: body.typeVariant || null,
-        deliveryDate: body.deliveryDate || null,
+        name: constrainedData.name as string,
+        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+        orderDate: (constrainedData.orderDate as string) || null,
+        country: (constrainedData.country as string) || null,
+        model: (constrainedData.model as string) || null,
+        range: (constrainedData.range as string) || null,
+        drive: (constrainedData.drive as string) || null,
+        color: (constrainedData.color as string) || null,
+        interior: (constrainedData.interior as string) || null,
+        wheels: (constrainedData.wheels as string) || null,
+        towHitch: (constrainedData.towHitch as string) || null,
+        autopilot: (constrainedData.autopilot as string) || null,
+        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+        vin: (constrainedData.vin as string) || null,
+        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+        productionDate: (constrainedData.productionDate as string) || null,
+        typeApproval: (constrainedData.typeApproval as string) || null,
+        typeVariant: (constrainedData.typeVariant as string) || null,
+        deliveryDate: (constrainedData.deliveryDate as string) || null,
         ...timePeriods,
         // Use custom password as editCode if provided, otherwise Prisma generates cuid
         ...(editCode && { editCode }),
@@ -271,32 +302,35 @@ export async function PUT(request: NextRequest) {
         // Calculate time periods from dates
         const timePeriods = calculateTimePeriods(data)
 
+        // Apply Model 3 constraints
+        const constrainedData = applyModel3Constraints(data)
+
         // Update order with new editCode
         const updated = await prisma.order.update({
           where: { id },
           data: {
             editCode: newEditCode, // Set the new password
-            name: data.name,
-            vehicleType: data.vehicleType || 'Model Y',
-            orderDate: data.orderDate || null,
-            country: data.country || null,
-            model: data.model || null,
-            range: data.range || null,
-            drive: data.drive || null,
-            color: data.color || null,
-            interior: data.interior || null,
-            wheels: data.wheels || null,
-            towHitch: data.towHitch || null,
-            autopilot: data.autopilot || null,
-            deliveryWindow: data.deliveryWindow || null,
-            deliveryLocation: data.deliveryLocation || null,
-            vin: data.vin || null,
-            vinReceivedDate: data.vinReceivedDate || null,
-            papersReceivedDate: data.papersReceivedDate || null,
-            productionDate: data.productionDate || null,
-            typeApproval: data.typeApproval || null,
-            typeVariant: data.typeVariant || null,
-            deliveryDate: data.deliveryDate || null,
+            name: constrainedData.name as string,
+            vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+            orderDate: (constrainedData.orderDate as string) || null,
+            country: (constrainedData.country as string) || null,
+            model: (constrainedData.model as string) || null,
+            range: (constrainedData.range as string) || null,
+            drive: (constrainedData.drive as string) || null,
+            color: (constrainedData.color as string) || null,
+            interior: (constrainedData.interior as string) || null,
+            wheels: (constrainedData.wheels as string) || null,
+            towHitch: (constrainedData.towHitch as string) || null,
+            autopilot: (constrainedData.autopilot as string) || null,
+            deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+            deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+            vin: (constrainedData.vin as string) || null,
+            vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+            papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+            productionDate: (constrainedData.productionDate as string) || null,
+            typeApproval: (constrainedData.typeApproval as string) || null,
+            typeVariant: (constrainedData.typeVariant as string) || null,
+            deliveryDate: (constrainedData.deliveryDate as string) || null,
             ...timePeriods,
           },
         })
@@ -336,30 +370,33 @@ export async function PUT(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(data)
 
+    // Apply Model 3 constraints
+    const constrainedData = applyModel3Constraints(data)
+
     const updated = await prisma.order.update({
       where: { id },
       data: {
-        name: data.name,
-        vehicleType: data.vehicleType || 'Model Y',
-        orderDate: data.orderDate || null,
-        country: data.country || null,
-        model: data.model || null,
-        range: data.range || null,
-        drive: data.drive || null,
-        color: data.color || null,
-        interior: data.interior || null,
-        wheels: data.wheels || null,
-        towHitch: data.towHitch || null,
-        autopilot: data.autopilot || null,
-        deliveryWindow: data.deliveryWindow || null,
-        deliveryLocation: data.deliveryLocation || null,
-        vin: data.vin || null,
-        vinReceivedDate: data.vinReceivedDate || null,
-        papersReceivedDate: data.papersReceivedDate || null,
-        productionDate: data.productionDate || null,
-        typeApproval: data.typeApproval || null,
-        typeVariant: data.typeVariant || null,
-        deliveryDate: data.deliveryDate || null,
+        name: constrainedData.name as string,
+        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+        orderDate: (constrainedData.orderDate as string) || null,
+        country: (constrainedData.country as string) || null,
+        model: (constrainedData.model as string) || null,
+        range: (constrainedData.range as string) || null,
+        drive: (constrainedData.drive as string) || null,
+        color: (constrainedData.color as string) || null,
+        interior: (constrainedData.interior as string) || null,
+        wheels: (constrainedData.wheels as string) || null,
+        towHitch: (constrainedData.towHitch as string) || null,
+        autopilot: (constrainedData.autopilot as string) || null,
+        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+        vin: (constrainedData.vin as string) || null,
+        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+        productionDate: (constrainedData.productionDate as string) || null,
+        typeApproval: (constrainedData.typeApproval as string) || null,
+        typeVariant: (constrainedData.typeVariant as string) || null,
+        deliveryDate: (constrainedData.deliveryDate as string) || null,
         ...timePeriods,
       },
     })

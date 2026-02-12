@@ -159,19 +159,20 @@ export const DRIVES = [
 ]
 
 export const COLORS = [
-  // Current colors (2025)
+  // Current colors (2025 Model Y Juniper / Model 3 Highland)
   { value: 'pearl_white', label: 'Pearl White', hex: '#FFFFFF', border: true },
+  { value: 'solid_black', label: 'Solid Black', hex: '#000000', border: false },
   { value: 'diamond_black', label: 'Diamond Black', hex: '#1A1A1A', border: false },
   { value: 'stealth_grey', label: 'Stealth Grey', hex: '#4A4A4A', border: false },
   { value: 'quicksilver', label: 'Quicksilver', hex: '#C0C0C0', border: true },
   { value: 'ultra_red', label: 'Ultra Red', hex: '#C41E3A', border: false },
-  { value: 'marine_blue', label: 'Marine Blue', hex: '#1E3A5F', border: false },
+  { value: 'glacier_blue', label: 'Glacier Blue', hex: '#8FBBD9', border: false },  // New Juniper
+  { value: 'marine_blue', label: 'Marine Blue', hex: '#1E3A5F', border: false },    // New Juniper
+  { value: 'deep_blue', label: 'Deep Blue Metallic', hex: '#1C3A5F', border: false },
+  { value: 'midnight_cherry', label: 'Midnight Cherry Red', hex: '#5C0029', border: false },
   // Legacy colors (discontinued but appear in historical orders)
   { value: 'midnight_silver', label: 'Midnight Silver Metallic', hex: '#71797E', border: false },
-  { value: 'solid_black', label: 'Solid Black', hex: '#000000', border: false },
-  { value: 'deep_blue', label: 'Deep Blue Metallic', hex: '#1C3A5F', border: false },
   { value: 'red_multi', label: 'Red Multi-Coat', hex: '#A52125', border: false },
-  { value: 'midnight_cherry', label: 'Midnight Cherry Red', hex: '#5C0029', border: false },
   { value: 'silver_metallic', label: 'Silver Metallic', hex: '#A8A9AD', border: true },
 ]
 
@@ -222,7 +223,7 @@ export const MODEL_3_INTERIOR_CONSTRAINTS: Record<string, string[]> = {
 // Model 3 tow hitch availability per trim
 export const MODEL_3_TOW_HITCH_AVAILABLE: Record<string, boolean> = {
   'standard': true,
-  'premium': false,
+  'premium': true,
   'performance': false,
 }
 
