@@ -392,7 +392,12 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod): Orde
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Interior distribution
+  // Interior distribution (black & white colors)
+  const INTERIOR_COLORS: Record<string, string> = {
+    'Schwarz': '#1a1a1a',
+    'Weiß': '#e5e5e5',
+    'Unbekannt': '#9ca3af',
+  }
   const interiorCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
     const interior = order.interior || 'Unbekannt'
@@ -402,7 +407,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod): Orde
     .map(([name, count], index) => ({
       name,
       count,
-      fill: CONFIG_COLORS[index % CONFIG_COLORS.length],
+      fill: INTERIOR_COLORS[name] || CONFIG_COLORS[index % CONFIG_COLORS.length],
     }))
     .sort((a, b) => b.count - a.count)
 

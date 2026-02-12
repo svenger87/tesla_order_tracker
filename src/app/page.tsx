@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee } from 'lucide-react'
+import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -41,14 +41,6 @@ export default function Home() {
   const [showStats, setShowStats] = useState(true)
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(orders), [orders])
-
-  // Extract unique delivery locations for typeahead
-  const existingLocations = useMemo(() => {
-    const locations = orders
-      .map(o => o.deliveryLocation)
-      .filter((loc): loc is string => !!loc && loc.trim() !== '')
-    return [...new Set(locations)].sort()
-  }, [orders])
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -166,6 +158,16 @@ export default function Home() {
                   <span>Unterstützen</span>
                 </a>
               )}
+              <a
+                href="https://github.com/svenger87/tesla_order_tracker"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Github className="h-4 w-4" />
+                  <span className="sr-only">GitHub</span>
+                </Button>
+              </a>
               <ThemeToggle />
               {isAdmin ? (
                 <Link href="/admin">
@@ -263,6 +265,16 @@ export default function Home() {
             className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-muted-foreground"
           >
             <span>Tesla Bestellungen und Statistiken - Community Projekt</span>
+            <span className="hidden sm:inline">·</span>
+            <a
+              href="https://github.com/svenger87/tesla_order_tracker"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" />
+              <span>GitHub</span>
+            </a>
             {settings?.showDonation && (
               <>
                 <span className="hidden sm:inline">·</span>
@@ -278,7 +290,6 @@ export default function Home() {
         open={showAddForm}
         onOpenChange={setShowAddForm}
         onSuccess={handleOrderSuccess}
-        existingLocations={existingLocations}
       />
 
       <EditCodeModal
@@ -293,7 +304,6 @@ export default function Home() {
         onOpenChange={setShowEditByCode}
         orders={orders}
         onSuccess={fetchOrders}
-        existingLocations={existingLocations}
       />
 
       {editingOrder && (
@@ -309,7 +319,6 @@ export default function Home() {
               // This is a simplified check - in production you'd track the actual update
             })
           }}
-          existingLocations={existingLocations}
         />
       )}
 

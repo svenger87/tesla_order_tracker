@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 // Valid option types
-const VALID_TYPES = ['country', 'model', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch'] as const
+const VALID_TYPES = ['country', 'model', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'deliveryLocation'] as const
 type OptionType = typeof VALID_TYPES[number]
 
 function isValidType(type: string): type is OptionType {

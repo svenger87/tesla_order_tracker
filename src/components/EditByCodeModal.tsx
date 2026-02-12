@@ -21,10 +21,9 @@ interface EditByCodeModalProps {
   onOpenChange: (open: boolean) => void
   orders: Order[]
   onSuccess: () => void
-  existingLocations?: string[]
 }
 
-export function EditByCodeModal({ open, onOpenChange, orders, onSuccess, existingLocations = [] }: EditByCodeModalProps) {
+export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditByCodeModalProps) {
   const [editCode, setEditCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -93,7 +92,6 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess, existin
         editCode={editCode}
         isLegacy={isLegacy}
         onSuccess={handleEditSuccess}
-        existingLocations={existingLocations}
       />
     )
   }

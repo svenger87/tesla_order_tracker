@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import {
@@ -24,17 +24,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
 import { Calendar } from '@/components/ui/calendar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CalendarIcon, Check, ChevronsUpDown, KeyRound, Shuffle } from 'lucide-react'
+import { CalendarIcon, KeyRound, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format, parse, isValid } from 'date-fns'
 import { de } from 'date-fns/locale'
@@ -46,7 +38,6 @@ interface OrderFormProps {
   editCode?: string
   isLegacy?: boolean // Legacy order from old spreadsheet import (no editCode)
   onSuccess: (editCode?: string) => void
-  existingLocations?: string[]
 }
 
 // Helper to parse German date format (DD.MM.YYYY) to Date object
@@ -105,83 +96,6 @@ function DatePickerField({
   )
 }
 
-// LocationCombobox component
-function LocationCombobox({
-  value,
-  onChange,
-  locations,
-}: {
-  value: string
-  onChange: (value: string) => void
-  locations: string[]
-}) {
-  const [open, setOpen] = useState(false)
-  const [inputValue, setInputValue] = useState(value)
-
-  const filteredLocations = useMemo(() => {
-    if (!inputValue) return locations
-    return locations.filter(loc =>
-      loc.toLowerCase().includes(inputValue.toLowerCase())
-    )
-  }, [inputValue, locations])
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between font-normal"
-        >
-          {value || "Auslieferungsort wählen"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <Command>
-          <CommandInput
-            placeholder="Ort suchen oder eingeben..."
-            value={inputValue}
-            onValueChange={(v) => {
-              setInputValue(v)
-              onChange(v)
-            }}
-          />
-          <CommandList>
-            <CommandEmpty>
-              <div className="p-2 text-sm text-muted-foreground">
-                &quot;{inputValue}&quot; als neuen Ort verwenden
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {filteredLocations.map((location) => (
-                <CommandItem
-                  key={location}
-                  value={location}
-                  onSelect={() => {
-                    onChange(location)
-                    setInputValue(location)
-                    setOpen(false)
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === location ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {location}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
 const emptyFormData: OrderFormData = {
   name: '',
   orderDate: '',
@@ -209,7 +123,7 @@ const emptyFormData: OrderFormData = {
   confirmPassword: '',
 }
 
-export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess, existingLocations = [] }: OrderFormProps) {
+export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess }: OrderFormProps) {
   const [formData, setFormData] = useState<OrderFormData>(emptyFormData)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -218,7 +132,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
 
   // Load dynamic options from API
-  const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch } = useOptions()
+  const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions()
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -637,12 +551,19 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deliveryLocation">Ort (Auslieferung)</Label>
-              <LocationCombobox
-                value={formData.deliveryLocation}
-                onChange={(v) => handleChange('deliveryLocation', v)}
-                locations={existingLocations}
-              />
+              <Label htmlFor="deliveryLocation">Ort (Auslieferung) *</Label>
+              <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Auslieferungsort wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deliveryLocations.map((loc) => (
+                    <SelectItem key={loc.value} value={loc.label}>
+                      {loc.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

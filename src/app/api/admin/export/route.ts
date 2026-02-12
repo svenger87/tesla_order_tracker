@@ -54,6 +54,8 @@ export async function GET() {
       { header: 'Tage: Bestellung→Papiere', key: 'orderToPapers', width: 20 },
       { header: 'Tage: Papiere→Lieferung', key: 'papersToDelivery', width: 20 },
       { header: 'Archiviert', key: 'archived', width: 10 },
+      { header: 'Archiviert am', key: 'archivedAt', width: 18 },
+      { header: 'Edit Code', key: 'editCode', width: 20 },
       { header: 'Erstellt', key: 'createdAt', width: 20 },
       { header: 'Aktualisiert', key: 'updatedAt', width: 20 },
     ]
@@ -72,6 +74,8 @@ export async function GET() {
       ordersSheet.addRow({
         ...order,
         archived: order.archived ? 'Ja' : 'Nein',
+        archivedAt: order.archivedAt ? new Date(order.archivedAt).toLocaleString('de-DE') : '',
+        editCode: order.editCode || '',
         createdAt: order.createdAt ? new Date(order.createdAt).toLocaleString('de-DE') : '',
         updatedAt: order.updatedAt ? new Date(order.updatedAt).toLocaleString('de-DE') : '',
       })

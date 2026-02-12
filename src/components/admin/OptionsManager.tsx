@@ -47,15 +47,16 @@ interface OptionFormData {
 }
 
 const OPTION_TYPES = [
-  { type: 'country', label: 'Länder', singular: 'Land', hasFlag: true },
-  { type: 'model', label: 'Modelle', singular: 'Modell' },
-  { type: 'range', label: 'Reichweiten', singular: 'Reichweite' },
-  { type: 'drive', label: 'Antriebe', singular: 'Antrieb' },
-  { type: 'color', label: 'Farben', singular: 'Farbe', hasColor: true },
-  { type: 'interior', label: 'Innenräume', singular: 'Innenraum' },
-  { type: 'wheels', label: 'Felgen', singular: 'Felge' },
-  { type: 'autopilot', label: 'Autopilot', singular: 'Autopilot' },
-  { type: 'towHitch', label: 'Anhängerkupplung', singular: 'Anhängerkupplung' },
+  { type: 'country', label: 'Länder', singular: 'Land', hasFlag: true, valueHint: 'deutschland', labelHint: 'Deutschland' },
+  { type: 'model', label: 'Modelle', singular: 'Modell', valueHint: 'model_y_rwd', labelHint: 'Model Y RWD' },
+  { type: 'range', label: 'Reichweiten', singular: 'Reichweite', valueHint: 'standard', labelHint: 'Standard' },
+  { type: 'drive', label: 'Antriebe', singular: 'Antrieb', valueHint: 'awd', labelHint: 'Allrad (AWD)' },
+  { type: 'color', label: 'Farben', singular: 'Farbe', hasColor: true, valueHint: 'pearl_white', labelHint: 'Pearl White' },
+  { type: 'interior', label: 'Innenräume', singular: 'Innenraum', valueHint: 'schwarz', labelHint: 'Schwarz' },
+  { type: 'wheels', label: 'Felgen', singular: 'Felge', valueHint: 'gemini_19', labelHint: 'Gemini 19"' },
+  { type: 'autopilot', label: 'Autopilot', singular: 'Autopilot', valueHint: 'fsd', labelHint: 'Full Self-Driving' },
+  { type: 'towHitch', label: 'Anhängerkupplung', singular: 'Anhängerkupplung', valueHint: 'yes', labelHint: 'Ja' },
+  { type: 'deliveryLocation', label: 'Auslieferungsorte', singular: 'Auslieferungsort', valueHint: 'muenchen', labelHint: 'München-Parsdorf' },
 ]
 
 export function OptionsManager() {
@@ -328,7 +329,7 @@ export function OptionsManager() {
                   id="value"
                   value={formData.value}
                   onChange={(e) => setFormData(f => ({ ...f, value: e.target.value }))}
-                  placeholder="z.B. pearl_white"
+                  placeholder={`z.B. ${dialogType ? getTypeConfig(dialogType)?.valueHint || 'wert' : 'wert'}`}
                 />
               </div>
             )}
@@ -339,7 +340,7 @@ export function OptionsManager() {
                 id="label"
                 value={formData.label}
                 onChange={(e) => setFormData(f => ({ ...f, label: e.target.value }))}
-                placeholder="z.B. Pearl White"
+                placeholder={`z.B. ${dialogType ? getTypeConfig(dialogType)?.labelHint || 'Anzeigename' : 'Anzeigename'}`}
               />
             </div>
 

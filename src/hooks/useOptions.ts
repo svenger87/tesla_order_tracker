@@ -116,6 +116,7 @@ export function useOptions() {
       wheels: getOptionsForType('wheels'),
       autopilot: getOptionsForType('autopilot'),
       towHitch: getOptionsForType('towHitch'),
+      deliveryLocations: getOptionsForType('deliveryLocation'),
     }
   }, [apiOptions])
 
