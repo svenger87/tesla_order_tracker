@@ -601,12 +601,22 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
           </Select>
 
           <Select value={filters.country} onValueChange={(v) => setFilters(f => ({ ...f, country: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[120px] h-8">
+            <SelectTrigger className="w-[150px] h-8">
               <SelectValue placeholder="Land" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Länder</SelectItem>
-              {filterOptions.country.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.country.map(v => {
+                const { flag, name } = parseCountryWithFlag(v)
+                return (
+                  <SelectItem key={v} value={v}>
+                    <span className="flex items-center gap-2">
+                      {flag && <TwemojiEmoji emoji={flag} size={16} />}
+                      {name}
+                    </span>
+                  </SelectItem>
+                )
+              })}
             </SelectContent>
           </Select>
 
