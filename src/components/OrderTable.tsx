@@ -326,8 +326,15 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
   const [showFilters, setShowFilters] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false)
 
-  // Get countries from useOptions hook (includes flags)
-  const { countries } = useOptions()
+  // Get options from useOptions hook (includes labels for values)
+  const { countries, models, ranges, drives, interiors, wheels } = useOptions()
+
+  // Helper to lookup label from value
+  const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
+    if (!value) return '-'
+    const option = options.find(o => o.value === value || o.label === value)
+    return option?.label || value
+  }
 
   // Refs for sticky scrollbar sync
   const tableContainerRef = useRef<HTMLDivElement>(null)
@@ -812,27 +819,27 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
                       variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
                       className="font-medium"
                     >
-                      {order.model}
+                      {getLabel(models, order.model)}
                     </Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {order.range ? (
                     <Badge variant="outline" className="text-xs">
-                      {order.range === 'Maximale Reichweite' ? 'Max. RW' : order.range}
+                      {getLabel(ranges, order.range) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, order.range)}
                     </Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {order.drive ? (
                     <Badge variant="outline" className="font-mono">
-                      {order.drive}
+                      {getLabel(drives, order.drive)}
                     </Badge>
                   ) : '-'}
                 </TableCell>
                 <ColorCell color={order.color} />
-                <TableCell className="whitespace-nowrap">{order.interior || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.wheels || '-'}</TableCell>
+                <TableCell className="whitespace-nowrap">{getLabel(interiors, order.interior)}</TableCell>
+                <TableCell className="whitespace-nowrap">{getLabel(wheels, order.wheels)}</TableCell>
                 <TableCell className="whitespace-nowrap">
                   {order.towHitch ? (
                     <Badge variant={order.towHitch.toLowerCase() === 'ja' ? 'default' : 'outline'}>
