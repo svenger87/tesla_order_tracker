@@ -109,24 +109,25 @@ const CountryCell = memo(function CountryCell({
 }) {
   if (!country) return <TableCell className="whitespace-nowrap">-</TableCell>
 
-  // Check if country already has an embedded flag
-  const { flag: embeddedFlag, name: countryName } = parseCountryWithFlag(country)
+  // Check if country already has an embedded flag (old format)
+  const { flag: embeddedFlag, name: parsedName } = parseCountryWithFlag(country)
 
-  // If no embedded flag, try to find one from the options
-  let flag = embeddedFlag
-  if (!flag) {
-    const countryLower = country.toLowerCase()
-    const countryInfo = countries.find(
-      c => c.label.toLowerCase() === countryLower || c.value.toLowerCase() === countryLower
-    )
-    flag = countryInfo?.flag || null
-  }
+  // Try to find country info from options (by value or label)
+  const countryLower = country.toLowerCase()
+  const countryInfo = countries.find(
+    c => c.value.toLowerCase() === countryLower || c.label.toLowerCase() === countryLower
+  )
+
+  // Use label from options if found, otherwise use parsed name
+  const displayName = countryInfo?.label || parsedName
+  // Use flag from options if no embedded flag
+  const flag = embeddedFlag || countryInfo?.flag || null
 
   return (
     <TableCell className="whitespace-nowrap">
       <div className="flex items-center gap-1.5">
         {flag && <TwemojiEmoji emoji={flag} size={16} />}
-        <span>{countryName}</span>
+        <span>{displayName}</span>
       </div>
     </TableCell>
   )
@@ -849,13 +850,13 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                 <TableCell className="whitespace-nowrap">
                   {order.towHitch ? (
                     <Badge variant={order.towHitch.toLowerCase() === 'ja' ? 'default' : 'outline'}>
-                      {order.towHitch}
+                      {order.towHitch.charAt(0).toUpperCase() + order.towHitch.slice(1).toLowerCase()}
                     </Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {order.autopilot ? (
-                    <Badge variant="secondary">{order.autopilot}</Badge>
+                    <Badge variant="secondary">{order.autopilot.toUpperCase()}</Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
