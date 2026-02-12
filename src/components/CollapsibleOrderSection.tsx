@@ -17,6 +17,7 @@ interface CollapsibleOrderSectionProps {
   isAdmin: boolean
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
+  onGenerateResetCode?: (orderId: string, orderName: string) => void
 }
 
 export function CollapsibleOrderSection({
@@ -24,6 +25,7 @@ export function CollapsibleOrderSection({
   isAdmin,
   onEdit,
   onDelete,
+  onGenerateResetCode,
 }: CollapsibleOrderSectionProps) {
   // Default to opening the first group
   const defaultValue = groups.length > 0 ? [groups[0].label] : []
@@ -77,6 +79,7 @@ export function CollapsibleOrderSection({
                       isAdmin={isAdmin}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onGenerateResetCode={onGenerateResetCode}
                     />
                   </motion.div>
                 </AccordionContent>

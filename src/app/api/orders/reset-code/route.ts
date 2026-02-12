@@ -1,8 +1,14 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
+import crypto from 'crypto'
 
-// Admin endpoint to reset an order's editCode (for users who lost their code)
+// Generate a random 6-digit code
+function generateResetCode(): string {
+  return crypto.randomInt(100000, 999999).toString()
+}
+
+// Admin endpoint to generate a one-time reset code for an order
 export async function POST(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
@@ -16,20 +22,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
     }
 
-    // Reset the editCode to null, allowing user to set a new one via username
+    // Generate a 6-digit code valid for 24 hours
+    const resetCode = generateResetCode()
+    const resetCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
     const order = await prisma.order.update({
       where: { id: orderId },
-      data: { editCode: null },
+      data: {
+        resetCode,
+        resetCodeExpires,
+      },
       select: { id: true, name: true },
     })
 
     return NextResponse.json({
       success: true,
-      message: `EditCode für "${order.name}" wurde zurückgesetzt. Der Benutzer kann jetzt seinen Benutzernamen verwenden.`,
+      resetCode,
+      expiresAt: resetCodeExpires.toISOString(),
+      message: `Einmalcode für "${order.name}" generiert. Gültig für 24 Stunden.`,
       orderId: order.id,
     })
   } catch (error) {
-    console.error('Reset code failed:', error)
-    return NextResponse.json({ error: 'Reset failed' }, { status: 500 })
+    console.error('Generate reset code failed:', error)
+    return NextResponse.json({ error: 'Generate reset code failed' }, { status: 500 })
   }
 }

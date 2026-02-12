@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2 } from 'lucide-react'
+import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -39,6 +39,14 @@ export default function Home() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(true)
+  // Reset code dialog state
+  const [resetCodeDialog, setResetCodeDialog] = useState<{
+    open: boolean
+    code: string
+    orderName: string
+  }>({ open: false, code: '', orderName: '' })
+  const [resetCodeCopied, setResetCodeCopied] = useState(false)
+  const [generatingResetCode, setGeneratingResetCode] = useState(false)
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(orders), [orders])
 
@@ -114,6 +122,31 @@ export default function Home() {
   const handleDeliveryUpdate = useCallback((hadDeliveryBefore: boolean, hasDeliveryNow: boolean) => {
     if (!hadDeliveryBefore && hasDeliveryNow) {
       triggerCelebration()
+    }
+  }, [])
+
+  const handleGenerateResetCode = useCallback(async (orderId: string, orderName: string) => {
+    setGeneratingResetCode(true)
+    try {
+      const res = await fetch('/api/orders/reset-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Fehler beim Generieren des Codes')
+      }
+      setResetCodeDialog({
+        open: true,
+        code: data.resetCode,
+        orderName: orderName,
+      })
+    } catch (error) {
+      console.error('Failed to generate reset code:', error)
+      alert(error instanceof Error ? error.message : 'Fehler beim Generieren des Codes')
+    } finally {
+      setGeneratingResetCode(false)
     }
   }, [])
 
@@ -255,6 +288,7 @@ export default function Home() {
                 isAdmin={isAdmin}
                 onEdit={handleEdit}
                 onDelete={(id) => setDeleteConfirm(id)}
+                onGenerateResetCode={isAdmin ? handleGenerateResetCode : undefined}
               />
             )}
           </CardContent>
@@ -350,6 +384,59 @@ export default function Home() {
             </Button>
             <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>
               Löschen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Code Dialog */}
+      <Dialog open={resetCodeDialog.open} onOpenChange={(open) => !open && setResetCodeDialog({ ...resetCodeDialog, open: false })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              Einmalcode generiert
+            </DialogTitle>
+            <DialogDescription>
+              Code für &quot;{resetCodeDialog.orderName}&quot; - Gültig für 24 Stunden
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <input
+                readOnly
+                value={resetCodeDialog.code}
+                className="flex-1 text-2xl font-mono text-center tracking-widest bg-muted px-4 py-3 rounded-md border"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  navigator.clipboard.writeText(resetCodeDialog.code)
+                  setResetCodeCopied(true)
+                  setTimeout(() => setResetCodeCopied(false), 2000)
+                }}
+                title="Kopieren"
+              >
+                {resetCodeCopied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3 text-sm text-amber-700 dark:text-amber-400">
+              <p className="font-medium">Wichtig:</p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>Teile diesen Code dem Benutzer mit</li>
+                <li>Der Benutzer kann damit ein neues Passwort setzen</li>
+                <li>Der Code ist nur einmal verwendbar</li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setResetCodeDialog({ ...resetCodeDialog, open: false })}>
+              Schließen
             </Button>
           </div>
         </DialogContent>

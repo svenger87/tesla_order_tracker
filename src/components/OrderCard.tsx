@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreVertical, Pencil, Trash2, MapPin, Calendar, Car, Hash } from 'lucide-react'
+import { MoreVertical, Pencil, Trash2, MapPin, Calendar, Car, Hash, KeyRound } from 'lucide-react'
 
 // Helper to find color info by label
 function findColorInfo(colorLabel: string | null) {
@@ -30,9 +30,10 @@ interface OrderCardProps {
   isAdmin: boolean
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
+  onGenerateResetCode?: (orderId: string, orderName: string) => void
 }
 
-export function OrderCard({ order, isAdmin, onEdit, onDelete }: OrderCardProps) {
+export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderCardProps) {
   const colorInfo = findColorInfo(order.color)
 
   return (
@@ -76,6 +77,12 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete }: OrderCardProps) 
                     <Pencil className="mr-2 h-4 w-4" />
                     Bearbeiten
                   </DropdownMenuItem>
+                  {onGenerateResetCode && (
+                    <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
+                      <KeyRound className="mr-2 h-4 w-4" />
+                      Einmalcode generieren
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={() => onDelete(order.id)}
                     className="text-destructive"

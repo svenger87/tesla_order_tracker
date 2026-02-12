@@ -2,6 +2,7 @@
 
 import { memo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { COLORS } from '@/lib/types'
 
 // Tesla compositor base URL
 const COMPOSITOR_BASE = 'https://static-assets.tesla.com/v1/compositor/'
@@ -22,6 +23,36 @@ const COLOR_CODES: Record<string, string> = {
   'red_multi': 'PPMR',
   'midnight_cherry': 'PR00',
   'silver_metallic': 'PMSS',
+}
+
+// Find color value from either value or label
+function findColorValue(colorInput: string | null | undefined): string | null {
+  if (!colorInput) return null
+
+  // First check if it's already a valid value
+  if (COLOR_CODES[colorInput]) {
+    return colorInput
+  }
+
+  // Otherwise try to find by label (case-insensitive)
+  const normalizedInput = colorInput.toLowerCase().trim()
+  const color = COLORS.find(c =>
+    c.value === normalizedInput ||
+    c.label.toLowerCase() === normalizedInput ||
+    normalizedInput.includes(c.label.toLowerCase()) ||
+    c.label.toLowerCase().includes(normalizedInput)
+  )
+
+  return color?.value || null
+}
+
+// Extract wheel size number from value or label (e.g., "19" from '19"' or '19')
+function findWheelSize(wheelInput: string | null | undefined): string | null {
+  if (!wheelInput) return null
+
+  // Extract just the number portion
+  const match = wheelInput.match(/(\d{2})/)
+  return match ? match[1] : null
 }
 
 // Model Y wheel codes
@@ -64,17 +95,19 @@ function buildCompositorUrl(
   // Build options array
   const options: string[] = []
 
-  // Add color code
-  if (color && COLOR_CODES[color]) {
-    options.push(`$${COLOR_CODES[color]}`)
+  // Add color code - resolve from value or label
+  const colorValue = findColorValue(color)
+  if (colorValue && COLOR_CODES[colorValue]) {
+    options.push(`$${COLOR_CODES[colorValue]}`)
   } else {
     // Default to Pearl White
     options.push('$PPSW')
   }
 
-  // Add wheel code
-  if (wheels && wheelCodes[wheels]) {
-    options.push(`$${wheelCodes[wheels]}`)
+  // Add wheel code - extract wheel size from value or label
+  const wheelSize = findWheelSize(wheels)
+  if (wheelSize && wheelCodes[wheelSize]) {
+    options.push(`$${wheelCodes[wheelSize]}`)
   } else {
     // Default to base wheels
     options.push(vehicleType === 'Model Y' ? '$WY19B' : '$W38B')

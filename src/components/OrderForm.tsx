@@ -152,6 +152,22 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return getConstraintsForModel(selectedModelValue)
   }, [selectedModelValue, getConstraintsForModel])
 
+  // Helper to convert value to label (database stores values, form uses labels)
+  const valueToLabel = <T extends { value: string; label: string }>(
+    options: T[],
+    value: string | null
+  ): string => {
+    if (!value) return ''
+    // First try to find by value
+    const byValue = options.find(o => o.value === value)
+    if (byValue) return byValue.label
+    // If not found, it might already be a label
+    const byLabel = options.find(o => o.label === value)
+    if (byLabel) return byLabel.label
+    // Return original value as fallback
+    return value
+  }
+
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
@@ -161,16 +177,17 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           vehicleType: (order.vehicleType as VehicleType) || 'Model Y',
           orderDate: order.orderDate || '',
           country: order.country || '',
-          model: order.model || '',
-          range: order.range || '',
-          drive: order.drive || '',
-          color: order.color || '',
-          interior: order.interior || '',
-          wheels: order.wheels || '',
-          towHitch: order.towHitch || '',
-          autopilot: order.autopilot || '',
+          // Convert database values to labels for Select components
+          model: valueToLabel(models, order.model),
+          range: valueToLabel(ranges, order.range),
+          drive: valueToLabel(drives, order.drive),
+          color: valueToLabel(colors, order.color),
+          interior: valueToLabel(interiors, order.interior),
+          wheels: valueToLabel(wheels, order.wheels),
+          towHitch: valueToLabel(towHitch, order.towHitch),
+          autopilot: valueToLabel(autopilot, order.autopilot),
           deliveryWindow: order.deliveryWindow || '',
-          deliveryLocation: order.deliveryLocation || '',
+          deliveryLocation: valueToLabel(deliveryLocations, order.deliveryLocation),
           vin: order.vin || '',
           vinReceivedDate: order.vinReceivedDate || '',
           papersReceivedDate: order.papersReceivedDate || '',
@@ -192,7 +209,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setConfirmNewEditCode('')
       setError('')
     }
-  }, [open, order])
+  }, [open, order, models, ranges, drives, colors, interiors, wheels, towHitch, autopilot, deliveryLocations])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

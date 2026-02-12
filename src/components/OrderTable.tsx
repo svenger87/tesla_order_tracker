@@ -142,7 +142,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Filter, X, Search } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Filter, X, Search, KeyRound } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -279,6 +279,7 @@ interface OrderTableProps {
   isAdmin: boolean
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
+  onGenerateResetCode?: (orderId: string, orderName: string) => void
 }
 
 interface SortableHeaderProps {
@@ -318,7 +319,7 @@ function SortableHeader({ field, currentField, direction, onSort, children }: So
 const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProps) {
+export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderTableProps) {
   // Default sort: orderDate ascending (oldest first, newest at bottom)
   const [sortField, setSortField] = useState<SortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -733,6 +734,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
               isAdmin={isAdmin}
               onEdit={onEdit}
               onDelete={onDelete}
+              onGenerateResetCode={onGenerateResetCode}
             />
           ))
         )}
@@ -910,6 +912,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
                           <Pencil className="mr-2 h-4 w-4" />
                           Bearbeiten
                         </DropdownMenuItem>
+                        {onGenerateResetCode && (
+                          <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
+                            <KeyRound className="mr-2 h-4 w-4" />
+                            Einmalcode generieren
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                           onClick={() => onDelete(order.id)}
                           className="text-destructive"
