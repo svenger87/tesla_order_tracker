@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Order, OrderFormData, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_3_TRIMS, MODEL_3_WHEEL_CONSTRAINTS, MODEL_3_COLOR_CONSTRAINTS, MODEL_3_INTERIOR_CONSTRAINTS, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
+import { useState, useEffect, useMemo } from 'react'
+import { Order, OrderFormData, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
+import { useConstraints } from '@/hooks/useConstraints'
 import {
   Dialog,
   DialogContent,
@@ -135,6 +136,21 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
   // Load dynamic options from API (filtered by vehicle type)
   const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
+
+  // Load constraints from database
+  const { getConstraintsForModel, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
+
+  // Get the model value from the selected label (for constraint lookups)
+  const selectedModelValue = useMemo(() => {
+    const model = models.find(m => m.label === formData.model)
+    return model?.value || ''
+  }, [models, formData.model])
+
+  // Get constraints for the selected model
+  const modelConstraints = useMemo(() => {
+    if (!selectedModelValue) return {}
+    return getConstraintsForModel(selectedModelValue)
+  }, [selectedModelValue, getConstraintsForModel])
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -382,50 +398,45 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Label htmlFor="model">Model *</Label>
               <Select value={formData.model} onValueChange={(v) => {
                 handleChange('model', v)
-                // Auto-set fields based on model and vehicle type
-                if (formData.vehicleType === 'Model Y') {
-                  if (v === 'Performance') {
-                    handleChange('range', 'Maximale Reichweite')
-                    handleChange('wheels', '21"')
-                    handleChange('drive', 'AWD')
-                  } else if (v === 'Standard') {
-                    handleChange('range', 'Standard')
-                    handleChange('wheels', '18"')
-                    handleChange('drive', 'RWD')
-                  } else if (v === 'Premium') {
-                    handleChange('range', 'Maximale Reichweite')
-                  }
-                } else if (formData.vehicleType === 'Model 3') {
-                  // Model 3 constraints based on German market 2025
-                  if (v === 'Hinterradantrieb') {
-                    handleChange('range', 'Standard')
-                    handleChange('wheels', '18"')
-                    handleChange('drive', 'RWD')
-                    handleChange('interior', 'Schwarz')  // Only black interior available
-                  } else if (v === 'Premium Maximale Reichweite RWD') {
-                    handleChange('range', 'Maximale Reichweite')
-                    handleChange('drive', 'RWD')
-                    handleChange('wheels', '')  // User can choose 18" or 19"
-                  } else if (v === 'Premium Maximale Reichweite AWD') {
-                    handleChange('range', 'Maximale Reichweite')
-                    handleChange('drive', 'AWD')
-                    handleChange('wheels', '')  // User can choose 18" or 19"
-                  } else if (v === 'Performance') {
-                    handleChange('range', 'Maximale Reichweite')
-                    handleChange('wheels', '20"')
-                    handleChange('drive', 'AWD')
-                  }
-                  // Reset color if not available for this trim
-                  const trimValue = MODEL_3_TRIMS.find(t => t.label === v)?.value
-                  if (trimValue && formData.color) {
-                    const colorValue = colors.find(c => c.label === formData.color)?.value
-                    if (colorValue && !MODEL_3_COLOR_CONSTRAINTS[trimValue]?.includes(colorValue)) {
-                      handleChange('color', '')
+                // Find the model value for constraint lookups
+                const modelValue = models.find(m => m.label === v)?.value
+                if (!modelValue) return
+
+                // Get constraints for this model
+                const constraints = getConstraintsForModel(modelValue)
+
+                // Auto-set fields based on constraints
+                const fields = ['range', 'wheels', 'drive', 'interior'] as const
+                for (const field of fields) {
+                  const fieldConstraint = constraints[field]
+                  if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
+                    // Find the label for the fixed value
+                    const optionsList = field === 'range' ? RANGES :
+                                        field === 'wheels' ? wheels :
+                                        field === 'drive' ? drives :
+                                        field === 'interior' ? interiors : []
+                    const option = optionsList.find(o => o.value === fieldConstraint.fixedValue)
+                    if (option) {
+                      handleChange(field, option.label)
                     }
                   }
-                  // Reset tow hitch if not available for this trim
-                  if (trimValue && !MODEL_3_TOW_HITCH_AVAILABLE[trimValue]) {
-                    handleChange('towHitch', 'Nein')
+                }
+
+                // Reset color if not in allowed values
+                if (constraints.color?.type === 'allow' && formData.color) {
+                  const colorValue = colors.find(c => c.label === formData.color)?.value
+                  if (colorValue && constraints.color.allowedValues && !constraints.color.allowedValues.includes(colorValue)) {
+                    handleChange('color', '')
+                  }
+                }
+
+                // Auto-set towHitch if field is disabled
+                if (constraints.towHitch?.type === 'disable') {
+                  handleChange('towHitch', 'Nein')
+                } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
+                  const option = towHitch.find(o => o.value === constraints.towHitch?.fixedValue)
+                  if (option) {
+                    handleChange('towHitch', option.label)
                   }
                 }
               }}>
@@ -442,48 +453,30 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </Select>
             </div>
 
-            {/* Reichweite - shown for all models, disabled for Performance/Standard/base variants */}
+            {/* Reichweite - shown for all models, disabled if constrained */}
             <div className="space-y-2">
               <Label htmlFor="range">Reichweite</Label>
               <Select
                 value={formData.range}
                 onValueChange={(v) => handleChange('range', v)}
-                disabled={
-                  formData.model === 'Performance' ||
-                  formData.model === 'Standard' ||
-                  // Model 3 trims all have fixed range
-                  formData.model === 'Hinterradantrieb' ||
-                  formData.model === 'Premium Maximale Reichweite RWD' ||
-                  formData.model === 'Premium Maximale Reichweite AWD'
-                }
+                disabled={isFieldDisabled(selectedModelValue, 'range')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Reichweite wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {RANGES.map((r) => (
+                  {filterOptions(selectedModelValue, 'range', RANGES).map((r) => (
                     <SelectItem key={r.value} value={r.label}>
                       {r.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {/* Model Y hints */}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
-                <p className="text-xs text-muted-foreground">Performance ist immer Max. Reichweite</p>
-              )}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
-                <p className="text-xs text-muted-foreground">Standard ist immer Standard-Reichweite</p>
-              )}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Premium' && (
-                <p className="text-xs text-muted-foreground">Premium ist normalerweise Max. Reichweite (Q3: editierbar)</p>
-              )}
-              {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">Hinterradantrieb ist Standard-Reichweite</p>
-              )}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite RWD' || formData.model === 'Premium Maximale Reichweite AWD' || formData.model === 'Performance') && (
-                <p className="text-xs text-muted-foreground">Premium/Performance ist immer Max. Reichweite</p>
+              {/* Show hint if field is fixed */}
+              {modelConstraints.range?.type === 'fixed' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: {formData.range} ist fest
+                </p>
               )}
             </div>
 
@@ -492,39 +485,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.drive}
                 onValueChange={(v) => handleChange('drive', v)}
-                disabled={
-                  formData.model === 'Standard' ||
-                  formData.model === 'Performance' ||
-                  // Model 3 trims all have fixed drive
-                  formData.model === 'Hinterradantrieb' ||
-                  formData.model === 'Premium Maximale Reichweite RWD' ||
-                  formData.model === 'Premium Maximale Reichweite AWD'
-                }
+                disabled={isFieldDisabled(selectedModelValue, 'drive')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Antrieb wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {drives.map((d) => (
+                  {filterOptions(selectedModelValue, 'drive', drives).map((d) => (
                     <SelectItem key={d.value} value={d.label}>
                       {d.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {/* Model Y hints */}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
-                <p className="text-xs text-muted-foreground">Standard hat immer RWD</p>
-              )}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
-                <p className="text-xs text-muted-foreground">Performance hat immer AWD</p>
-              )}
-              {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Hinterradantrieb' || formData.model === 'Premium Maximale Reichweite RWD') && (
-                <p className="text-xs text-muted-foreground">{formData.model} hat immer RWD</p>
-              )}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite AWD' || formData.model === 'Performance') && (
-                <p className="text-xs text-muted-foreground">{formData.model} hat immer AWD</p>
+              {/* Show hint if field is fixed */}
+              {modelConstraints.drive?.type === 'fixed' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: {formData.drive} ist fest
+                </p>
               )}
             </div>
 
@@ -553,38 +531,29 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {colors
-                    .filter((c) => {
-                      // Model 3 color filtering based on trim
-                      if (formData.vehicleType === 'Model 3' && formData.model) {
-                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
-                        if (trimValue && MODEL_3_COLOR_CONSTRAINTS[trimValue]) {
-                          return MODEL_3_COLOR_CONSTRAINTS[trimValue].includes(c.value)
-                        }
-                      }
-                      return true
-                    })
-                    .map((c) => (
-                      <SelectItem key={c.value} value={c.label}>
-                        <div className="flex items-center gap-2">
-                          {c.hex && (
-                            <span
-                              className={cn(
-                                "w-4 h-4 rounded-full inline-block",
-                                c.border && "border border-border"
-                              )}
-                              style={{ backgroundColor: c.hex }}
-                            />
-                          )}
-                          {c.label}
-                        </div>
-                      </SelectItem>
-                    ))}
+                  {filterOptions(selectedModelValue, 'color', colors).map((c) => (
+                    <SelectItem key={c.value} value={c.label}>
+                      <div className="flex items-center gap-2">
+                        {c.hex && (
+                          <span
+                            className={cn(
+                              "w-4 h-4 rounded-full inline-block",
+                              c.border && "border border-border"
+                            )}
+                            style={{ backgroundColor: c.hex }}
+                          />
+                        )}
+                        {c.label}
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {/* Model 3 color hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">Hinterradantrieb: nur Pearl White, Diamond Black, Stealth Grey</p>
+              {/* Show hint if colors are restricted */}
+              {modelConstraints.color?.type === 'allow' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: eingeschränkte Farbauswahl
+                </p>
               )}
             </div>
 
@@ -593,33 +562,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.interior}
                 onValueChange={(v) => handleChange('interior', v)}
-                disabled={formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb'}
+                disabled={isFieldDisabled(selectedModelValue, 'interior')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Innenraum wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {interiors
-                    .filter((i) => {
-                      // Model 3 interior filtering based on trim
-                      if (formData.vehicleType === 'Model 3' && formData.model) {
-                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
-                        if (trimValue && MODEL_3_INTERIOR_CONSTRAINTS[trimValue]) {
-                          return MODEL_3_INTERIOR_CONSTRAINTS[trimValue].includes(i.value)
-                        }
-                      }
-                      return true
-                    })
-                    .map((i) => (
-                      <SelectItem key={i.value} value={i.label}>
-                        {i.label}
-                      </SelectItem>
-                    ))}
+                  {filterOptions(selectedModelValue, 'interior', interiors).map((i) => (
+                    <SelectItem key={i.value} value={i.label}>
+                      {i.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {/* Model 3 interior hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">Hinterradantrieb: nur Schwarz verfügbar</p>
+              {/* Show hint if interior is fixed */}
+              {modelConstraints.interior?.type === 'fixed' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: {formData.interior} ist fest
+                </p>
               )}
             </div>
 
@@ -628,60 +588,30 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.wheels}
                 onValueChange={(v) => handleChange('wheels', v)}
-                disabled={
-                  // Model Y fixed wheels
-                  formData.model === 'Standard' ||
-                  formData.model === 'Performance' ||
-                  // Model 3 trims with only one wheel option
-                  formData.model === 'Hinterradantrieb' ||
-                  (formData.vehicleType === 'Model 3' && formData.model === 'Performance')
-                }
+                disabled={isFieldDisabled(selectedModelValue, 'wheels')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Felgen wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {wheels
-                    .filter((w) => {
-                      // Model Y Premium only has 19" and 20"
-                      if (formData.vehicleType === 'Model Y' && formData.model === 'Premium') {
-                        return w.label.includes('19') || w.label.includes('20')
-                      }
-                      // Model 3 wheel filtering based on trim
-                      if (formData.vehicleType === 'Model 3' && formData.model) {
-                        const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
-                        if (trimValue && MODEL_3_WHEEL_CONSTRAINTS[trimValue]) {
-                          return MODEL_3_WHEEL_CONSTRAINTS[trimValue].includes(w.value)
-                        }
-                      }
-                      return true
-                    })
-                    .map((w) => (
-                      <SelectItem key={w.value} value={w.label}>
-                        {w.label}
-                      </SelectItem>
-                    ))}
+                  {filterOptions(selectedModelValue, 'wheels', wheels).map((w) => (
+                    <SelectItem key={w.value} value={w.label}>
+                      {w.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {/* Model Y hints */}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
-                <p className="text-xs text-muted-foreground">Standard hat immer 18"</p>
+              {/* Show hint if wheels are fixed */}
+              {modelConstraints.wheels?.type === 'fixed' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: {formData.wheels} ist fest
+                </p>
               )}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
-                <p className="text-xs text-muted-foreground">Performance hat immer 21"</p>
-              )}
-              {formData.vehicleType === 'Model Y' && formData.model === 'Premium' && (
-                <p className="text-xs text-muted-foreground">Premium: nur 19" oder 20"</p>
-              )}
-              {/* Model 3 hints */}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">Hinterradantrieb hat 18"</p>
-              )}
-              {formData.vehicleType === 'Model 3' && formData.model === 'Performance' && (
-                <p className="text-xs text-muted-foreground">Performance hat 20"</p>
-              )}
-              {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite RWD' || formData.model === 'Premium Maximale Reichweite AWD') && (
-                <p className="text-xs text-muted-foreground">Premium: 18" oder 19"</p>
+              {/* Show hint if wheels are restricted */}
+              {modelConstraints.wheels?.type === 'allow' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: eingeschränkte Felgenauswahl
+                </p>
               )}
             </div>
 
@@ -690,31 +620,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.towHitch}
                 onValueChange={(v) => handleChange('towHitch', v)}
-                disabled={(() => {
-                  // Model 3: only Hinterradantrieb has tow hitch option
-                  if (formData.vehicleType === 'Model 3' && formData.model) {
-                    const trimValue = MODEL_3_TRIMS.find(t => t.label === formData.model)?.value
-                    if (trimValue && !MODEL_3_TOW_HITCH_AVAILABLE[trimValue]) {
-                      return true
-                    }
-                  }
-                  return false
-                })()}
+                disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="AHK wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {towHitch.map((t) => (
+                  {filterOptions(selectedModelValue, 'towHitch', towHitch).map((t) => (
                     <SelectItem key={t.value} value={t.label}>
                       {t.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {/* Model 3 tow hitch hints */}
-              {formData.vehicleType === 'Model 3' && formData.model && formData.model !== 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">AHK nur für Hinterradantrieb verfügbar</p>
+              {/* Show hint if tow hitch is disabled */}
+              {modelConstraints.towHitch?.type === 'disable' && (
+                <p className="text-xs text-muted-foreground">
+                  {formData.model}: AHK nicht verfügbar
+                </p>
               )}
             </div>
 

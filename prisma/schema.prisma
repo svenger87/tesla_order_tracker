@@ -84,3 +84,21 @@ model Option {
   @@unique([type, value, vehicleType])
   @@index([type, vehicleType, isActive, sortOrder])
 }
+
+// Constraints between options (e.g., "Model 3 Hinterradantrieb can only have 18" wheels")
+model OptionConstraint {
+  id             String   @id @default(cuid())
+  sourceType     String   // Option type that triggers constraint (e.g., 'model')
+  sourceValue    String   // Option value that triggers constraint (e.g., 'hinterradantrieb')
+  vehicleType    String?  // Vehicle type for this constraint (e.g., 'Model 3'), null = all
+  targetType     String   // Field being constrained (e.g., 'wheels', 'color', 'interior')
+  constraintType String   // 'allow' = whitelist, 'fixed' = auto-set & disable, 'disable' = hide field
+  values         String   // JSON: array for 'allow' (["18","19"]), single value for 'fixed' ("Standard")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([sourceType, sourceValue, vehicleType, targetType])
+  @@index([sourceType, sourceValue, vehicleType, isActive])
+  @@index([vehicleType, isActive])
+}

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Tesla Bestellungen und Statistiken",
-  description: "Verfolge Tesla Model Y Bestellungen in der Community",
+  description: "Verfolge Tesla Bestellungen in der Community",
   icons: {
     icon: "/favicon.webp",
     apple: "/favicon.webp",
