@@ -1,0 +1,913 @@
+openapi: 3.0.3
+info:
+  title: Tesla Order Tracker API
+  description: |
+    External REST API for Tesla Order Tracker.
+
+    This API allows external systems to create, read, and update Tesla orders.
+    All endpoints require API key authentication via the `X-API-Key` header.
+
+    ## Authentication
+    Include your API key in the `X-API-Key` header with every request:
+    ```
+    X-API-Key: your-api-key-here
+    ```
+
+    ## Response Format
+    All responses follow a consistent envelope format:
+    ```json
+    {
+      "success": true,
+      "data": { ... },
+      "meta": {
+        "timestamp": "2025-02-12T10:30:00Z",
+        "version": "v1"
+      }
+    }
+    ```
+
+    ## Date Format
+    All dates use German format: `DD.MM.YYYY` (e.g., `15.01.2025`)
+  version: 1.0.0
+  contact:
+    name: Tesla Order Tracker
+servers:
+  - url: '{baseUrl}/api/v1'
+    description: API Server
+    variables:
+      baseUrl:
+        default: http://localhost:3000
+        description: Base URL of the application
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Orders
+    description: Order management operations
+  - name: Options
+    description: Form dropdown options
+
+paths:
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: List all orders
+      description: Returns a paginated list of orders with optional filtering
+      operationId: listOrders
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of orders to return (1-100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: Number of orders to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: country
+          in: query
+          description: Filter by country code (e.g., de, at, ch)
+          schema:
+            type: string
+        - name: model
+          in: query
+          description: Filter by model (standard, premium, performance)
+          schema:
+            type: string
+            enum: [standard, premium, performance]
+        - name: archived
+          in: query
+          description: Include archived orders
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+                      meta:
+                        allOf:
+                          - $ref: '#/components/schemas/Meta'
+                          - type: object
+                            properties:
+                              pagination:
+                                $ref: '#/components/schemas/Pagination'
+              example:
+                success: true
+                data:
+                  - id: "clx123abc"
+                    name: "MaxMustermann"
+                    orderDate: "15.01.2025"
+                    country: "de"
+                    model: "performance"
+                    range: null
+                    drive: "awd"
+                    color: "ultra_red"
+                    interior: "black"
+                    wheels: "21"
+                    towHitch: "ja"
+                    autopilot: "fsd"
+                    deliveryWindow: "Februar 2025"
+                    deliveryLocation: "München"
+                    vin: null
+                    vinReceivedDate: null
+                    papersReceivedDate: null
+                    productionDate: null
+                    typeApproval: null
+                    typeVariant: null
+                    deliveryDate: null
+                    orderToProduction: null
+                    orderToVin: null
+                    orderToDelivery: null
+                    orderToPapers: null
+                    papersToDelivery: null
+                    archived: false
+                    archivedAt: null
+                    createdAt: "2025-02-12T10:30:00.000Z"
+                    updatedAt: "2025-02-12T10:30:00.000Z"
+                meta:
+                  timestamp: "2025-02-12T10:30:00.000Z"
+                  version: "v1"
+                  pagination:
+                    total: 150
+                    limit: 50
+                    offset: 0
+                    hasMore: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Orders
+      summary: Create a new order
+      description: Creates a new order with the provided details
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            example:
+              name: "MaxMustermann"
+              orderDate: "15.01.2025"
+              country: "de"
+              model: "performance"
+              drive: "awd"
+              color: "ultra_red"
+              interior: "black"
+              wheels: "21"
+              towHitch: "ja"
+              autopilot: "fsd"
+              deliveryWindow: "Februar 2025"
+              deliveryLocation: "München"
+              editCode: "MySecure123"
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CreateOrderResponse'
+              example:
+                success: true
+                data:
+                  id: "clx789ghi"
+                  editCode: "MySecure123"
+                  message: "Order created successfully"
+                meta:
+                  timestamp: "2025-02-12T10:30:00.000Z"
+                  version: "v1"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by ID
+      description: Returns a single order by its ID
+      operationId: getOrderById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Orders
+      summary: Update an order
+      description: Updates an existing order. Requires the order's edit code for authorization.
+      operationId: updateOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderRequest'
+            example:
+              editCode: "MySecure123"
+              vin: "5YJ3E1EA1NF123456"
+              vinReceivedDate: "10.02.2025"
+              deliveryWindow: "Februar 2025"
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UpdateOrderResponse'
+              example:
+                success: true
+                data:
+                  id: "clx123abc"
+                  updatedAt: "2025-02-12T10:35:00.000Z"
+                  message: "Order updated successfully"
+                meta:
+                  timestamp: "2025-02-12T10:35:00.000Z"
+                  version: "v1"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders/by-name/{name}:
+    get:
+      tags:
+        - Orders
+      summary: Get orders by username
+      description: |
+        Returns all orders for a given username. Returns an array since
+        a user can have multiple orders with different order dates.
+        Username matching is case-insensitive.
+      operationId: getOrdersByName
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Username (URL-encoded)
+          schema:
+            type: string
+        - name: archived
+          in: query
+          description: Include archived orders
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+                      meta:
+                        allOf:
+                          - $ref: '#/components/schemas/Meta'
+                          - type: object
+                            properties:
+                              count:
+                                type: integer
+                                description: Number of orders found
+              example:
+                success: true
+                data:
+                  - id: "clx123abc"
+                    name: "MaxMustermann"
+                    orderDate: "15.01.2025"
+                    country: "de"
+                    model: "performance"
+                  - id: "clx456def"
+                    name: "MaxMustermann"
+                    orderDate: "20.06.2024"
+                    country: "de"
+                    model: "premium"
+                meta:
+                  timestamp: "2025-02-12T10:30:00.000Z"
+                  version: "v1"
+                  count: 2
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /options:
+    get:
+      tags:
+        - Options
+      summary: Get dropdown options
+      description: Returns all available dropdown options for the order form, grouped by type
+      operationId: getOptions
+      parameters:
+        - name: type
+          in: query
+          description: Filter by option type
+          schema:
+            type: string
+            enum:
+              - country
+              - model
+              - range
+              - drive
+              - color
+              - interior
+              - wheels
+              - autopilot
+              - towHitch
+              - deliveryLocation
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Options'
+              example:
+                success: true
+                data:
+                  country:
+                    - value: "de"
+                      label: "Deutschland"
+                      metadata:
+                        flag: "de"
+                    - value: "at"
+                      label: "Österreich"
+                      metadata:
+                        flag: "at"
+                  model:
+                    - value: "standard"
+                      label: "Standard"
+                    - value: "premium"
+                      label: "Premium"
+                    - value: "performance"
+                      label: "Performance"
+                  color:
+                    - value: "pearl_white"
+                      label: "Pearl White"
+                      metadata:
+                        hex: "#FFFFFF"
+                        border: true
+                    - value: "ultra_red"
+                      label: "Ultra Red"
+                      metadata:
+                        hex: "#C41E3A"
+                        border: false
+                meta:
+                  timestamp: "2025-02-12T10:30:00.000Z"
+                  version: "v1"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique order identifier
+        name:
+          type: string
+          description: Customer username
+        orderDate:
+          type: string
+          nullable: true
+          description: Order date (DD.MM.YYYY format)
+        country:
+          type: string
+          nullable: true
+          description: Country code
+        model:
+          type: string
+          nullable: true
+          enum: [standard, premium, performance]
+          description: Tesla model variant
+        range:
+          type: string
+          nullable: true
+          enum: [maximale_reichweite, standard]
+          description: Range option (not applicable for Performance)
+        drive:
+          type: string
+          nullable: true
+          enum: [rwd, awd]
+          description: Drive type
+        color:
+          type: string
+          nullable: true
+          description: Exterior color
+        interior:
+          type: string
+          nullable: true
+          enum: [black, white]
+          description: Interior color
+        wheels:
+          type: string
+          nullable: true
+          enum: ['18', '19', '20', '21']
+          description: Wheel size
+        towHitch:
+          type: string
+          nullable: true
+          enum: [ja, nein]
+          description: Tow hitch option
+        autopilot:
+          type: string
+          nullable: true
+          enum: [none, ap, eap, fsd, fsd_transfer]
+          description: Autopilot package
+        deliveryWindow:
+          type: string
+          nullable: true
+          description: Expected delivery window
+        deliveryLocation:
+          type: string
+          nullable: true
+          description: Delivery location
+        vin:
+          type: string
+          nullable: true
+          description: Vehicle Identification Number
+        vinReceivedDate:
+          type: string
+          nullable: true
+          description: Date VIN was received (DD.MM.YYYY)
+        papersReceivedDate:
+          type: string
+          nullable: true
+          description: Date papers were received (DD.MM.YYYY)
+        productionDate:
+          type: string
+          nullable: true
+          description: Production date (DD.MM.YYYY)
+        typeApproval:
+          type: string
+          nullable: true
+          description: Type approval code
+        typeVariant:
+          type: string
+          nullable: true
+          description: Type variant code
+        deliveryDate:
+          type: string
+          nullable: true
+          description: Actual delivery date (DD.MM.YYYY)
+        orderToProduction:
+          type: integer
+          nullable: true
+          description: Days from order to production
+        orderToVin:
+          type: integer
+          nullable: true
+          description: Days from order to VIN received
+        orderToDelivery:
+          type: integer
+          nullable: true
+          description: Days from order to delivery
+        orderToPapers:
+          type: integer
+          nullable: true
+          description: Days from order to papers received
+        papersToDelivery:
+          type: integer
+          nullable: true
+          description: Days from papers to delivery
+        archived:
+          type: boolean
+          description: Whether the order is archived
+        archivedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Archive timestamp
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Customer username (required)
+        orderDate:
+          type: string
+          description: Order date (DD.MM.YYYY format)
+        country:
+          type: string
+        model:
+          type: string
+          enum: [standard, premium, performance]
+        range:
+          type: string
+          enum: [maximale_reichweite, standard]
+        drive:
+          type: string
+          enum: [rwd, awd]
+        color:
+          type: string
+        interior:
+          type: string
+          enum: [black, white]
+        wheels:
+          type: string
+          enum: ['18', '19', '20', '21']
+        towHitch:
+          type: string
+          enum: [ja, nein]
+        autopilot:
+          type: string
+          enum: [none, ap, eap, fsd, fsd_transfer]
+        deliveryWindow:
+          type: string
+        deliveryLocation:
+          type: string
+        vin:
+          type: string
+        vinReceivedDate:
+          type: string
+        papersReceivedDate:
+          type: string
+        productionDate:
+          type: string
+        typeApproval:
+          type: string
+        typeVariant:
+          type: string
+        deliveryDate:
+          type: string
+        editCode:
+          type: string
+          description: Custom edit password (min 6 chars, must contain a number)
+
+    UpdateOrderRequest:
+      type: object
+      required:
+        - editCode
+      properties:
+        editCode:
+          type: string
+          description: Edit code for authorization (required)
+        name:
+          type: string
+        orderDate:
+          type: string
+        country:
+          type: string
+        model:
+          type: string
+        range:
+          type: string
+        drive:
+          type: string
+        color:
+          type: string
+        interior:
+          type: string
+        wheels:
+          type: string
+        towHitch:
+          type: string
+        autopilot:
+          type: string
+        deliveryWindow:
+          type: string
+        deliveryLocation:
+          type: string
+        vin:
+          type: string
+        vinReceivedDate:
+          type: string
+        papersReceivedDate:
+          type: string
+        productionDate:
+          type: string
+        typeApproval:
+          type: string
+        typeVariant:
+          type: string
+        deliveryDate:
+          type: string
+        expectedUpdatedAt:
+          type: string
+          format: date-time
+          description: For optimistic locking - fails if order was modified after this time
+
+    CreateOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Created order ID
+        editCode:
+          type: string
+          nullable: true
+          description: Edit code for future updates
+        message:
+          type: string
+
+    UpdateOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Updated order ID
+        updatedAt:
+          type: string
+          format: date-time
+          description: New update timestamp
+        message:
+          type: string
+
+    Option:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Option value
+        label:
+          type: string
+          description: Display label
+        metadata:
+          type: object
+          description: Additional metadata (e.g., hex color, flag emoji)
+
+    Options:
+      type: object
+      properties:
+        country:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        model:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        range:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        drive:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        color:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        interior:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        wheels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        autopilot:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        towHitch:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        deliveryLocation:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+
+    Meta:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "v1"
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        limit:
+          type: integer
+          description: Items per page
+        offset:
+          type: integer
+          description: Items skipped
+        hasMore:
+          type: boolean
+          description: Whether more items exist
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+            details:
+              type: object
+              description: Field-specific error details
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+  responses:
+    Unauthorized:
+      description: API key missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "UNAUTHORIZED"
+              message: "API key required. Use X-API-Key header."
+            meta:
+              timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "NOT_FOUND"
+              message: "Order not found"
+            meta:
+              timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "VALIDATION_ERROR"
+              message: "Validation failed"
+              details:
+                name: "Name is required"
+            meta:
+              timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"
+
+    Conflict:
+      description: Conflict (e.g., concurrent modification)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "CONFLICT"
+              message: "Order was modified by another user. Please refresh and try again."
+            meta:
+              timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "SERVER_ERROR"
+              message: "Internal server error"
+            meta:
+              timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"

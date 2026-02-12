@@ -1,0 +1,549 @@
+{
+  "info": {
+    "_postman_id": "tesla-order-tracker-v1",
+    "name": "Tesla Order Tracker API v1",
+    "description": "External REST API for Tesla Order Tracker.\n\n## Authentication\nAll requests require an API key in the `X-API-Key` header.\n\n## Setup\n1. Create an environment with `base_url` and `api_key` variables\n2. Set `base_url` to your server URL (e.g., `http://localhost:3000`)\n3. Set `api_key` to your API key\n\n## Date Format\nAll dates use German format: DD.MM.YYYY (e.g., 15.01.2025)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string",
+      "description": "Order ID from create/list operations"
+    },
+    {
+      "key": "edit_code",
+      "value": "",
+      "type": "string",
+      "description": "Edit code from create operation"
+    }
+  ],
+  "item": [
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders?limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Maximum number of orders (1-100)"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of orders to skip"
+                }
+              ]
+            },
+            "description": "Returns a paginated list of all orders"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"clx123abc\",\n      \"name\": \"MaxMustermann\",\n      \"orderDate\": \"15.01.2025\",\n      \"country\": \"de\",\n      \"model\": \"performance\",\n      \"color\": \"ultra_red\"\n    }\n  ],\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\",\n    \"pagination\": {\n      \"total\": 1,\n      \"limit\": 50,\n      \"offset\": 0,\n      \"hasMore\": false\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Orders (with filters)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders?country=de&model=performance&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "de",
+                  "description": "Filter by country code"
+                },
+                {
+                  "key": "model",
+                  "value": "performance",
+                  "description": "Filter by model (standard, premium, performance)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "archived",
+                  "value": "true",
+                  "description": "Include archived orders",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns orders filtered by country and model"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}"]
+            },
+            "description": "Returns a single order by its ID"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/clx123abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "clx123abc"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx123abc\",\n    \"name\": \"MaxMustermann\",\n    \"orderDate\": \"15.01.2025\",\n    \"country\": \"de\",\n    \"model\": \"performance\",\n    \"range\": null,\n    \"drive\": \"awd\",\n    \"color\": \"ultra_red\",\n    \"interior\": \"black\",\n    \"wheels\": \"21\",\n    \"towHitch\": \"ja\",\n    \"autopilot\": \"fsd\",\n    \"deliveryWindow\": \"Februar 2025\",\n    \"deliveryLocation\": \"München\",\n    \"vin\": null,\n    \"archived\": false,\n    \"createdAt\": \"2025-02-12T10:30:00.000Z\",\n    \"updatedAt\": \"2025-02-12T10:30:00.000Z\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/invalid-id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "invalid-id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Order not found\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Orders by Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/by-name/MaxMustermann",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "by-name", "MaxMustermann"]
+            },
+            "description": "Returns all orders for a given username. Case-insensitive matching."
+          },
+          "response": [
+            {
+              "name": "Success (multiple orders)",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/by-name/MaxMustermann",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "by-name", "MaxMustermann"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"clx123abc\",\n      \"name\": \"MaxMustermann\",\n      \"orderDate\": \"15.01.2025\",\n      \"model\": \"performance\"\n    },\n    {\n      \"id\": \"clx456def\",\n      \"name\": \"MaxMustermann\",\n      \"orderDate\": \"20.06.2024\",\n      \"model\": \"premium\"\n    }\n  ],\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\",\n    \"count\": 2\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data) {",
+                  "    pm.collectionVariables.set('order_id', jsonData.data.id);",
+                  "    if (jsonData.data.editCode) {",
+                  "        pm.collectionVariables.set('edit_code', jsonData.data.editCode);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MaxMustermann\",\n  \"orderDate\": \"15.01.2025\",\n  \"country\": \"de\",\n  \"model\": \"performance\",\n  \"drive\": \"awd\",\n  \"color\": \"ultra_red\",\n  \"interior\": \"black\",\n  \"wheels\": \"21\",\n  \"towHitch\": \"ja\",\n  \"autopilot\": \"fsd\",\n  \"deliveryWindow\": \"Februar 2025\",\n  \"deliveryLocation\": \"München\",\n  \"editCode\": \"MySecure123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"]
+            },
+            "description": "Creates a new order. The `editCode` is optional - if not provided, one will be auto-generated.\n\n**Note**: The test script automatically saves the returned `order_id` and `edit_code` to collection variables for use in subsequent requests."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"MaxMustermann\",\n  \"orderDate\": \"15.01.2025\",\n  \"country\": \"de\",\n  \"model\": \"performance\",\n  \"editCode\": \"MySecure123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx789ghi\",\n    \"editCode\": \"MySecure123\",\n    \"message\": \"Order created successfully\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Validation failed\",\n    \"details\": {\n      \"name\": \"Name is required\"\n    }\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order (minimal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"TestUser\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"]
+            },
+            "description": "Creates an order with only the required `name` field. An edit code will be auto-generated."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"editCode\": \"{{edit_code}}\",\n  \"vin\": \"5YJ3E1EA1NF123456\",\n  \"vinReceivedDate\": \"10.02.2025\",\n  \"deliveryWindow\": \"Februar 2025\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}"]
+            },
+            "description": "Updates an existing order. The `editCode` is required for authorization.\n\nOnly include fields you want to update."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"editCode\": \"MySecure123\",\n  \"vin\": \"5YJ3E1EA1NF123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/clx123abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "clx123abc"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx123abc\",\n    \"updatedAt\": \"2025-02-12T10:35:00.000Z\",\n    \"message\": \"Order updated successfully\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:35:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            },
+            {
+              "name": "Invalid Edit Code",
+              "originalRequest": {
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"editCode\": \"wrong-code\",\n  \"vin\": \"5YJ3E1EA1NF123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/clx123abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "clx123abc"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid edit code\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Order (with optimistic locking)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"editCode\": \"{{edit_code}}\",\n  \"vin\": \"5YJ3E1EA1NF123456\",\n  \"expectedUpdatedAt\": \"2025-02-12T10:30:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}"]
+            },
+            "description": "Updates with optimistic locking. If the order was modified after `expectedUpdatedAt`, the update will fail with a 409 Conflict error."
+          },
+          "response": [
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"editCode\": \"MySecure123\",\n  \"vin\": \"5YJ3E1EA1NF123456\",\n  \"expectedUpdatedAt\": \"2025-02-12T10:00:00.000Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders/clx123abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "orders", "clx123abc"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"CONFLICT\",\n    \"message\": \"Order was modified by another user. Please refresh and try again.\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:35:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Order management endpoints"
+    },
+    {
+      "name": "Options",
+      "item": [
+        {
+          "name": "Get All Options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/options",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "options"]
+            },
+            "description": "Returns all dropdown options grouped by type (country, model, color, etc.)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/options",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "options"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"country\": [\n      {\"value\": \"de\", \"label\": \"Deutschland\", \"metadata\": {\"flag\": \"de\"}},\n      {\"value\": \"at\", \"label\": \"Österreich\", \"metadata\": {\"flag\": \"at\"}}\n    ],\n    \"model\": [\n      {\"value\": \"standard\", \"label\": \"Standard\"},\n      {\"value\": \"premium\", \"label\": \"Premium\"},\n      {\"value\": \"performance\", \"label\": \"Performance\"}\n    ],\n    \"color\": [\n      {\"value\": \"pearl_white\", \"label\": \"Pearl White\", \"metadata\": {\"hex\": \"#FFFFFF\", \"border\": true}},\n      {\"value\": \"ultra_red\", \"label\": \"Ultra Red\", \"metadata\": {\"hex\": \"#C41E3A\"}}\n    ]\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Options by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/options?type=color",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "options"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "color",
+                  "description": "Option type: country, model, range, drive, color, interior, wheels, autopilot, towHitch, deliveryLocation"
+                }
+              ]
+            },
+            "description": "Returns options for a specific type only"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/options?type=color",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "options"],
+                  "query": [{"key": "type", "value": "color"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"color\": [\n      {\"value\": \"pearl_white\", \"label\": \"Pearl White\", \"metadata\": {\"hex\": \"#FFFFFF\", \"border\": true}},\n      {\"value\": \"diamond_black\", \"label\": \"Diamond Black\", \"metadata\": {\"hex\": \"#1A1A1A\"}},\n      {\"value\": \"ultra_red\", \"label\": \"Ultra Red\", \"metadata\": {\"hex\": \"#C41E3A\"}}\n    ]\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Form dropdown options"
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Test API Key (any endpoint)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/options",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "options"]
+            },
+            "description": "Test that your API key is valid. This request uses the collection-level auth."
+          },
+          "response": [
+            {
+              "name": "Missing API Key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/options",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "options"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"API key required. Use X-API-Key header.\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            },
+            {
+              "name": "Invalid API Key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {"key": "X-API-Key", "value": "invalid-key"}
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/options",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "options"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid API key\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Test authentication"
+    }
+  ]
+}
