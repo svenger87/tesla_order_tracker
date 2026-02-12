@@ -140,33 +140,16 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   // Load constraints from database
   const { getConstraintsForModel, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
 
-  // Get the model value from the selected label (for constraint lookups)
+  // Get the model value for constraint lookups (formData.model is already a value)
   const selectedModelValue = useMemo(() => {
-    const model = models.find(m => m.label === formData.model)
-    return model?.value || ''
-  }, [models, formData.model])
+    return formData.model || ''
+  }, [formData.model])
 
   // Get constraints for the selected model
   const modelConstraints = useMemo(() => {
     if (!selectedModelValue) return {}
     return getConstraintsForModel(selectedModelValue)
   }, [selectedModelValue, getConstraintsForModel])
-
-  // Helper to convert value to label (database stores values, form uses labels)
-  const valueToLabel = <T extends { value: string; label: string }>(
-    options: T[],
-    value: string | null
-  ): string => {
-    if (!value) return ''
-    // First try to find by value
-    const byValue = options.find(o => o.value === value)
-    if (byValue) return byValue.label
-    // If not found, it might already be a label
-    const byLabel = options.find(o => o.label === value)
-    if (byLabel) return byLabel.label
-    // Return original value as fallback
-    return value
-  }
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -177,17 +160,17 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           vehicleType: (order.vehicleType as VehicleType) || 'Model Y',
           orderDate: order.orderDate || '',
           country: order.country || '',
-          // Convert database values to labels for Select components
-          model: valueToLabel(models, order.model),
-          range: valueToLabel(ranges, order.range),
-          drive: valueToLabel(drives, order.drive),
-          color: valueToLabel(colors, order.color),
-          interior: valueToLabel(interiors, order.interior),
-          wheels: valueToLabel(wheels, order.wheels),
-          towHitch: valueToLabel(towHitch, order.towHitch),
-          autopilot: valueToLabel(autopilot, order.autopilot),
+          // Use raw values from database - SelectItems now use value directly
+          model: order.model || '',
+          range: order.range || '',
+          drive: order.drive || '',
+          color: order.color || '',
+          interior: order.interior || '',
+          wheels: order.wheels || '',
+          towHitch: order.towHitch || '',
+          autopilot: order.autopilot || '',
           deliveryWindow: order.deliveryWindow || '',
-          deliveryLocation: valueToLabel(deliveryLocations, order.deliveryLocation),
+          deliveryLocation: order.deliveryLocation || '',
           vin: order.vin || '',
           vinReceivedDate: order.vinReceivedDate || '',
           papersReceivedDate: order.papersReceivedDate || '',
@@ -209,7 +192,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setConfirmNewEditCode('')
       setError('')
     }
-  }, [open, order, models, ranges, drives, colors, interiors, wheels, towHitch, autopilot, deliveryLocations])
+  }, [open, order])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -400,7 +383,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((c) => (
-                    <SelectItem key={c.value} value={c.flag ? `${c.flag} ${c.label}` : c.label}>
+                    <SelectItem key={c.value} value={c.value}>
                       <span className="flex items-center gap-2">
                         {c.flag && <TwemojiEmoji emoji={c.flag} size={16} />}
                         {c.label}
@@ -415,8 +398,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Label htmlFor="model">Model *</Label>
               <Select value={formData.model} onValueChange={(v) => {
                 handleChange('model', v)
-                // Find the model value for constraint lookups
-                const modelValue = models.find(m => m.label === v)?.value
+                // v is now the model value directly (not label)
+                const modelValue = v
                 if (!modelValue) return
 
                 // Get constraints for this model
@@ -427,34 +410,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 for (const field of fields) {
                   const fieldConstraint = constraints[field]
                   if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
-                    // Find the label for the fixed value
-                    const optionsList = field === 'range' ? ranges :
-                                        field === 'wheels' ? wheels :
-                                        field === 'drive' ? drives :
-                                        field === 'interior' ? interiors : []
-                    const option = optionsList.find(o => o.value === fieldConstraint.fixedValue)
-                    if (option) {
-                      handleChange(field, option.label)
-                    }
+                    // Use the fixed value directly (not label)
+                    handleChange(field, fieldConstraint.fixedValue)
                   }
                 }
 
                 // Reset color if not in allowed values
                 if (constraints.color?.type === 'allow' && formData.color) {
-                  const colorValue = colors.find(c => c.label === formData.color)?.value
-                  if (colorValue && constraints.color.allowedValues && !constraints.color.allowedValues.includes(colorValue)) {
+                  // formData.color is already a value, not label
+                  if (constraints.color.allowedValues && !constraints.color.allowedValues.includes(formData.color)) {
                     handleChange('color', '')
                   }
                 }
 
                 // Auto-set towHitch if field is disabled (not available for this model)
                 if (constraints.towHitch?.type === 'disable') {
-                  handleChange('towHitch', 'n.v.')
+                  handleChange('towHitch', '-')
                 } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
-                  const option = towHitch.find(o => o.value === constraints.towHitch?.fixedValue)
-                  if (option) {
-                    handleChange('towHitch', option.label)
-                  }
+                  handleChange('towHitch', constraints.towHitch.fixedValue)
                 }
               }}>
                 <SelectTrigger>
@@ -462,7 +435,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {models.map((m) => (
-                    <SelectItem key={m.value} value={m.label}>
+                    <SelectItem key={m.value} value={m.value}>
                       {m.label}
                     </SelectItem>
                   ))}
@@ -483,7 +456,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'range', ranges).map((r) => (
-                    <SelectItem key={r.value} value={r.label}>
+                    <SelectItem key={r.value} value={r.value}>
                       {r.label}
                     </SelectItem>
                   ))}
@@ -509,7 +482,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'drive', drives).map((d) => (
-                    <SelectItem key={d.value} value={d.label}>
+                    <SelectItem key={d.value} value={d.value}>
                       {d.label}
                     </SelectItem>
                   ))}
@@ -531,7 +504,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                     {formData.color && (
                       <div className="flex items-center gap-2">
                         {(() => {
-                          const colorOpt = colors.find(c => c.label === formData.color)
+                          const colorOpt = colors.find(c => c.value === formData.color)
                           return colorOpt?.hex ? (
                             <span
                               className={cn(
@@ -542,14 +515,14 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                             />
                           ) : null
                         })()}
-                        {formData.color}
+                        {colors.find(c => c.value === formData.color)?.label || formData.color}
                       </div>
                     )}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'color', colors).map((c) => (
-                    <SelectItem key={c.value} value={c.label}>
+                    <SelectItem key={c.value} value={c.value}>
                       <div className="flex items-center gap-2">
                         {c.hex && (
                           <span
@@ -586,7 +559,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'interior', interiors).map((i) => (
-                    <SelectItem key={i.value} value={i.label}>
+                    <SelectItem key={i.value} value={i.value}>
                       {i.label}
                     </SelectItem>
                   ))}
@@ -612,7 +585,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'wheels', wheels).map((w) => (
-                    <SelectItem key={w.value} value={w.label}>
+                    <SelectItem key={w.value} value={w.value}>
                       {w.label}
                     </SelectItem>
                   ))}
@@ -644,7 +617,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {filterOptions(selectedModelValue, 'towHitch', towHitch).map((t) => (
-                    <SelectItem key={t.value} value={t.label}>
+                    <SelectItem key={t.value} value={t.value}>
                       {t.label}
                     </SelectItem>
                   ))}
@@ -666,7 +639,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {autopilot.map((a) => (
-                    <SelectItem key={a.value} value={a.label}>
+                    <SelectItem key={a.value} value={a.value}>
                       {a.label}
                     </SelectItem>
                   ))}
@@ -692,7 +665,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </SelectTrigger>
                 <SelectContent>
                   {deliveryLocations.map((loc) => (
-                    <SelectItem key={loc.value} value={loc.label}>
+                    <SelectItem key={loc.value} value={loc.value}>
                       {loc.label}
                     </SelectItem>
                   ))}

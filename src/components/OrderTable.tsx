@@ -333,7 +333,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Get options from useOptions hook (includes labels for values)
-  const { countries, models, ranges, drives, interiors, wheels } = useOptions()
+  const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions } = useOptions()
 
   // Helper to lookup label from value
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
@@ -850,13 +850,13 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                 <TableCell className="whitespace-nowrap">
                   {order.towHitch ? (
                     <Badge variant={order.towHitch.toLowerCase() === 'ja' ? 'default' : 'outline'}>
-                      {order.towHitch.charAt(0).toUpperCase() + order.towHitch.slice(1).toLowerCase()}
+                      {getLabel(towHitchOptions, order.towHitch)}
                     </Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {order.autopilot ? (
-                    <Badge variant="secondary">{order.autopilot.toUpperCase()}</Badge>
+                    <Badge variant="secondary">{getLabel(autopilotOptions, order.autopilot)}</Badge>
                   ) : '-'}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
