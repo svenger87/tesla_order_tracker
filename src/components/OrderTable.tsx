@@ -230,13 +230,18 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
   let aVal = a[field]
   let bVal = b[field]
 
-  // Handle country field - strip flag emojis and normalize umlauts for proper alphabetical sorting
+  // Handle country field - look up label from code and normalize umlauts for proper alphabetical sorting
   if (field === 'country') {
-    const aCountry = normalizeForSort(stripFlagEmoji((aVal as string | null) || ''))
-    const bCountry = normalizeForSort(stripFlagEmoji((bVal as string | null) || ''))
-    return direction === 'asc'
-      ? aCountry.localeCompare(bCountry)
-      : bCountry.localeCompare(aCountry)
+    const aCode = (aVal as string | null) || ''
+    const bCode = (bVal as string | null) || ''
+    // Look up country labels from COUNTRIES constant
+    const aLabel = COUNTRIES.find(c => c.value === aCode)?.label || aCode
+    const bLabel = COUNTRIES.find(c => c.value === bCode)?.label || bCode
+    const aCountry = normalizeForSort(aLabel)
+    const bCountry = normalizeForSort(bLabel)
+    if (aCountry < bCountry) return direction === 'asc' ? -1 : 1
+    if (aCountry > bCountry) return direction === 'asc' ? 1 : -1
+    return 0
   }
 
   // Handle date fields
