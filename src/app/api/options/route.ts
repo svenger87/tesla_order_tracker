@@ -40,7 +40,20 @@ export async function GET(request: NextRequest) {
       metadata: opt.metadata ? JSON.parse(opt.metadata) : null,
     }))
 
-    return NextResponse.json(parsedOptions)
+    // Sort countries alphabetically with German locale for proper umlaut handling
+    const sortedOptions = parsedOptions.sort((a, b) => {
+      // First sort by type
+      if (a.type !== b.type) return a.type.localeCompare(b.type)
+      // For countries, use German locale for proper umlaut sorting
+      if (a.type === 'country') {
+        return a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
+      }
+      // For other types, sort by sortOrder then label
+      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder
+      return a.label.localeCompare(b.label)
+    })
+
+    return NextResponse.json(sortedOptions)
   } catch (error) {
     console.error('Failed to fetch options:', error)
     return NextResponse.json({ error: 'Failed to fetch options' }, { status: 500 })

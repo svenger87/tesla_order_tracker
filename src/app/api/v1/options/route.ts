@@ -94,7 +94,14 @@ export const GET = withApiAuth(async (request: NextRequest) => {
       type: string,
       fallback: ApiOption[]
     ): ApiOption[] => {
-      return dbOptionsByType[type]?.length > 0 ? dbOptionsByType[type] : fallback
+      const options = dbOptionsByType[type]?.length > 0 ? dbOptionsByType[type] : fallback
+      // Sort countries alphabetically with German locale for proper umlaut handling
+      if (type === 'country') {
+        return options.sort((a, b) =>
+          a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
+        )
+      }
+      return options
     }
 
     // If filtering by type, return just that type's options

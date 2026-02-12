@@ -1,5 +1,9 @@
 # Tesla Order Tracker
 
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buymeacoffee&logoColor=white)](https://buymeacoffee.com/sven.7687)
+[![GitHub](https://img.shields.io/badge/GitHub-svenger87-181717?style=for-the-badge&logo=github)](https://github.com/svenger87/tesla_order_tracker)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
 A community-driven web application for tracking Tesla Model Y orders, delivery timelines, and statistics. Built with Next.js 16, React 19, and Prisma.
 
 ## Features
@@ -243,6 +247,16 @@ tesla_order_tracker/
 | `JWT_SECRET` | Yes | Secret for JWT tokens |
 | `ADMIN_USERNAME` | Yes | Default admin username |
 | `ADMIN_PASSWORD` | Yes | Default admin password |
+
+## Support the Project
+
+If you find this project helpful, consider supporting its development:
+
+<a href="https://buymeacoffee.com/sven.7687" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
+</a>
+
+Your support helps cover hosting costs and motivates continued development. Thank you!
 
 ## Contributing
 

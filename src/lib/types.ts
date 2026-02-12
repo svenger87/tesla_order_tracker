@@ -87,18 +87,38 @@ export interface SyncResult {
   errors: string[]
 }
 
+// All EU countries + Switzerland, UK, Norway - sorted alphabetically by German label
 export const COUNTRIES = [
-  { value: 'de', label: 'Deutschland', flag: '🇩🇪' },
-  { value: 'at', label: 'Österreich', flag: '🇦🇹' },
-  { value: 'ch', label: 'Schweiz', flag: '🇨🇭' },
-  { value: 'nl', label: 'Niederlande', flag: '🇳🇱' },
   { value: 'be', label: 'Belgien', flag: '🇧🇪' },
+  { value: 'bg', label: 'Bulgarien', flag: '🇧🇬' },
+  { value: 'dk', label: 'Dänemark', flag: '🇩🇰' },
+  { value: 'de', label: 'Deutschland', flag: '🇩🇪' },
+  { value: 'ee', label: 'Estland', flag: '🇪🇪' },
+  { value: 'fi', label: 'Finnland', flag: '🇫🇮' },
   { value: 'fr', label: 'Frankreich', flag: '🇫🇷' },
+  { value: 'gr', label: 'Griechenland', flag: '🇬🇷' },
+  { value: 'ie', label: 'Irland', flag: '🇮🇪' },
   { value: 'it', label: 'Italien', flag: '🇮🇹' },
-  { value: 'es', label: 'Spanien', flag: '🇪🇸' },
-  { value: 'pt', label: 'Portugal', flag: '🇵🇹' },
+  { value: 'hr', label: 'Kroatien', flag: '🇭🇷' },
+  { value: 'lv', label: 'Lettland', flag: '🇱🇻' },
+  { value: 'lt', label: 'Litauen', flag: '🇱🇹' },
+  { value: 'lu', label: 'Luxemburg', flag: '🇱🇺' },
+  { value: 'mt', label: 'Malta', flag: '🇲🇹' },
+  { value: 'nl', label: 'Niederlande', flag: '🇳🇱' },
+  { value: 'no', label: 'Norwegen', flag: '🇳🇴' },
+  { value: 'at', label: 'Österreich', flag: '🇦🇹' },
   { value: 'pl', label: 'Polen', flag: '🇵🇱' },
+  { value: 'pt', label: 'Portugal', flag: '🇵🇹' },
+  { value: 'ro', label: 'Rumänien', flag: '🇷🇴' },
+  { value: 'se', label: 'Schweden', flag: '🇸🇪' },
+  { value: 'ch', label: 'Schweiz', flag: '🇨🇭' },
+  { value: 'sk', label: 'Slowakei', flag: '🇸🇰' },
+  { value: 'si', label: 'Slowenien', flag: '🇸🇮' },
+  { value: 'es', label: 'Spanien', flag: '🇪🇸' },
+  { value: 'cz', label: 'Tschechien', flag: '🇨🇿' },
   { value: 'uk', label: 'UK', flag: '🇬🇧' },
+  { value: 'hu', label: 'Ungarn', flag: '🇭🇺' },
+  { value: 'cy', label: 'Zypern', flag: '🇨🇾' },
 ]
 
 export const MODELS = [

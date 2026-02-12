@@ -107,8 +107,13 @@ export function useOptions() {
       return FALLBACK_OPTIONS[type] || []
     }
 
+    // Sort countries alphabetically with German locale for proper umlaut handling
+    const sortedCountries = getOptionsForType('country').sort((a, b) =>
+      a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
+    )
+
     return {
-      countries: getOptionsForType('country'),
+      countries: sortedCountries,
       models: getOptionsForType('model'),
       drives: getOptionsForType('drive'),
       colors: getOptionsForType('color'),

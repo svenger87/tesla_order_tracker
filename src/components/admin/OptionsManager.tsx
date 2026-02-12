@@ -91,7 +91,12 @@ export function OptionsManager() {
   }, [fetchOptions])
 
   const getOptionsForType = (type: string) => {
-    return options.filter(o => o.type === type).sort((a, b) => a.sortOrder - b.sortOrder)
+    const typeOptions = options.filter(o => o.type === type)
+    // Sort countries alphabetically with German locale for proper umlaut handling
+    if (type === 'country') {
+      return typeOptions.sort((a, b) => a.label.localeCompare(b.label, 'de', { sensitivity: 'base' }))
+    }
+    return typeOptions.sort((a, b) => a.sortOrder - b.sortOrder)
   }
 
   const getTypeConfig = (type: string) => {
