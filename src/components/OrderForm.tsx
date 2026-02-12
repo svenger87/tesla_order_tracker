@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_Y_WHEELS, MODEL_3_WHEELS, MODEL_3_WHEEL_CONSTRAINTS, MODEL_3_COLOR_CONSTRAINTS, MODEL_3_INTERIOR_CONSTRAINTS, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
+import { Order, OrderFormData, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_3_TRIMS, MODEL_3_WHEEL_CONSTRAINTS, MODEL_3_COLOR_CONSTRAINTS, MODEL_3_INTERIOR_CONSTRAINTS, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import {
   Dialog,
@@ -134,7 +134,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
 
   // Load dynamic options from API (filtered by vehicle type)
-  const { countries, drives, colors, interiors, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
+  const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -399,20 +399,20 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   // Model 3 constraints based on German market 2025
                   if (v === 'Hinterradantrieb') {
                     handleChange('range', 'Standard')
-                    handleChange('wheels', '18" Prismata')
+                    handleChange('wheels', '18"')
                     handleChange('drive', 'RWD')
                     handleChange('interior', 'Schwarz')  // Only black interior available
                   } else if (v === 'Premium Maximale Reichweite RWD') {
                     handleChange('range', 'Maximale Reichweite')
                     handleChange('drive', 'RWD')
-                    handleChange('wheels', '')  // User can choose 18" Photon or 19" Nova
+                    handleChange('wheels', '')  // User can choose 18" or 19"
                   } else if (v === 'Premium Maximale Reichweite AWD') {
                     handleChange('range', 'Maximale Reichweite')
                     handleChange('drive', 'AWD')
-                    handleChange('wheels', '')  // User can choose 18" Photon or 19" Nova
+                    handleChange('wheels', '')  // User can choose 18" or 19"
                   } else if (v === 'Performance') {
                     handleChange('range', 'Maximale Reichweite')
-                    handleChange('wheels', '20" Warp')
+                    handleChange('wheels', '20"')
                     handleChange('drive', 'AWD')
                   }
                   // Reset color if not available for this trim
@@ -433,7 +433,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Model wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(formData.vehicleType === 'Model 3' ? MODEL_3_TRIMS : MODEL_Y_TRIMS).map((m) => (
+                  {models.map((m) => (
                     <SelectItem key={m.value} value={m.label}>
                       {m.label}
                     </SelectItem>
@@ -641,7 +641,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Felgen wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(formData.vehicleType === 'Model 3' ? MODEL_3_WHEELS : MODEL_Y_WHEELS)
+                  {wheels
                     .filter((w) => {
                       // Model Y Premium only has 19" and 20"
                       if (formData.vehicleType === 'Model Y' && formData.model === 'Premium') {
@@ -675,13 +675,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               )}
               {/* Model 3 hints */}
               {formData.vehicleType === 'Model 3' && formData.model === 'Hinterradantrieb' && (
-                <p className="text-xs text-muted-foreground">Hinterradantrieb hat 18" Prismata</p>
+                <p className="text-xs text-muted-foreground">Hinterradantrieb hat 18"</p>
               )}
               {formData.vehicleType === 'Model 3' && formData.model === 'Performance' && (
-                <p className="text-xs text-muted-foreground">Performance hat 20" Warp</p>
+                <p className="text-xs text-muted-foreground">Performance hat 20"</p>
               )}
               {formData.vehicleType === 'Model 3' && (formData.model === 'Premium Maximale Reichweite RWD' || formData.model === 'Premium Maximale Reichweite AWD') && (
-                <p className="text-xs text-muted-foreground">Premium: 18" Photon oder 19" Nova</p>
+                <p className="text-xs text-muted-foreground">Premium: 18" oder 19"</p>
               )}
             </div>
 

@@ -34,8 +34,21 @@ CREATE UNIQUE INDEX IF NOT EXISTS "Option_type_value_vehicleType_key" ON "Option
 
 
 -- ============================================
--- STEP 3: Seed Model 3 Options
+-- STEP 3: Seed Vehicle-Specific Options
 -- ============================================
+
+-- Model Y Trims
+INSERT INTO Option (id, type, value, label, vehicleType, sortOrder, isActive, createdAt, updatedAt) VALUES
+(lower(hex(randomblob(16))), 'model', 'standard', 'Standard', 'Model Y', 1, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'model', 'premium', 'Premium', 'Model Y', 2, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'model', 'performance', 'Performance', 'Model Y', 3, 1, datetime('now'), datetime('now'));
+
+-- Model Y Wheels
+INSERT INTO Option (id, type, value, label, vehicleType, sortOrder, isActive, createdAt, updatedAt) VALUES
+(lower(hex(randomblob(16))), 'wheels', '18', '18"', 'Model Y', 1, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'wheels', '19', '19"', 'Model Y', 2, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'wheels', '20', '20"', 'Model Y', 3, 1, datetime('now'), datetime('now')),
+(lower(hex(randomblob(16))), 'wheels', '21', '21"', 'Model Y', 4, 1, datetime('now'), datetime('now'));
 
 -- Model 3 Trims
 INSERT INTO Option (id, type, value, label, vehicleType, sortOrder, isActive, createdAt, updatedAt) VALUES

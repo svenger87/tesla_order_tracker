@@ -56,7 +56,7 @@ interface OptionFormData {
 }
 
 const VEHICLE_TYPE_OPTIONS = [
-  { value: '', label: 'Alle Fahrzeuge' },
+  { value: 'all', label: 'Alle Fahrzeuge' },
   { value: 'Model Y', label: 'Model Y' },
   { value: 'Model 3', label: 'Model 3' },
 ]
@@ -121,7 +121,7 @@ export function OptionsManager() {
   const openAddDialog = (type: string) => {
     setDialogType(type)
     setEditingOption(null)
-    setFormData({ value: '', label: '', vehicleType: '' })
+    setFormData({ value: '', label: '', vehicleType: 'all' })
     setDialogOpen(true)
   }
 
@@ -131,7 +131,7 @@ export function OptionsManager() {
     setFormData({
       value: option.value,
       label: option.label,
-      vehicleType: option.vehicleType || '',
+      vehicleType: option.vehicleType || 'all',
       flag: option.metadata?.flag,
       hex: option.metadata?.hex,
       border: option.metadata?.border,
@@ -157,6 +157,9 @@ export function OptionsManager() {
         if (formData.border !== undefined) metadata.border = formData.border
       }
 
+      // Convert 'all' to null for database storage
+      const vehicleTypeForDb = formData.vehicleType === 'all' ? null : formData.vehicleType
+
       if (editingOption) {
         // Update
         const res = await fetch('/api/options', {
@@ -165,7 +168,7 @@ export function OptionsManager() {
           body: JSON.stringify({
             id: editingOption.id,
             label: formData.label,
-            vehicleType: formData.vehicleType || null,  // null = all vehicles
+            vehicleType: vehicleTypeForDb,
             metadata: Object.keys(metadata).length > 0 ? metadata : null,
           }),
         })
@@ -183,7 +186,7 @@ export function OptionsManager() {
             type: dialogType,
             value: formData.value,
             label: formData.label,
-            vehicleType: formData.vehicleType || null,  // null = all vehicles
+            vehicleType: vehicleTypeForDb,
             metadata: Object.keys(metadata).length > 0 ? metadata : null,
             sortOrder: getOptionsForType(dialogType).length,
           }),
@@ -383,7 +386,7 @@ export function OptionsManager() {
                 </SelectTrigger>
                 <SelectContent>
                   {VEHICLE_TYPE_OPTIONS.map((vt) => (
-                    <SelectItem key={vt.value || 'all'} value={vt.value}>
+                    <SelectItem key={vt.value} value={vt.value}>
                       {vt.label}
                     </SelectItem>
                   ))}
