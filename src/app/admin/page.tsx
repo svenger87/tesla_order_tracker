@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { LogOut, Save, Home, Key, Heart, RefreshCw, AlertTriangle, Database, Bug, Archive, RotateCcw, Download } from 'lucide-react'
+import { LogOut, Save, Home, Key, Heart, RefreshCw, AlertTriangle, Database, Bug, Archive, RotateCcw, Download, Code2, Copy, Check, ExternalLink } from 'lucide-react'
 import { SyncResult } from '@/lib/types'
 import Link from 'next/link'
 import { OptionsManager } from '@/components/admin/OptionsManager'
@@ -53,6 +53,11 @@ export default function AdminDashboard() {
   const [exporting, setExporting] = useState(false)
   const [archiveError, setArchiveError] = useState('')
 
+  // API Key state
+  const [apiKey, setApiKey] = useState<string | null>(null)
+  const [apiKeyConfigured, setApiKeyConfigured] = useState(false)
+  const [apiKeyCopied, setApiKeyCopied] = useState(false)
+
   const router = useRouter()
 
   const checkAuth = useCallback(async () => {
@@ -91,6 +96,19 @@ export default function AdminDashboard() {
     }
   }, [])
 
+  const fetchApiKey = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/api-key')
+      const data = await res.json()
+      setApiKeyConfigured(data.configured)
+      if (data.configured) {
+        setApiKey(data.apiKey)
+      }
+    } catch (error) {
+      console.error('Failed to fetch API key:', error)
+    }
+  }, [])
+
   useEffect(() => {
     checkAuth().then((authed) => {
       if (authed) {
@@ -100,6 +118,7 @@ export default function AdminDashboard() {
             fetchArchiveInfo(settingsData.archiveThreshold ?? 180)
           }
         }).finally(() => setLoading(false))
+        fetchApiKey()
       }
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -412,6 +431,81 @@ export default function AdminDashboard() {
                   {changingPassword ? 'Ändern...' : 'Passwort ändern'}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* API Key for Developers */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code2 className="h-5 w-5" />
+                API für Entwickler
+              </CardTitle>
+              <CardDescription>
+                API-Schlüssel für externen Zugriff auf die Daten
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {apiKeyConfigured && apiKey ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>API Key</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={apiKey}
+                        readOnly
+                        className="font-mono text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(apiKey)
+                          setApiKeyCopied(true)
+                          setTimeout(() => setApiKeyCopied(false), 2000)
+                        }}
+                        title="Kopieren"
+                      >
+                        {apiKeyCopied ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Diesen Key an Entwickler weitergeben, die die API nutzen möchten.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Link href="/docs" target="_blank">
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        API Dokumentation
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                    <p><strong>Verfügbare Endpunkte:</strong></p>
+                    <ul className="list-disc list-inside ml-2 font-mono">
+                      <li>GET /api/v1/orders - Alle Bestellungen</li>
+                      <li>GET /api/v1/orders/by-name/:name - Nach Name</li>
+                      <li>POST /api/v1/orders - Neue Bestellung</li>
+                      <li>PUT /api/v1/orders/:id - Bestellung aktualisieren</li>
+                      <li>GET /api/v1/options - Dropdown-Optionen</li>
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  <p>API Key nicht konfiguriert.</p>
+                  <p className="mt-2">
+                    Setze <code className="bg-muted px-1 rounded">EXTERNAL_API_KEY</code> in den Umgebungsvariablen.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
