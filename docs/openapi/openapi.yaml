@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Tesla Order Tracker API
+  title: tff order stats API
   description: |
     External REST API for Tesla Order Tracker.
 

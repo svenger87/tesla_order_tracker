@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "tesla-order-tracker-v1",
-    "name": "Tesla Order Tracker API v1",
+    "name": "tff order stats API v1",
     "description": "External REST API for Tesla Order Tracker.\n\n## Authentication\nAll requests require an API key in the `X-API-Key` header.\n\n## Setup\n1. Create an environment with `base_url` and `api_key` variables\n2. Set `base_url` to your server URL (e.g., `http://localhost:3000`)\n3. Set `api_key` to your API key\n\n## Date Format\nAll dates use German format: DD.MM.YYYY (e.g., 15.01.2025)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
