@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Settings2, Save, Loader2, Check } from 'lucide-react'
+import { Settings2, Save, Loader2, Check, Database } from 'lucide-react'
 import { VEHICLE_TYPES, VehicleType } from '@/lib/types'
 
 interface Option {
@@ -62,6 +62,7 @@ export function ConstraintManager() {
   const [constraints, setConstraints] = useState<Constraint[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [seeding, setSeeding] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
 
@@ -282,6 +283,33 @@ export function ConstraintManager() {
     }
   }
 
+  // Seed constraints from hardcoded rules
+  const handleSeed = async () => {
+    setSeeding(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const res = await fetch('/api/admin/seed-constraints', {
+        method: 'POST',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Fehler beim Seeden')
+      }
+
+      setSuccess(`${data.created} Einschränkungen erstellt, ${data.skipped} übersprungen`)
+      await fetchConstraints()
+      setTimeout(() => setSuccess(''), 5000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Fehler beim Seeden')
+    } finally {
+      setSeeding(false)
+    }
+  }
+
   if (loading) {
     return (
       <Card>
@@ -296,13 +324,30 @@ export function ConstraintManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings2 className="h-5 w-5" />
-          Modell-Einschränkungen
-        </CardTitle>
-        <CardDescription>
-          Konfiguriere welche Optionen für jedes Modell verfügbar sind
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5" />
+              Modell-Einschränkungen
+            </CardTitle>
+            <CardDescription>
+              Konfiguriere welche Optionen für jedes Modell verfügbar sind
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSeed}
+            disabled={seeding}
+          >
+            {seeding ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Database className="h-4 w-4 mr-2" />
+            )}
+            {seeding ? 'Seede...' : 'Standard-Regeln laden'}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
