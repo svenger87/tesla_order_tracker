@@ -5,7 +5,7 @@ const COUNTRY_NAMES: Record<string, string> = {
   'DE': 'Deutschland',
   'AT': 'Österreich',
   'CH': 'Schweiz',
-  'NL': 'Nederland',
+  'NL': 'Niederlande',
   'PL': 'Polen',
   'PT': 'Portugal',
   'ES': 'Spanien',

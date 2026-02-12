@@ -235,12 +235,13 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     return direction === 'asc' ? aNum - bNum : bNum - aNum
   }
 
-  // Handle string fields
+  // Handle string fields - German collation sorts umlauts correctly (Ö = O, Ä = A, Ü = U)
   const aStr = (aVal as string | null) || ''
   const bStr = (bVal as string | null) || ''
+  const collator = new Intl.Collator('de', { sensitivity: 'base' })
   return direction === 'asc'
-    ? aStr.localeCompare(bStr, 'de')
-    : bStr.localeCompare(aStr, 'de')
+    ? collator.compare(aStr, bStr)
+    : collator.compare(bStr, aStr)
 }
 
 interface OrderTableProps {
