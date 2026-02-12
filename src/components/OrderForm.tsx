@@ -430,9 +430,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   }
                 }
 
-                // Auto-set towHitch if field is disabled
+                // Auto-set towHitch if field is disabled (not available for this model)
                 if (constraints.towHitch?.type === 'disable') {
-                  handleChange('towHitch', 'Nein')
+                  handleChange('towHitch', 'n.v.')
                 } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
                   const option = towHitch.find(o => o.value === constraints.towHitch?.fixedValue)
                   if (option) {

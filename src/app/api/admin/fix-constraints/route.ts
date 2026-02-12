@@ -7,6 +7,11 @@ const VALUE_FIXES: Record<string, string> = {
   'max': 'maximale_reichweite',
 }
 
+// Source value mappings to fix - old sourceValue -> correct sourceValue
+const SOURCE_VALUE_FIXES: Record<string, string> = {
+  'performance_m3': 'performance',
+}
+
 // POST - Fix constraint values in database
 export async function POST(request: NextRequest) {
   const admin = await getAdminFromCookie()
@@ -22,11 +27,21 @@ export async function POST(request: NextRequest) {
 
     for (const constraint of constraints) {
       let values = JSON.parse(constraint.values)
+      let sourceValue = constraint.sourceValue
       let needsUpdate = false
+      const changes: string[] = []
+
+      // Check if sourceValue needs fixing
+      if (SOURCE_VALUE_FIXES[sourceValue]) {
+        changes.push(`sourceValue: ${sourceValue} -> ${SOURCE_VALUE_FIXES[sourceValue]}`)
+        sourceValue = SOURCE_VALUE_FIXES[sourceValue]
+        needsUpdate = true
+      }
 
       // Check if it's a string (fixed value)
       if (typeof values === 'string') {
         if (VALUE_FIXES[values]) {
+          changes.push(`values: ${values} -> ${VALUE_FIXES[values]}`)
           values = VALUE_FIXES[values]
           needsUpdate = true
         }
@@ -35,6 +50,7 @@ export async function POST(request: NextRequest) {
       else if (Array.isArray(values)) {
         const newValues = values.map(v => VALUE_FIXES[v] || v)
         if (JSON.stringify(newValues) !== JSON.stringify(values)) {
+          changes.push(`values: ${JSON.stringify(values)} -> ${JSON.stringify(newValues)}`)
           values = newValues
           needsUpdate = true
         }
@@ -43,14 +59,16 @@ export async function POST(request: NextRequest) {
       if (needsUpdate) {
         await prisma.optionConstraint.update({
           where: { id: constraint.id },
-          data: { values: JSON.stringify(values) },
+          data: {
+            sourceValue,
+            values: JSON.stringify(values),
+          },
         })
         results.push({
           id: constraint.id,
-          sourceValue: constraint.sourceValue,
+          originalSourceValue: constraint.sourceValue,
           targetType: constraint.targetType,
-          oldValue: JSON.parse(constraint.values),
-          newValue: values,
+          changes,
         })
       }
     }

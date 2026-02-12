@@ -242,4 +242,5 @@ export const AUTOPILOT_OPTIONS = [
 export const TOW_HITCH_OPTIONS = [
   { value: 'ja', label: 'Ja' },
   { value: 'nein', label: 'Nein' },
+  { value: 'nv', label: 'n.v.' },  // nicht verfügbar - for models without AHK option
 ]

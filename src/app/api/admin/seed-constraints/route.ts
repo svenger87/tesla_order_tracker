@@ -35,11 +35,11 @@ const MODEL_3_CONSTRAINTS: ConstraintDefinition[] = [
   { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
   { sourceType: 'model', sourceValue: 'premium_lr_awd', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
 
-  // Performance
-  { sourceType: 'model', sourceValue: 'performance_m3', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '20' },
-  { sourceType: 'model', sourceValue: 'performance_m3', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'performance_m3', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'performance_m3', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  // Performance (value matches MODEL_3_TRIMS: 'performance', distinguished by vehicleType)
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '20' },
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
 ]
 
 // All Model Y constraints
