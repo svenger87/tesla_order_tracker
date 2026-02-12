@@ -35,6 +35,8 @@ import { cn } from '@/lib/utils'
 const colorMap = new Map<string, typeof COLORS[0]>()
 COLORS.forEach(c => {
   colorMap.set(c.label.toLowerCase(), c)
+  // Also add internal code format (with underscores)
+  colorMap.set(c.label.toLowerCase().replace(/\s+/g, '_'), c)
   // Also add partial matches
   c.label.toLowerCase().split(' ').forEach(word => {
     if (word.length > 3) colorMap.set(word, c)
@@ -58,6 +60,8 @@ const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
   if (!color) return <TableCell className="whitespace-nowrap">-</TableCell>
 
   const colorInfo = findColorInfo(color)
+  // Display label if found, otherwise show formatted color value
+  const displayLabel = colorInfo?.label || color.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
   return (
     <TableCell className="whitespace-nowrap">
       <div className="flex items-center gap-2">
@@ -70,7 +74,7 @@ const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
             style={{ backgroundColor: colorInfo.hex }}
           />
         )}
-        <span>{color}</span>
+        <span>{displayLabel}</span>
       </div>
     </TableCell>
   )
