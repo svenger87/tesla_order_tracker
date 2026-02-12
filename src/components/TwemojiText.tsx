@@ -3,6 +3,19 @@
 import React, { memo } from 'react'
 import { parse, EmojiEntity } from 'twemoji-parser'
 
+// Use jsDelivr CDN which has proper CORS support (maxcdn has CORS issues)
+const TWEMOJI_CDN_BASE = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/'
+
+// Convert twemoji-parser URL to jsDelivr URL
+function fixTwemojiUrl(url: string): string {
+  // Extract emoji code from URL like https://twemoji.maxcdn.com/v/latest/72x72/1f1e9-1f1ea.png
+  const match = url.match(/\/([a-f0-9-]+)\.png$/i)
+  if (match) {
+    return `${TWEMOJI_CDN_BASE}${match[1]}.png`
+  }
+  return url
+}
+
 interface TwemojiTextProps {
   text: string
   className?: string
@@ -39,7 +52,7 @@ export const TwemojiText = memo(function TwemojiText({
     elements.push(
       <img
         key={i}
-        src={entity.url}
+        src={fixTwemojiUrl(entity.url)}
         alt={entity.text}
         className="inline-block align-text-bottom"
         style={{
@@ -82,7 +95,7 @@ export const TwemojiEmoji = memo(function TwemojiEmoji({
 
   return (
     <img
-      src={entities[0].url}
+      src={fixTwemojiUrl(entities[0].url)}
       alt={emoji}
       className={`inline-block ${className}`}
       style={{
