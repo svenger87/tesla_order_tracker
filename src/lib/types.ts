@@ -231,6 +231,7 @@ export const AUTOPILOT_OPTIONS = [
   { value: 'none', label: 'Kein' },
   { value: 'ap', label: 'AP' },
   { value: 'eap', label: 'EAP' },
+  { value: 'eap_transfer', label: 'EAP Transfer' },
   { value: 'fsd', label: 'FSD' },
   { value: 'fsd_transfer', label: 'FSD Transfer' },
 ]

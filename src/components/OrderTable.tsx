@@ -629,7 +629,19 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
               <SelectItem value="all">Alle Farben</SelectItem>
               {filterOptions.color.map(v => {
                 const colorInfo = findColorInfo(v)
-                return <SelectItem key={v} value={v}>{colorInfo?.label || v}</SelectItem>
+                return (
+                  <SelectItem key={v} value={v}>
+                    <span className="flex items-center gap-2">
+                      {colorInfo?.hex && (
+                        <span
+                          className={cn("w-3 h-3 rounded-full inline-block", colorInfo.border && "border border-border")}
+                          style={{ backgroundColor: colorInfo.hex }}
+                        />
+                      )}
+                      {colorInfo?.label || v}
+                    </span>
+                  </SelectItem>
+                )
               })}
             </SelectContent>
           </Select>
