@@ -28,6 +28,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { CalendarIcon, KeyRound, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TwemojiEmoji } from '@/components/TwemojiText'
 import { format, parse, isValid } from 'date-fns'
 import { de } from 'date-fns/locale'
 
@@ -317,7 +318,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 <SelectContent>
                   {countries.map((c) => (
                     <SelectItem key={c.value} value={c.flag ? `${c.flag} ${c.label}` : c.label}>
-                      {c.flag && `${c.flag} `}{c.label}
+                      <span className="flex items-center gap-2">
+                        {c.flag && <TwemojiEmoji emoji={c.flag} size={16} />}
+                        {c.label}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
