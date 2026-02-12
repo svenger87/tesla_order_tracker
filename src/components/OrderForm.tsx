@@ -187,6 +187,28 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       return
     }
 
+    // Validate required vehicle configuration fields (only for new orders)
+    if (!order) {
+      const requiredFields = [
+        { field: 'model', label: 'Model' },
+        { field: 'color', label: 'Farbe' },
+        { field: 'interior', label: 'Innenraum' },
+        { field: 'wheels', label: 'Felgen' },
+        { field: 'towHitch', label: 'AHK' },
+        { field: 'autopilot', label: 'Autopilot' },
+        { field: 'country', label: 'Land' },
+        { field: 'deliveryLocation', label: 'Ort (Auslieferung)' },
+      ] as const
+
+      for (const { field, label } of requiredFields) {
+        if (!formData[field]) {
+          setError(`${label} ist erforderlich`)
+          setLoading(false)
+          return
+        }
+      }
+    }
+
     // Validate custom password if selected (only for new orders)
     if (!order && formData.useCustomPassword) {
       const validation = validateCustomPassword(formData.customPassword)
@@ -310,7 +332,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="country">Land</Label>
+              <Label htmlFor="country">Land *</Label>
               <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Land wählen" />
@@ -329,7 +351,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
+              <Label htmlFor="model">Model *</Label>
               <Select value={formData.model} onValueChange={(v) => {
                 handleChange('model', v)
                 // Auto-set fields based on model
@@ -415,7 +437,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="color">Farbe</Label>
+              <Label htmlFor="color">Farbe *</Label>
               <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Farbe wählen">
@@ -460,7 +482,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="interior">Innenraum</Label>
+              <Label htmlFor="interior">Innenraum *</Label>
               <Select value={formData.interior} onValueChange={(v) => handleChange('interior', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Innenraum wählen" />
@@ -476,7 +498,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="wheels">Felgen</Label>
+              <Label htmlFor="wheels">Felgen *</Label>
               <Select
                 value={formData.wheels}
                 onValueChange={(v) => handleChange('wheels', v)}
@@ -513,7 +535,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="towHitch">AHK (Anhängerkupplung)</Label>
+              <Label htmlFor="towHitch">AHK (Anhängerkupplung) *</Label>
               <Select value={formData.towHitch} onValueChange={(v) => handleChange('towHitch', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="AHK wählen" />
@@ -529,7 +551,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="autopilot">Autopilot</Label>
+              <Label htmlFor="autopilot">Autopilot *</Label>
               <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Autopilot wählen" />

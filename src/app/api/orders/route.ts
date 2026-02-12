@@ -133,6 +133,28 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    // Validate required fields for vehicle configuration
+    const requiredFields = [
+      { field: 'name', label: 'Name' },
+      { field: 'model', label: 'Model' },
+      { field: 'color', label: 'Farbe' },
+      { field: 'interior', label: 'Innenraum' },
+      { field: 'wheels', label: 'Felgen' },
+      { field: 'towHitch', label: 'AHK' },
+      { field: 'autopilot', label: 'Autopilot' },
+      { field: 'country', label: 'Land' },
+      { field: 'deliveryLocation', label: 'Ort (Auslieferung)' },
+    ] as const
+
+    for (const { field, label } of requiredFields) {
+      if (!body[field] || (typeof body[field] === 'string' && !body[field].trim())) {
+        return NextResponse.json(
+          { error: `${label} ist erforderlich` },
+          { status: 400 }
+        )
+      }
+    }
+
     // Handle custom password if provided
     let editCode: string | undefined = undefined
     if (body.customPassword) {

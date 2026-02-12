@@ -161,6 +161,7 @@ interface Filters {
   drive: string
   color: string
   country: string
+  deliveryLocation: string
   wheels: string
   interior: string
   towHitch: string
@@ -176,6 +177,7 @@ const emptyFilters: Filters = {
   drive: '',
   color: '',
   country: '',
+  deliveryLocation: '',
   wheels: '',
   interior: '',
   towHitch: '',
@@ -433,6 +435,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
     drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
     color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
     country: [...new Set(orders.map(o => o.country).filter(Boolean))].sort() as string[],
+    deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) => a.localeCompare(b, 'de')),
     wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
     interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
     towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
@@ -479,6 +482,9 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
     }
     if (filters.country) {
       result = result.filter(o => o.country === filters.country)
+    }
+    if (filters.deliveryLocation) {
+      result = result.filter(o => o.deliveryLocation === filters.deliveryLocation)
     }
     if (filters.wheels) {
       result = result.filter(o => o.wheels === filters.wheels)
@@ -601,6 +607,16 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
             <SelectContent>
               <SelectItem value="all">Alle Länder</SelectItem>
               {filterOptions.country.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.deliveryLocation} onValueChange={(v) => setFilters(f => ({ ...f, deliveryLocation: v === 'all' ? '' : v }))}>
+            <SelectTrigger className="w-[130px] h-8">
+              <SelectValue placeholder="Ort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle Orte</SelectItem>
+              {filterOptions.deliveryLocation.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
             </SelectContent>
           </Select>
 
