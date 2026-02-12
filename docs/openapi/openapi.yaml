@@ -87,6 +87,12 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: vehicleType
+          in: query
+          description: Filter by vehicle type
+          schema:
+            type: string
+            enum: [Model Y, Model 3]
       responses:
         '200':
           description: Successful response
@@ -113,6 +119,7 @@ paths:
                 data:
                   - id: "clx123abc"
                     name: "MaxMustermann"
+                    vehicleType: "Model Y"
                     orderDate: "15.01.2025"
                     country: "de"
                     model: "performance"
@@ -168,6 +175,7 @@ paths:
               $ref: '#/components/schemas/CreateOrderRequest'
             example:
               name: "MaxMustermann"
+              vehicleType: "Model Y"
               orderDate: "15.01.2025"
               country: "de"
               model: "performance"
@@ -390,6 +398,12 @@ paths:
               - autopilot
               - towHitch
               - deliveryLocation
+        - name: vehicleType
+          in: query
+          description: Filter options by vehicle type (returns vehicle-specific and universal options)
+          schema:
+            type: string
+            enum: [Model Y, Model 3]
       responses:
         '200':
           description: Successful response
@@ -408,19 +422,33 @@ paths:
                   country:
                     - value: "de"
                       label: "Deutschland"
+                      vehicleType: null
                       metadata:
                         flag: "de"
                     - value: "at"
                       label: "Österreich"
+                      vehicleType: null
                       metadata:
                         flag: "at"
                   model:
                     - value: "standard"
                       label: "Standard"
+                      vehicleType: "Model Y"
                     - value: "premium"
                       label: "Premium"
+                      vehicleType: "Model Y"
                     - value: "performance"
                       label: "Performance"
+                      vehicleType: "Model Y"
+                    - value: "model_3"
+                      label: "Model 3"
+                      vehicleType: "Model 3"
+                    - value: "model_3_lr"
+                      label: "Model 3 Long Range"
+                      vehicleType: "Model 3"
+                    - value: "model_3_performance"
+                      label: "Model 3 Performance"
+                      vehicleType: "Model 3"
                   color:
                     - value: "pearl_white"
                       label: "Pearl White"
@@ -460,6 +488,11 @@ components:
         name:
           type: string
           description: Customer username
+        vehicleType:
+          type: string
+          nullable: true
+          enum: [Model Y, Model 3]
+          description: Vehicle type (Model Y or Model 3)
         orderDate:
           type: string
           nullable: true
@@ -471,8 +504,10 @@ components:
         model:
           type: string
           nullable: true
-          enum: [standard, premium, performance]
-          description: Tesla model variant
+          description: |
+            Tesla model trim. Values depend on vehicleType:
+            - Model Y: standard, premium, performance
+            - Model 3: model_3, model_3_lr, model_3_performance
         range:
           type: string
           nullable: true
@@ -588,6 +623,10 @@ components:
         name:
           type: string
           description: Customer username (required)
+        vehicleType:
+          type: string
+          enum: [Model Y, Model 3]
+          description: Vehicle type (defaults to Model Y)
         orderDate:
           type: string
           description: Order date (DD.MM.YYYY format)
@@ -595,7 +634,10 @@ components:
           type: string
         model:
           type: string
-          enum: [standard, premium, performance]
+          description: |
+            Model trim. Values depend on vehicleType:
+            - Model Y: standard, premium, performance
+            - Model 3: model_3, model_3_lr, model_3_performance
         range:
           type: string
           enum: [maximale_reichweite, standard]
@@ -648,6 +690,10 @@ components:
           description: Edit code for authorization (required)
         name:
           type: string
+        vehicleType:
+          type: string
+          enum: [Model Y, Model 3]
+          description: Vehicle type
         orderDate:
           type: string
         country:
@@ -726,6 +772,11 @@ components:
         label:
           type: string
           description: Display label
+        vehicleType:
+          type: string
+          nullable: true
+          enum: [Model Y, Model 3]
+          description: Which vehicle this option applies to (null = all vehicles)
         metadata:
           type: object
           description: Additional metadata (e.g., hex color, flag emoji)

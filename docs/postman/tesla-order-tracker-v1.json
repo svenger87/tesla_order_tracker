@@ -113,7 +113,7 @@
                 {
                   "key": "model",
                   "value": "performance",
-                  "description": "Filter by model (standard, premium, performance)"
+                  "description": "Filter by model (standard, premium, performance for Model Y; model_3, model_3_lr, model_3_performance for Model 3)"
                 },
                 {
                   "key": "limit",
@@ -124,10 +124,41 @@
                   "value": "true",
                   "description": "Include archived orders",
                   "disabled": true
+                },
+                {
+                  "key": "vehicleType",
+                  "value": "Model Y",
+                  "description": "Filter by vehicle type (Model Y or Model 3)",
+                  "disabled": true
                 }
               ]
             },
             "description": "Returns orders filtered by country and model"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders (Model 3 only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders?vehicleType=Model 3&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "Model 3",
+                  "description": "Filter by vehicle type"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Returns only Model 3 orders"
           },
           "response": []
         },
@@ -235,7 +266,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"MaxMustermann\",\n  \"orderDate\": \"15.01.2025\",\n  \"country\": \"de\",\n  \"model\": \"performance\",\n  \"drive\": \"awd\",\n  \"color\": \"ultra_red\",\n  \"interior\": \"black\",\n  \"wheels\": \"21\",\n  \"towHitch\": \"ja\",\n  \"autopilot\": \"fsd\",\n  \"deliveryWindow\": \"Februar 2025\",\n  \"deliveryLocation\": \"München\",\n  \"editCode\": \"MySecure123\"\n}"
+              "raw": "{\n  \"name\": \"MaxMustermann\",\n  \"vehicleType\": \"Model Y\",\n  \"orderDate\": \"15.01.2025\",\n  \"country\": \"de\",\n  \"model\": \"performance\",\n  \"drive\": \"awd\",\n  \"color\": \"ultra_red\",\n  \"interior\": \"black\",\n  \"wheels\": \"21\",\n  \"towHitch\": \"ja\",\n  \"autopilot\": \"fsd\",\n  \"deliveryWindow\": \"Februar 2025\",\n  \"deliveryLocation\": \"München\",\n  \"editCode\": \"MySecure123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orders",
@@ -304,7 +335,30 @@
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "orders"]
             },
-            "description": "Creates an order with only the required `name` field. An edit code will be auto-generated."
+            "description": "Creates an order with only the required `name` field. An edit code will be auto-generated. Defaults to Model Y."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order (Model 3)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Model3User\",\n  \"vehicleType\": \"Model 3\",\n  \"orderDate\": \"15.01.2025\",\n  \"country\": \"de\",\n  \"model\": \"model_3_lr\",\n  \"drive\": \"awd\",\n  \"color\": \"pearl_white\",\n  \"interior\": \"black\",\n  \"wheels\": \"19\",\n  \"towHitch\": \"nein\",\n  \"autopilot\": \"eap\",\n  \"deliveryWindow\": \"März 2025\",\n  \"deliveryLocation\": \"Berlin\",\n  \"editCode\": \"Model3Secure123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"]
+            },
+            "description": "Creates a Model 3 order. Note the different model values: model_3, model_3_lr, model_3_performance"
           },
           "response": []
         },
@@ -484,6 +538,44 @@
               "code": 200,
               "_postman_previewlanguage": "json",
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"color\": [\n      {\"value\": \"pearl_white\", \"label\": \"Pearl White\", \"metadata\": {\"hex\": \"#FFFFFF\", \"border\": true}},\n      {\"value\": \"diamond_black\", \"label\": \"Diamond Black\", \"metadata\": {\"hex\": \"#1A1A1A\"}},\n      {\"value\": \"ultra_red\", \"label\": \"Ultra Red\", \"metadata\": {\"hex\": \"#C41E3A\"}}\n    ]\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Options by Vehicle Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/options?vehicleType=Model 3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "options"],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "Model 3",
+                  "description": "Filter options by vehicle type (Model Y or Model 3)"
+                }
+              ]
+            },
+            "description": "Returns options filtered by vehicle type. Returns vehicle-specific options plus universal options (vehicleType: null)."
+          },
+          "response": [
+            {
+              "name": "Success (Model 3 options)",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/api/v1/options?vehicleType=Model 3",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "options"],
+                  "query": [{"key": "vehicleType", "value": "Model 3"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"model\": [\n      {\"value\": \"model_3\", \"label\": \"Model 3\", \"vehicleType\": \"Model 3\"},\n      {\"value\": \"model_3_lr\", \"label\": \"Model 3 Long Range\", \"vehicleType\": \"Model 3\"},\n      {\"value\": \"model_3_performance\", \"label\": \"Model 3 Performance\", \"vehicleType\": \"Model 3\"}\n    ],\n    \"wheels\": [\n      {\"value\": \"18\", \"label\": \"18\\\"\", \"vehicleType\": \"Model 3\"},\n      {\"value\": \"19\", \"label\": \"19\\\"\", \"vehicleType\": \"Model 3\"}\n    ],\n    \"color\": [\n      {\"value\": \"pearl_white\", \"label\": \"Pearl White\", \"vehicleType\": null, \"metadata\": {\"hex\": \"#FFFFFF\", \"border\": true}}\n    ]\n  },\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
             }
           ]
         }
