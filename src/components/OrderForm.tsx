@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Order, OrderFormData, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType } from '@/lib/types'
+import { Order, OrderFormData, validateCustomPassword, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import { useConstraints } from '@/hooks/useConstraints'
 import {
@@ -135,7 +135,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
 
   // Load dynamic options from API (filtered by vehicle type)
-  const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
+  const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
 
   // Load constraints from database
   const { getConstraintsForModel, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
@@ -411,7 +411,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   const fieldConstraint = constraints[field]
                   if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
                     // Find the label for the fixed value
-                    const optionsList = field === 'range' ? RANGES :
+                    const optionsList = field === 'range' ? ranges :
                                         field === 'wheels' ? wheels :
                                         field === 'drive' ? drives :
                                         field === 'interior' ? interiors : []
@@ -465,7 +465,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Reichweite wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'range', RANGES).map((r) => (
+                  {filterOptions(selectedModelValue, 'range', ranges).map((r) => (
                     <SelectItem key={r.value} value={r.label}>
                       {r.label}
                     </SelectItem>

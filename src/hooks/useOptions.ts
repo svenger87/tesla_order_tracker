@@ -5,6 +5,7 @@ import {
   COUNTRIES,
   MODELS,
   MODEL_3_TRIMS,
+  RANGES,
   DRIVES,
   COLORS,
   INTERIORS,
@@ -68,6 +69,7 @@ function hardcodedToFormOptions(
 const FALLBACK_OPTIONS: Record<string, FormOption[]> = {
   country: hardcodedToFormOptions(COUNTRIES.map(c => ({ value: c.value, label: c.label, flag: c.flag }))),
   model: hardcodedToFormOptions(MODELS),  // Model Y trims
+  range: hardcodedToFormOptions(RANGES),
   drive: hardcodedToFormOptions(DRIVES),
   color: hardcodedToFormOptions(COLORS),
   interior: hardcodedToFormOptions(INTERIORS),
@@ -145,6 +147,7 @@ export function useOptions(vehicleType?: VehicleType) {
     return {
       countries: sortedCountries,
       models: getOptionsForType('model'),
+      ranges: getOptionsForType('range'),
       drives: getOptionsForType('drive'),
       colors: getOptionsForType('color'),
       interiors: getOptionsForType('interior'),
