@@ -140,14 +140,58 @@ function mapTowHitch(towHitch: string | null, model: string | null): string | nu
   return towHitch
 }
 
-// Normalize country - remove emoji flag if present
+// Normalize country - convert to country code
 function normalizeCountry(country: string | null): string | null {
   if (!country) return null
 
-  // Country format: "🇩🇪 Deutschland" or just "Deutschland"
   // Remove any emoji flags and trim
-  const normalized = country.replace(/[\u{1F1E0}-\u{1F1FF}]+/gu, '').trim()
-  return normalized || null
+  const cleaned = country.replace(/[\u{1F1E0}-\u{1F1FF}]+/gu, '').trim().toLowerCase()
+
+  // Map country names to codes
+  const countryMap: Record<string, string> = {
+    'deutschland': 'de',
+    'germany': 'de',
+    'österreich': 'at',
+    'austria': 'at',
+    'schweiz': 'ch',
+    'switzerland': 'ch',
+    'niederlande': 'nl',
+    'netherlands': 'nl',
+    'nederland': 'nl',
+    'belgien': 'be',
+    'belgium': 'be',
+    'frankreich': 'fr',
+    'france': 'fr',
+    'italien': 'it',
+    'italy': 'it',
+    'spanien': 'es',
+    'spain': 'es',
+    'portugal': 'pt',
+    'polen': 'pl',
+    'poland': 'pl',
+    'dänemark': 'dk',
+    'denmark': 'dk',
+    'schweden': 'se',
+    'sweden': 'se',
+    'norwegen': 'no',
+    'norway': 'no',
+    'finnland': 'fi',
+    'finland': 'fi',
+    'uk': 'uk',
+    'großbritannien': 'uk',
+    'slovenia': 'si',
+    'slowenien': 'si',
+    'tschechien': 'cz',
+    'czech': 'cz',
+    'ungarn': 'hu',
+    'hungary': 'hu',
+    'irland': 'ie',
+    'ireland': 'ie',
+    'luxemburg': 'lu',
+    'luxembourg': 'lu',
+  }
+
+  return countryMap[cleaned] || cleaned
 }
 
 // Normalize wheels - convert "18''" to "18"
