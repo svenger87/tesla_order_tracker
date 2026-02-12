@@ -62,3 +62,4 @@ turso-schema.sql
 
 .vercel
 .env*.local
+backups/
