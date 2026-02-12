@@ -471,11 +471,13 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod): Orde
     })
     .sort((a, b) => b.count - a.count)
 
-  // Delivery location distribution
+  // Delivery location distribution (exclude unknown/empty)
   const deliveryLocationCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const location = order.deliveryLocation || 'Unbekannt'
-    deliveryLocationCounts[location] = (deliveryLocationCounts[location] || 0) + 1
+    const location = order.deliveryLocation?.trim()
+    if (location) {
+      deliveryLocationCounts[location] = (deliveryLocationCounts[location] || 0) + 1
+    }
   })
   const deliveryLocationDistribution = Object.entries(deliveryLocationCounts)
     .map(([name, count], index) => ({
