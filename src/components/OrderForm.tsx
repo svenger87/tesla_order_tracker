@@ -133,8 +133,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [newEditCode, setNewEditCode] = useState('')
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
 
-  // Load dynamic options from API
-  const { countries, models, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions()
+  // Load dynamic options from API (filtered by vehicle type)
+  const { countries, drives, colors, interiors, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -584,7 +584,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Felgen wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(formData.vehicleType === 'Model 3' ? MODEL_3_WHEELS : wheels)
+                  {(formData.vehicleType === 'Model 3' ? MODEL_3_WHEELS : MODEL_Y_WHEELS)
                     .filter((w) => {
                       // Model Y Premium only has 19" and 20"
                       if (formData.vehicleType === 'Model Y' && formData.model === 'Premium') {
