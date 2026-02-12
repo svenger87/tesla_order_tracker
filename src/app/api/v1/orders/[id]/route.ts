@@ -43,6 +43,7 @@ function calculateTimePeriods(data: {
 const orderSelectFields = {
   id: true,
   name: true,
+  vehicleType: true,
   orderDate: true,
   country: true,
   model: true,

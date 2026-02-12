@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword } from '@/lib/types'
+import { Order, OrderFormData, COLORS, RANGES, validateCustomPassword, VEHICLE_TYPES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_Y_WHEELS, MODEL_3_WHEELS } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import {
   Dialog,
@@ -99,6 +99,7 @@ function DatePickerField({
 
 const emptyFormData: OrderFormData = {
   name: '',
+  vehicleType: 'Model Y',
   orderDate: '',
   country: '',
   model: '',
@@ -141,6 +142,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       if (order) {
         setFormData({
           name: order.name || '',
+          vehicleType: (order.vehicleType as VehicleType) || 'Model Y',
           orderDate: order.orderDate || '',
           country: order.country || '',
           model: order.model || '',
@@ -323,6 +325,32 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="vehicleType">Fahrzeug *</Label>
+              <Select
+                value={formData.vehicleType}
+                onValueChange={(v) => {
+                  handleChange('vehicleType', v as VehicleType)
+                  // Reset model when vehicle type changes
+                  handleChange('model', '')
+                  handleChange('range', '')
+                  handleChange('drive', '')
+                  handleChange('wheels', '')
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Fahrzeug wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPES.map((vt) => (
+                    <SelectItem key={vt.value} value={vt.value}>
+                      {vt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="orderDate">Bestelldatum</Label>
               <DatePickerField
                 value={formData.orderDate}
@@ -354,24 +382,39 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Label htmlFor="model">Model *</Label>
               <Select value={formData.model} onValueChange={(v) => {
                 handleChange('model', v)
-                // Auto-set fields based on model
-                if (v === 'Performance') {
-                  handleChange('range', 'Maximale Reichweite')
-                  handleChange('wheels', '21"')
-                  handleChange('drive', 'AWD')
-                } else if (v === 'Standard') {
-                  handleChange('range', 'Standard')
-                  handleChange('wheels', '18"')
-                  handleChange('drive', 'RWD')
-                } else if (v === 'Premium') {
-                  handleChange('range', 'Maximale Reichweite')
+                // Auto-set fields based on model and vehicle type
+                if (formData.vehicleType === 'Model Y') {
+                  if (v === 'Performance') {
+                    handleChange('range', 'Maximale Reichweite')
+                    handleChange('wheels', '21"')
+                    handleChange('drive', 'AWD')
+                  } else if (v === 'Standard') {
+                    handleChange('range', 'Standard')
+                    handleChange('wheels', '18"')
+                    handleChange('drive', 'RWD')
+                  } else if (v === 'Premium') {
+                    handleChange('range', 'Maximale Reichweite')
+                  }
+                } else if (formData.vehicleType === 'Model 3') {
+                  if (v === 'Model 3 Performance') {
+                    handleChange('range', 'Maximale Reichweite')
+                    handleChange('wheels', '19"')
+                    handleChange('drive', 'AWD')
+                  } else if (v === 'Model 3') {
+                    handleChange('range', 'Standard')
+                    handleChange('wheels', '18"')
+                    handleChange('drive', 'RWD')
+                  } else if (v === 'Model 3 Long Range') {
+                    handleChange('range', 'Maximale Reichweite')
+                    handleChange('drive', 'AWD')
+                  }
                 }
               }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Model wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {models.map((m) => (
+                  {(formData.vehicleType === 'Model 3' ? MODEL_3_TRIMS : MODEL_Y_TRIMS).map((m) => (
                     <SelectItem key={m.value} value={m.label}>
                       {m.label}
                     </SelectItem>
@@ -380,13 +423,19 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </Select>
             </div>
 
-            {/* Reichweite - shown for all models, disabled for Performance/Standard, editable for Premium (Q3 exception) */}
+            {/* Reichweite - shown for all models, disabled for Performance/Standard/base variants */}
             <div className="space-y-2">
               <Label htmlFor="range">Reichweite</Label>
               <Select
                 value={formData.range}
                 onValueChange={(v) => handleChange('range', v)}
-                disabled={formData.model === 'Performance' || formData.model === 'Standard'}
+                disabled={
+                  formData.model === 'Performance' ||
+                  formData.model === 'Standard' ||
+                  formData.model === 'Model 3' ||
+                  formData.model === 'Model 3 Performance' ||
+                  formData.model === 'Model 3 Long Range'
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Reichweite wählen" />
@@ -399,14 +448,22 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   ))}
                 </SelectContent>
               </Select>
-              {formData.model === 'Performance' && (
+              {/* Model Y hints */}
+              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
                 <p className="text-xs text-muted-foreground">Performance ist immer Max. Reichweite</p>
               )}
-              {formData.model === 'Standard' && (
+              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
                 <p className="text-xs text-muted-foreground">Standard ist immer Standard-Reichweite</p>
               )}
-              {formData.model === 'Premium' && (
+              {formData.vehicleType === 'Model Y' && formData.model === 'Premium' && (
                 <p className="text-xs text-muted-foreground">Premium ist normalerweise Max. Reichweite (Q3: editierbar)</p>
+              )}
+              {/* Model 3 hints */}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
+                <p className="text-xs text-muted-foreground">Model 3 ist immer Standard-Reichweite</p>
+              )}
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Model 3 Long Range' || formData.model === 'Model 3 Performance') && (
+                <p className="text-xs text-muted-foreground">Long Range/Performance ist immer Max. Reichweite</p>
               )}
             </div>
 
@@ -415,7 +472,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.drive}
                 onValueChange={(v) => handleChange('drive', v)}
-                disabled={formData.model === 'Standard' || formData.model === 'Performance'}
+                disabled={
+                  formData.model === 'Standard' ||
+                  formData.model === 'Performance' ||
+                  formData.model === 'Model 3' ||
+                  formData.model === 'Model 3 Performance' ||
+                  formData.model === 'Model 3 Long Range'
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Antrieb wählen" />
@@ -428,11 +491,19 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   ))}
                 </SelectContent>
               </Select>
-              {formData.model === 'Standard' && (
+              {/* Model Y hints */}
+              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
                 <p className="text-xs text-muted-foreground">Standard hat immer RWD</p>
               )}
-              {formData.model === 'Performance' && (
+              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
                 <p className="text-xs text-muted-foreground">Performance hat immer AWD</p>
+              )}
+              {/* Model 3 hints */}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
+                <p className="text-xs text-muted-foreground">Model 3 hat immer RWD</p>
+              )}
+              {formData.vehicleType === 'Model 3' && (formData.model === 'Model 3 Long Range' || formData.model === 'Model 3 Performance') && (
+                <p className="text-xs text-muted-foreground">Long Range/Performance hat immer AWD</p>
               )}
             </div>
 
@@ -502,16 +573,21 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <Select
                 value={formData.wheels}
                 onValueChange={(v) => handleChange('wheels', v)}
-                disabled={formData.model === 'Standard' || formData.model === 'Performance'}
+                disabled={
+                  formData.model === 'Standard' ||
+                  formData.model === 'Performance' ||
+                  formData.model === 'Model 3' ||
+                  formData.model === 'Model 3 Performance'
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Felgen wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {wheels
+                  {(formData.vehicleType === 'Model 3' ? MODEL_3_WHEELS : wheels)
                     .filter((w) => {
-                      // Premium only has 19" and 20"
-                      if (formData.model === 'Premium') {
+                      // Model Y Premium only has 19" and 20"
+                      if (formData.vehicleType === 'Model Y' && formData.model === 'Premium') {
                         return w.label.includes('19') || w.label.includes('20')
                       }
                       return true
@@ -523,14 +599,25 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                     ))}
                 </SelectContent>
               </Select>
-              {formData.model === 'Standard' && (
+              {/* Model Y hints */}
+              {formData.vehicleType === 'Model Y' && formData.model === 'Standard' && (
                 <p className="text-xs text-muted-foreground">Standard hat immer 18"</p>
               )}
-              {formData.model === 'Performance' && (
+              {formData.vehicleType === 'Model Y' && formData.model === 'Performance' && (
                 <p className="text-xs text-muted-foreground">Performance hat immer 21"</p>
               )}
-              {formData.model === 'Premium' && (
+              {formData.vehicleType === 'Model Y' && formData.model === 'Premium' && (
                 <p className="text-xs text-muted-foreground">Premium: nur 19" oder 20"</p>
+              )}
+              {/* Model 3 hints */}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3' && (
+                <p className="text-xs text-muted-foreground">Model 3 hat immer 18"</p>
+              )}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3 Performance' && (
+                <p className="text-xs text-muted-foreground">Performance hat immer 19"</p>
+              )}
+              {formData.vehicleType === 'Model 3' && formData.model === 'Model 3 Long Range' && (
+                <p className="text-xs text-muted-foreground">Long Range: 18" oder 19"</p>
               )}
             </div>
 

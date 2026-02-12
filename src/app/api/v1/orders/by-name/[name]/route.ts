@@ -8,6 +8,7 @@ import { ApiOrder } from '@/lib/api-types'
 const orderSelectFields = {
   id: true,
   name: true,
+  vehicleType: true,
   orderDate: true,
   country: true,
   model: true,

@@ -1,6 +1,15 @@
+// Vehicle types supported by the application
+export type VehicleType = 'Model Y' | 'Model 3'
+
+export const VEHICLE_TYPES: { value: VehicleType; label: string }[] = [
+  { value: 'Model Y', label: 'Model Y' },
+  { value: 'Model 3', label: 'Model 3' },
+]
+
 export interface Order {
   id: string
   name: string
+  vehicleType: string
   orderDate: string | null
   country: string | null
   model: string | null
@@ -33,6 +42,7 @@ export interface Order {
 
 export interface OrderFormData {
   name: string
+  vehicleType: VehicleType
   orderDate: string
   country: string
   model: string
@@ -121,10 +131,21 @@ export const COUNTRIES = [
   { value: 'cy', label: 'Zypern', flag: '🇨🇾' },
 ]
 
+// Model Y trims
 export const MODELS = [
   { value: 'standard', label: 'Standard' },
   { value: 'premium', label: 'Premium' },
   { value: 'performance', label: 'Performance' },
+]
+
+// Alias for clarity
+export const MODEL_Y_TRIMS = MODELS
+
+// Model 3 trims (Tesla's actual naming)
+export const MODEL_3_TRIMS = [
+  { value: 'model_3', label: 'Model 3' },
+  { value: 'model_3_lr', label: 'Model 3 Long Range' },
+  { value: 'model_3_performance', label: 'Model 3 Performance' },
 ]
 
 export const RANGES = [
@@ -159,11 +180,21 @@ export const INTERIORS = [
   { value: 'white', label: 'Weiß' },
 ]
 
+// Model Y wheels (all sizes)
 export const WHEELS = [
   { value: '18', label: "18\"" },
   { value: '19', label: "19\"" },
   { value: '20', label: "20\"" },
   { value: '21', label: "21\"" },
+]
+
+// Alias for clarity
+export const MODEL_Y_WHEELS = WHEELS
+
+// Model 3 wheels (only 18" and 19" available)
+export const MODEL_3_WHEELS = [
+  { value: '18', label: "18\"" },
+  { value: '19', label: "19\"" },
 ]
 
 export const AUTOPILOT_OPTIONS = [

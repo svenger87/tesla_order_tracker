@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
+          vehicleType: true,
           orderDate: true,
           country: true,
           model: true,
@@ -89,6 +90,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
+          vehicleType: true,
           orderDate: true,
           country: true,
           model: true,
@@ -192,6 +194,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.create({
       data: {
         name: body.name,
+        vehicleType: body.vehicleType || 'Model Y',
         orderDate: body.orderDate || null,
         country: body.country || null,
         model: body.model || null,
@@ -274,6 +277,7 @@ export async function PUT(request: NextRequest) {
           data: {
             editCode: newEditCode, // Set the new password
             name: data.name,
+            vehicleType: data.vehicleType || 'Model Y',
             orderDate: data.orderDate || null,
             country: data.country || null,
             model: data.model || null,
@@ -336,6 +340,7 @@ export async function PUT(request: NextRequest) {
       where: { id },
       data: {
         name: data.name,
+        vehicleType: data.vehicleType || 'Model Y',
         orderDate: data.orderDate || null,
         country: data.country || null,
         model: data.model || null,
