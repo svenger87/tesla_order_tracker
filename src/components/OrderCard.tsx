@@ -78,6 +78,11 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete }: OrderCardProps) 
 
           {/* Car config badges */}
           <div className="flex flex-wrap gap-1.5 mb-3">
+            {order.vehicleType && (
+              <Badge variant="outline" className="text-xs font-semibold">
+                {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+              </Badge>
+            )}
             {order.model && (
               <Badge
                 variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}

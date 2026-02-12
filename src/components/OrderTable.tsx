@@ -156,6 +156,7 @@ type SortDirection = 'asc' | 'desc'
 type SortField = keyof Order | null
 
 interface Filters {
+  vehicleType: string
   model: string
   range: string
   drive: string
@@ -172,6 +173,7 @@ interface Filters {
 }
 
 const emptyFilters: Filters = {
+  vehicleType: '',
   model: '',
   range: '',
   drive: '',
@@ -430,6 +432,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
 
   // Extract unique values for filter dropdowns
   const filterOptions = useMemo(() => ({
+    vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
     model: [...new Set(orders.map(o => o.model).filter(Boolean))].sort() as string[],
     range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
     drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
@@ -465,6 +468,11 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
     if (filters.nameSearch) {
       const searchLower = filters.nameSearch.toLowerCase()
       result = result.filter(o => o.name.toLowerCase().includes(searchLower))
+    }
+
+    // Apply vehicle type filter
+    if (filters.vehicleType) {
+      result = result.filter(o => o.vehicleType === filters.vehicleType)
     }
 
     // Apply filters
@@ -560,6 +568,16 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
       {/* Filter Row */}
       {showFilters && (
         <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md">
+          <Select value={filters.vehicleType} onValueChange={(v) => setFilters(f => ({ ...f, vehicleType: v === 'all' ? '' : v }))}>
+            <SelectTrigger className="w-[120px] h-8">
+              <SelectValue placeholder="Fahrzeug" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle Fahrzeuge</SelectItem>
+              {filterOptions.vehicleType.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
           <Select value={filters.model} onValueChange={(v) => setFilters(f => ({ ...f, model: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[130px] h-8">
               <SelectValue placeholder="Model" />
@@ -714,6 +732,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>
             <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>Name</SortableHeader>
+            <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>Fahrzeug</SortableHeader>
             <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Bestelldatum</SortableHeader>
             <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>Land</SortableHeader>
             <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>Model</SortableHeader>
@@ -749,7 +768,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
         <TableBody>
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={isAdmin ? 28 : 27} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={isAdmin ? 29 : 28} className="text-center py-8 text-muted-foreground">
                 {orders.length === 0 ? 'Keine Bestellungen vorhanden' : 'Keine Einträge mit diesen Filtern'}
               </TableCell>
             </TableRow>
@@ -768,6 +787,13 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete }: OrderTableProp
                   <OrderProgressBar order={order} compact />
                 </TableCell>
                 <TableCell className="font-medium whitespace-nowrap">{order.name}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {order.vehicleType ? (
+                    <Badge variant="outline" className="text-xs">
+                      {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                    </Badge>
+                  ) : '-'}
+                </TableCell>
                 <TableCell className="whitespace-nowrap">{order.orderDate || '-'}</TableCell>
                 <CountryCell country={order.country} countries={countries} />
                 <TableCell className="whitespace-nowrap">
