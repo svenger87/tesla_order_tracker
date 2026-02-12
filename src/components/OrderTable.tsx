@@ -202,6 +202,18 @@ function stripFlagEmoji(str: string): string {
   return str.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '')
 }
 
+// Normalize German umlauts for sorting (Ö→O, Ä→A, Ü→U)
+function normalizeForSort(str: string): string {
+  return str
+    .replace(/Ä/g, 'A')
+    .replace(/ä/g, 'a')
+    .replace(/Ö/g, 'O')
+    .replace(/ö/g, 'o')
+    .replace(/Ü/g, 'U')
+    .replace(/ü/g, 'u')
+    .replace(/ß/g, 'ss')
+}
+
 // Compare function for sorting
 function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection): number {
   if (!field) return 0
@@ -209,14 +221,13 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
   let aVal = a[field]
   let bVal = b[field]
 
-  // Handle country field - strip flag emojis for proper alphabetical sorting
+  // Handle country field - strip flag emojis and normalize umlauts for proper alphabetical sorting
   if (field === 'country') {
-    const aCountry = stripFlagEmoji((aVal as string | null) || '')
-    const bCountry = stripFlagEmoji((bVal as string | null) || '')
-    const collator = new Intl.Collator('de', { sensitivity: 'base' })
+    const aCountry = normalizeForSort(stripFlagEmoji((aVal as string | null) || ''))
+    const bCountry = normalizeForSort(stripFlagEmoji((bVal as string | null) || ''))
     return direction === 'asc'
-      ? collator.compare(aCountry, bCountry)
-      : collator.compare(bCountry, aCountry)
+      ? aCountry.localeCompare(bCountry)
+      : bCountry.localeCompare(aCountry)
   }
 
   // Handle date fields
@@ -251,13 +262,12 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     return direction === 'asc' ? aNum - bNum : bNum - aNum
   }
 
-  // Handle string fields - German collation sorts umlauts correctly (Ö = O, Ä = A, Ü = U)
-  const aStr = (aVal as string | null) || ''
-  const bStr = (bVal as string | null) || ''
-  const collator = new Intl.Collator('de', { sensitivity: 'base' })
+  // Handle string fields - normalize umlauts for proper alphabetical sorting (Ö = O, Ä = A, Ü = U)
+  const aStr = normalizeForSort((aVal as string | null) || '')
+  const bStr = normalizeForSort((bVal as string | null) || '')
   return direction === 'asc'
-    ? collator.compare(aStr, bStr)
-    : collator.compare(bStr, aStr)
+    ? aStr.localeCompare(bStr, 'de')
+    : bStr.localeCompare(aStr, 'de')
 }
 
 interface OrderTableProps {
