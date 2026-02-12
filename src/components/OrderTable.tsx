@@ -469,22 +469,14 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
   // Extract unique values for filter dropdowns
   const filterOptions = useMemo(() => {
-    // Helper to get label for sorting (with umlaut normalization)
-    const getCountryLabelForSort = (code: string) => {
-      const label = countries.find(c => c.value === code)?.label || code
-      return normalizeForSort(label)
-    }
-
     return {
       vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
       model: [...new Set(orders.map(o => o.model).filter(Boolean))].sort() as string[],
       range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
       drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
       color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
-      // Sort countries by label with umlaut normalization (Österreich under O, not at top)
-      country: ([...new Set(orders.map(o => o.country).filter(Boolean))] as string[]).sort((a, b) =>
-        getCountryLabelForSort(a).localeCompare(getCountryLabelForSort(b))
-      ),
+      // Don't sort here - sortCountryCodes handles it at render time with proper fallback
+      country: [...new Set(orders.map(o => o.country).filter(Boolean))] as string[],
       deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) =>
         normalizeForSort(a).localeCompare(normalizeForSort(b))
       ),
@@ -493,7 +485,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
       autopilot: [...new Set(orders.map(o => o.autopilot).filter(Boolean))].sort() as string[],
     }
-  }, [orders, countries])
+  }, [orders])
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length
 
