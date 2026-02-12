@@ -444,19 +444,27 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   }, [])
 
   // Extract unique values for filter dropdowns
-  const filterOptions = useMemo(() => ({
-    vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
-    model: [...new Set(orders.map(o => o.model).filter(Boolean))].sort() as string[],
-    range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
-    drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
-    color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
-    country: [...new Set(orders.map(o => o.country).filter(Boolean))].sort() as string[],
-    deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) => a.localeCompare(b, 'de')),
-    wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
-    interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
-    towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
-    autopilot: [...new Set(orders.map(o => o.autopilot).filter(Boolean))].sort() as string[],
-  }), [orders])
+  const filterOptions = useMemo(() => {
+    // Helper to get label for sorting
+    const getCountryLabel = (code: string) => countries.find(c => c.value === code)?.label || code
+
+    return {
+      vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
+      model: [...new Set(orders.map(o => o.model).filter(Boolean))].sort() as string[],
+      range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
+      drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
+      color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
+      // Sort countries by label (e.g., "Österreich" under O, not "at" under A)
+      country: ([...new Set(orders.map(o => o.country).filter(Boolean))] as string[]).sort((a, b) =>
+        getCountryLabel(a).localeCompare(getCountryLabel(b), 'de')
+      ),
+      deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) => a.localeCompare(b, 'de')),
+      wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
+      interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
+      towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
+      autopilot: [...new Set(orders.map(o => o.autopilot).filter(Boolean))].sort() as string[],
+    }
+  }, [orders, countries])
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length
 
