@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github } from 'lucide-react'
+import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -158,6 +158,12 @@ export default function Home() {
                   <span>Unterstützen</span>
                 </a>
               )}
+              <Link href="/docs">
+                <Button variant="ghost" size="icon" className="h-9 w-9" title="API Dokumentation">
+                  <Code2 className="h-4 w-4" />
+                  <span className="sr-only">API Docs</span>
+                </Button>
+              </Link>
               <a
                 href="https://github.com/svenger87/tesla_order_tracker"
                 target="_blank"
@@ -275,6 +281,14 @@ export default function Home() {
               <Github className="h-3.5 w-3.5" />
               <span>GitHub</span>
             </a>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/docs"
+              className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              <span>API</span>
+            </Link>
             {settings?.showDonation && (
               <>
                 <span className="hidden sm:inline">·</span>
