@@ -78,7 +78,8 @@ interface TeslaCarImageProps {
   color?: string | null
   wheels?: string | null
   view?: ViewAngle
-  size?: number
+  size?: number // Display size in CSS pixels
+  fetchSize?: number // Resolution to request from API (for high-DPI screens)
   className?: string
 }
 
@@ -130,12 +131,16 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   wheels,
   view = 'STUD_3QTR',
   size = 400,
+  fetchSize,
   className,
 }: TeslaCarImageProps) {
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  const imageUrl = buildCompositorUrl(vehicleType, color, wheels, view, size)
+  // Use fetchSize if provided, otherwise use size (for backwards compatibility)
+  // For high-DPI screens, request a larger image than display size
+  const apiSize = fetchSize || size
+  const imageUrl = buildCompositorUrl(vehicleType, color, wheels, view, apiSize)
 
   if (hasError) {
     // Fallback: show a placeholder or text
@@ -181,20 +186,21 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   )
 })
 
-// Compact version for tables
+// Compact version for cards - requests high-res image for crisp display on retina screens
 export const TeslaCarThumbnail = memo(function TeslaCarThumbnail({
   vehicleType,
   color,
   wheels,
   className,
-}: Omit<TeslaCarImageProps, 'view' | 'size'>) {
+}: Omit<TeslaCarImageProps, 'view' | 'size' | 'fetchSize'>) {
   return (
     <TeslaCarImage
       vehicleType={vehicleType}
       color={color}
       wheels={wheels}
       view="STUD_3QTR"
-      size={120}
+      size={200} // Display size
+      fetchSize={800} // Request 800px for high-DPI screens (4x)
       className={className}
     />
   )
