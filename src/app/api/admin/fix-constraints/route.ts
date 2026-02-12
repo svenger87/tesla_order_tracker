@@ -5,6 +5,7 @@ import { getAdminFromCookie } from '@/lib/auth'
 // Value mappings to fix - old value -> correct value
 const VALUE_FIXES: Record<string, string> = {
   'max': 'maximale_reichweite',
+  'max_reichweite': 'maximale_reichweite',
 }
 
 // Source value mappings to fix - old sourceValue -> correct sourceValue
