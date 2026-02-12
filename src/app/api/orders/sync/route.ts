@@ -119,6 +119,81 @@ function parseNumber(value: string | undefined): number | null {
   return isNaN(num) ? null : num
 }
 
+// Normalize color - convert display name to internal code
+function normalizeColor(color: string | null): string | null {
+  if (!color) return null
+  return color.toLowerCase().replace(/\s+/g, '_')
+}
+
+// Normalize drive - convert to lowercase
+function normalizeDrive(drive: string | null): string | null {
+  if (!drive) return null
+  return drive.toLowerCase()
+}
+
+// Normalize interior - convert display name to internal code
+function normalizeInterior(interior: string | null): string | null {
+  if (!interior) return null
+  const interiorMap: Record<string, string> = {
+    'schwarz': 'black',
+    'weiß': 'white',
+    'black': 'black',
+    'white': 'white',
+  }
+  return interiorMap[interior.toLowerCase()] || interior.toLowerCase()
+}
+
+// Normalize autopilot - convert to lowercase
+function normalizeAutopilot(autopilot: string | null): string | null {
+  if (!autopilot) return null
+  return autopilot.toLowerCase()
+}
+
+// Normalize towHitch - convert to lowercase
+function normalizeTowHitch(towHitch: string | null): string | null {
+  if (!towHitch) return null
+  const val = towHitch.toLowerCase()
+  if (val === 'ja' || val === 'yes') return 'ja'
+  if (val === 'nein' || val === 'no') return 'nein'
+  return val
+}
+
+// Normalize country - convert to country code
+function normalizeCountry(country: string | null): string | null {
+  if (!country) return null
+  const cleaned = country.replace(/[\u{1F1E0}-\u{1F1FF}]+/gu, '').trim().toLowerCase()
+  const countryMap: Record<string, string> = {
+    'deutschland': 'de',
+    'germany': 'de',
+    'österreich': 'at',
+    'austria': 'at',
+    'schweiz': 'ch',
+    'switzerland': 'ch',
+    'niederlande': 'nl',
+    'netherlands': 'nl',
+    'belgien': 'be',
+    'belgium': 'be',
+    'frankreich': 'fr',
+    'france': 'fr',
+    'italien': 'it',
+    'italy': 'it',
+    'spanien': 'es',
+    'spain': 'es',
+    'portugal': 'pt',
+    'polen': 'pl',
+    'poland': 'pl',
+    'dänemark': 'dk',
+    'denmark': 'dk',
+    'schweden': 'se',
+    'sweden': 'se',
+    'norwegen': 'no',
+    'norway': 'no',
+    'uk': 'uk',
+    'großbritannien': 'uk',
+  }
+  return countryMap[cleaned] || cleaned
+}
+
 async function fetchCSV(gid: string): Promise<string> {
   const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}`
 
@@ -218,14 +293,14 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
     const orderData = {
       name,
       orderDate,
-      country: cleanValue(row[cols.country]),
+      country: normalizeCountry(cleanValue(row[cols.country])),
       model: cleanValue(row[cols.model])?.toLowerCase() || null,  // Normalize to lowercase
-      drive: cleanValue(row[cols.drive]),
-      color: cleanValue(row[cols.color]),
-      interior: cleanValue(row[cols.interior]),
+      drive: normalizeDrive(cleanValue(row[cols.drive])),
+      color: normalizeColor(cleanValue(row[cols.color])),
+      interior: normalizeInterior(cleanValue(row[cols.interior])),
       wheels: cleanValue(row[cols.wheels]),
-      towHitch: cleanValue(row[cols.towHitch]),
-      autopilot: cleanValue(row[cols.autopilot]),
+      towHitch: normalizeTowHitch(cleanValue(row[cols.towHitch])),
+      autopilot: normalizeAutopilot(cleanValue(row[cols.autopilot])),
       deliveryWindow: cleanValue(row[cols.deliveryWindow]),
       deliveryLocation: cleanValue(row[cols.deliveryLocation]),
       vin: cleanValue(row[cols.vin]),
