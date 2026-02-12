@@ -445,8 +445,11 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
   // Extract unique values for filter dropdowns
   const filterOptions = useMemo(() => {
-    // Helper to get label for sorting
-    const getCountryLabel = (code: string) => countries.find(c => c.value === code)?.label || code
+    // Helper to get label for sorting (with umlaut normalization)
+    const getCountryLabelForSort = (code: string) => {
+      const label = countries.find(c => c.value === code)?.label || code
+      return normalizeForSort(label)
+    }
 
     return {
       vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
@@ -454,11 +457,13 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
       drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
       color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
-      // Sort countries by label (e.g., "Österreich" under O, not "at" under A)
+      // Sort countries by label with umlaut normalization (Österreich under O, not at top)
       country: ([...new Set(orders.map(o => o.country).filter(Boolean))] as string[]).sort((a, b) =>
-        getCountryLabel(a).localeCompare(getCountryLabel(b), 'de')
+        getCountryLabelForSort(a).localeCompare(getCountryLabelForSort(b))
       ),
-      deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) => a.localeCompare(b, 'de')),
+      deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) =>
+        normalizeForSort(a).localeCompare(normalizeForSort(b))
+      ),
       wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
       interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
       towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
