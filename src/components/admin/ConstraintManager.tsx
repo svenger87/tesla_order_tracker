@@ -228,9 +228,13 @@ export function ConstraintManager() {
         if (config.type === 'none') {
           // Delete existing constraint if any
           if (existingConstraint) {
-            await fetch(`/api/constraints?id=${existingConstraint.id}`, {
+            const res = await fetch(`/api/constraints?id=${existingConstraint.id}`, {
               method: 'DELETE',
             })
+            if (!res.ok) {
+              const data = await res.json()
+              throw new Error(data.error || `Fehler beim Löschen von ${field.label}`)
+            }
           }
         } else {
           // Prepare values
@@ -245,7 +249,7 @@ export function ConstraintManager() {
 
           if (existingConstraint) {
             // Update existing
-            await fetch('/api/constraints', {
+            const res = await fetch('/api/constraints', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -254,9 +258,13 @@ export function ConstraintManager() {
                 values,
               }),
             })
+            if (!res.ok) {
+              const data = await res.json()
+              throw new Error(data.error || `Fehler beim Aktualisieren von ${field.label}`)
+            }
           } else {
             // Create new
-            await fetch('/api/constraints', {
+            const res = await fetch('/api/constraints', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -268,6 +276,10 @@ export function ConstraintManager() {
                 values,
               }),
             })
+            if (!res.ok) {
+              const data = await res.json()
+              throw new Error(data.error || `Fehler beim Erstellen von ${field.label}`)
+            }
           }
         }
       }
