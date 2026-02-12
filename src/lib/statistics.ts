@@ -1,4 +1,4 @@
-import { Order, COLORS, VehicleType } from './types'
+import { Order, COLORS, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS } from './types'
 
 // Normalize country codes to full names
 const COUNTRY_NAMES: Record<string, string> = {
@@ -215,6 +215,36 @@ function normalizeWheels(wheels: string | null | undefined): string {
   return trimmed
 }
 
+// Normalize option values to labels (handles both lowercase values and labels)
+function normalizeOption<T extends { value: string; label: string }>(
+  value: string | null | undefined,
+  options: T[],
+  fallback: string = 'Unbekannt'
+): string {
+  if (!value) return fallback
+  const trimmed = value.trim()
+  // Try to find by value first (case-insensitive)
+  const byValue = options.find(o => o.value.toLowerCase() === trimmed.toLowerCase())
+  if (byValue) return byValue.label
+  // Try to find by label (case-insensitive)
+  const byLabel = options.find(o => o.label.toLowerCase() === trimmed.toLowerCase())
+  if (byLabel) return byLabel.label
+  // Return original value if no match
+  return trimmed
+}
+
+// Normalize model names (combines Model Y and Model 3 trims)
+function normalizeModel(model: string | null | undefined): string {
+  if (!model) return 'Unbekannt'
+  // Try Model Y trims first
+  const normalized = normalizeOption(model, MODEL_Y_TRIMS, '')
+  if (normalized) return normalized
+  // Try Model 3 trims
+  const normalizedM3 = normalizeOption(model, MODEL_3_TRIMS, '')
+  if (normalizedM3) return normalizedM3
+  return model
+}
+
 function calculateAverage(values: (number | null)[]): number | null {
   const validValues = values.filter((v): v is number => v !== null && !isNaN(v) && v >= 0)
   if (validValues.length === 0) return null
@@ -295,10 +325,10 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     ? null : rawAvgOrderToPapers
   const avgPapersToDelivery = rawAvgPapersToDelivery
 
-  // Model distribution
+  // Model distribution (normalized to proper labels)
   const modelCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const model = order.model || 'Unbekannt'
+    const model = normalizeModel(order.model)
     modelCounts[model] = (modelCounts[model] || 0) + 1
   })
   const modelDistribution = Object.entries(modelCounts)
@@ -316,7 +346,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   }
   const rangeCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const range = order.range || 'Unbekannt'
+    const range = normalizeOption(order.range, RANGES, 'Unbekannt')
     rangeCounts[range] = (rangeCounts[range] || 0) + 1
   })
   const rangeDistribution = Object.entries(rangeCounts)
@@ -418,7 +448,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Interior distribution (black & white colors)
+  // Interior distribution (black & white colors, normalized)
   const INTERIOR_COLORS: Record<string, string> = {
     'Schwarz': '#1a1a1a',
     'Weiß': '#e5e5e5',
@@ -426,7 +456,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   }
   const interiorCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const interior = order.interior || 'Unbekannt'
+    const interior = normalizeOption(order.interior, INTERIORS, 'Unbekannt')
     interiorCounts[interior] = (interiorCounts[interior] || 0) + 1
   })
   const interiorDistribution = Object.entries(interiorCounts)
@@ -451,10 +481,10 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Drive distribution
+  // Drive distribution (normalized)
   const driveCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const drive = order.drive || 'Unbekannt'
+    const drive = normalizeOption(order.drive, DRIVES, 'Unbekannt')
     driveCounts[drive] = (driveCounts[drive] || 0) + 1
   })
   const driveDistribution = Object.entries(driveCounts)

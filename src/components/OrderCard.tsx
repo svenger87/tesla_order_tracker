@@ -1,6 +1,7 @@
 'use client'
 
 import { Order, COLORS, VehicleType } from '@/lib/types'
+import { useOptions } from '@/hooks/useOptions'
 import { OrderProgressBar } from './OrderProgressBar'
 import { TeslaCarThumbnail } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
@@ -35,6 +36,14 @@ interface OrderCardProps {
 
 export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderCardProps) {
   const colorInfo = findColorInfo(order.color)
+  const { models, ranges, drives, interiors } = useOptions()
+
+  // Helper to lookup label from value
+  const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
+    if (!value) return ''
+    const option = options.find(o => o.value === value || o.label === value)
+    return option?.label || value
+  }
 
   return (
     <Card className="relative overflow-hidden">
@@ -107,17 +116,20 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                 variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
                 className="text-xs"
               >
-                {order.model}
+                {getLabel(models, order.model)}
               </Badge>
             )}
             {order.range && (
               <Badge variant="outline" className="text-xs">
-                {order.range === 'Maximale Reichweite' ? 'Max. RW' : order.range}
+                {(() => {
+                  const rangeLabel = getLabel(ranges, order.range)
+                  return rangeLabel === 'Maximale Reichweite' ? 'Max. RW' : rangeLabel
+                })()}
               </Badge>
             )}
             {order.drive && (
               <Badge variant="outline" className="text-xs font-mono">
-                {order.drive}
+                {getLabel(drives, order.drive)}
               </Badge>
             )}
             {colorInfo && (
@@ -134,7 +146,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
             )}
             {order.interior && (
               <Badge variant="outline" className="text-xs">
-                {order.interior}
+                {getLabel(interiors, order.interior)}
               </Badge>
             )}
           </div>
