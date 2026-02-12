@@ -1,13 +1,25 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { COUNTRIES } from '@/lib/types'
 
+// Check if request has valid API key or admin cookie
+async function isAuthorized(request: NextRequest): Promise<boolean> {
+  // Check API key first
+  const apiKey = request.headers.get('X-API-Key')
+  const validApiKey = process.env.EXTERNAL_API_KEY
+  if (apiKey && validApiKey && apiKey === validApiKey) {
+    return true
+  }
+  // Fall back to admin cookie
+  const admin = await getAdminFromCookie()
+  return !!admin
+}
+
 // POST /api/admin/seed-countries - Add missing EU countries to the database
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const admin = await getAdminFromCookie()
-    if (!admin) {
+    if (!(await isAuthorized(request))) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
     }
 
@@ -62,10 +74,9 @@ export async function POST() {
 }
 
 // GET /api/admin/seed-countries - Check which countries are missing
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const admin = await getAdminFromCookie()
-    if (!admin) {
+    if (!(await isAuthorized(request))) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
     }
 
