@@ -63,18 +63,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to check if reset is available (doesn't require token)
+// GET endpoint disabled for security - no info disclosure
 export async function GET() {
-  const hasResetToken = !!process.env.ADMIN_RESET_TOKEN
-  const hasAdminUsername = !!process.env.ADMIN_USERNAME
-  const hasAdminPassword = !!process.env.ADMIN_PASSWORD
-
-  return NextResponse.json({
-    resetAvailable: hasResetToken,
-    envVarsConfigured: {
-      ADMIN_RESET_TOKEN: hasResetToken,
-      ADMIN_USERNAME: hasAdminUsername,
-      ADMIN_PASSWORD: hasAdminPassword,
-    },
-  })
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
 }
