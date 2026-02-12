@@ -1,7 +1,8 @@
 'use client'
 
-import { Order, COLORS } from '@/lib/types'
+import { Order, COLORS, VehicleType } from '@/lib/types'
 import { OrderProgressBar } from './OrderProgressBar'
+import { TeslaCarThumbnail } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,17 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete }: OrderCardProps) 
         <div className="h-1.5">
           <OrderProgressBar order={order} compact barOnly />
         </div>
+
+        {/* Car image */}
+        {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') && (
+          <div className="flex justify-center py-2 bg-gradient-to-b from-muted/30 to-transparent">
+            <TeslaCarThumbnail
+              vehicleType={order.vehicleType as VehicleType}
+              color={order.color}
+              wheels={order.wheels}
+            />
+          </div>
+        )}
 
         <CardContent className="p-4">
           {/* Header row: Name + Admin menu */}
