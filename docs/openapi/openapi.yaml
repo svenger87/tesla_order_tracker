@@ -32,12 +32,10 @@ info:
   contact:
     name: Tesla Order Tracker
 servers:
-  - url: '{baseUrl}/api/v1'
-    description: API Server
-    variables:
-      baseUrl:
-        default: http://localhost:3000
-        description: Base URL of the application
+  - url: 'https://tff-order-stats.vercel.app/api/v1'
+    description: Production
+  - url: 'http://localhost:3000/api/v1'
+    description: Local Development
 
 security:
   - ApiKeyAuth: []
