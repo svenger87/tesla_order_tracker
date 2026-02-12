@@ -159,6 +159,53 @@ function normalizeWheels(wheels: string | null): string | null {
   return match ? match[1] : wheels
 }
 
+// Normalize color - convert display name to internal code
+function normalizeColor(color: string | null): string | null {
+  if (!color) return null
+  const colorMap: Record<string, string> = {
+    'pearl white': 'pearl_white',
+    'diamond black': 'diamond_black',
+    'stealth grey': 'stealth_grey',
+    'quicksilver': 'quicksilver',
+    'ultra red': 'ultra_red',
+    'marine blue': 'marine_blue',
+  }
+  return colorMap[color.toLowerCase()] || color.toLowerCase().replace(/\s+/g, '_')
+}
+
+// Normalize drive - convert to lowercase
+function normalizeDrive(drive: string | null): string | null {
+  if (!drive) return null
+  return drive.toLowerCase()
+}
+
+// Normalize interior - convert display name to internal code
+function normalizeInterior(interior: string | null): string | null {
+  if (!interior) return null
+  const interiorMap: Record<string, string> = {
+    'schwarz': 'black',
+    'weiß': 'white',
+    'black': 'black',
+    'white': 'white',
+  }
+  return interiorMap[interior.toLowerCase()] || interior.toLowerCase()
+}
+
+// Normalize autopilot - convert to lowercase
+function normalizeAutopilot(autopilot: string | null): string | null {
+  if (!autopilot) return null
+  return autopilot.toLowerCase()
+}
+
+// Normalize towHitch - convert to lowercase
+function normalizeTowHitchValue(towHitch: string | null): string | null {
+  if (!towHitch) return null
+  const val = towHitch.toLowerCase()
+  if (val === 'ja' || val === 'yes') return 'ja'
+  if (val === 'nein' || val === 'no') return 'nein'
+  return val
+}
+
 async function fetchCSV(spreadsheetId: string, gid: string): Promise<string> {
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`
 
@@ -253,12 +300,12 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
       country: normalizeCountry(cleanValue(row[cols.country])),
       model,
       range, // Mapped from battery/Akku
-      drive: cleanValue(row[cols.drive]),
-      color: cleanValue(row[cols.color]),
-      interior: cleanValue(row[cols.interior]),
+      drive: normalizeDrive(cleanValue(row[cols.drive])),
+      color: normalizeColor(cleanValue(row[cols.color])),
+      interior: normalizeInterior(cleanValue(row[cols.interior])),
       wheels: normalizeWheels(cleanValue(row[cols.wheels])),
-      towHitch: mapTowHitch(cleanValue(row[cols.towHitch]), model),
-      autopilot: cleanValue(row[cols.autopilot]),
+      towHitch: mapTowHitch(normalizeTowHitchValue(cleanValue(row[cols.towHitch])), model),
+      autopilot: normalizeAutopilot(cleanValue(row[cols.autopilot])),
       deliveryWindow: cleanValue(row[cols.deliveryWindow]),
       deliveryLocation: cleanValue(row[cols.deliveryLocation]),
       vin: cleanValue(row[cols.vin]),
