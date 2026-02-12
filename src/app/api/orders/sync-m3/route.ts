@@ -29,17 +29,18 @@ const COLUMNS_M3 = {
   deliveryLocation: 12, // Ort
   vin: 13,              // VIN
   vinReceivedDate: 14,  // VIN erhalten am
-  papersReceivedDate: 15, // Papiere erhalten am
-  productionDate: 16,   // Produktionsdatum
-  typeApproval: 17,     // Typgenehmigung
-  typeVariant: 18,      // Typ-Variante
-  deliveryDate: 19,     // Auslieferungs-datum
-  // Column 20: Warten auf VIN (calculated, skip)
-  orderToProduction: 21, // Bestellung bis Produktion
-  orderToVin: 22,       // Bestellung bis VIN
-  orderToDelivery: 23,  // Bestellung bis Lieferung
-  orderToPapers: 24,    // Bestellung bis Papiere
-  papersToDelivery: 25, // Papiere bis Auslieferung
+  // Column 15 is empty in the sheet
+  papersReceivedDate: 16, // Papiere erhalten am
+  productionDate: 17,   // Produktionsdatum
+  typeApproval: 18,     // Typgenehmigung
+  typeVariant: 19,      // Typ-Variante
+  deliveryDate: 20,     // Auslieferungs-datum
+  // Column 21: Warten auf VIN (calculated, skip)
+  orderToProduction: 22, // Bestellung bis Produktion
+  orderToVin: 23,       // Bestellung bis VIN
+  orderToDelivery: 24,  // Bestellung bis Lieferung
+  orderToPapers: 25,    // Bestellung bis Papiere
+  papersToDelivery: 26, // Papiere bis Auslieferung
 }
 
 function parseCSV(csvText: string): string[][] {
