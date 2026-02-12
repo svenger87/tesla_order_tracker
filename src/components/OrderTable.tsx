@@ -617,7 +617,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle</SelectItem>
-              {filterOptions.drive.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.drive.map(v => <SelectItem key={v} value={v}>{getLabel(drives, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -627,7 +627,10 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Farben</SelectItem>
-              {filterOptions.color.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.color.map(v => {
+                const colorInfo = findColorInfo(v)
+                return <SelectItem key={v} value={v}>{colorInfo?.label || v}</SelectItem>
+              })}
             </SelectContent>
           </Select>
 
@@ -638,12 +641,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             <SelectContent>
               <SelectItem value="all">Alle Länder</SelectItem>
               {filterOptions.country.map(v => {
-                const { flag, name } = parseCountryWithFlag(v)
+                const countryInfo = countries.find(c => c.value === v)
                 return (
                   <SelectItem key={v} value={v}>
                     <span className="flex items-center gap-2">
-                      {flag && <TwemojiEmoji emoji={flag} size={16} />}
-                      {name}
+                      {countryInfo?.flag && <TwemojiEmoji emoji={countryInfo.flag} size={16} />}
+                      {countryInfo?.label || v}
                     </span>
                   </SelectItem>
                 )
@@ -667,7 +670,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Felgen</SelectItem>
-              {filterOptions.wheels.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.wheels.map(v => <SelectItem key={v} value={v}>{getLabel(wheels, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -677,7 +680,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle</SelectItem>
-              {filterOptions.interior.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.interior.map(v => <SelectItem key={v} value={v}>{getLabel(interiors, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -687,7 +690,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle</SelectItem>
-              {filterOptions.towHitch.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.towHitch.map(v => <SelectItem key={v} value={v}>{getLabel(towHitchOptions, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -697,7 +700,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle</SelectItem>
-              {filterOptions.autopilot.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {filterOptions.autopilot.map(v => <SelectItem key={v} value={v}>{getLabel(autopilotOptions, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
