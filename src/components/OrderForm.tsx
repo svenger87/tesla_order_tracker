@@ -151,6 +151,26 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return getConstraintsForModel(selectedModelValue)
   }, [selectedModelValue, getConstraintsForModel])
 
+  // Helper: get options for a constrained field, ensuring fixed values always have a matching SelectItem
+  const getFieldOptions = <T extends { value: string; label: string }>(
+    fieldType: keyof typeof modelConstraints,
+    options: T[],
+    allOptions: T[] = options
+  ): T[] => {
+    const filtered = filterOptions(selectedModelValue, fieldType, options)
+    if (filtered.length > 0) return filtered
+
+    // For fixed fields: ensure the fixed value appears even if options haven't loaded
+    const constraint = modelConstraints[fieldType]
+    if (constraint?.type === 'fixed' && constraint.fixedValue) {
+      const fallback = allOptions.find(o => o.value === constraint.fixedValue)
+      if (fallback) return [fallback]
+      // Last resort: create a synthetic option
+      return [{ value: constraint.fixedValue, label: constraint.fixedValue } as T]
+    }
+    return filtered
+  }
+
   // Apply fixed constraint values when constraints load or model changes
   // This ensures fixed fields (e.g., Performance wheels=20) show the correct value
   // even when opening an existing order where the DB value might be empty
@@ -168,8 +188,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       }
       if (constraint?.type === 'disable') {
         const current = formData[field]
-        if (!current || current === '') {
-          setFormData(prev => ({ ...prev, [field]: '-' }))
+        if (!current || current === '' || current === '-') {
+          // For towHitch, use 'nein' (Nein) since AHK is not available
+          setFormData(prev => ({ ...prev, [field]: field === 'towHitch' ? 'nein' : '-' }))
         }
       }
     }
@@ -450,7 +471,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
                 // Auto-set towHitch if field is disabled (not available for this model)
                 if (constraints.towHitch?.type === 'disable') {
-                  handleChange('towHitch', '-')
+                  handleChange('towHitch', 'nein')
                 } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
                   handleChange('towHitch', constraints.towHitch.fixedValue)
                 }
@@ -480,7 +501,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Reichweite wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'range', ranges).map((r) => (
+                  {getFieldOptions('range', ranges).map((r) => (
                     <SelectItem key={r.value} value={r.value}>
                       {r.label}
                     </SelectItem>
@@ -506,7 +527,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Antrieb wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'drive', drives).map((d) => (
+                  {getFieldOptions('drive', drives).map((d) => (
                     <SelectItem key={d.value} value={d.value}>
                       {d.label}
                     </SelectItem>
@@ -546,7 +567,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'color', colors).map((c) => (
+                  {getFieldOptions('color', colors).map((c) => (
                     <SelectItem key={c.value} value={c.value}>
                       <div className="flex items-center gap-2">
                         {c.hex && (
@@ -583,7 +604,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Innenraum wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'interior', interiors).map((i) => (
+                  {getFieldOptions('interior', interiors).map((i) => (
                     <SelectItem key={i.value} value={i.value}>
                       {i.label}
                     </SelectItem>
@@ -609,7 +630,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="Felgen wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'wheels', wheels).map((w) => (
+                  {getFieldOptions('wheels', wheels).map((w) => (
                     <SelectItem key={w.value} value={w.value}>
                       {w.label}
                     </SelectItem>
@@ -641,7 +662,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <SelectValue placeholder="AHK wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterOptions(selectedModelValue, 'towHitch', towHitch).map((t) => (
+                  {(modelConstraints.towHitch?.type === 'disable'
+                    ? [{ value: 'nein', label: 'Nein' }]
+                    : filterOptions(selectedModelValue, 'towHitch', towHitch)
+                  ).map((t) => (
                     <SelectItem key={t.value} value={t.value}>
                       {t.label}
                     </SelectItem>
