@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, nowISO } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 
@@ -15,21 +15,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
     }
 
-    // Check if password contains at least one number
     if (!/\d/.test(newPassword)) {
       return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
     }
 
-    // Find order with this reset code
-    const order = await prisma.order.findFirst({
-      where: {
-        resetCode: resetCode.trim(),
-        resetCodeExpires: {
-          gt: new Date(), // Not expired
-        },
-      },
-      select: { id: true, name: true },
-    })
+    // Find order with this reset code that hasn't expired
+    const now = new Date().toISOString()
+    const order = await queryOne<{ id: string; name: string }>(
+      `SELECT id, name FROM "Order" WHERE resetCode = ? AND resetCodeExpires > ?`,
+      [resetCode.trim(), now],
+    )
 
     if (!order) {
       return NextResponse.json({ error: 'Ungültiger oder abgelaufener Einmalcode' }, { status: 400 })
@@ -39,14 +34,10 @@ export async function POST(request: NextRequest) {
     const newEditCode = await bcrypt.hash(newPassword, 10)
 
     // Update the order with new editCode and clear reset code
-    await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        editCode: newEditCode,
-        resetCode: null,
-        resetCodeExpires: null,
-      },
-    })
+    await execute(
+      `UPDATE "Order" SET editCode = ?, resetCode = NULL, resetCodeExpires = NULL, updatedAt = ? WHERE id = ?`,
+      [newEditCode, nowISO(), order.id],
+    )
 
     return NextResponse.json({
       success: true,

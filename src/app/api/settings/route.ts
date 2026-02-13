@@ -1,25 +1,32 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, nowISO } from '@/lib/db'
+import { transformSettingsRow, type SettingsRow } from '@/lib/db-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
-// Force reload after schema update
 
 async function getOrCreateSettings() {
-  let settings = await prisma.settings.findUnique({ where: { id: 'default' } })
-  if (!settings) {
-    settings = await prisma.settings.create({
-      data: {
-        id: 'default',
-        showDonation: true,
-        donationUrl: 'https://buymeacoffee.com',
-        donationText: 'Dieses Projekt unterstützen',
-        lastSyncTime: null,
-        lastSyncCount: null,
-        archiveEnabled: true,
-        archiveThreshold: 180,
-      },
-    })
-  }
-  return settings
+  const row = await queryOne<Record<string, unknown>>(
+    `SELECT * FROM "Settings" WHERE id = ?`,
+    ['default'],
+  )
+  if (row) return transformSettingsRow(row)
+
+  const now = nowISO()
+  await execute(
+    `INSERT INTO "Settings" (id, showDonation, donationUrl, donationText, lastSyncTime, lastSyncCount, archiveEnabled, archiveThreshold, updatedAt)
+     VALUES (?, 1, ?, ?, NULL, NULL, 1, 180, ?)`,
+    ['default', 'https://buymeacoffee.com', 'Dieses Projekt unterstützen', now],
+  )
+  return {
+    id: 'default',
+    showDonation: true,
+    donationUrl: 'https://buymeacoffee.com',
+    donationText: 'Dieses Projekt unterstützen',
+    lastSyncTime: null,
+    lastSyncCount: null,
+    archiveEnabled: true,
+    archiveThreshold: 180,
+    updatedAt: now,
+  } as SettingsRow
 }
 
 export async function GET() {
@@ -30,7 +37,6 @@ export async function GET() {
     console.error('Failed to fetch settings:', error)
     console.error('TURSO_DATABASE_URL set:', !!process.env.TURSO_DATABASE_URL)
     console.error('TURSO_AUTH_TOKEN set:', !!process.env.TURSO_AUTH_TOKEN)
-    // Return default settings to prevent frontend crash
     return NextResponse.json({
       id: 'default',
       showDonation: false,
@@ -53,17 +59,22 @@ export async function PUT(request: NextRequest) {
 
     await getOrCreateSettings()
 
-    const settings = await prisma.settings.update({
-      where: { id: 'default' },
-      data: {
-        showDonation: body.showDonation ?? true,
-        donationUrl: body.donationUrl || 'https://buymeacoffee.com',
-        donationText: body.donationText || 'Support this project',
-        archiveEnabled: body.archiveEnabled ?? true,
-        archiveThreshold: body.archiveThreshold ?? 180,
-      },
-    })
+    const now = nowISO()
+    await execute(
+      `UPDATE "Settings" SET showDonation = ?, donationUrl = ?, donationText = ?, archiveEnabled = ?, archiveThreshold = ?, updatedAt = ?
+       WHERE id = ?`,
+      [
+        (body.showDonation ?? true) ? 1 : 0,
+        body.donationUrl || 'https://buymeacoffee.com',
+        body.donationText || 'Support this project',
+        (body.archiveEnabled ?? true) ? 1 : 0,
+        body.archiveThreshold ?? 180,
+        now,
+        'default',
+      ],
+    )
 
+    const settings = await getOrCreateSettings()
     return NextResponse.json(settings)
   } catch (error) {
     console.error('Failed to update settings:', error)

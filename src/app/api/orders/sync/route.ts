@@ -1,60 +1,31 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, generateId, nowISO } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult } from '@/lib/types'
 
 const SPREADSHEET_ID = '1--3lNLMSUDwxgcpqrYh4Fbz8LONLBfbJwOIftKgzaSA'
 
-// All Benutzerdaten sheets with their GIDs
-// To find a GID: Open the sheet tab in browser, look at URL for #gid=XXXXXXXX
-// NOTE: GID 1610681959 was a statistics sheet, not user data!
-// Q3 has different column structure: Option Code in T, Delivery Date in U
 const SHEET_GIDS = [
-  { gid: '0', label: 'Q3 2025', isQ3: true },        // Benutzerdaten Q3 - 174 users (different columns!)
-  { gid: '957284045', label: 'Q4 2025', isQ3: false },            // Benutzerdaten Q4
-  { gid: '1666102380', label: 'Current Quarter', isQ3: false },   // Benutzerdaten Q1 2026 - 108 users
+  { gid: '0', label: 'Q3 2025', isQ3: true },
+  { gid: '957284045', label: 'Q4 2025', isQ3: false },
+  { gid: '1666102380', label: 'Current Quarter', isQ3: false },
 ]
 
-// Default single sheet for regular sync
 const DEFAULT_SHEET_GID = '1666102380'
 
-// Column indices (0-based) based on the spreadsheet structure
-// Standard columns for Q4/Q1 sheets
 const COLUMNS = {
-  name: 0,
-  orderDate: 1,
-  country: 2,
-  model: 3,
-  drive: 4,
-  color: 5,
-  interior: 6,
-  wheels: 7,
-  towHitch: 8,
-  autopilot: 9,
-  deliveryWindow: 10,
-  deliveryLocation: 11,
-  vin: 12,
-  vinReceivedDate: 13,
-  // Column 14 is blank
-  papersReceivedDate: 15,
-  productionDate: 16,
-  typeApproval: 17,
-  typeVariant: 18,
-  deliveryDate: 19,
-  // Column 20 is blank
-  orderToProduction: 21,
-  orderToVin: 22,
-  orderToDelivery: 23,
-  orderToPapers: 24,
-  papersToDelivery: 25,
+  name: 0, orderDate: 1, country: 2, model: 3, drive: 4, color: 5,
+  interior: 6, wheels: 7, towHitch: 8, autopilot: 9, deliveryWindow: 10,
+  deliveryLocation: 11, vin: 12, vinReceivedDate: 13,
+  papersReceivedDate: 15, productionDate: 16, typeApproval: 17,
+  typeVariant: 18, deliveryDate: 19,
+  orderToProduction: 21, orderToVin: 22, orderToDelivery: 23,
+  orderToPapers: 24, papersToDelivery: 25,
 }
 
-// Q3 sheet has different structure: Option Code in T (19), Delivery Date in U (20)
 const COLUMNS_Q3 = {
   ...COLUMNS,
-  // Q3-specific: Delivery date is in column U (20), not T (19)
   deliveryDate: 20,
-  // orderToDelivery is in V (21) for Q3
   orderToDelivery: 21,
 }
 
@@ -71,7 +42,7 @@ function parseCSV(csvText: string): string[][] {
     if (inQuotes) {
       if (char === '"' && nextChar === '"') {
         currentCell += '"'
-        i++ // Skip the escaped quote
+        i++
       } else if (char === '"') {
         inQuotes = false
       } else {
@@ -90,14 +61,13 @@ function parseCSV(csvText: string): string[][] {
         }
         currentRow = []
         currentCell = ''
-        if (char === '\r') i++ // Skip \n after \r
+        if (char === '\r') i++
       } else if (char !== '\r') {
         currentCell += char
       }
     }
   }
 
-  // Handle last row
   if (currentCell || currentRow.length > 0) {
     currentRow.push(currentCell.trim())
     if (currentRow.some(cell => cell !== '')) {
@@ -119,37 +89,29 @@ function parseNumber(value: string | undefined): number | null {
   return isNaN(num) ? null : num
 }
 
-// Normalize color - convert display name to internal code
 function normalizeColor(color: string | null): string | null {
   if (!color) return null
   return color.toLowerCase().replace(/\s+/g, '_')
 }
 
-// Normalize drive - convert to lowercase
 function normalizeDrive(drive: string | null): string | null {
   if (!drive) return null
   return drive.toLowerCase()
 }
 
-// Normalize interior - convert display name to internal code
 function normalizeInterior(interior: string | null): string | null {
   if (!interior) return null
   const interiorMap: Record<string, string> = {
-    'schwarz': 'black',
-    'weiß': 'white',
-    'black': 'black',
-    'white': 'white',
+    'schwarz': 'black', 'weiß': 'white', 'black': 'black', 'white': 'white',
   }
   return interiorMap[interior.toLowerCase()] || interior.toLowerCase()
 }
 
-// Normalize autopilot - convert to lowercase
 function normalizeAutopilot(autopilot: string | null): string | null {
   if (!autopilot) return null
   return autopilot.toLowerCase()
 }
 
-// Normalize towHitch - convert to lowercase
 function normalizeTowHitch(towHitch: string | null): string | null {
   if (!towHitch) return null
   const val = towHitch.toLowerCase()
@@ -158,69 +120,37 @@ function normalizeTowHitch(towHitch: string | null): string | null {
   return val
 }
 
-// Normalize country - convert to country code
 function normalizeCountry(country: string | null): string | null {
   if (!country) return null
   const cleaned = country.replace(/[\u{1F1E0}-\u{1F1FF}]+/gu, '').trim().toLowerCase()
   const countryMap: Record<string, string> = {
-    'deutschland': 'de',
-    'germany': 'de',
-    'österreich': 'at',
-    'austria': 'at',
-    'schweiz': 'ch',
-    'switzerland': 'ch',
-    'niederlande': 'nl',
-    'netherlands': 'nl',
-    'belgien': 'be',
-    'belgium': 'be',
-    'frankreich': 'fr',
-    'france': 'fr',
-    'italien': 'it',
-    'italy': 'it',
-    'spanien': 'es',
-    'spain': 'es',
-    'portugal': 'pt',
-    'polen': 'pl',
-    'poland': 'pl',
-    'dänemark': 'dk',
-    'denmark': 'dk',
-    'schweden': 'se',
-    'sweden': 'se',
-    'norwegen': 'no',
-    'norway': 'no',
-    'uk': 'uk',
-    'großbritannien': 'uk',
+    'deutschland': 'de', 'germany': 'de', 'österreich': 'at', 'austria': 'at',
+    'schweiz': 'ch', 'switzerland': 'ch', 'niederlande': 'nl', 'netherlands': 'nl',
+    'belgien': 'be', 'belgium': 'be', 'frankreich': 'fr', 'france': 'fr',
+    'italien': 'it', 'italy': 'it', 'spanien': 'es', 'spain': 'es',
+    'portugal': 'pt', 'polen': 'pl', 'poland': 'pl', 'dänemark': 'dk',
+    'denmark': 'dk', 'schweden': 'se', 'sweden': 'se', 'norwegen': 'no',
+    'norway': 'no', 'uk': 'uk', 'großbritannien': 'uk',
   }
   return countryMap[cleaned] || cleaned
 }
 
 async function fetchCSV(gid: string): Promise<string> {
   const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}`
-
   const response = await fetch(url, {
     redirect: 'follow',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
   })
-
   if (!response.ok) {
     throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
   }
-
   return response.text()
 }
 
-// Sync a single sheet and return result
 async function syncSheet(gid: string, label: string, isQ3: boolean = false): Promise<SyncResult & { sheetLabel: string }> {
-  // Use Q3-specific columns if needed
   const cols = isQ3 ? COLUMNS_Q3 : COLUMNS
   const result: SyncResult & { sheetLabel: string } = {
-    sheetLabel: label,
-    created: 0,
-    updated: 0,
-    skipped: 0,
-    errors: []
+    sheetLabel: label, created: 0, updated: 0, skipped: 0, errors: []
   }
 
   const csvText = await fetchCSV(gid)
@@ -234,12 +164,10 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
     return result
   }
 
-  // Find header row - look for row containing expected headers like "Name" or "Bestelldatum"
   let headerRowIndex = 0
   for (let i = 0; i < Math.min(5, rows.length); i++) {
     const row = rows[i]
     const rowLower = row.map(c => c.toLowerCase())
-    // Check if this row contains typical header values
     if (rowLower.some(c => c.includes('name') || c.includes('bestelldatum') || c.includes('modell'))) {
       headerRowIndex = i
       console.log(`[Sync ${label}] Found header row at index ${i}`)
@@ -247,24 +175,18 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
     }
   }
 
-  // Log header row for debugging
   if (rows[headerRowIndex]) {
     console.log(`[Sync ${label}] Header row columns: ${rows[headerRowIndex].length}`)
     console.log(`[Sync ${label}] Headers: ${rows[headerRowIndex].join(' | ')}`)
   }
 
-  // Skip to data rows (after header)
   const dataRows = rows.slice(headerRowIndex + 1)
-
-  // Log data rows info
   console.log(`[Sync ${label}] Data rows (after header): ${dataRows.length}`)
 
-  // Log first 3 data rows for debugging
   dataRows.slice(0, 3).forEach((row, i) => {
     console.log(`[Sync ${label}] Row ${i + 1}: Name="${row[cols.name] || ''}", Cols=${row.length}`)
   })
 
-  // Filter out empty rows
   const validRows = dataRows.filter(row => {
     const name = cleanValue(row[cols.name])
     return name && name.length > 0
@@ -272,7 +194,6 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
 
   console.log(`[Sync ${label}] Valid rows with names: ${validRows.length}`)
 
-  // Log first valid row for debugging
   if (validRows.length > 0) {
     const sampleRow = validRows[0]
     console.log(`[Sync ${label}] Sample row - Name: "${sampleRow[cols.name]}", OrderDate: "${sampleRow[cols.orderDate]}", Country: "${sampleRow[cols.country]}"`)
@@ -291,10 +212,9 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
     }
 
     const orderData = {
-      name,
-      orderDate,
+      name, orderDate,
       country: normalizeCountry(cleanValue(row[cols.country])),
-      model: cleanValue(row[cols.model])?.toLowerCase() || null,  // Normalize to lowercase
+      model: cleanValue(row[cols.model])?.toLowerCase() || null,
       drive: normalizeDrive(cleanValue(row[cols.drive])),
       color: normalizeColor(cleanValue(row[cols.color])),
       interior: normalizeInterior(cleanValue(row[cols.interior])),
@@ -318,34 +238,46 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
     }
 
     try {
-      // Check if order exists by name + orderDate
-      const existing = await prisma.order.findFirst({
-        where: {
-          name: name,
-          orderDate: orderDate,
-        }
-      })
+      const existing = await queryOne<{ id: string }>(
+        `SELECT id FROM "Order" WHERE name = ? AND orderDate ${orderDate ? '= ?' : 'IS NULL'} LIMIT 1`,
+        orderDate ? [name, orderDate] : [name],
+      )
 
       if (existing) {
-        // Update existing order - preserve editCode and range!
-        await prisma.order.update({
-          where: { id: existing.id },
-          data: orderData,
-          // Note: range field is NOT in orderData, so existing range is preserved
-        })
+        const now = nowISO()
+        await execute(
+          `UPDATE "Order" SET name = ?, orderDate = ?, country = ?, model = ?, drive = ?, color = ?, interior = ?, wheels = ?, towHitch = ?, autopilot = ?, deliveryWindow = ?, deliveryLocation = ?, vin = ?, vinReceivedDate = ?, papersReceivedDate = ?, productionDate = ?, typeApproval = ?, typeVariant = ?, deliveryDate = ?, orderToProduction = ?, orderToVin = ?, orderToDelivery = ?, orderToPapers = ?, papersToDelivery = ?, updatedAt = ? WHERE id = ?`,
+          [
+            orderData.name, orderData.orderDate, orderData.country, orderData.model,
+            orderData.drive, orderData.color, orderData.interior, orderData.wheels,
+            orderData.towHitch, orderData.autopilot, orderData.deliveryWindow,
+            orderData.deliveryLocation, orderData.vin, orderData.vinReceivedDate,
+            orderData.papersReceivedDate, orderData.productionDate, orderData.typeApproval,
+            orderData.typeVariant, orderData.deliveryDate, orderData.orderToProduction,
+            orderData.orderToVin, orderData.orderToDelivery, orderData.orderToPapers,
+            orderData.papersToDelivery, now, existing.id,
+          ],
+        )
         result.updated++
       } else {
-        // Create new order - set default range based on model
         const model = orderData.model || ''
         const isStandard = model === 'standard'
-        // Use internal codes: 'maximale_reichweite' or 'standard'
         const defaultRange = isStandard ? 'standard' : 'maximale_reichweite'
-        await prisma.order.create({
-          data: {
-            ...orderData,
-            range: defaultRange,
-          },
-        })
+        const now = nowISO()
+        await execute(
+          `INSERT INTO "Order" (id, name, vehicleType, orderDate, country, model, range, drive, color, interior, wheels, towHitch, autopilot, deliveryWindow, deliveryLocation, vin, vinReceivedDate, papersReceivedDate, productionDate, typeApproval, typeVariant, deliveryDate, orderToProduction, orderToVin, orderToDelivery, orderToPapers, papersToDelivery, archived, createdAt, updatedAt)
+           VALUES (?, ?, 'Model Y', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+          [
+            generateId(), orderData.name, orderData.orderDate, orderData.country,
+            orderData.model, defaultRange, orderData.drive, orderData.color,
+            orderData.interior, orderData.wheels, orderData.towHitch, orderData.autopilot,
+            orderData.deliveryWindow, orderData.deliveryLocation, orderData.vin,
+            orderData.vinReceivedDate, orderData.papersReceivedDate, orderData.productionDate,
+            orderData.typeApproval, orderData.typeVariant, orderData.deliveryDate,
+            orderData.orderToProduction, orderData.orderToVin, orderData.orderToDelivery,
+            orderData.orderToPapers, orderData.papersToDelivery, now, now,
+          ],
+        )
         result.created++
       }
     } catch (error) {
@@ -358,6 +290,16 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
   return result
 }
 
+async function upsertSyncSettings(count: number) {
+  const now = nowISO()
+  await execute(
+    `INSERT INTO "Settings" (id, lastSyncTime, lastSyncCount, showDonation, donationUrl, donationText, archiveEnabled, archiveThreshold, updatedAt)
+     VALUES ('default', ?, ?, 1, 'https://buymeacoffee.com', 'Dieses Projekt unterstützen', 1, 180, ?)
+     ON CONFLICT(id) DO UPDATE SET lastSyncTime = excluded.lastSyncTime, lastSyncCount = excluded.lastSyncCount, updatedAt = excluded.updatedAt`,
+    [now, count, now],
+  )
+}
+
 export async function POST(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
@@ -365,12 +307,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
     }
 
-    // Check if multi-sheet sync is requested
     const { searchParams } = new URL(request.url)
     const syncAll = searchParams.get('all') === 'true'
 
     if (syncAll) {
-      // Multi-sheet sync - sync all historical data sheets
       const sheetResults: (SyncResult & { sheetLabel: string })[] = []
 
       for (const sheet of SHEET_GIDS) {
@@ -378,7 +318,6 @@ export async function POST(request: NextRequest) {
         sheetResults.push(sheetResult)
       }
 
-      // Aggregate results
       const totalResult: SyncResult & { sheets: typeof sheetResults } = {
         created: sheetResults.reduce((sum, r) => sum + r.created, 0),
         updated: sheetResults.reduce((sum, r) => sum + r.updated, 0),
@@ -387,39 +326,11 @@ export async function POST(request: NextRequest) {
         sheets: sheetResults,
       }
 
-      // Update settings with sync info
-      await prisma.settings.upsert({
-        where: { id: 'default' },
-        create: {
-          id: 'default',
-          lastSyncTime: new Date(),
-          lastSyncCount: totalResult.created + totalResult.updated,
-        },
-        update: {
-          lastSyncTime: new Date(),
-          lastSyncCount: totalResult.created + totalResult.updated,
-        },
-      })
-
+      await upsertSyncSettings(totalResult.created + totalResult.updated)
       return NextResponse.json(totalResult)
     } else {
-      // Single sheet sync (default - current quarter only)
       const result = await syncSheet(DEFAULT_SHEET_GID, 'Current Quarter')
-
-      // Update settings with sync info
-      await prisma.settings.upsert({
-        where: { id: 'default' },
-        create: {
-          id: 'default',
-          lastSyncTime: new Date(),
-          lastSyncCount: result.created + result.updated,
-        },
-        update: {
-          lastSyncTime: new Date(),
-          lastSyncCount: result.created + result.updated,
-        },
-      })
-
+      await upsertSyncSettings(result.created + result.updated)
       return NextResponse.json(result)
     }
   } catch (error) {

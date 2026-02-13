@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, nowISO } from '@/lib/db'
+import { ORDER_PUBLIC_COLS, transformOrderRow } from '@/lib/db-helpers'
 import { NextRequest } from 'next/server'
 import { withApiAuth, RouteContext } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
@@ -39,61 +40,29 @@ function calculateTimePeriods(data: {
   }
 }
 
-// Fields to select (excludes editCode for security)
-const orderSelectFields = {
-  id: true,
-  name: true,
-  vehicleType: true,
-  orderDate: true,
-  country: true,
-  model: true,
-  range: true,
-  drive: true,
-  color: true,
-  interior: true,
-  wheels: true,
-  towHitch: true,
-  autopilot: true,
-  deliveryWindow: true,
-  deliveryLocation: true,
-  vin: true,
-  vinReceivedDate: true,
-  papersReceivedDate: true,
-  productionDate: true,
-  typeApproval: true,
-  typeVariant: true,
-  deliveryDate: true,
-  orderToProduction: true,
-  orderToVin: true,
-  orderToDelivery: true,
-  orderToPapers: true,
-  papersToDelivery: true,
-  archived: true,
-  archivedAt: true,
-  createdAt: true,
-  updatedAt: true,
-} as const
-
 // GET /api/v1/orders/[id] - Get a single order by ID
 export const GET = withApiAuth(
   async (request: NextRequest, context: RouteContext<{ id: string }>) => {
     try {
       const { id } = await context.params
 
-      const order = await prisma.order.findUnique({
-        where: { id },
-        select: orderSelectFields,
-      })
+      const row = await queryOne<Record<string, unknown>>(
+        `SELECT ${ORDER_PUBLIC_COLS} FROM "Order" WHERE id = ?`,
+        [id],
+      )
 
-      if (!order) {
+      if (!row) {
         return ApiErrors.notFound('Order')
       }
 
+      const order = transformOrderRow(row)
+
+      // SQLite returns dates as strings already — no .toISOString() needed
       const apiOrder: ApiOrder = {
         ...order,
-        archivedAt: order.archivedAt?.toISOString() ?? null,
-        createdAt: order.createdAt.toISOString(),
-        updatedAt: order.updatedAt.toISOString(),
+        archivedAt: order.archivedAt ?? null,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
       }
 
       return createApiSuccessResponse(apiOrder)
@@ -119,10 +88,10 @@ export const PUT = withApiAuth(
       }
 
       // Find the order and verify editCode
-      const order = await prisma.order.findUnique({
-        where: { id },
-        select: { id: true, editCode: true, updatedAt: true },
-      })
+      const order = await queryOne<{ id: string; editCode: string | null; updatedAt: string }>(
+        `SELECT id, editCode, updatedAt FROM "Order" WHERE id = ?`,
+        [id],
+      )
 
       if (!order) {
         return ApiErrors.notFound('Order')
@@ -136,7 +105,7 @@ export const PUT = withApiAuth(
       // Optimistic locking: check if order was modified since user loaded it
       if (body.expectedUpdatedAt) {
         const expectedTime = new Date(body.expectedUpdatedAt).getTime()
-        const actualTime = order.updatedAt.getTime()
+        const actualTime = new Date(order.updatedAt).getTime()
         if (actualTime > expectedTime) {
           return ApiErrors.conflict(
             'Order was modified by another user. Please refresh and try again.'
@@ -145,9 +114,10 @@ export const PUT = withApiAuth(
       }
 
       // Build update data from provided fields
-      const updateData: Record<string, unknown> = {}
+      const setClauses: string[] = ['updatedAt = ?']
+      const now = nowISO()
+      const args: unknown[] = [now]
 
-      // Only include fields that were explicitly provided
       const fieldMappings: Array<[keyof UpdateOrderRequest, string]> = [
         ['name', 'name'],
         ['orderDate', 'orderDate'],
@@ -173,36 +143,37 @@ export const PUT = withApiAuth(
 
       for (const [key, dbKey] of fieldMappings) {
         if (key in body && key !== 'editCode' && key !== 'expectedUpdatedAt') {
-          updateData[dbKey] = body[key] || null
+          setClauses.push(`${dbKey} = ?`)
+          args.push(body[key] || null)
         }
       }
 
       // Recalculate time periods if any date fields changed
       const timePeriods = calculateTimePeriods({
-        orderDate: (updateData.orderDate as string) ?? undefined,
-        productionDate: (updateData.productionDate as string) ?? undefined,
-        vinReceivedDate: (updateData.vinReceivedDate as string) ?? undefined,
-        deliveryDate: (updateData.deliveryDate as string) ?? undefined,
-        papersReceivedDate: (updateData.papersReceivedDate as string) ?? undefined,
+        orderDate: ('orderDate' in body ? body.orderDate : undefined) ?? undefined,
+        productionDate: ('productionDate' in body ? body.productionDate : undefined) ?? undefined,
+        vinReceivedDate: ('vinReceivedDate' in body ? body.vinReceivedDate : undefined) ?? undefined,
+        deliveryDate: ('deliveryDate' in body ? body.deliveryDate : undefined) ?? undefined,
+        papersReceivedDate: ('papersReceivedDate' in body ? body.papersReceivedDate : undefined) ?? undefined,
       })
 
       // Only include time periods that are not null
       for (const [key, value] of Object.entries(timePeriods)) {
         if (value !== null) {
-          updateData[key] = value
+          setClauses.push(`${key} = ?`)
+          args.push(value)
         }
       }
 
-      // Update the order
-      const updated = await prisma.order.update({
-        where: { id },
-        data: updateData,
-        select: { id: true, updatedAt: true },
-      })
+      args.push(id)
+      await execute(
+        `UPDATE "Order" SET ${setClauses.join(', ')} WHERE id = ?`,
+        args,
+      )
 
       const response: UpdateOrderResponse = {
-        id: updated.id,
-        updatedAt: updated.updatedAt.toISOString(),
+        id,
+        updatedAt: now,
         message: 'Order updated successfully',
       }
 

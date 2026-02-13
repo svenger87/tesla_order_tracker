@@ -1,46 +1,22 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, generateId, nowISO } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
 
-// Model 3 Spreadsheet
 const MODEL_3_SPREADSHEET_ID = '10fQS1HdBFnvSEVDyP8ofgXerxT1RVoVYUJfagyn95DA'
 
-// Model 3 sheets
 const MODEL_3_SHEET_GIDS = [
   { gid: '1666102380', label: 'Model 3 Data' },
 ]
 
-// Column indices for Model 3 sheet (0-based)
-// Model 3 has "Akku" column (battery) instead of the Model Y's implicit range
 const COLUMNS_M3 = {
-  name: 0,              // Name
-  orderDate: 1,         // Bestelldatum
-  country: 2,           // Land
-  model: 3,             // Model (Standard/Premium/Performance)
-  drive: 4,             // Antrieb
-  battery: 5,           // Akku (Std/Max/-) - maps to range
-  color: 6,             // Farbe
-  interior: 7,          // Innen
-  wheels: 8,            // Felgen
-  towHitch: 9,          // AHK
-  autopilot: 10,        // Autopilot
-  deliveryWindow: 11,   // Lieferfenster
-  deliveryLocation: 12, // Ort
-  vin: 13,              // VIN
-  vinReceivedDate: 14,  // VIN erhalten am
-  // Column 15 is empty in the sheet
-  papersReceivedDate: 16, // Papiere erhalten am
-  productionDate: 17,   // Produktionsdatum
-  typeApproval: 18,     // Typgenehmigung
-  typeVariant: 19,      // Typ-Variante
-  deliveryDate: 20,     // Auslieferungs-datum
-  // Column 21: Warten auf VIN (calculated, skip)
-  orderToProduction: 22, // Bestellung bis Produktion
-  orderToVin: 23,       // Bestellung bis VIN
-  orderToDelivery: 24,  // Bestellung bis Lieferung
-  orderToPapers: 25,    // Bestellung bis Papiere
-  papersToDelivery: 26, // Papiere bis Auslieferung
+  name: 0, orderDate: 1, country: 2, model: 3, drive: 4, battery: 5,
+  color: 6, interior: 7, wheels: 8, towHitch: 9, autopilot: 10,
+  deliveryWindow: 11, deliveryLocation: 12, vin: 13, vinReceivedDate: 14,
+  papersReceivedDate: 16, productionDate: 17, typeApproval: 18,
+  typeVariant: 19, deliveryDate: 20,
+  orderToProduction: 22, orderToVin: 23, orderToDelivery: 24,
+  orderToPapers: 25, papersToDelivery: 26,
 }
 
 function parseCSV(csvText: string): string[][] {
@@ -56,7 +32,7 @@ function parseCSV(csvText: string): string[][] {
     if (inQuotes) {
       if (char === '"' && nextChar === '"') {
         currentCell += '"'
-        i++ // Skip the escaped quote
+        i++
       } else if (char === '"') {
         inQuotes = false
       } else {
@@ -75,14 +51,13 @@ function parseCSV(csvText: string): string[][] {
         }
         currentRow = []
         currentCell = ''
-        if (char === '\r') i++ // Skip \n after \r
+        if (char === '\r') i++
       } else if (char !== '\r') {
         currentCell += char
       }
     }
   }
 
-  // Handle last row
   if (currentCell || currentRow.length > 0) {
     currentRow.push(currentCell.trim())
     if (currentRow.some(cell => cell !== '')) {
@@ -104,144 +79,77 @@ function parseNumber(value: string | undefined): number | null {
   return isNaN(num) ? null : num
 }
 
-// Map battery/Akku value to range
 function mapBatteryToRange(battery: string | null, model: string | null): string | null {
-  // Performance models always have maximum range battery
-  if (model?.toLowerCase().includes('performance')) {
-    return 'maximale_reichweite'
-  }
-
+  if (model?.toLowerCase().includes('performance')) return 'maximale_reichweite'
   if (!battery) return null
-
   const batteryLower = battery.toLowerCase().trim()
-  if (batteryLower === 'max' || batteryLower === 'maximale reichweite') {
-    return 'maximale_reichweite'
-  }
-  if (batteryLower === 'std' || batteryLower === 'standard') {
-    return 'standard'
-  }
-
+  if (batteryLower === 'max' || batteryLower === 'maximale reichweite') return 'maximale_reichweite'
+  if (batteryLower === 'std' || batteryLower === 'standard') return 'standard'
   return null
 }
 
-// Map tow hitch - use ruleset to determine availability
 function mapTowHitch(towHitch: string | null, model: string | null): string | null {
   const modelLower = model?.toLowerCase() || ''
-  // Check ruleset for tow hitch availability
   const trimKey = modelLower.includes('performance') ? 'performance'
     : modelLower.includes('premium') ? 'premium'
     : modelLower.includes('standard') ? 'standard'
     : null
-
-  // If tow hitch not available for this trim, set to "-"
-  if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
-    return '-'
-  }
+  if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) return '-'
   return towHitch
 }
 
-// Normalize country - convert to country code
 function normalizeCountry(country: string | null): string | null {
   if (!country) return null
-
-  // Remove any emoji flags and trim
   const cleaned = country.replace(/[\u{1F1E0}-\u{1F1FF}]+/gu, '').trim().toLowerCase()
-
-  // Map country names to codes
   const countryMap: Record<string, string> = {
-    'deutschland': 'de',
-    'germany': 'de',
-    'österreich': 'at',
-    'austria': 'at',
-    'schweiz': 'ch',
-    'switzerland': 'ch',
-    'niederlande': 'nl',
-    'netherlands': 'nl',
-    'nederland': 'nl',
-    'belgien': 'be',
-    'belgium': 'be',
-    'frankreich': 'fr',
-    'france': 'fr',
-    'italien': 'it',
-    'italy': 'it',
-    'spanien': 'es',
-    'spain': 'es',
-    'portugal': 'pt',
-    'polen': 'pl',
-    'poland': 'pl',
-    'dänemark': 'dk',
-    'denmark': 'dk',
-    'schweden': 'se',
-    'sweden': 'se',
-    'norwegen': 'no',
-    'norway': 'no',
-    'finnland': 'fi',
-    'finland': 'fi',
-    'uk': 'uk',
-    'großbritannien': 'uk',
-    'slovenia': 'si',
-    'slowenien': 'si',
-    'tschechien': 'cz',
-    'czech': 'cz',
-    'ungarn': 'hu',
-    'hungary': 'hu',
-    'irland': 'ie',
-    'ireland': 'ie',
-    'luxemburg': 'lu',
-    'luxembourg': 'lu',
+    'deutschland': 'de', 'germany': 'de', 'österreich': 'at', 'austria': 'at',
+    'schweiz': 'ch', 'switzerland': 'ch', 'niederlande': 'nl', 'netherlands': 'nl',
+    'nederland': 'nl', 'belgien': 'be', 'belgium': 'be', 'frankreich': 'fr',
+    'france': 'fr', 'italien': 'it', 'italy': 'it', 'spanien': 'es', 'spain': 'es',
+    'portugal': 'pt', 'polen': 'pl', 'poland': 'pl', 'dänemark': 'dk', 'denmark': 'dk',
+    'schweden': 'se', 'sweden': 'se', 'norwegen': 'no', 'norway': 'no',
+    'finnland': 'fi', 'finland': 'fi', 'uk': 'uk', 'großbritannien': 'uk',
+    'slovenia': 'si', 'slowenien': 'si', 'tschechien': 'cz', 'czech': 'cz',
+    'ungarn': 'hu', 'hungary': 'hu', 'irland': 'ie', 'ireland': 'ie',
+    'luxemburg': 'lu', 'luxembourg': 'lu',
   }
-
   return countryMap[cleaned] || cleaned
 }
 
-// Normalize wheels - convert "18''" to "18"
 function normalizeWheels(wheels: string | null): string | null {
   if (!wheels) return null
-
-  // Extract just the number: "18''" -> "18", "19 Zoll" -> "19"
   const match = wheels.match(/(\d{2})/)
   return match ? match[1] : wheels
 }
 
-// Normalize color - convert display name to internal code
 function normalizeColor(color: string | null): string | null {
   if (!color) return null
   const colorMap: Record<string, string> = {
-    'pearl white': 'pearl_white',
-    'diamond black': 'diamond_black',
-    'stealth grey': 'stealth_grey',
-    'quicksilver': 'quicksilver',
-    'ultra red': 'ultra_red',
-    'marine blue': 'marine_blue',
+    'pearl white': 'pearl_white', 'diamond black': 'diamond_black',
+    'stealth grey': 'stealth_grey', 'quicksilver': 'quicksilver',
+    'ultra red': 'ultra_red', 'marine blue': 'marine_blue',
   }
   return colorMap[color.toLowerCase()] || color.toLowerCase().replace(/\s+/g, '_')
 }
 
-// Normalize drive - convert to lowercase
 function normalizeDrive(drive: string | null): string | null {
   if (!drive) return null
   return drive.toLowerCase()
 }
 
-// Normalize interior - convert display name to internal code
 function normalizeInterior(interior: string | null): string | null {
   if (!interior) return null
   const interiorMap: Record<string, string> = {
-    'schwarz': 'black',
-    'weiß': 'white',
-    'black': 'black',
-    'white': 'white',
+    'schwarz': 'black', 'weiß': 'white', 'black': 'black', 'white': 'white',
   }
   return interiorMap[interior.toLowerCase()] || interior.toLowerCase()
 }
 
-// Normalize autopilot - convert to lowercase
 function normalizeAutopilot(autopilot: string | null): string | null {
   if (!autopilot) return null
   return autopilot.toLowerCase()
 }
 
-// Normalize towHitch - convert to lowercase
 function normalizeTowHitchValue(towHitch: string | null): string | null {
   if (!towHitch) return null
   const val = towHitch.toLowerCase()
@@ -252,29 +160,20 @@ function normalizeTowHitchValue(towHitch: string | null): string | null {
 
 async function fetchCSV(spreadsheetId: string, gid: string): Promise<string> {
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`
-
   const response = await fetch(url, {
     redirect: 'follow',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
   })
-
   if (!response.ok) {
     throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
   }
-
   return response.text()
 }
 
 async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult & { sheetLabel: string }> {
   const cols = COLUMNS_M3
   const result: SyncResult & { sheetLabel: string } = {
-    sheetLabel: label,
-    created: 0,
-    updated: 0,
-    skipped: 0,
-    errors: []
+    sheetLabel: label, created: 0, updated: 0, skipped: 0, errors: []
   }
 
   const csvText = await fetchCSV(MODEL_3_SPREADSHEET_ID, gid)
@@ -288,7 +187,6 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
     return result
   }
 
-  // Find header row
   let headerRowIndex = 0
   for (let i = 0; i < Math.min(5, rows.length); i++) {
     const row = rows[i]
@@ -300,22 +198,18 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
     }
   }
 
-  // Log header row for debugging
   if (rows[headerRowIndex]) {
     console.log(`[Sync M3 ${label}] Header row columns: ${rows[headerRowIndex].length}`)
     console.log(`[Sync M3 ${label}] Headers: ${rows[headerRowIndex].join(' | ')}`)
   }
 
-  // Skip to data rows
   const dataRows = rows.slice(headerRowIndex + 1)
   console.log(`[Sync M3 ${label}] Data rows (after header): ${dataRows.length}`)
 
-  // Log first 3 data rows for debugging
   dataRows.slice(0, 3).forEach((row, i) => {
     console.log(`[Sync M3 ${label}] Row ${i + 1}: Name="${row[cols.name] || ''}", Model="${row[cols.model] || ''}", Akku="${row[cols.battery] || ''}"`)
   })
 
-  // Filter out empty rows
   const validRows = dataRows.filter(row => {
     const name = cleanValue(row[cols.name])
     return name && name.length > 0
@@ -333,17 +227,14 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
     }
 
     const modelRaw = cleanValue(row[cols.model])
-    const model = modelRaw?.toLowerCase() || null  // Normalize to lowercase
+    const model = modelRaw?.toLowerCase() || null
     const battery = cleanValue(row[cols.battery])
     const range = mapBatteryToRange(battery, model)
 
     const orderData = {
-      name,
-      vehicleType: 'Model 3', // All records are Model 3
-      orderDate,
+      name, vehicleType: 'Model 3' as const, orderDate,
       country: normalizeCountry(cleanValue(row[cols.country])),
-      model,
-      range, // Mapped from battery/Akku
+      model, range,
       drive: normalizeDrive(cleanValue(row[cols.drive])),
       color: normalizeColor(cleanValue(row[cols.color])),
       interior: normalizeInterior(cleanValue(row[cols.interior])),
@@ -367,27 +258,45 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
     }
 
     try {
-      // Check if order exists by name + orderDate + vehicleType
-      const existing = await prisma.order.findFirst({
-        where: {
-          name: name,
-          orderDate: orderDate,
-          vehicleType: 'Model 3',
-        }
-      })
+      const existing = await queryOne<{ id: string }>(
+        `SELECT id FROM "Order" WHERE name = ? AND orderDate ${orderDate ? '= ?' : 'IS NULL'} AND vehicleType = 'Model 3' LIMIT 1`,
+        orderDate ? [name, orderDate] : [name],
+      )
 
       if (existing) {
-        // Update existing order - preserve editCode
-        await prisma.order.update({
-          where: { id: existing.id },
-          data: orderData,
-        })
+        const now = nowISO()
+        await execute(
+          `UPDATE "Order" SET name = ?, vehicleType = ?, orderDate = ?, country = ?, model = ?, range = ?, drive = ?, color = ?, interior = ?, wheels = ?, towHitch = ?, autopilot = ?, deliveryWindow = ?, deliveryLocation = ?, vin = ?, vinReceivedDate = ?, papersReceivedDate = ?, productionDate = ?, typeApproval = ?, typeVariant = ?, deliveryDate = ?, orderToProduction = ?, orderToVin = ?, orderToDelivery = ?, orderToPapers = ?, papersToDelivery = ?, updatedAt = ? WHERE id = ?`,
+          [
+            orderData.name, orderData.vehicleType, orderData.orderDate,
+            orderData.country, orderData.model, orderData.range, orderData.drive,
+            orderData.color, orderData.interior, orderData.wheels, orderData.towHitch,
+            orderData.autopilot, orderData.deliveryWindow, orderData.deliveryLocation,
+            orderData.vin, orderData.vinReceivedDate, orderData.papersReceivedDate,
+            orderData.productionDate, orderData.typeApproval, orderData.typeVariant,
+            orderData.deliveryDate, orderData.orderToProduction, orderData.orderToVin,
+            orderData.orderToDelivery, orderData.orderToPapers, orderData.papersToDelivery,
+            now, existing.id,
+          ],
+        )
         result.updated++
       } else {
-        // Create new order
-        await prisma.order.create({
-          data: orderData,
-        })
+        const now = nowISO()
+        await execute(
+          `INSERT INTO "Order" (id, name, vehicleType, orderDate, country, model, range, drive, color, interior, wheels, towHitch, autopilot, deliveryWindow, deliveryLocation, vin, vinReceivedDate, papersReceivedDate, productionDate, typeApproval, typeVariant, deliveryDate, orderToProduction, orderToVin, orderToDelivery, orderToPapers, papersToDelivery, archived, createdAt, updatedAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+          [
+            generateId(), orderData.name, orderData.vehicleType, orderData.orderDate,
+            orderData.country, orderData.model, orderData.range, orderData.drive,
+            orderData.color, orderData.interior, orderData.wheels, orderData.towHitch,
+            orderData.autopilot, orderData.deliveryWindow, orderData.deliveryLocation,
+            orderData.vin, orderData.vinReceivedDate, orderData.papersReceivedDate,
+            orderData.productionDate, orderData.typeApproval, orderData.typeVariant,
+            orderData.deliveryDate, orderData.orderToProduction, orderData.orderToVin,
+            orderData.orderToDelivery, orderData.orderToPapers, orderData.papersToDelivery,
+            now, now,
+          ],
+        )
         result.created++
       }
     } catch (error) {
@@ -414,7 +323,6 @@ export async function POST(request: NextRequest) {
       sheetResults.push(sheetResult)
     }
 
-    // Aggregate results
     const totalResult: SyncResult & { sheets: typeof sheetResults } = {
       created: sheetResults.reduce((sum, r) => sum + r.created, 0),
       updated: sheetResults.reduce((sum, r) => sum + r.updated, 0),
@@ -423,19 +331,13 @@ export async function POST(request: NextRequest) {
       sheets: sheetResults,
     }
 
-    // Update settings with sync info
-    await prisma.settings.upsert({
-      where: { id: 'default' },
-      create: {
-        id: 'default',
-        lastSyncTime: new Date(),
-        lastSyncCount: totalResult.created + totalResult.updated,
-      },
-      update: {
-        lastSyncTime: new Date(),
-        lastSyncCount: totalResult.created + totalResult.updated,
-      },
-    })
+    const now = nowISO()
+    await execute(
+      `INSERT INTO "Settings" (id, lastSyncTime, lastSyncCount, showDonation, donationUrl, donationText, archiveEnabled, archiveThreshold, updatedAt)
+       VALUES ('default', ?, ?, 1, 'https://buymeacoffee.com', 'Dieses Projekt unterstützen', 1, 180, ?)
+       ON CONFLICT(id) DO UPDATE SET lastSyncTime = excluded.lastSyncTime, lastSyncCount = excluded.lastSyncCount, updatedAt = excluded.updatedAt`,
+      [now, totalResult.created + totalResult.updated, now],
+    )
 
     return NextResponse.json({
       message: 'Model 3 sync completed',

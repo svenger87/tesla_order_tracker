@@ -1,8 +1,7 @@
-import { prisma } from '@/lib/db'
+import { execute, nowISO } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
-// POST - Fix wheel labels in database
 export async function POST(request: NextRequest) {
   const admin = await getAdminFromCookie()
   if (!admin) {
@@ -18,25 +17,17 @@ export async function POST(request: NextRequest) {
     ]
 
     const results = []
+    const now = nowISO()
 
     for (const fix of fixes) {
-      const result = await prisma.option.updateMany({
-        where: {
-          type: 'wheels',
-          value: fix.value,
-        },
-        data: {
-          label: fix.label,
-        },
-      })
-      results.push({ value: fix.value, updated: result.count })
+      const result = await execute(
+        `UPDATE "Option" SET label = ?, updatedAt = ? WHERE type = 'wheels' AND value = ?`,
+        [fix.label, now, fix.value],
+      )
+      results.push({ value: fix.value, updated: result.rowsAffected })
     }
 
-    return NextResponse.json({
-      success: true,
-      results,
-      message: 'Wheel labels fixed',
-    })
+    return NextResponse.json({ success: true, results, message: 'Wheel labels fixed' })
   } catch (error) {
     console.error('Failed to fix wheels:', error)
     return NextResponse.json({ error: 'Failed to fix wheels' }, { status: 500 })

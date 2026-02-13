@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/db'
+import { query, queryOne, execute, nowISO } from '@/lib/db'
+import { transformSettingsRow } from '@/lib/db-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
@@ -17,17 +18,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
     }
 
-    const updated = await prisma.order.update({
-      where: { id },
-      data: {
-        archived: archive,
-        archivedAt: archive ? new Date() : null,
-      },
-    })
+    const now = nowISO()
+    await execute(
+      `UPDATE "Order" SET archived = ?, archivedAt = ?, updatedAt = ? WHERE id = ?`,
+      [archive ? 1 : 0, archive ? now : null, now, id],
+    )
 
     return NextResponse.json({
-      id: updated.id,
-      archived: updated.archived,
+      id,
+      archived: archive,
       message: archive ? 'Order archived' : 'Order restored',
     })
   } catch (error) {
@@ -45,7 +44,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if archiving is enabled
-    const settings = await prisma.settings.findUnique({ where: { id: 'default' } })
+    const settingsRow = await queryOne<Record<string, unknown>>(`SELECT * FROM "Settings" WHERE id = ?`, ['default'])
+    const settings = settingsRow ? transformSettingsRow(settingsRow) : null
     if (!settings?.archiveEnabled) {
       return NextResponse.json({ error: 'Archivierung ist deaktiviert' }, { status: 400 })
     }
@@ -59,37 +59,30 @@ export async function POST(request: NextRequest) {
 
     const thresholdDate = new Date()
     thresholdDate.setDate(thresholdDate.getDate() - thresholdDays)
+    const thresholdISO = thresholdDate.toISOString()
 
-    // Find stale orders (not delivered, not archived, not updated recently)
-    const staleOrders = await prisma.order.findMany({
-      where: {
-        archived: false,
-        deliveryDate: null, // Not delivered
-        updatedAt: {
-          lt: thresholdDate,
-        },
-      },
-      select: { id: true },
-    })
+    // Find stale orders
+    const staleOrders = await query<{ id: string }>(
+      `SELECT id FROM "Order" WHERE archived = 0 AND deliveryDate IS NULL AND updatedAt < ?`,
+      [thresholdISO],
+    )
 
     if (staleOrders.length === 0) {
       return NextResponse.json({ count: 0, message: 'No stale orders found' })
     }
 
     // Archive all stale orders
-    const result = await prisma.order.updateMany({
-      where: {
-        id: { in: staleOrders.map(o => o.id) },
-      },
-      data: {
-        archived: true,
-        archivedAt: new Date(),
-      },
-    })
+    const now = nowISO()
+    const placeholders = staleOrders.map(() => '?').join(',')
+    const ids = staleOrders.map(o => o.id)
+    await execute(
+      `UPDATE "Order" SET archived = 1, archivedAt = ?, updatedAt = ? WHERE id IN (${placeholders})`,
+      [now, now, ...ids],
+    )
 
     return NextResponse.json({
-      count: result.count,
-      message: `${result.count} orders archived`,
+      count: staleOrders.length,
+      message: `${staleOrders.length} orders archived`,
     })
   } catch (error) {
     console.error('Failed to batch archive orders:', error)
@@ -112,31 +105,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid threshold' }, { status: 400 })
     }
 
-    // Check if archiving is enabled
-    const settings = await prisma.settings.findUnique({ where: { id: 'default' } })
+    const settingsRow = await queryOne<Record<string, unknown>>(`SELECT * FROM "Settings" WHERE id = ?`, ['default'])
+    const settings = settingsRow ? transformSettingsRow(settingsRow) : null
 
     const thresholdDate = new Date()
     thresholdDate.setDate(thresholdDate.getDate() - thresholdDays)
+    const thresholdISO = thresholdDate.toISOString()
 
-    // Count stale orders
-    const staleCount = await prisma.order.count({
-      where: {
-        archived: false,
-        deliveryDate: null,
-        updatedAt: {
-          lt: thresholdDate,
-        },
-      },
-    })
+    const staleResult = await queryOne<{ count: number }>(
+      `SELECT COUNT(*) as count FROM "Order" WHERE archived = 0 AND deliveryDate IS NULL AND updatedAt < ?`,
+      [thresholdISO],
+    )
 
-    // Count archived orders
-    const archivedCount = await prisma.order.count({
-      where: { archived: true },
-    })
+    const archivedResult = await queryOne<{ count: number }>(
+      `SELECT COUNT(*) as count FROM "Order" WHERE archived = 1`,
+    )
 
     return NextResponse.json({
-      staleCount,
-      archivedCount,
+      staleCount: staleResult?.count ?? 0,
+      archivedCount: archivedResult?.count ?? 0,
       thresholdDays,
       archiveEnabled: settings?.archiveEnabled ?? true,
     })

@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { queryOne, execute, nowISO } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import crypto from 'crypto'
@@ -24,23 +24,24 @@ export async function POST(request: NextRequest) {
 
     // Generate a 6-digit code valid for 24 hours
     const resetCode = generateResetCode()
-    const resetCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+    const resetCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
-    const order = await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        resetCode,
-        resetCodeExpires,
-      },
-      select: { id: true, name: true },
-    })
+    await execute(
+      `UPDATE "Order" SET resetCode = ?, resetCodeExpires = ?, updatedAt = ? WHERE id = ?`,
+      [resetCode, resetCodeExpires, nowISO(), orderId],
+    )
+
+    const order = await queryOne<{ id: string; name: string }>(
+      `SELECT id, name FROM "Order" WHERE id = ?`,
+      [orderId],
+    )
 
     return NextResponse.json({
       success: true,
       resetCode,
-      expiresAt: resetCodeExpires.toISOString(),
-      message: `Einmalcode für "${order.name}" generiert. Gültig für 24 Stunden.`,
-      orderId: order.id,
+      expiresAt: resetCodeExpires,
+      message: `Einmalcode für "${order?.name}" generiert. Gültig für 24 Stunden.`,
+      orderId,
     })
   } catch (error) {
     console.error('Generate reset code failed:', error)

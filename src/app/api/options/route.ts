@@ -1,11 +1,9 @@
-import { prisma } from '@/lib/db'
+import { query, execute, generateId, nowISO } from '@/lib/db'
+import { transformOptionRow } from '@/lib/db-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
-// Valid option types
 const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'deliveryLocation'] as const
-
-// Valid vehicle types
 const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const
 type OptionType = typeof VALID_TYPES[number]
 
@@ -13,55 +11,42 @@ function isValidType(type: string): type is OptionType {
   return VALID_TYPES.includes(type as OptionType)
 }
 
-// GET - List all options (public, for form dropdowns)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
     const vehicleType = searchParams.get('vehicleType')
 
-    // Build where clause - include options that are global (null) OR match the specific vehicle type
-    const where = {
-      isActive: true,
-      ...(type && isValidType(type) ? { type } : {}),
-      // If vehicleType is specified, include options that are global OR match that vehicle
-      ...(vehicleType ? {
-        OR: [
-          { vehicleType: null },
-          { vehicleType: vehicleType },
-        ],
-      } : {}),
+    let sql = `SELECT id, type, value, label, vehicleType, metadata, sortOrder FROM "Option" WHERE isActive = 1`
+    const args: unknown[] = []
+
+    if (type && isValidType(type)) {
+      sql += ` AND type = ?`
+      args.push(type)
     }
 
-    const options = await prisma.option.findMany({
-      where,
-      orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }, { label: 'asc' }],
-      select: {
-        id: true,
-        type: true,
-        value: true,
-        label: true,
-        vehicleType: true,
-        metadata: true,
-        sortOrder: true,
-      },
+    if (vehicleType) {
+      sql += ` AND (vehicleType IS NULL OR vehicleType = ?)`
+      args.push(vehicleType)
+    }
+
+    sql += ` ORDER BY type ASC, sortOrder ASC, label ASC`
+
+    const rows = await query<Record<string, unknown>>(sql, args)
+    const options = rows.map(row => {
+      const opt = transformOptionRow(row)
+      return {
+        ...opt,
+        metadata: opt.metadata ? JSON.parse(opt.metadata) : null,
+      }
     })
 
-    // Parse metadata JSON for each option
-    const parsedOptions = options.map(opt => ({
-      ...opt,
-      metadata: opt.metadata ? JSON.parse(opt.metadata) : null,
-    }))
-
-    // Sort countries alphabetically with German locale for proper umlaut handling
-    const sortedOptions = parsedOptions.sort((a, b) => {
-      // First sort by type
+    // Sort countries alphabetically with German locale
+    const sortedOptions = options.sort((a, b) => {
       if (a.type !== b.type) return a.type.localeCompare(b.type)
-      // For countries, use German locale for proper umlaut sorting
       if (a.type === 'country') {
         return a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
       }
-      // For other types, sort by sortOrder then label
       if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder
       return a.label.localeCompare(b.label)
     })
@@ -73,7 +58,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new option (admin only)
 export async function POST(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
@@ -92,37 +76,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 })
     }
 
-    // Validate vehicleType if provided
     if (vehicleType && !VALID_VEHICLE_TYPES.includes(vehicleType)) {
       return NextResponse.json({ error: `Invalid vehicleType. Must be one of: ${VALID_VEHICLE_TYPES.join(', ')}` }, { status: 400 })
     }
 
-    const option = await prisma.option.create({
-      data: {
-        type,
-        value,
-        label,
-        vehicleType: vehicleType || null,  // null = applies to all vehicles
-        metadata: metadata ? JSON.stringify(metadata) : null,
-        sortOrder: sortOrder ?? 0,
-      },
-    })
+    const id = generateId()
+    const now = nowISO()
+    await execute(
+      `INSERT INTO "Option" (id, type, value, label, vehicleType, metadata, sortOrder, isActive, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+      [id, type, value, label, vehicleType || null, metadata ? JSON.stringify(metadata) : null, sortOrder ?? 0, now, now],
+    )
 
     return NextResponse.json({
-      ...option,
-      metadata: option.metadata ? JSON.parse(option.metadata) : null,
+      id, type, value, label, vehicleType: vehicleType || null,
+      metadata: metadata || null, sortOrder: sortOrder ?? 0, isActive: true,
+      createdAt: now, updatedAt: now,
     })
   } catch (error) {
     console.error('Failed to create option:', error)
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-    if (errorMsg.includes('Unique constraint')) {
+    if (errorMsg.includes('UNIQUE constraint')) {
       return NextResponse.json({ error: 'Diese Option existiert bereits' }, { status: 400 })
     }
     return NextResponse.json({ error: 'Failed to create option' }, { status: 500 })
   }
 }
 
-// PUT - Update option (admin only)
 export async function PUT(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
@@ -137,33 +117,35 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
 
-    // Validate vehicleType if provided
     if (vehicleType !== undefined && vehicleType !== null && !VALID_VEHICLE_TYPES.includes(vehicleType)) {
       return NextResponse.json({ error: `Invalid vehicleType. Must be one of: ${VALID_VEHICLE_TYPES.join(', ')}` }, { status: 400 })
     }
 
-    const option = await prisma.option.update({
-      where: { id },
-      data: {
-        ...(label !== undefined && { label }),
-        ...(vehicleType !== undefined && { vehicleType: vehicleType || null }),
-        ...(metadata !== undefined && { metadata: metadata ? JSON.stringify(metadata) : null }),
-        ...(sortOrder !== undefined && { sortOrder }),
-        ...(isActive !== undefined && { isActive }),
-      },
-    })
+    const setClauses: string[] = ['updatedAt = ?']
+    const args: unknown[] = [nowISO()]
 
-    return NextResponse.json({
+    if (label !== undefined) { setClauses.push('label = ?'); args.push(label) }
+    if (vehicleType !== undefined) { setClauses.push('vehicleType = ?'); args.push(vehicleType || null) }
+    if (metadata !== undefined) { setClauses.push('metadata = ?'); args.push(metadata ? JSON.stringify(metadata) : null) }
+    if (sortOrder !== undefined) { setClauses.push('sortOrder = ?'); args.push(sortOrder) }
+    if (isActive !== undefined) { setClauses.push('isActive = ?'); args.push(isActive ? 1 : 0) }
+
+    args.push(id)
+    await execute(`UPDATE "Option" SET ${setClauses.join(', ')} WHERE id = ?`, args)
+
+    const row = await query<Record<string, unknown>>(`SELECT * FROM "Option" WHERE id = ?`, [id])
+    const option = row[0] ? transformOptionRow(row[0]) : null
+
+    return NextResponse.json(option ? {
       ...option,
       metadata: option.metadata ? JSON.parse(option.metadata) : null,
-    })
+    } : null)
   } catch (error) {
     console.error('Failed to update option:', error)
     return NextResponse.json({ error: 'Failed to update option' }, { status: 500 })
   }
 }
 
-// DELETE - Delete option (admin only) - actually just deactivates
 export async function DELETE(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
@@ -178,11 +160,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
 
-    // Soft delete by deactivating
-    await prisma.option.update({
-      where: { id },
-      data: { isActive: false },
-    })
+    await execute(`UPDATE "Option" SET isActive = 0, updatedAt = ? WHERE id = ?`, [nowISO(), id])
 
     return NextResponse.json({ message: 'Option deactivated' })
   } catch (error) {

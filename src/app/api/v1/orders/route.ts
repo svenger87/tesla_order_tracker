@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/db'
+import { query, queryOne, execute, generateId, nowISO } from '@/lib/db'
+import { ORDER_PUBLIC_COLS, transformOrderRow } from '@/lib/db-helpers'
 import { NextRequest } from 'next/server'
 import { withApiAuth } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
@@ -39,41 +40,6 @@ function calculateTimePeriods(data: {
   }
 }
 
-// Fields to select (excludes editCode for security)
-const orderSelectFields = {
-  id: true,
-  name: true,
-  vehicleType: true,
-  orderDate: true,
-  country: true,
-  model: true,
-  range: true,
-  drive: true,
-  color: true,
-  interior: true,
-  wheels: true,
-  towHitch: true,
-  autopilot: true,
-  deliveryWindow: true,
-  deliveryLocation: true,
-  vin: true,
-  vinReceivedDate: true,
-  papersReceivedDate: true,
-  productionDate: true,
-  typeApproval: true,
-  typeVariant: true,
-  deliveryDate: true,
-  orderToProduction: true,
-  orderToVin: true,
-  orderToDelivery: true,
-  orderToPapers: true,
-  papersToDelivery: true,
-  archived: true,
-  archivedAt: true,
-  createdAt: true,
-  updatedAt: true,
-} as const
-
 // GET /api/v1/orders - List all orders with pagination and filtering
 export const GET = withApiAuth(async (request: NextRequest) => {
   try {
@@ -89,31 +55,35 @@ export const GET = withApiAuth(async (request: NextRequest) => {
     const model = searchParams.get('model')
     const includeArchived = searchParams.get('archived') === 'true'
 
-    const where = {
-      ...(vehicleType && { vehicleType }),
-      ...(country && { country }),
-      ...(model && { model }),
-      ...(!includeArchived && { archived: false }),
-    }
+    let whereSql = `WHERE 1=1`
+    const args: unknown[] = []
+
+    if (vehicleType) { whereSql += ` AND vehicleType = ?`; args.push(vehicleType) }
+    if (country) { whereSql += ` AND country = ?`; args.push(country) }
+    if (model) { whereSql += ` AND model = ?`; args.push(model) }
+    if (!includeArchived) { whereSql += ` AND archived = 0` }
 
     // Execute queries in parallel
-    const [orders, total] = await Promise.all([
-      prisma.order.findMany({
-        where,
-        skip: offset,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        select: orderSelectFields,
-      }),
-      prisma.order.count({ where }),
+    const [rows, countRow] = await Promise.all([
+      query<Record<string, unknown>>(
+        `SELECT ${ORDER_PUBLIC_COLS} FROM "Order" ${whereSql} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
+        [...args, limit, offset],
+      ),
+      queryOne<{ cnt: number }>(
+        `SELECT COUNT(*) as cnt FROM "Order" ${whereSql}`,
+        args,
+      ),
     ])
 
-    // Transform to API response format
+    const total = countRow?.cnt ?? 0
+    const orders = rows.map(transformOrderRow)
+
+    // SQLite returns dates as strings already — no .toISOString() needed
     const apiOrders: ApiOrder[] = orders.map((order) => ({
       ...order,
-      archivedAt: order.archivedAt?.toISOString() ?? null,
-      createdAt: order.createdAt.toISOString(),
-      updatedAt: order.updatedAt.toISOString(),
+      archivedAt: order.archivedAt ?? null,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
     }))
 
     return createApiSuccessResponse(apiOrders, {
@@ -157,9 +127,10 @@ export const POST = withApiAuth(async (request: NextRequest) => {
       }
 
       // Check uniqueness
-      const existing = await prisma.order.findUnique({
-        where: { editCode: body.editCode },
-      })
+      const existing = await queryOne<{ id: string }>(
+        `SELECT id FROM "Order" WHERE editCode = ? LIMIT 1`,
+        [body.editCode],
+      )
       if (existing) {
         return ApiErrors.validationError('Validation failed', {
           editCode: 'This password is already in use',
@@ -173,37 +144,48 @@ export const POST = withApiAuth(async (request: NextRequest) => {
     const timePeriods = calculateTimePeriods(body)
 
     // Create order
-    const order = await prisma.order.create({
-      data: {
-        name: body.name.trim(),
-        vehicleType: body.vehicleType || 'Model Y',
-        orderDate: body.orderDate || null,
-        country: body.country || null,
-        model: body.model || null,
-        range: body.range || null,
-        drive: body.drive || null,
-        color: body.color || null,
-        interior: body.interior || null,
-        wheels: body.wheels || null,
-        towHitch: body.towHitch || null,
-        autopilot: body.autopilot || null,
-        deliveryWindow: body.deliveryWindow || null,
-        deliveryLocation: body.deliveryLocation || null,
-        vin: body.vin || null,
-        vinReceivedDate: body.vinReceivedDate || null,
-        papersReceivedDate: body.papersReceivedDate || null,
-        productionDate: body.productionDate || null,
-        typeApproval: body.typeApproval || null,
-        typeVariant: body.typeVariant || null,
-        deliveryDate: body.deliveryDate || null,
-        ...timePeriods,
-        ...(editCode && { editCode }),
-      },
-    })
+    const id = generateId()
+    const now = nowISO()
+    await execute(
+      `INSERT INTO "Order" (id, name, vehicleType, orderDate, country, model, range, drive, color, interior, wheels, towHitch, autopilot, deliveryWindow, deliveryLocation, vin, vinReceivedDate, papersReceivedDate, productionDate, typeApproval, typeVariant, deliveryDate, orderToProduction, orderToVin, orderToDelivery, orderToPapers, papersToDelivery, editCode, archived, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+      [
+        id,
+        body.name.trim(),
+        body.vehicleType || 'Model Y',
+        body.orderDate || null,
+        body.country || null,
+        body.model || null,
+        body.range || null,
+        body.drive || null,
+        body.color || null,
+        body.interior || null,
+        body.wheels || null,
+        body.towHitch || null,
+        body.autopilot || null,
+        body.deliveryWindow || null,
+        body.deliveryLocation || null,
+        body.vin || null,
+        body.vinReceivedDate || null,
+        body.papersReceivedDate || null,
+        body.productionDate || null,
+        body.typeApproval || null,
+        body.typeVariant || null,
+        body.deliveryDate || null,
+        timePeriods.orderToProduction,
+        timePeriods.orderToVin,
+        timePeriods.orderToDelivery,
+        timePeriods.orderToPapers,
+        timePeriods.papersToDelivery,
+        editCode || null,
+        now,
+        now,
+      ],
+    )
 
     const response: CreateOrderResponse = {
-      id: order.id,
-      editCode: order.editCode,
+      id,
+      editCode: editCode || null,
       message: 'Order created successfully',
     }
 
@@ -211,7 +193,7 @@ export const POST = withApiAuth(async (request: NextRequest) => {
   } catch (error) {
     console.error('API v1 orders POST error:', error)
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-    if (errorMsg.includes('Unique constraint')) {
+    if (errorMsg.includes('UNIQUE constraint')) {
       return ApiErrors.conflict('An order with this name and date already exists')
     }
     return ApiErrors.serverError('Failed to create order')
