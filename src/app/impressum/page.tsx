@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { ObfuscatedEmail } from './ObfuscatedEmail'
 
 export const metadata = {
   title: 'Impressum — TFF Order Stats',
@@ -25,13 +26,7 @@ export default function ImpressumPage() {
               Kontakt
             </h2>
             <p>
-              E-Mail:{' '}
-              <a
-                href="mailto:rosema.sven@gmail.com"
-                className="underline underline-offset-4 hover:text-foreground transition-colors"
-              >
-                rosema.sven@gmail.com
-              </a>
+              E-Mail: <ObfuscatedEmail user="rosema.sven" domain="gmail.com" />
             </p>
           </section>
 
