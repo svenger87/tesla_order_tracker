@@ -24,8 +24,8 @@ jobs:
             # --- Bootstrap staging repo on first run ---
             if [ ! -d "$STAGING_DIR" ]; then
               echo ">>> First run: cloning staging repo..."
-              git clone --branch redesign "$( cd $PROD_DIR && git remote get-url origin )" "$STAGING_DIR"
-              chown -R deploy:deploy "$STAGING_DIR"
+              sudo git clone --branch redesign "$( cd $PROD_DIR && git remote get-url origin )" "$STAGING_DIR"
+              sudo chown -R deploy:deploy "$STAGING_DIR"
             fi
 
             # --- Pull latest redesign branch ---
