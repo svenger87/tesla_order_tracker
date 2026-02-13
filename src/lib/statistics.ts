@@ -1,29 +1,9 @@
-import { Order, COLORS, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS } from './types'
+import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS } from './types'
 
-// Normalize country codes to full names
-const COUNTRY_NAMES: Record<string, string> = {
-  'DE': 'Deutschland',
-  'AT': 'Österreich',
-  'CH': 'Schweiz',
-  'NL': 'Niederlande',
-  'PL': 'Polen',
-  'PT': 'Portugal',
-  'ES': 'Spanien',
-  'FR': 'Frankreich',
-  'IT': 'Italien',
-  'BE': 'Belgien',
-  'LU': 'Luxemburg',
-  'DK': 'Dänemark',
-  'SE': 'Schweden',
-  'NO': 'Norwegen',
-  'FI': 'Finnland',
-  'CZ': 'Tschechien',
-  'SK': 'Slowakei',
-  'HU': 'Ungarn',
-  'UK': 'Großbritannien',
-  'GB': 'Großbritannien',
-  'IE': 'Irland',
-}
+// Build COUNTRY_NAMES from the canonical COUNTRIES constant to stay in sync
+const COUNTRY_NAMES: Record<string, string> = Object.fromEntries(
+  COUNTRIES.map(c => [c.value.toUpperCase(), c.label])
+)
 
 function normalizeCountry(country: string | null | undefined): string {
   if (!country || country === '-') return 'Unbekannt'

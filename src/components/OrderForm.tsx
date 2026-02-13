@@ -151,6 +151,30 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return getConstraintsForModel(selectedModelValue)
   }, [selectedModelValue, getConstraintsForModel])
 
+  // Apply fixed constraint values when constraints load or model changes
+  // This ensures fixed fields (e.g., Performance wheels=20) show the correct value
+  // even when opening an existing order where the DB value might be empty
+  useEffect(() => {
+    if (!formData.model) return
+    const constraints = getConstraintsForModel(formData.model)
+    const fields = ['range', 'wheels', 'drive', 'interior', 'towHitch'] as const
+    for (const field of fields) {
+      const constraint = constraints[field]
+      if (constraint?.type === 'fixed' && constraint.fixedValue) {
+        const current = formData[field]
+        if (!current || current === '' || current === '-') {
+          setFormData(prev => ({ ...prev, [field]: constraint.fixedValue! }))
+        }
+      }
+      if (constraint?.type === 'disable') {
+        const current = formData[field]
+        if (!current || current === '') {
+          setFormData(prev => ({ ...prev, [field]: '-' }))
+        }
+      }
+    }
+  }, [formData.model, getConstraintsForModel]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
@@ -261,22 +285,23 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const url = '/api/orders'
       const method = order ? 'PUT' : 'POST'
 
-      // Build request body
+      // Build request body - strip internal form fields that don't belong in the DB
+      const { useCustomPassword, customPassword, confirmPassword, ...orderData } = formData
       let requestBody
       if (order) {
         if (isLegacy) {
           // Legacy order: include isLegacy flag and newEditCode
-          requestBody = { id: order.id, isLegacy: true, newEditCode, expectedUpdatedAt: order.updatedAt, ...formData }
+          requestBody = { id: order.id, isLegacy: true, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         } else {
           // Normal edit: include editCode and expectedUpdatedAt for conflict detection
-          requestBody = { id: order.id, editCode, expectedUpdatedAt: order.updatedAt, ...formData }
+          requestBody = { id: order.id, editCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         }
       } else {
         // New order
         requestBody = {
-          ...formData,
+          ...orderData,
           // Include custom password if user chose to set one
-          customPassword: formData.useCustomPassword ? formData.customPassword : undefined,
+          customPassword: useCustomPassword ? customPassword : undefined,
         }
       }
 
@@ -465,7 +490,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if field is fixed */}
               {modelConstraints.range?.type === 'fixed' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: {formData.range} ist fest
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {ranges.find(r => r.value === formData.range)?.label ?? formData.range} ist fest
                 </p>
               )}
             </div>
@@ -491,7 +516,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if field is fixed */}
               {modelConstraints.drive?.type === 'fixed' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: {formData.drive} ist fest
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {drives.find(d => d.value === formData.drive)?.label ?? formData.drive} ist fest
                 </p>
               )}
             </div>
@@ -542,7 +567,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if colors are restricted */}
               {modelConstraints.color?.type === 'allow' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: eingeschränkte Farbauswahl
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Farbauswahl
                 </p>
               )}
             </div>
@@ -568,7 +593,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if interior is fixed */}
               {modelConstraints.interior?.type === 'fixed' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: {formData.interior} ist fest
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {interiors.find(i => i.value === formData.interior)?.label ?? formData.interior} ist fest
                 </p>
               )}
             </div>
@@ -594,13 +619,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if wheels are fixed */}
               {modelConstraints.wheels?.type === 'fixed' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: {formData.wheels} ist fest
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels} ist fest
                 </p>
               )}
               {/* Show hint if wheels are restricted */}
               {modelConstraints.wheels?.type === 'allow' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: eingeschränkte Felgenauswahl
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Felgenauswahl
                 </p>
               )}
             </div>
@@ -626,7 +651,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {/* Show hint if tow hitch is disabled */}
               {modelConstraints.towHitch?.type === 'disable' && (
                 <p className="text-xs text-muted-foreground">
-                  {formData.model}: AHK nicht verfügbar
+                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: AHK nicht verfügbar
                 </p>
               )}
             </div>

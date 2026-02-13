@@ -2,7 +2,7 @@
 
 import { useState, useMemo, memo, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Order, COLORS, COUNTRIES } from '@/lib/types'
+import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions } from '@/hooks/useOptions'
 
@@ -340,11 +340,15 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   // Get options from useOptions hook (includes labels for values)
   const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions } = useOptions()
 
-  // Helper to lookup label from value
+  // Helper to lookup label from value (falls back to hardcoded trims for model)
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
     if (!value) return '-'
     const option = options.find(o => o.value === value || o.label === value)
-    return option?.label || value
+    if (option) return option.label
+    // Fallback: check hardcoded model trims (in case API options don't include the value)
+    const trimFallback = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS].find(t => t.value === value || t.label === value)
+    if (trimFallback) return trimFallback.label
+    return value
   }
 
   // Create a lookup map for country labels (for sorting)

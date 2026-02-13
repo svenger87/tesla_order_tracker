@@ -4,46 +4,61 @@ import { memo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { COLORS } from '@/lib/types'
 
-// Tesla compositor base URL
-const COMPOSITOR_BASE = 'https://static-assets.tesla.com/v1/compositor/'
+// Tesla compositor base URL - using configurator/compositor endpoint
+const COMPOSITOR_BASE = 'https://static-assets.tesla.com/configurator/compositor'
 
-// Color value to Tesla option code mapping
+// Color value to Tesla compositor option code mapping
+// Source: tesla-order-status-tracker.de (2026-02-07) + POC verification
 const COLOR_CODES: Record<string, string> = {
-  // Current colors (2024-2025)
+  // Current colors (2025 Model Y Juniper / Model 3 Highland)
   'pearl_white': 'PPSW',
-  'diamond_black': 'PMBL',      // Obsidian Black Multi-Coat (closest match)
+  'solid_black': 'PBSB',
+  'diamond_black': 'PX02',      // Updated for Juniper
   'stealth_grey': 'PN01',
   'quicksilver': 'PN00',
   'ultra_red': 'PR01',
-  'marine_blue': 'PPSB',        // Deep Blue Metallic (closest match)
-  // Legacy colors
-  'midnight_silver': 'PMNG',
-  'solid_black': 'PBSB',
+  'glacier_blue': 'PB01',       // New Juniper color
+  'marine_blue': 'PB02',        // New Juniper color (updated code)
   'deep_blue': 'PPSB',
-  'red_multi': 'PPMR',
   'midnight_cherry': 'PR00',
+  // Legacy colors (discontinued but appear in historical orders)
+  'midnight_silver': 'PMNG',
+  'red_multi': 'PPMR',
   'silver_metallic': 'PMSS',
+  'obsidian_black': 'PMBL',     // Old Model Y
+  'anza_brown': 'PMAB',
+  'monterey_blue': 'PMMB',
+  'green_metallic': 'PMSG',
+  'dolphin_grey': 'PMTG',
+  'signature_red': 'PPSR',
+  'titanium': 'PPTI',
+  'solid_white': 'PBCW',
 }
 
-// Find color value from either value or label
-function findColorValue(colorInput: string | null | undefined): string | null {
+// Find color code from color value or label
+function findColorCode(colorInput: string | null | undefined): string | null {
   if (!colorInput) return null
 
-  // First check if it's already a valid value
-  if (COLOR_CODES[colorInput]) {
-    return colorInput
+  const normalizedInput = colorInput.toLowerCase().trim().replace(/[\s-]+/g, '_')
+
+  // Direct match on value
+  if (COLOR_CODES[normalizedInput]) {
+    return COLOR_CODES[normalizedInput]
   }
 
-  // Otherwise try to find by label (case-insensitive)
-  const normalizedInput = colorInput.toLowerCase().trim()
+  // Try to match via COLORS array (value or label)
   const color = COLORS.find(c =>
     c.value === normalizedInput ||
-    c.label.toLowerCase() === normalizedInput ||
-    normalizedInput.includes(c.label.toLowerCase()) ||
-    c.label.toLowerCase().includes(normalizedInput)
+    c.label.toLowerCase().replace(/[\s-]+/g, '_') === normalizedInput ||
+    normalizedInput.includes(c.value) ||
+    c.value.includes(normalizedInput)
   )
 
-  return color?.value || null
+  if (color?.value && COLOR_CODES[color.value]) {
+    return COLOR_CODES[color.value]
+  }
+
+  return null
 }
 
 // Extract wheel size number from value or label (e.g., "19" from '19"' or '19')
@@ -55,17 +70,19 @@ function findWheelSize(wheelInput: string | null | undefined): string | null {
   return match ? match[1] : null
 }
 
-// Model Y wheel codes
+// Model Y wheel codes (2025 Juniper + legacy)
+// Source: tesla-order-status-tracker.de + POC verification
 const MODEL_Y_WHEEL_CODES: Record<string, string> = {
   '18': 'WY18B',    // 18" Aero
-  '19': 'WY19B',    // 19" Gemini
-  '20': 'WY0S',     // 20" Induction
-  '21': 'WY1S',     // 21" Uberturbine
+  '19': 'WY19B',    // 19" Sport (pre-Juniper: Gemini)
+  '20': 'WY20A',    // 20" Helix (Juniper) - updated from WY0S
+  '21': 'WY21A',    // 21" Arachnid 2.0 (Juniper) - updated from WY1S
 }
 
 // Model 3 wheel codes (Highland 2024+)
+// Source: tesla-order-status-tracker.de + POC verification
 const MODEL_3_WHEEL_CODES: Record<string, string> = {
-  '18': 'W38B',     // 18" Aero
+  '18': 'W38A',     // 18" Photon (Highland default) - updated from W38B
   '19': 'W39B',     // 19" Sport
   '20': 'W32P',     // 20" Performance
 }
@@ -83,6 +100,12 @@ interface TeslaCarImageProps {
   className?: string
 }
 
+// Body style / generation codes for current models
+// Source: POC testing (2026-02-12) - verified with Tesla compositor API
+// Model 3: Default (no code) = Highland body
+// Model Y: MTY70 = Juniper body (without this, shows pre-Juniper)
+const MODEL_Y_JUNIPER_CODE = 'MTY70'
+
 function buildCompositorUrl(
   vehicleType: 'Model Y' | 'Model 3',
   color: string | null | undefined,
@@ -97,9 +120,9 @@ function buildCompositorUrl(
   const options: string[] = []
 
   // Add color code - resolve from value or label
-  const colorValue = findColorValue(color)
-  if (colorValue && COLOR_CODES[colorValue]) {
-    options.push(`$${COLOR_CODES[colorValue]}`)
+  const colorCode = findColorCode(color)
+  if (colorCode) {
+    options.push(`$${colorCode}`)
   } else {
     // Default to Pearl White
     options.push('$PPSW')
@@ -110,16 +133,22 @@ function buildCompositorUrl(
   if (wheelSize && wheelCodes[wheelSize]) {
     options.push(`$${wheelCodes[wheelSize]}`)
   } else {
-    // Default to base wheels
-    options.push(vehicleType === 'Model Y' ? '$WY19B' : '$W38B')
+    // Default to base wheels (Juniper/Highland defaults)
+    options.push(vehicleType === 'Model Y' ? '$WY19B' : '$W38A')
+  }
+
+  // Add body style code for Juniper Model Y
+  // Model 3 Highland is default (no additional code needed)
+  if (vehicleType === 'Model Y') {
+    options.push(`$${MODEL_Y_JUNIPER_CODE}`)
   }
 
   const params = new URLSearchParams({
+    bkba_opt: '2',  // Transparent background (using value 2 as per teslahunt library)
     model,
-    view,
-    size: size.toString(),
     options: options.join(','),
-    bkba_opt: '1',  // Transparent background
+    size: size.toString(),
+    view,
   })
 
   return `${COMPOSITOR_BASE}?${params.toString()}`
