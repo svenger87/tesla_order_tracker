@@ -54,8 +54,8 @@ jobs:
             echo ">>> Building and starting app-staging..."
             docker compose up -d --build app-staging
 
-            # --- Reload Caddy to pick up staging subdomain ---
-            echo ">>> Reloading Caddy..."
-            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile 2>/dev/null || docker compose restart caddy
+            # --- Restart Caddy to pick up config changes ---
+            echo ">>> Restarting Caddy..."
+            docker compose restart caddy
 
             echo ">>> Staging deployed to https://staging.tff-order-stats.de"
