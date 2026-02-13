@@ -115,8 +115,8 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           <div className="flex flex-wrap items-center gap-4">
             {/* Vehicle Type Selector */}
             <div className="flex items-center gap-2">
-              <Car className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Fahrzeug:</span>
+              <Car className="h-5 w-5 text-muted-foreground hidden sm:block" />
+              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Fahrzeug:</span>
             <Select
               value={selectedVehicle}
               onValueChange={(value) => setSelectedVehicle(value as VehicleType | 'all')}
@@ -137,8 +137,8 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
 
           {/* Period Selector */}
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Zeitraum:</span>
+            <Calendar className="h-5 w-5 text-muted-foreground hidden sm:block" />
+            <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Zeitraum:</span>
             <Select
               value={periodToKey(selectedPeriod)}
               onValueChange={(key) => setSelectedPeriod(keyToPeriod(key))}
@@ -189,25 +189,29 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
 
       {/* Main Statistics Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="flex w-full overflow-x-auto sm:grid sm:grid-cols-5 gap-1">
-          <TabsTrigger value="overview" className="flex items-center gap-1 text-xs sm:text-sm shrink-0">
-            <BarChart3 className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-5 gap-1">
+          <TabsTrigger value="overview" className="flex items-center gap-1 text-xs sm:text-sm">
+            <BarChart3 className="h-4 w-4 shrink-0" />
+            <span className="sm:hidden">Stats</span>
             <span className="hidden sm:inline">Übersicht</span>
           </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center gap-1 text-xs sm:text-sm shrink-0">
-            <Car className="h-4 w-4" />
+          <TabsTrigger value="config" className="flex items-center gap-1 text-xs sm:text-sm">
+            <Car className="h-4 w-4 shrink-0" />
+            <span className="sm:hidden">Konfig</span>
             <span className="hidden sm:inline">Konfiguration</span>
           </TabsTrigger>
-          <TabsTrigger value="ausstattung" className="flex items-center gap-1 text-xs sm:text-sm shrink-0">
-            <Settings2 className="h-4 w-4" />
+          <TabsTrigger value="ausstattung" className="flex items-center gap-1 text-xs sm:text-sm">
+            <Settings2 className="h-4 w-4 shrink-0" />
+            <span className="sm:hidden">Extras</span>
             <span className="hidden sm:inline">Ausstattung</span>
           </TabsTrigger>
-          <TabsTrigger value="geo" className="flex items-center gap-1 text-xs sm:text-sm shrink-0">
-            <Globe className="h-4 w-4" />
-            <span className="hidden sm:inline">Geodaten</span>
+          <TabsTrigger value="geo" className="flex items-center gap-1 text-xs sm:text-sm">
+            <Globe className="h-4 w-4 shrink-0" />
+            <span>Geo</span>
           </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-1 text-xs sm:text-sm shrink-0">
-            <TrendingUp className="h-4 w-4" />
+          <TabsTrigger value="timeline" className="flex items-center gap-1 text-xs sm:text-sm">
+            <TrendingUp className="h-4 w-4 shrink-0" />
+            <span className="sm:hidden">Zeit</span>
             <span className="hidden sm:inline">Zeitverlauf</span>
           </TabsTrigger>
         </TabsList>
@@ -222,6 +226,7 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               icon={Car}
               description="Bestellungen"
               hint="Gesamtanzahl aller erfassten Bestellungen im gewählten Zeitraum."
+              variant="hero"
               delay={0}
             />
             <StatCard
@@ -230,6 +235,7 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               icon={CheckCircle2}
               description={`${stats.totalOrders > 0 ? Math.round((stats.deliveredOrders / stats.totalOrders) * 100) : 0}%`}
               hint="Anzahl der bereits ausgelieferten Fahrzeuge."
+              variant="hero"
               delay={0.1}
             />
             <StatCard

@@ -1,0 +1,62 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [redesign]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy staging via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            STAGING_DIR="/opt/tesla-order-tracker-staging"
+            PROD_DIR="/opt/tesla-order-tracker"
+
+            # --- Bootstrap staging repo on first run ---
+            if [ ! -d "$STAGING_DIR" ]; then
+              echo ">>> First run: cloning staging repo..."
+              git clone --branch redesign "$( cd $PROD_DIR && git remote get-url origin )" "$STAGING_DIR"
+              chown -R deploy:deploy "$STAGING_DIR"
+            fi
+
+            # --- Pull latest redesign branch ---
+            echo ">>> Pulling latest redesign..."
+            cd "$STAGING_DIR"
+            git fetch origin redesign
+            git reset --hard origin/redesign
+
+            # --- Create .env.staging if missing ---
+            if [ ! -f "$PROD_DIR/.env.staging" ]; then
+              echo ">>> Creating .env.staging from template..."
+              cp "$PROD_DIR/.env.production" "$PROD_DIR/.env.staging"
+              # Generate a separate JWT secret for staging
+              sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -hex 32)|" "$PROD_DIR/.env.staging"
+              # Remove analytics for staging
+              sed -i '/^UMAMI_WEBSITE_ID/d' "$PROD_DIR/.env.staging"
+            fi
+
+            # --- Update production repo (for Caddyfile & docker-compose changes) ---
+            echo ">>> Syncing production repo (compose + Caddy config)..."
+            cd "$PROD_DIR"
+            git fetch origin redesign
+            # Only update Caddyfile and docker-compose.yml from redesign
+            git checkout origin/redesign -- Caddyfile docker-compose.yml
+
+            # --- Build and start staging container ---
+            echo ">>> Building and starting app-staging..."
+            docker compose up -d --build app-staging
+
+            # --- Reload Caddy to pick up staging subdomain ---
+            echo ">>> Reloading Caddy..."
+            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile 2>/dev/null || docker compose restart caddy
+
+            echo ">>> Staging deployed to https://staging.tff-order-stats.de"

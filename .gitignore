@@ -63,3 +63,5 @@ backups/
 # SSH keys
 deploy_key
 deploy_key.pub
+DEPLOYMENT.md
+CREDENTIALS.md

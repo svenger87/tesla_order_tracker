@@ -28,6 +28,12 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
+          <defs>
+            <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="oklch(0.6 0.2 25)" stopOpacity={1} />
+              <stop offset="100%" stopColor="oklch(0.6 0.2 25)" stopOpacity={0.6} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis
             dataKey="month"
@@ -61,8 +67,10 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
           />
           <Bar
             dataKey="count"
-            fill="oklch(0.6 0.2 25)"
+            fill="url(#ordersGradient)"
             radius={[4, 4, 0, 0]}
+            animationDuration={1000}
+            animationEasing="ease-out"
           />
         </BarChart>
       </ResponsiveContainer>

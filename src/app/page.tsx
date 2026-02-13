@@ -22,7 +22,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound } from 'lucide-react'
+import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -158,7 +164,8 @@ export default function Home() {
         animate={{ y: 0, opacity: 1 }}
         className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-lg"
       >
-        <div className="w-full max-w-[98vw] mx-auto px-4 py-4">
+        <div className="h-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40" />
+        <div className="w-full max-w-[98vw] mx-auto px-3 py-3 sm:px-4 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <motion.div
@@ -173,13 +180,17 @@ export default function Home() {
                 />
               </motion.div>
               <div>
-                <h1 className="text-xl font-bold md:text-2xl">Tesla Bestellungen und Statistiken</h1>
+                <h1 className="text-xl font-bold md:text-2xl">
+                  <span className="sm:hidden">Tesla Tracker</span>
+                  <span className="hidden sm:inline">Tesla Bestellungen und Statistiken</span>
+                </h1>
                 <p className="hidden text-sm text-muted-foreground sm:block">
                   Verfolge Tesla Bestellungen
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {/* Desktop nav items */}
               {settings?.showDonation && settings?.donationUrl && (
                 <a
                   href={settings.donationUrl}
@@ -191,7 +202,7 @@ export default function Home() {
                   <span>Unterstützen</span>
                 </a>
               )}
-              <Link href="/docs">
+              <Link href="/docs" className="hidden sm:inline-flex">
                 <Button variant="ghost" size="icon" className="h-9 w-9" title="API Dokumentation">
                   <Code2 className="h-4 w-4" />
                   <span className="sr-only">API Docs</span>
@@ -201,6 +212,7 @@ export default function Home() {
                 href="https://github.com/svenger87/tesla_order_tracker"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="hidden sm:inline-flex"
               >
                 <Button variant="ghost" size="icon" className="h-9 w-9">
                   <Github className="h-4 w-4" />
@@ -208,17 +220,72 @@ export default function Home() {
                 </Button>
               </a>
               <ThemeToggle />
+              {/* Mobile overflow menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className="sm:hidden">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Menü</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/docs">
+                      <Code2 className="mr-2 h-4 w-4" />
+                      API Docs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a
+                      href="https://github.com/svenger87/tesla_order_tracker"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Github className="mr-2 h-4 w-4" />
+                      GitHub
+                    </a>
+                  </DropdownMenuItem>
+                  {settings?.showDonation && settings?.donationUrl && (
+                    <DropdownMenuItem asChild>
+                      <a
+                        href={settings.donationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Coffee className="mr-2 h-4 w-4" />
+                        Unterstützen
+                      </a>
+                    </DropdownMenuItem>
+                  )}
+                  {isAdmin ? (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin">
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Admin Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/login">
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* Desktop admin button */}
               {isAdmin ? (
-                <Link href="/admin">
+                <Link href="/admin" className="hidden sm:inline-flex">
                   <Button variant="outline" size="sm">
                     Admin Dashboard
                   </Button>
                 </Link>
               ) : (
-                <Link href="/admin/login">
+                <Link href="/admin/login" className="hidden sm:inline-flex">
                   <Button variant="ghost" size="sm">
                     <LogIn className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Admin</span>
+                    Admin
                   </Button>
                 </Link>
               )}
@@ -227,23 +294,31 @@ export default function Home() {
         </div>
       </motion.header>
 
-      <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-6">
+      <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-8">
         {/* Statistics Toggle & Dashboard */}
         <div className="flex items-center justify-between">
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => setShowStats(!showStats)}
             className="gap-2"
           >
             <BarChart3 className="h-4 w-4" />
             {showStats ? 'Statistiken ausblenden' : 'Statistiken anzeigen'}
+            <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
           </Button>
         </div>
 
         {showStats && !loading && (
           <StatisticsDashboard orders={orders} />
         )}
+
+        {/* Section Divider */}
+        <div className="relative flex items-center py-2">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Bestellungen</span>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        </div>
 
         {/* Orders Section */}
         <Card>
@@ -260,7 +335,7 @@ export default function Home() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={fetchOrders}>
+                <Button variant="ghost" size="sm" onClick={fetchOrders} className="text-muted-foreground">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Aktualisieren</span>
                 </Button>
@@ -268,7 +343,7 @@ export default function Home() {
                   <Pencil className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Bearbeiten</span>
                 </Button>
-                <Button size="sm" onClick={() => setShowAddForm(true)}>
+                <Button size="sm" onClick={() => setShowAddForm(true)} className="shadow-sm">
                   <Plus className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Neue Bestellung</span>
                 </Button>
@@ -296,46 +371,44 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-auto">
-        <div className="w-full max-w-[98vw] mx-auto px-4 py-4">
+      <footer className="border-t mt-12">
+        <div className="w-full max-w-[98vw] mx-auto px-4 py-6 sm:py-8">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-muted-foreground"
+            className="flex flex-col items-center gap-4"
           >
-            <span>Tesla Bestellungen und Statistiken - Community Projekt</span>
-            <span className="hidden sm:inline">·</span>
-            <a
-              href="https://github.com/svenger87/tesla_order_tracker"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
-            >
-              <Github className="h-3.5 w-3.5" />
-              <span>GitHub</span>
-            </a>
-            <span className="hidden sm:inline">·</span>
-            <Link
-              href="/docs"
-              className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
-            >
-              <Code2 className="h-3.5 w-3.5" />
-              <span>API</span>
-            </Link>
-            <span className="hidden sm:inline">·</span>
-            <Link
-              href="/impressum"
-              className="hover:text-foreground transition-colors"
-            >
-              Impressum
-            </Link>
-            {settings?.showDonation && (
-              <>
-                <span className="hidden sm:inline">·</span>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
+              <a
+                href="https://github.com/svenger87/tesla_order_tracker"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                <span>GitHub</span>
+              </a>
+              <Link
+                href="/docs"
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                <Code2 className="h-4 w-4" />
+                <span>API Docs</span>
+              </Link>
+              <Link
+                href="/impressum"
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                Impressum
+              </Link>
+              {settings?.showDonation && (
                 <DonationBanner settings={settings} />
-              </>
-            )}
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground/60">
+              Tesla Bestellungen und Statistiken — Ein Community Projekt der TFF
+            </p>
           </motion.div>
         </div>
       </footer>

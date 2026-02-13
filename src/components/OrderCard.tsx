@@ -114,13 +114,20 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
             {order.model && (
               <Badge
                 variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
-                className="text-xs"
+                className={cn("text-xs", order.model.toLowerCase().includes('premium') || order.model.toLowerCase().includes('long')
+                  ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800'
+                  : ''
+                )}
               >
                 {getLabel(models, order.model)}
               </Badge>
             )}
             {order.range && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className={cn("text-xs",
+                (getLabel(ranges, order.range) === 'Maximale Reichweite' || order.range.toLowerCase().includes('max'))
+                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
+                  : ''
+              )}>
                 {(() => {
                   const rangeLabel = getLabel(ranges, order.range)
                   return rangeLabel === 'Maximale Reichweite' ? 'Max. RW' : rangeLabel
@@ -128,7 +135,11 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               </Badge>
             )}
             {order.drive && (
-              <Badge variant="outline" className="text-xs font-mono">
+              <Badge variant="outline" className={cn("text-xs font-mono",
+                (getLabel(drives, order.drive).includes('AWD') || getLabel(drives, order.drive).includes('Dual'))
+                  ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800'
+                  : ''
+              )}>
                 {getLabel(drives, order.drive)}
               </Badge>
             )}

@@ -12,6 +12,23 @@ services:
     volumes:
       - sqlite_data:/app/data
 
+  app-staging:
+    build:
+      context: /opt/tesla-order-tracker-staging
+      dockerfile: Dockerfile
+    command: >
+      sh -c "if [ ! -f /app/data/staging.db ]; then cp /app/schema-template.db /app/data/staging.db; fi && node server.js"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    env_file:
+      - .env.staging
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/staging.db
+    volumes:
+      - sqlite_data_staging:/app/data
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -56,6 +73,7 @@ services:
 
 volumes:
   sqlite_data:
+  sqlite_data_staging:
   caddy_data:
   caddy_config:
   uptime_kuma_data:

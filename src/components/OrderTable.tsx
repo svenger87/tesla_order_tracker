@@ -147,8 +147,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Filter, X, Search, KeyRound } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Filter, X, Search, KeyRound, Columns3 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -326,6 +333,54 @@ function SortableHeader({ field, currentField, direction, onSort, children }: So
   )
 }
 
+// Column visibility system
+type ColumnGroup = 'essential' | 'configuration' | 'detail'
+
+interface ColumnDef {
+  key: string
+  label: string
+  group: ColumnGroup
+}
+
+const COLUMN_DEFS: ColumnDef[] = [
+  // Essential (always visible)
+  { key: 'status', label: 'Status', group: 'essential' },
+  { key: 'name', label: 'Name', group: 'essential' },
+  { key: 'vehicleType', label: 'Fahrzeug', group: 'essential' },
+  { key: 'orderDate', label: 'Bestelldatum', group: 'essential' },
+  { key: 'deliveryDate', label: 'Lieferdatum', group: 'essential' },
+  // Configuration (default on)
+  { key: 'model', label: 'Model', group: 'configuration' },
+  { key: 'range', label: 'Reichweite', group: 'configuration' },
+  { key: 'drive', label: 'Antrieb', group: 'configuration' },
+  { key: 'color', label: 'Farbe', group: 'configuration' },
+  // Detail (default off)
+  { key: 'country', label: 'Land', group: 'detail' },
+  { key: 'interior', label: 'Innen', group: 'detail' },
+  { key: 'wheels', label: 'Felgen', group: 'detail' },
+  { key: 'towHitch', label: 'AHK', group: 'detail' },
+  { key: 'autopilot', label: 'Autopilot', group: 'detail' },
+  { key: 'deliveryWindow', label: 'Lieferfenster', group: 'detail' },
+  { key: 'deliveryLocation', label: 'Ort', group: 'detail' },
+  { key: 'vin', label: 'VIN', group: 'detail' },
+  { key: 'vinReceivedDate', label: 'VIN am', group: 'detail' },
+  { key: 'papersReceivedDate', label: 'Papiere am', group: 'detail' },
+  { key: 'productionDate', label: 'Produktion', group: 'detail' },
+  { key: 'typeApproval', label: 'Typgen.', group: 'detail' },
+  { key: 'typeVariant', label: 'Typ-Var.', group: 'detail' },
+  { key: 'orderToProduction', label: 'B→P', group: 'detail' },
+  { key: 'orderToVin', label: 'B→VIN', group: 'detail' },
+  { key: 'orderToDelivery', label: 'B→L', group: 'detail' },
+  { key: 'orderToPapers', label: 'B→Pap', group: 'detail' },
+  { key: 'papersToDelivery', label: 'Pap→L', group: 'detail' },
+  { key: 'updatedAt', label: 'Änderung', group: 'detail' },
+]
+
+const DEFAULT_VISIBLE_COLUMNS = new Set(
+  COLUMN_DEFS.filter(c => c.group === 'essential' || c.group === 'configuration').map(c => c.key)
+)
+
+const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
@@ -335,6 +390,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [showFilters, setShowFilters] = useState(false)
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(DEFAULT_VISIBLE_COLUMNS)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Get options from useOptions hook (includes labels for values)
@@ -386,7 +442,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   const searchParams = useSearchParams()
   const highlightUser = searchParams.get('user')?.toLowerCase()
 
-  // Load filters and sorting from localStorage on mount
+  // Load filters, sorting, and column visibility from localStorage on mount
   useEffect(() => {
     // Load filters
     const savedFilters = localStorage.getItem(FILTERS_STORAGE_KEY)
@@ -414,6 +470,19 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       }
     }
 
+    // Load column visibility
+    const savedColumns = localStorage.getItem(COLUMNS_STORAGE_KEY)
+    if (savedColumns) {
+      try {
+        const parsed = JSON.parse(savedColumns)
+        if (Array.isArray(parsed)) {
+          setVisibleColumns(new Set(parsed))
+        }
+      } catch (e) {
+        console.error('Failed to parse saved columns:', e)
+      }
+    }
+
     setIsHydrated(true)
   }, [])
 
@@ -430,6 +499,27 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify({ field: sortField, direction: sortDirection }))
     }
   }, [sortField, sortDirection, isHydrated])
+
+  // Save column visibility to localStorage whenever it changes
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify([...visibleColumns]))
+    }
+  }, [visibleColumns, isHydrated])
+
+  const isColumnVisible = useCallback((key: string) => visibleColumns.has(key), [visibleColumns])
+
+  const toggleColumn = useCallback((key: string) => {
+    setVisibleColumns(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      return next
+    })
+  }, [])
 
   // Measure scroll dimensions for sticky scrollbar
   useEffect(() => {
@@ -605,6 +695,45 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </Badge>
           )}
         </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Columns3 className="h-4 w-4" />
+              <span className="hidden xs:inline">Spalten</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[240px] p-3" align="start">
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Sichtbare Spalten</p>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Konfiguration</p>
+                {COLUMN_DEFS.filter(c => c.group === 'configuration').map(col => (
+                  <div key={col.key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`col-${col.key}`}
+                      checked={isColumnVisible(col.key)}
+                      onCheckedChange={() => toggleColumn(col.key)}
+                    />
+                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{col.label}</Label>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Detail</p>
+                {COLUMN_DEFS.filter(c => c.group === 'detail').map(col => (
+                  <div key={col.key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`col-${col.key}`}
+                      checked={isColumnVisible(col.key)}
+                      onCheckedChange={() => toggleColumn(col.key)}
+                    />
+                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{col.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
         {activeFilterCount > 0 && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
             <X className="h-3 w-3" />
@@ -618,7 +747,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
       {/* Filter Row */}
       {showFilters && (
-        <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md">
+        <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md overflow-x-auto">
           <Select value={filters.vehicleType} onValueChange={(v) => setFilters(f => ({ ...f, vehicleType: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[120px] h-8">
               <SelectValue placeholder="Fahrzeug" />
@@ -807,34 +936,34 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         <table className="w-full min-w-max caption-bottom text-sm">
         <TableHeader className="sticky top-0 z-20">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
-            <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>
-            <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>Name</SortableHeader>
-            <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>Fahrzeug</SortableHeader>
-            <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Bestelldatum</SortableHeader>
-            <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>Land</SortableHeader>
-            <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>Model</SortableHeader>
-            <SortableHeader field="range" currentField={sortField} direction={sortDirection} onSort={handleSort}>Reichweite</SortableHeader>
-            <SortableHeader field="drive" currentField={sortField} direction={sortDirection} onSort={handleSort}>Antrieb</SortableHeader>
-            <SortableHeader field="color" currentField={sortField} direction={sortDirection} onSort={handleSort}>Farbe</SortableHeader>
-            <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>Innen</SortableHeader>
-            <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>Felgen</SortableHeader>
-            <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>AHK</SortableHeader>
-            <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>Autopilot</SortableHeader>
-            <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferfenster</SortableHeader>
-            <SortableHeader field="deliveryLocation" currentField={sortField} direction={sortDirection} onSort={handleSort}>Ort</SortableHeader>
-            <SortableHeader field="vin" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN</SortableHeader>
-            <SortableHeader field="vinReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN am</SortableHeader>
-            <SortableHeader field="papersReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Papiere am</SortableHeader>
-            <SortableHeader field="productionDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Produktion</SortableHeader>
-            <SortableHeader field="typeApproval" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typgen.</SortableHeader>
-            <SortableHeader field="typeVariant" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typ-Var.</SortableHeader>
-            <SortableHeader field="deliveryDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferdatum</SortableHeader>
-            <SortableHeader field="orderToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→P</SortableHeader>
-            <SortableHeader field="orderToVin" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→VIN</SortableHeader>
-            <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→L</SortableHeader>
-            <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→Pap</SortableHeader>
-            <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>Pap→L</SortableHeader>
-            <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>Änderung</SortableHeader>
+            {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>}
+            {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>Name</SortableHeader>}
+            {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>Fahrzeug</SortableHeader>}
+            {isColumnVisible('orderDate') && <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Bestelldatum</SortableHeader>}
+            {isColumnVisible('country') && <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>Land</SortableHeader>}
+            {isColumnVisible('model') && <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>Model</SortableHeader>}
+            {isColumnVisible('range') && <SortableHeader field="range" currentField={sortField} direction={sortDirection} onSort={handleSort}>Reichweite</SortableHeader>}
+            {isColumnVisible('drive') && <SortableHeader field="drive" currentField={sortField} direction={sortDirection} onSort={handleSort}>Antrieb</SortableHeader>}
+            {isColumnVisible('color') && <SortableHeader field="color" currentField={sortField} direction={sortDirection} onSort={handleSort}>Farbe</SortableHeader>}
+            {isColumnVisible('interior') && <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>Innen</SortableHeader>}
+            {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>Felgen</SortableHeader>}
+            {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>AHK</SortableHeader>}
+            {isColumnVisible('autopilot') && <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>Autopilot</SortableHeader>}
+            {isColumnVisible('deliveryWindow') && <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferfenster</SortableHeader>}
+            {isColumnVisible('deliveryLocation') && <SortableHeader field="deliveryLocation" currentField={sortField} direction={sortDirection} onSort={handleSort}>Ort</SortableHeader>}
+            {isColumnVisible('vin') && <SortableHeader field="vin" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN</SortableHeader>}
+            {isColumnVisible('vinReceivedDate') && <SortableHeader field="vinReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN am</SortableHeader>}
+            {isColumnVisible('papersReceivedDate') && <SortableHeader field="papersReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Papiere am</SortableHeader>}
+            {isColumnVisible('productionDate') && <SortableHeader field="productionDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Produktion</SortableHeader>}
+            {isColumnVisible('typeApproval') && <SortableHeader field="typeApproval" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typgen.</SortableHeader>}
+            {isColumnVisible('typeVariant') && <SortableHeader field="typeVariant" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typ-Var.</SortableHeader>}
+            {isColumnVisible('deliveryDate') && <SortableHeader field="deliveryDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferdatum</SortableHeader>}
+            {isColumnVisible('orderToProduction') && <SortableHeader field="orderToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→P</SortableHeader>}
+            {isColumnVisible('orderToVin') && <SortableHeader field="orderToVin" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→VIN</SortableHeader>}
+            {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→L</SortableHeader>}
+            {isColumnVisible('orderToPapers') && <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→Pap</SortableHeader>}
+            {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>Pap→L</SortableHeader>}
+            {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>Änderung</SortableHeader>}
             {isAdmin && (
               <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
                 Aktionen
@@ -845,7 +974,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         <TableBody>
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={isAdmin ? 29 : 28} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={visibleColumns.size + (isAdmin ? 1 : 0)} className="text-center py-8 text-muted-foreground">
                 {orders.length === 0 ? 'Keine Bestellungen vorhanden' : 'Keine Einträge mit diesen Filtern'}
               </TableCell>
             </TableRow>
@@ -860,103 +989,162 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                   isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25"
                 )}
               >
-                <TableCell className="whitespace-nowrap">
-                  <OrderProgressBar order={order} compact />
-                </TableCell>
-                <TableCell className="font-medium whitespace-nowrap">{order.name}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.vehicleType ? (
-                    <Badge variant="outline" className="text-xs">
-                      {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
-                    </Badge>
-                  ) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{order.orderDate || '-'}</TableCell>
-                <CountryCell country={order.country} countries={countries} />
-                <TableCell className="whitespace-nowrap">
-                  {order.model ? (
-                    <Badge
-                      variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
-                      className="font-medium"
-                    >
-                      {getLabel(models, order.model)}
-                    </Badge>
-                  ) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.range ? (
-                    <Badge variant="outline" className="text-xs">
-                      {getLabel(ranges, order.range) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, order.range)}
-                    </Badge>
-                  ) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.drive ? (
-                    <Badge variant="outline" className="font-mono">
-                      {getLabel(drives, order.drive)}
-                    </Badge>
-                  ) : '-'}
-                </TableCell>
-                <ColorCell color={order.color} />
-                <TableCell className="whitespace-nowrap">{getLabel(interiors, order.interior)}</TableCell>
-                <TableCell className="whitespace-nowrap">{getLabel(wheels, order.wheels)}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.towHitch ? (
-                    <Badge variant={order.towHitch.toLowerCase() === 'ja' ? 'default' : 'outline'}>
-                      {getLabel(towHitchOptions, order.towHitch)}
-                    </Badge>
-                  ) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.autopilot ? (
-                    <Badge variant="secondary">{getLabel(autopilotOptions, order.autopilot)}</Badge>
-                  ) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.deliveryLocation || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap font-mono text-xs">
-                  {order.vin ? order.vin.substring(0, 17) : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{order.vinReceivedDate || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.papersReceivedDate || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.productionDate || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.typeApproval || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">{order.typeVariant || '-'}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.deliveryDate ? (() => {
-                    const deliveryParsed = parseDate(order.deliveryDate)
-                    const isDelivered = deliveryParsed && deliveryParsed <= new Date()
-                    return (
-                      <Badge
-                        variant={isDelivered ? "default" : "outline"}
-                        className={isDelivered
-                          ? "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white"
-                          : "text-muted-foreground"
-                        }
-                      >
-                        {order.deliveryDate}
+                {isColumnVisible('status') && (
+                  <TableCell className="whitespace-nowrap">
+                    <OrderProgressBar order={order} compact />
+                  </TableCell>
+                )}
+                {isColumnVisible('name') && (
+                  <TableCell className="font-medium whitespace-nowrap">{order.name}</TableCell>
+                )}
+                {isColumnVisible('vehicleType') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.vehicleType ? (
+                      <Badge variant="outline" className="text-xs">
+                        {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
                       </Badge>
-                    )
-                  })() : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-center font-mono">
-                  {order.orderToProduction !== null ? order.orderToProduction : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-center font-mono">
-                  {order.orderToVin !== null ? order.orderToVin : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-center font-mono">
-                  {order.orderToDelivery !== null ? order.orderToDelivery : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-center font-mono">
-                  {order.orderToPapers !== null ? order.orderToPapers : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-center font-mono">
-                  {order.papersToDelivery !== null ? order.papersToDelivery : '-'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                  {formatRelativeTime(order.updatedAt)}
-                </TableCell>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderDate') && (
+                  <TableCell className="whitespace-nowrap">{order.orderDate || '-'}</TableCell>
+                )}
+                {isColumnVisible('country') && (
+                  <CountryCell country={order.country} countries={countries} />
+                )}
+                {isColumnVisible('model') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.model ? (
+                      <Badge
+                        variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
+                        className="font-medium"
+                      >
+                        {getLabel(models, order.model)}
+                      </Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('range') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.range ? (
+                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">
+                        {getLabel(ranges, order.range) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, order.range)}
+                      </Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('drive') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.drive ? (
+                      <Badge variant="outline" className={cn(
+                        "font-mono",
+                        getLabel(drives, order.drive).includes('AWD') || getLabel(drives, order.drive).includes('Dual')
+                          ? "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800"
+                          : ""
+                      )}>
+                        {getLabel(drives, order.drive)}
+                      </Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('color') && <ColorCell color={order.color} />}
+                {isColumnVisible('interior') && (
+                  <TableCell className="whitespace-nowrap">{getLabel(interiors, order.interior)}</TableCell>
+                )}
+                {isColumnVisible('wheels') && (
+                  <TableCell className="whitespace-nowrap">{getLabel(wheels, order.wheels)}</TableCell>
+                )}
+                {isColumnVisible('towHitch') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.towHitch ? (
+                      <Badge variant={order.towHitch.toLowerCase() === 'ja' ? 'default' : 'outline'}>
+                        {getLabel(towHitchOptions, order.towHitch)}
+                      </Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('autopilot') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.autopilot ? (
+                      <Badge variant="secondary">{getLabel(autopilotOptions, order.autopilot)}</Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('deliveryWindow') && (
+                  <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
+                )}
+                {isColumnVisible('deliveryLocation') && (
+                  <TableCell className="whitespace-nowrap">{order.deliveryLocation || '-'}</TableCell>
+                )}
+                {isColumnVisible('vin') && (
+                  <TableCell className="whitespace-nowrap font-mono text-xs">
+                    {order.vin ? order.vin.substring(0, 17) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('vinReceivedDate') && (
+                  <TableCell className="whitespace-nowrap">{order.vinReceivedDate || '-'}</TableCell>
+                )}
+                {isColumnVisible('papersReceivedDate') && (
+                  <TableCell className="whitespace-nowrap">{order.papersReceivedDate || '-'}</TableCell>
+                )}
+                {isColumnVisible('productionDate') && (
+                  <TableCell className="whitespace-nowrap">{order.productionDate || '-'}</TableCell>
+                )}
+                {isColumnVisible('typeApproval') && (
+                  <TableCell className="whitespace-nowrap">{order.typeApproval || '-'}</TableCell>
+                )}
+                {isColumnVisible('typeVariant') && (
+                  <TableCell className="whitespace-nowrap">{order.typeVariant || '-'}</TableCell>
+                )}
+                {isColumnVisible('deliveryDate') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.deliveryDate ? (() => {
+                      const deliveryParsed = parseDate(order.deliveryDate)
+                      const isDelivered = deliveryParsed && deliveryParsed <= new Date()
+                      return (
+                        <Badge
+                          variant={isDelivered ? "default" : "outline"}
+                          className={isDelivered
+                            ? "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white"
+                            : "text-muted-foreground"
+                          }
+                        >
+                          {order.deliveryDate}
+                        </Badge>
+                      )
+                    })() : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderToProduction') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.orderToProduction !== null ? order.orderToProduction : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderToVin') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.orderToVin !== null ? order.orderToVin : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderToDelivery') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.orderToDelivery !== null ? order.orderToDelivery : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderToPapers') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.orderToPapers !== null ? order.orderToPapers : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('papersToDelivery') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.papersToDelivery !== null ? order.papersToDelivery : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('updatedAt') && (
+                  <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                    {formatRelativeTime(order.updatedAt)}
+                  </TableCell>
+                )}
                 {isAdmin && (
                   <TableCell className="sticky right-0 bg-card dark:bg-card shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-10">
                     <DropdownMenu>
