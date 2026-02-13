@@ -14,7 +14,7 @@ services:
 
   app-staging:
     build:
-      context: /opt/tesla-order-tracker-staging
+      context: /opt/tesla-order-tracker/staging-src
       dockerfile: Dockerfile
     command: >
       sh -c "if [ ! -f /app/data/staging.db ]; then cp /app/schema-template.db /app/data/staging.db; fi && node server.js"
