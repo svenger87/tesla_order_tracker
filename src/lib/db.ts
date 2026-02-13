@@ -1,21 +1,22 @@
 import { createClient, type Client, type InArgs, type ResultSet } from '@libsql/client/web'
 
-// Singleton client
+// Lazy singleton — avoids URL validation at build time when env vars are absent
 const globalForDb = globalThis as unknown as { db: Client | undefined }
 
-function createDbClient(): Client {
+function getDb(): Client {
+  if (globalForDb.db) return globalForDb.db
+
   const url = process.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL_PREVIEW || ''
   const authToken = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN_PREVIEW
 
-  return createClient({
+  const client = createClient({
     url,
     ...(authToken && { authToken }),
   })
+
+  if (process.env.NODE_ENV !== 'production') globalForDb.db = client
+  return client
 }
-
-export const db = globalForDb.db ?? createDbClient()
-
-if (process.env.NODE_ENV !== 'production') globalForDb.db = db
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ export async function query<T = Record<string, unknown>>(
   sql: string,
   args: unknown[] = [],
 ): Promise<T[]> {
-  const rs: ResultSet = await db.execute({ sql, args: args as InArgs })
+  const rs: ResultSet = await getDb().execute({ sql, args: args as InArgs })
   return rs.rows as unknown as T[]
 }
 
@@ -39,14 +40,14 @@ export async function queryOne<T = Record<string, unknown>>(
 
 /** Run a write statement (INSERT / UPDATE / DELETE) and return metadata. */
 export async function execute(sql: string, args: unknown[] = []): Promise<ResultSet> {
-  return db.execute({ sql, args: args as InArgs })
+  return getDb().execute({ sql, args: args as InArgs })
 }
 
 /** Run multiple statements in a batch (implicit transaction). */
 export async function batch(
   stmts: Array<{ sql: string; args?: InArgs }>,
 ): Promise<ResultSet[]> {
-  return db.batch(
+  return getDb().batch(
     stmts.map((s) => ({ sql: s.sql, args: s.args ?? [] })),
     'write',
   )
