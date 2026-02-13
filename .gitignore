@@ -63,3 +63,7 @@ turso-schema.sql
 .vercel
 .env*.local
 backups/
+
+# Cloudflare
+.open-next/
+.wrangler/
