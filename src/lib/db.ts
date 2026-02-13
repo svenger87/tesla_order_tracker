@@ -1,20 +1,34 @@
 import { createClient, type Client, type InArgs, type ResultSet } from '@libsql/client/web'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 
 // Lazy singleton — avoids URL validation at build time when env vars are absent
 const globalForDb = globalThis as unknown as { db: Client | undefined }
 
+function getEnv(key: string): string | undefined {
+  // Try Cloudflare bindings first (production Workers runtime)
+  try {
+    const ctx = getCloudflareContext()
+    const val = (ctx.env as Record<string, unknown>)[key]
+    if (typeof val === 'string') return val
+  } catch {
+    // Not in Cloudflare context (dev mode or build time)
+  }
+  // Fallback to process.env (dev mode)
+  return process.env[key] || undefined
+}
+
 function getDb(): Client {
   if (globalForDb.db) return globalForDb.db
 
-  const url = process.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL_PREVIEW || ''
-  const authToken = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN_PREVIEW
+  const url = getEnv('TURSO_DATABASE_URL') || getEnv('TURSO_DATABASE_URL_PREVIEW') || ''
+  const authToken = getEnv('TURSO_AUTH_TOKEN') || getEnv('TURSO_AUTH_TOKEN_PREVIEW')
 
   const client = createClient({
     url,
     ...(authToken && { authToken }),
   })
 
-  if (process.env.NODE_ENV !== 'production') globalForDb.db = client
+  globalForDb.db = client
   return client
 }
 
