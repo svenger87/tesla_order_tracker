@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 RUN npm run build
-RUN DATABASE_URL="file:/app/schema-template.db" npx prisma db push --skip-generate --accept-data-loss
+RUN DATABASE_URL="file:/app/schema-template.db" npx prisma db push --accept-data-loss
 
 FROM node:22-alpine AS runner
 WORKDIR /app
