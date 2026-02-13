@@ -343,31 +343,32 @@ interface ColumnDef {
 }
 
 const COLUMN_DEFS: ColumnDef[] = [
-  // Essential (always visible)
+  // Essential (always visible, not toggleable)
   { key: 'status', label: 'Status', group: 'essential' },
   { key: 'name', label: 'Name', group: 'essential' },
   { key: 'vehicleType', label: 'Fahrzeug', group: 'essential' },
   { key: 'orderDate', label: 'Bestelldatum', group: 'essential' },
-  { key: 'deliveryDate', label: 'Lieferdatum', group: 'essential' },
-  // Configuration (default on)
+  // Configuration
+  { key: 'country', label: 'Land', group: 'configuration' },
   { key: 'model', label: 'Model', group: 'configuration' },
   { key: 'range', label: 'Reichweite', group: 'configuration' },
   { key: 'drive', label: 'Antrieb', group: 'configuration' },
   { key: 'color', label: 'Farbe', group: 'configuration' },
-  // Detail (default off)
-  { key: 'country', label: 'Land', group: 'detail' },
-  { key: 'interior', label: 'Innen', group: 'detail' },
-  { key: 'wheels', label: 'Felgen', group: 'detail' },
-  { key: 'towHitch', label: 'AHK', group: 'detail' },
-  { key: 'autopilot', label: 'Autopilot', group: 'detail' },
-  { key: 'deliveryWindow', label: 'Lieferfenster', group: 'detail' },
-  { key: 'deliveryLocation', label: 'Ort', group: 'detail' },
-  { key: 'vin', label: 'VIN', group: 'detail' },
-  { key: 'vinReceivedDate', label: 'VIN am', group: 'detail' },
-  { key: 'papersReceivedDate', label: 'Papiere am', group: 'detail' },
-  { key: 'productionDate', label: 'Produktion', group: 'detail' },
-  { key: 'typeApproval', label: 'Typgen.', group: 'detail' },
-  { key: 'typeVariant', label: 'Typ-Var.', group: 'detail' },
+  { key: 'interior', label: 'Innen', group: 'configuration' },
+  { key: 'wheels', label: 'Felgen', group: 'configuration' },
+  { key: 'towHitch', label: 'AHK', group: 'configuration' },
+  { key: 'autopilot', label: 'Autopilot', group: 'configuration' },
+  // Status & Delivery
+  { key: 'deliveryWindow', label: 'Lieferfenster', group: 'configuration' },
+  { key: 'deliveryLocation', label: 'Ort', group: 'configuration' },
+  { key: 'vin', label: 'VIN', group: 'configuration' },
+  { key: 'vinReceivedDate', label: 'VIN am', group: 'configuration' },
+  { key: 'papersReceivedDate', label: 'Papiere am', group: 'configuration' },
+  { key: 'productionDate', label: 'Produktion', group: 'configuration' },
+  { key: 'typeApproval', label: 'Typgen.', group: 'configuration' },
+  { key: 'typeVariant', label: 'Typ-Var.', group: 'configuration' },
+  { key: 'deliveryDate', label: 'Lieferdatum', group: 'configuration' },
+  // Detail (time periods & metadata)
   { key: 'orderToProduction', label: 'B→P', group: 'detail' },
   { key: 'orderToVin', label: 'B→VIN', group: 'detail' },
   { key: 'orderToDelivery', label: 'B→L', group: 'detail' },
@@ -376,8 +377,9 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'updatedAt', label: 'Änderung', group: 'detail' },
 ]
 
+// All columns visible by default
 const DEFAULT_VISIBLE_COLUMNS = new Set(
-  COLUMN_DEFS.filter(c => c.group === 'essential' || c.group === 'configuration').map(c => c.key)
+  COLUMN_DEFS.map(c => c.key)
 )
 
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
@@ -933,7 +935,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         onScroll={handleTableScroll}
         className="hidden md:block rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="w-full min-w-max caption-bottom text-sm">
+        <table className="w-full min-w-max caption-bottom text-xs">
         <TableHeader className="sticky top-0 z-20">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>}

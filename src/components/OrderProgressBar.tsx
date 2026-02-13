@@ -62,43 +62,63 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
     )
   }
 
-  // Compact segmented progress bar for table view
+  // Compact circle progress bar for table view
   if (compact) {
     return (
-      <div className="flex items-center gap-0.5 w-[80px]">
+      <div className="flex items-center gap-0">
         {STEPS.map((step, index) => {
           const isCompleted = index <= currentIndex
+          const isCurrent = index === currentIndex
           const isLastStep = index === STEPS.length - 1
           const isScheduledDelivery = isLastStep && isScheduled
+          const Icon = isScheduledDelivery ? Calendar : step.icon
           const dateValue = order[step.dateField]
 
-          const segmentColor = !isCompleted
-            ? 'bg-muted'
-            : isScheduledDelivery
-              ? 'bg-amber-500'
-              : isLastStep && isCompleted && !isScheduled
-                ? 'bg-green-500'
-                : 'bg-primary'
-
           return (
-            <Tooltip key={step.key}>
-              <TooltipTrigger asChild>
+            <Fragment key={step.key}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      'relative flex items-center justify-center rounded-full transition-colors shrink-0',
+                      'h-6 w-6',
+                      isScheduledDelivery
+                        ? 'bg-amber-500 text-white'
+                        : isLastStep && isCompleted && !isScheduled
+                          ? 'bg-green-500 text-white'
+                          : isCompleted
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground',
+                      isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
+                      isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
+                    )}
+                  >
+                    {isCompleted && index < currentIndex && !isScheduledDelivery ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Icon className="h-3 w-3" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-medium">
+                    {isScheduledDelivery ? 'Lieferung geplant' : step.label}
+                  </p>
+                  {dateValue && (
+                    <p className="text-xs text-white/80">{dateValue}</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+
+              {index < STEPS.length - 1 && (
                 <div
                   className={cn(
-                    'h-2 flex-1 rounded-sm transition-colors',
-                    segmentColor
+                    'h-px w-1.5 shrink-0',
+                    index < currentIndex ? 'bg-primary' : 'bg-muted'
                   )}
                 />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="font-medium">
-                  {isScheduledDelivery ? 'Lieferung geplant' : step.label}
-                </p>
-                {dateValue && (
-                  <p className="text-xs text-white/80">{dateValue}</p>
-                )}
-              </TooltipContent>
-            </Tooltip>
+              )}
+            </Fragment>
           )
         })}
       </div>
