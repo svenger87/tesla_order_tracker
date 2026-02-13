@@ -7,18 +7,14 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "import:sheets": "tsx scripts/import-from-sheets.ts",
-    "deploy": "vercel --prod",
-    "deploy:preview": "vercel",
-    "vercel:link": "vercel link",
-    "vercel:env": "vercel env pull .env.local"
+    "import:sheets": "tsx scripts/import-from-sheets.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@libsql/client": "^0.17.0",
-    "@prisma/adapter-libsql": "^7.3.0",
+    "@prisma/adapter-better-sqlite3": "^7.4.0",
     "@prisma/client": "^7.3.0",
     "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.6.2",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -48,6 +44,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/canvas-confetti": "^1.9.0",
     "@types/js-yaml": "^4.0.9",
     "@types/jsonwebtoken": "^9.0.10",

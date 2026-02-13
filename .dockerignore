@@ -1,0 +1,6 @@
+node_modules
+.next
+.git
+*.md
+turso_*
+snapshot.md

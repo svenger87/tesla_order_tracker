@@ -152,8 +152,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(orders)
   } catch (error) {
     console.error('Failed to fetch orders:', error)
-    console.error('TURSO_DATABASE_URL set:', !!process.env.TURSO_DATABASE_URL)
-    console.error('TURSO_AUTH_TOKEN set:', !!process.env.TURSO_AUTH_TOKEN)
     // Return empty array to prevent frontend crash
     return NextResponse.json([])
   }

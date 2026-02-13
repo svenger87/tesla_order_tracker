@@ -41,9 +41,6 @@ yarn-error.log*
 .env.local
 .env.production
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -53,13 +50,12 @@ next-env.d.ts
 # SQLite database
 *.db
 *.db-journal
+*.db-wal
+/data/
 
-# Vercel
-.vercel
+.open-next/
 turso-schema.sql
 .playwright-mcp/
 *.png
-
-.vercel
 .env*.local
 backups/

@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       error: 'Admin reset failed',
       details: errorMessage,
-      tursoConfigured: !!process.env.TURSO_DATABASE_URL,
     }, { status: 500 })
   }
 }

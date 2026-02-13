@@ -28,8 +28,6 @@ export async function GET() {
     return NextResponse.json(settings)
   } catch (error) {
     console.error('Failed to fetch settings:', error)
-    console.error('TURSO_DATABASE_URL set:', !!process.env.TURSO_DATABASE_URL)
-    console.error('TURSO_AUTH_TOKEN set:', !!process.env.TURSO_AUTH_TOKEN)
     // Return default settings to prevent frontend crash
     return NextResponse.json({
       id: 'default',

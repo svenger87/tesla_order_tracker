@@ -1,0 +1,3 @@
+tff-order-stats.de {
+    reverse_proxy app:3000
+}
