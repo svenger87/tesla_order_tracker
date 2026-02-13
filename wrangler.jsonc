@@ -7,5 +7,16 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+  },
+  // Non-secret environment variables (deployed with code, won't be wiped)
+  "vars": {
+    "TURSO_DATABASE_URL": "libsql://tesla-tracker-sven7687.aws-eu-west-1.turso.io",
+    "ADMIN_USERNAME": "admin",
+    "NODE_ENV": "production"
   }
+  // Secrets (set once via: npx wrangler secret put <NAME>)
+  // - TURSO_AUTH_TOKEN
+  // - JWT_SECRET
+  // - ADMIN_PASSWORD
+  // - EXTERNAL_API_KEY (if needed)
 }
