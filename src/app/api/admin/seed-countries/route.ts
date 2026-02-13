@@ -1,42 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
-import { query, execute, generateId, nowISO } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { COUNTRIES } from '@/lib/types'
 
+// Check if request has valid API key or admin cookie
 async function isAuthorized(request: NextRequest): Promise<boolean> {
+  // Check API key first
   const apiKey = request.headers.get('X-API-Key')
   const validApiKey = process.env.EXTERNAL_API_KEY
-  if (apiKey && validApiKey && apiKey === validApiKey) return true
+  if (apiKey && validApiKey && apiKey === validApiKey) {
+    return true
+  }
+  // Fall back to admin cookie
   const admin = await getAdminFromCookie()
   return !!admin
 }
 
+// POST /api/admin/seed-countries - Add missing EU countries to the database
 export async function POST(request: NextRequest) {
   try {
     if (!(await isAuthorized(request))) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
     }
 
-    const existingCountries = await query<{ value: string }>(
-      `SELECT value FROM "Option" WHERE type = 'country' AND isActive = 1`,
-    )
+    // Get existing country values
+    const existingCountries = await prisma.option.findMany({
+      where: { type: 'country', isActive: true },
+      select: { value: true },
+    })
     const existingValues = new Set(existingCountries.map((c) => c.value))
 
+    // Find missing countries
     const missingCountries = COUNTRIES.filter((c) => !existingValues.has(c.value))
 
     if (missingCountries.length === 0) {
-      return NextResponse.json({ message: 'All countries already exist', added: 0, total: COUNTRIES.length })
+      return NextResponse.json({
+        message: 'All countries already exist',
+        added: 0,
+        total: COUNTRIES.length,
+      })
     }
 
+    // Add missing countries with proper sort order (alphabetical by label)
     let addedCount = 0
     for (const country of missingCountries) {
       try {
-        const now = nowISO()
-        await execute(
-          `INSERT INTO "Option" (id, type, value, label, metadata, sortOrder, isActive, createdAt, updatedAt)
-           VALUES (?, 'country', ?, ?, ?, ?, 1, ?, ?)`,
-          [generateId(), country.value, country.label, JSON.stringify({ flag: country.flag }), COUNTRIES.findIndex((c) => c.value === country.value), now, now],
-        )
+        await prisma.option.create({
+          data: {
+            type: 'country',
+            value: country.value,
+            label: country.label,
+            metadata: JSON.stringify({ flag: country.flag }),
+            sortOrder: COUNTRIES.findIndex((c) => c.value === country.value),
+            isActive: true,
+          },
+        })
         addedCount++
       } catch {
         // Skip duplicates
@@ -55,15 +73,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// GET /api/admin/seed-countries - Check which countries are missing
 export async function GET(request: NextRequest) {
   try {
     if (!(await isAuthorized(request))) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
     }
 
-    const existingCountries = await query<{ value: string; label: string }>(
-      `SELECT value, label FROM "Option" WHERE type = 'country' AND isActive = 1 ORDER BY label ASC`,
-    )
+    const existingCountries = await prisma.option.findMany({
+      where: { type: 'country', isActive: true },
+      select: { value: true, label: true },
+      orderBy: { label: 'asc' },
+    })
     const existingValues = new Set(existingCountries.map((c) => c.value))
 
     const missingCountries = COUNTRIES.filter((c) => !existingValues.has(c.value))

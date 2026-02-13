@@ -1,4 +1,4 @@
-import { query, queryOne, execute, generateId, nowISO } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { comparePassword, signToken, hashPassword } from '@/lib/auth'
 import { cookies } from 'next/headers'
@@ -20,33 +20,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if any admin exists, if not, create from env vars
-    const countResult = await queryOne<{ count: number }>(`SELECT COUNT(*) as count FROM "Admin"`)
-    if (countResult && countResult.count === 0) {
+    const adminCount = await prisma.admin.count()
+    if (adminCount === 0) {
       const passwordHash = await hashPassword(envPassword)
-      const now = nowISO()
-      await execute(
-        `INSERT INTO "Admin" (id, username, passwordHash, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)`,
-        [generateId(), envUsername, passwordHash, now, now],
-      )
+      await prisma.admin.create({
+        data: {
+          username: envUsername,
+          passwordHash,
+        },
+      })
     }
 
-    let admin = await queryOne<{ id: string; username: string; passwordHash: string }>(
-      `SELECT id, username, passwordHash FROM "Admin" WHERE username = ?`,
-      [username],
-    )
+    let admin = await prisma.admin.findUnique({ where: { username } })
 
     // If login matches env vars but stored hash doesn't match, update the admin
+    // This allows password changes via env vars to take effect
     if (!admin && username === envUsername) {
-      const existingAdmin = await queryOne<{ id: string; username: string; passwordHash: string }>(
-        `SELECT id, username, passwordHash FROM "Admin" LIMIT 1`,
-      )
+      // Username matches env but doesn't exist - check if we need to update existing admin
+      const existingAdmin = await prisma.admin.findFirst()
       if (existingAdmin && existingAdmin.username !== envUsername) {
-        const now = nowISO()
-        await execute(
-          `UPDATE "Admin" SET username = ?, passwordHash = ?, updatedAt = ? WHERE id = ?`,
-          [envUsername, await hashPassword(envPassword), now, existingAdmin.id],
-        )
-        admin = { ...existingAdmin, username: envUsername, passwordHash: await hashPassword(envPassword) }
+        // Admin exists with different username, update it
+        admin = await prisma.admin.update({
+          where: { id: existingAdmin.id },
+          data: {
+            username: envUsername,
+            passwordHash: await hashPassword(envPassword),
+          },
+        })
       }
     }
 
@@ -58,13 +58,13 @@ export async function POST(request: NextRequest) {
     let valid = await comparePassword(password, admin.passwordHash)
 
     // If password doesn't match stored hash but matches env var, update the hash
+    // This handles the case where env var password was changed
     if (!valid && username === envUsername && password === envPassword) {
       const newHash = await hashPassword(envPassword)
-      const now = nowISO()
-      await execute(
-        `UPDATE "Admin" SET passwordHash = ?, updatedAt = ? WHERE id = ?`,
-        [newHash, now, admin.id],
-      )
+      admin = await prisma.admin.update({
+        where: { id: admin.id },
+        data: { passwordHash: newHash },
+      })
       valid = true
     }
 

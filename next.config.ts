@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: [
-    "@libsql/client",
-  ],
+  /* config options here */
 };
 
 export default nextConfig;

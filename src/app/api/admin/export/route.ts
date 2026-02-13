@@ -1,5 +1,4 @@
-import { query } from '@/lib/db'
-import { transformOrderRow, transformOptionRow } from '@/lib/db-helpers'
+import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import ExcelJS from 'exceljs'
@@ -12,10 +11,9 @@ export async function GET() {
     }
 
     // Fetch all orders
-    const rows = await query<Record<string, unknown>>(
-      `SELECT * FROM "Order" ORDER BY createdAt DESC`,
-    )
-    const orders = rows.map(transformOrderRow)
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
 
     // Create workbook
     const workbook = new ExcelJS.Workbook()
@@ -397,10 +395,9 @@ export async function GET() {
     // ===== Sheet 11: Admin Options =====
     const optionsSheet = workbook.addWorksheet('Dropdown-Optionen')
 
-    const optionRows = await query<Record<string, unknown>>(
-      `SELECT * FROM "Option" ORDER BY type ASC, sortOrder ASC`,
-    )
-    const options = optionRows.map(transformOptionRow)
+    const options = await prisma.option.findMany({
+      orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }]
+    })
 
     optionsSheet.columns = [
       { header: 'Typ', key: 'type', width: 15 },
@@ -424,7 +421,7 @@ export async function GET() {
         value: opt.value,
         label: opt.label,
         sortOrder: opt.sortOrder,
-        metadata: opt.metadata || '',
+        metadata: opt.metadata ? JSON.stringify(opt.metadata) : '',
       })
     })
 

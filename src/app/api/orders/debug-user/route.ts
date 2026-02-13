@@ -1,4 +1,4 @@
-import { query } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Debug endpoint to check if a user exists in the database
@@ -14,9 +14,10 @@ export async function GET(request: NextRequest) {
 
     const searchName = name.trim().toLowerCase()
 
-    const allOrders = await query<{ id: string; name: string; editCode: string | null; orderDate: string | null }>(
-      `SELECT id, name, editCode, orderDate FROM "Order"`,
-    )
+    // Find all orders with similar names
+    const allOrders = await prisma.order.findMany({
+      select: { id: true, name: true, editCode: true, orderDate: true },
+    })
 
     // Exact match (case-insensitive)
     const exactMatch = allOrders.find(o =>

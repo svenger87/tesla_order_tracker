@@ -1,4 +1,4 @@
-import { query, queryOne } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -11,21 +11,25 @@ export async function GET(request: NextRequest) {
     }
 
     // First, try to find by editCode (standard flow)
-    const order = await queryOne<{ id: string }>(
-      `SELECT id FROM "Order" WHERE editCode = ?`,
-      [editCode],
-    )
+    const order = await prisma.order.findUnique({
+      where: { editCode },
+      select: { id: true },
+    })
 
     if (order) {
       return NextResponse.json({ orderId: order.id, isLegacy: false })
     }
 
     // Fallback: For legacy orders (imported without editCode), allow using username
+    // Only works for orders that have NO editCode set
+    // Use case-insensitive matching and trim whitespace
     const searchName = editCode.trim().toLowerCase()
 
-    const allOrders = await query<{ id: string; name: string; editCode: string | null }>(
-      `SELECT id, name, editCode FROM "Order"`,
-    )
+    // Get all orders and filter for those without editCode
+    // (Prisma has issues with null comparisons, so we filter in JS)
+    const allOrders = await prisma.order.findMany({
+      select: { id: true, name: true, editCode: true },
+    })
 
     // Filter for legacy orders (no editCode - null OR empty string) and match by name case-insensitively
     const legacyOrder = allOrders.find(o =>
@@ -37,12 +41,14 @@ export async function GET(request: NextRequest) {
       const legacyCount = allOrders.filter(o => !o.editCode || o.editCode === '').length
       console.log(`[Legacy Verify] No match for "${editCode}" (searched: "${searchName}")`)
       console.log(`[Legacy Verify] Total orders: ${allOrders.length}, Legacy (no editCode): ${legacyCount}`)
+      // Log first few legacy names to help debug
       const sampleNames = allOrders
         .filter(o => !o.editCode || o.editCode === '')
         .slice(0, 10)
         .map(o => `"${o.name}"`)
       console.log(`[Legacy Verify] Sample legacy names: ${sampleNames.join(', ')}`)
 
+      // Also check if user exists but has an editCode
       const userWithCode = allOrders.find(o =>
         o.name && o.name.trim().toLowerCase() === searchName && o.editCode
       )
@@ -54,7 +60,7 @@ export async function GET(request: NextRequest) {
     if (legacyOrder) {
       return NextResponse.json({
         orderId: legacyOrder.id,
-        isLegacy: true,
+        isLegacy: true, // Flag to indicate user needs to set a new password
         message: 'Bestandseintrag gefunden. Bitte setze ein neues Passwort.',
       })
     }

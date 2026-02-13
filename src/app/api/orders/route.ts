@@ -1,5 +1,4 @@
-import { query, queryOne, execute, generateId, nowISO } from '@/lib/db'
-import { transformOrderRow, ORDER_PUBLIC_COLS } from '@/lib/db-helpers'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { parse, differenceInDays, isValid } from 'date-fns'
@@ -72,16 +71,90 @@ export async function GET(request: NextRequest) {
     const admin = await getAdminFromCookie()
     const showArchived = admin && includeArchived
 
-    const rows = showArchived
-      ? await query<Record<string, unknown>>(`SELECT ${ORDER_PUBLIC_COLS} FROM "Order" ORDER BY createdAt DESC`)
-      : await query<Record<string, unknown>>(`SELECT ${ORDER_PUBLIC_COLS} FROM "Order" WHERE archived = 0 ORDER BY createdAt DESC`)
-
-    const orders = rows.map(transformOrderRow)
+    // Try to query with archive filter, fall back to without if field doesn't exist
+    let orders
+    try {
+      orders = await prisma.order.findMany({
+        where: showArchived ? {} : { archived: false },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          vehicleType: true,
+          orderDate: true,
+          country: true,
+          model: true,
+          range: true,
+          drive: true,
+          color: true,
+          interior: true,
+          wheels: true,
+          towHitch: true,
+          autopilot: true,
+          deliveryWindow: true,
+          deliveryLocation: true,
+          vin: true,
+          vinReceivedDate: true,
+          papersReceivedDate: true,
+          productionDate: true,
+          typeApproval: true,
+          typeVariant: true,
+          deliveryDate: true,
+          orderToProduction: true,
+          orderToVin: true,
+          orderToDelivery: true,
+          orderToPapers: true,
+          papersToDelivery: true,
+          archived: true,
+          archivedAt: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+    } catch {
+      // If archived field doesn't exist yet (migration not run), fetch without it
+      orders = await prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          vehicleType: true,
+          orderDate: true,
+          country: true,
+          model: true,
+          range: true,
+          drive: true,
+          color: true,
+          interior: true,
+          wheels: true,
+          towHitch: true,
+          autopilot: true,
+          deliveryWindow: true,
+          deliveryLocation: true,
+          vin: true,
+          vinReceivedDate: true,
+          papersReceivedDate: true,
+          productionDate: true,
+          typeApproval: true,
+          typeVariant: true,
+          deliveryDate: true,
+          orderToProduction: true,
+          orderToVin: true,
+          orderToDelivery: true,
+          orderToPapers: true,
+          papersToDelivery: true,
+          createdAt: true,
+        },
+      })
+      // Add default archived fields to the response
+      orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, updatedAt: o.createdAt }))
+    }
     return NextResponse.json(orders)
   } catch (error) {
     console.error('Failed to fetch orders:', error)
     console.error('TURSO_DATABASE_URL set:', !!process.env.TURSO_DATABASE_URL)
     console.error('TURSO_AUTH_TOKEN set:', !!process.env.TURSO_AUTH_TOKEN)
+    // Return empty array to prevent frontend crash
     return NextResponse.json([])
   }
 }
@@ -113,8 +186,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle custom password if provided
-    let editCode: string | null = null
+    let editCode: string | undefined = undefined
     if (body.customPassword) {
+      // Validate custom password
       if (body.customPassword.length < 6) {
         return NextResponse.json(
           { error: 'Passwort muss mindestens 6 Zeichen lang sein' },
@@ -129,10 +203,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Check uniqueness
-      const existing = await queryOne<{ id: string }>(
-        `SELECT id FROM "Order" WHERE editCode = ?`,
-        [body.customPassword],
-      )
+      const existing = await prisma.order.findUnique({
+        where: { editCode: body.customPassword },
+      })
       if (existing) {
         return NextResponse.json(
           { error: 'Dieses Passwort ist bereits vergeben. Bitte wähle ein anderes.' },
@@ -147,51 +220,40 @@ export async function POST(request: NextRequest) {
     const timePeriods = calculateTimePeriods(body)
 
     // Apply Model 3 constraints (set unavailable options to "-")
-    const d = applyModel3Constraints(body)
+    const constrainedData = applyModel3Constraints(body)
 
-    const id = generateId()
-    const now = nowISO()
-
-    await execute(
-      `INSERT INTO "Order" (id, editCode, name, vehicleType, orderDate, country, model, range, drive, color, interior, wheels, towHitch, autopilot, deliveryWindow, deliveryLocation, vin, vinReceivedDate, papersReceivedDate, productionDate, typeApproval, typeVariant, deliveryDate, orderToProduction, orderToVin, orderToDelivery, orderToPapers, papersToDelivery, archived, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
-      [
-        id,
-        editCode,
-        d.name as string,
-        (d.vehicleType as string) || 'Model Y',
-        (d.orderDate as string) || null,
-        (d.country as string) || null,
-        (d.model as string) || null,
-        (d.range as string) || null,
-        (d.drive as string) || null,
-        (d.color as string) || null,
-        (d.interior as string) || null,
-        (d.wheels as string) || null,
-        (d.towHitch as string) || null,
-        (d.autopilot as string) || null,
-        (d.deliveryWindow as string) || null,
-        (d.deliveryLocation as string) || null,
-        (d.vin as string) || null,
-        (d.vinReceivedDate as string) || null,
-        (d.papersReceivedDate as string) || null,
-        (d.productionDate as string) || null,
-        (d.typeApproval as string) || null,
-        (d.typeVariant as string) || null,
-        (d.deliveryDate as string) || null,
-        timePeriods.orderToProduction,
-        timePeriods.orderToVin,
-        timePeriods.orderToDelivery,
-        timePeriods.orderToPapers,
-        timePeriods.papersToDelivery,
-        now,
-        now,
-      ],
-    )
+    const order = await prisma.order.create({
+      data: {
+        name: constrainedData.name as string,
+        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+        orderDate: (constrainedData.orderDate as string) || null,
+        country: (constrainedData.country as string) || null,
+        model: (constrainedData.model as string) || null,
+        range: (constrainedData.range as string) || null,
+        drive: (constrainedData.drive as string) || null,
+        color: (constrainedData.color as string) || null,
+        interior: (constrainedData.interior as string) || null,
+        wheels: (constrainedData.wheels as string) || null,
+        towHitch: (constrainedData.towHitch as string) || null,
+        autopilot: (constrainedData.autopilot as string) || null,
+        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+        vin: (constrainedData.vin as string) || null,
+        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+        productionDate: (constrainedData.productionDate as string) || null,
+        typeApproval: (constrainedData.typeApproval as string) || null,
+        typeVariant: (constrainedData.typeVariant as string) || null,
+        deliveryDate: (constrainedData.deliveryDate as string) || null,
+        ...timePeriods,
+        // Use custom password as editCode if provided, otherwise Prisma generates cuid
+        ...(editCode && { editCode }),
+      },
+    })
 
     return NextResponse.json({
-      id,
-      editCode,
+      id: order.id,
+      editCode: order.editCode,
       isCustomPassword: !!body.customPassword,
       message: 'Order created successfully'
     })
@@ -210,10 +272,7 @@ export async function PUT(request: NextRequest) {
 
     // Check authorization - either admin or valid edit code
     if (!admin) {
-      const order = await queryOne<{ id: string; editCode: string | null }>(
-        `SELECT id, editCode FROM "Order" WHERE id = ?`,
-        [id],
-      )
+      const order = await prisma.order.findUnique({ where: { id } })
 
       if (!order) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -221,9 +280,12 @@ export async function PUT(request: NextRequest) {
 
       // Legacy order flow - user verified via username
       if (isLegacy && order.editCode === null) {
+        // For legacy orders, user must set a new password
         if (!newEditCode) {
           return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge' }, { status: 400 })
         }
+
+        // Validate new password
         if (newEditCode.length < 6) {
           return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
         }
@@ -232,55 +294,49 @@ export async function PUT(request: NextRequest) {
         }
 
         // Check uniqueness
-        const existing = await queryOne<{ id: string }>(
-          `SELECT id FROM "Order" WHERE editCode = ?`,
-          [newEditCode],
-        )
+        const existing = await prisma.order.findUnique({ where: { editCode: newEditCode } })
         if (existing) {
           return NextResponse.json({ error: 'Dieses Passwort ist bereits vergeben' }, { status: 400 })
         }
 
+        // Calculate time periods from dates
         const timePeriods = calculateTimePeriods(data)
-        const d = applyModel3Constraints(data)
-        const now = nowISO()
 
-        await execute(
-          `UPDATE "Order" SET editCode = ?, name = ?, vehicleType = ?, orderDate = ?, country = ?, model = ?, range = ?, drive = ?, color = ?, interior = ?, wheels = ?, towHitch = ?, autopilot = ?, deliveryWindow = ?, deliveryLocation = ?, vin = ?, vinReceivedDate = ?, papersReceivedDate = ?, productionDate = ?, typeApproval = ?, typeVariant = ?, deliveryDate = ?, orderToProduction = ?, orderToVin = ?, orderToDelivery = ?, orderToPapers = ?, papersToDelivery = ?, updatedAt = ? WHERE id = ?`,
-          [
-            newEditCode,
-            d.name as string,
-            (d.vehicleType as string) || 'Model Y',
-            (d.orderDate as string) || null,
-            (d.country as string) || null,
-            (d.model as string) || null,
-            (d.range as string) || null,
-            (d.drive as string) || null,
-            (d.color as string) || null,
-            (d.interior as string) || null,
-            (d.wheels as string) || null,
-            (d.towHitch as string) || null,
-            (d.autopilot as string) || null,
-            (d.deliveryWindow as string) || null,
-            (d.deliveryLocation as string) || null,
-            (d.vin as string) || null,
-            (d.vinReceivedDate as string) || null,
-            (d.papersReceivedDate as string) || null,
-            (d.productionDate as string) || null,
-            (d.typeApproval as string) || null,
-            (d.typeVariant as string) || null,
-            (d.deliveryDate as string) || null,
-            timePeriods.orderToProduction,
-            timePeriods.orderToVin,
-            timePeriods.orderToDelivery,
-            timePeriods.orderToPapers,
-            timePeriods.papersToDelivery,
-            now,
-            id,
-          ],
-        )
+        // Apply Model 3 constraints
+        const constrainedData = applyModel3Constraints(data)
+
+        // Update order with new editCode
+        const updated = await prisma.order.update({
+          where: { id },
+          data: {
+            editCode: newEditCode, // Set the new password
+            name: constrainedData.name as string,
+            vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+            orderDate: (constrainedData.orderDate as string) || null,
+            country: (constrainedData.country as string) || null,
+            model: (constrainedData.model as string) || null,
+            range: (constrainedData.range as string) || null,
+            drive: (constrainedData.drive as string) || null,
+            color: (constrainedData.color as string) || null,
+            interior: (constrainedData.interior as string) || null,
+            wheels: (constrainedData.wheels as string) || null,
+            towHitch: (constrainedData.towHitch as string) || null,
+            autopilot: (constrainedData.autopilot as string) || null,
+            deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+            deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+            vin: (constrainedData.vin as string) || null,
+            vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+            papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+            productionDate: (constrainedData.productionDate as string) || null,
+            typeApproval: (constrainedData.typeApproval as string) || null,
+            typeVariant: (constrainedData.typeVariant as string) || null,
+            deliveryDate: (constrainedData.deliveryDate as string) || null,
+            ...timePeriods,
+          },
+        })
 
         return NextResponse.json({
-          id,
+          id: updated.id,
           editCode: newEditCode,
           message: 'Eintrag aktualisiert und neues Passwort gesetzt!',
         })
@@ -298,10 +354,7 @@ export async function PUT(request: NextRequest) {
 
     // Optimistic locking: check if order was modified since user loaded it
     if (expectedUpdatedAt) {
-      const currentOrder = await queryOne<{ updatedAt: string }>(
-        `SELECT updatedAt FROM "Order" WHERE id = ?`,
-        [id],
-      )
+      const currentOrder = await prisma.order.findUnique({ where: { id } })
       if (currentOrder && currentOrder.updatedAt) {
         const expectedTime = new Date(expectedUpdatedAt).getTime()
         const actualTime = new Date(currentOrder.updatedAt).getTime()
@@ -314,45 +367,41 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(data)
-    const d = applyModel3Constraints(data)
-    const now = nowISO()
 
-    await execute(
-      `UPDATE "Order" SET name = ?, vehicleType = ?, orderDate = ?, country = ?, model = ?, range = ?, drive = ?, color = ?, interior = ?, wheels = ?, towHitch = ?, autopilot = ?, deliveryWindow = ?, deliveryLocation = ?, vin = ?, vinReceivedDate = ?, papersReceivedDate = ?, productionDate = ?, typeApproval = ?, typeVariant = ?, deliveryDate = ?, orderToProduction = ?, orderToVin = ?, orderToDelivery = ?, orderToPapers = ?, papersToDelivery = ?, updatedAt = ? WHERE id = ?`,
-      [
-        d.name as string,
-        (d.vehicleType as string) || 'Model Y',
-        (d.orderDate as string) || null,
-        (d.country as string) || null,
-        (d.model as string) || null,
-        (d.range as string) || null,
-        (d.drive as string) || null,
-        (d.color as string) || null,
-        (d.interior as string) || null,
-        (d.wheels as string) || null,
-        (d.towHitch as string) || null,
-        (d.autopilot as string) || null,
-        (d.deliveryWindow as string) || null,
-        (d.deliveryLocation as string) || null,
-        (d.vin as string) || null,
-        (d.vinReceivedDate as string) || null,
-        (d.papersReceivedDate as string) || null,
-        (d.productionDate as string) || null,
-        (d.typeApproval as string) || null,
-        (d.typeVariant as string) || null,
-        (d.deliveryDate as string) || null,
-        timePeriods.orderToProduction,
-        timePeriods.orderToVin,
-        timePeriods.orderToDelivery,
-        timePeriods.orderToPapers,
-        timePeriods.papersToDelivery,
-        now,
-        id,
-      ],
-    )
+    // Apply Model 3 constraints
+    const constrainedData = applyModel3Constraints(data)
 
-    return NextResponse.json({ id, updatedAt: now, message: 'Order updated successfully' })
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        name: constrainedData.name as string,
+        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+        orderDate: (constrainedData.orderDate as string) || null,
+        country: (constrainedData.country as string) || null,
+        model: (constrainedData.model as string) || null,
+        range: (constrainedData.range as string) || null,
+        drive: (constrainedData.drive as string) || null,
+        color: (constrainedData.color as string) || null,
+        interior: (constrainedData.interior as string) || null,
+        wheels: (constrainedData.wheels as string) || null,
+        towHitch: (constrainedData.towHitch as string) || null,
+        autopilot: (constrainedData.autopilot as string) || null,
+        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+        vin: (constrainedData.vin as string) || null,
+        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+        productionDate: (constrainedData.productionDate as string) || null,
+        typeApproval: (constrainedData.typeApproval as string) || null,
+        typeVariant: (constrainedData.typeVariant as string) || null,
+        deliveryDate: (constrainedData.deliveryDate as string) || null,
+        ...timePeriods,
+      },
+    })
+
+    return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated successfully' })
   } catch (error) {
     console.error('Failed to update order:', error)
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
@@ -373,7 +422,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
     }
 
-    await execute(`DELETE FROM "Order" WHERE id = ?`, [id])
+    await prisma.order.delete({ where: { id } })
     return NextResponse.json({ message: 'Order deleted successfully' })
   } catch (error) {
     console.error('Failed to delete order:', error)

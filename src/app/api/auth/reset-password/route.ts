@@ -1,4 +1,4 @@
-import { queryOne, execute, nowISO } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { hashPassword, getAdminFromCookie } from '@/lib/auth'
 
@@ -15,10 +15,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'New password must be at least 6 characters' }, { status: 400 })
     }
 
-    const adminRecord = await queryOne<{ id: string; passwordHash: string }>(
-      `SELECT id, passwordHash FROM "Admin" WHERE id = ?`,
-      [admin.adminId],
-    )
+    const adminRecord = await prisma.admin.findUnique({ where: { id: admin.adminId } })
     if (!adminRecord) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
     }
@@ -32,10 +29,10 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(newPassword)
 
-    await execute(
-      `UPDATE "Admin" SET passwordHash = ?, updatedAt = ? WHERE id = ?`,
-      [passwordHash, nowISO(), admin.adminId],
-    )
+    await prisma.admin.update({
+      where: { id: admin.adminId },
+      data: { passwordHash },
+    })
 
     return NextResponse.json({ message: 'Password updated successfully' })
   } catch (error) {

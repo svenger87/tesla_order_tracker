@@ -1,5 +1,4 @@
-import { query } from '@/lib/db'
-import { transformOptionRow } from '@/lib/db-helpers'
+import { prisma } from '@/lib/db'
 import { NextRequest } from 'next/server'
 import { withApiAuth } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
@@ -63,18 +62,19 @@ export const GET = withApiAuth(async (request: NextRequest) => {
     }
 
     // Fetch database options
-    let sql = `SELECT * FROM "Option" WHERE isActive = 1`
-    const args: unknown[] = []
-
-    if (typeFilter) {
-      sql += ` AND type = ?`
-      args.push(typeFilter)
-    }
-
-    sql += ` ORDER BY type ASC, sortOrder ASC, label ASC`
-
-    const rows = await query<Record<string, unknown>>(sql, args)
-    const dbOptions = rows.map(transformOptionRow)
+    const dbOptions = await prisma.option.findMany({
+      where: {
+        isActive: true,
+        ...(typeFilter ? { type: typeFilter } : {}),
+      },
+      orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }, { label: 'asc' }],
+      select: {
+        type: true,
+        value: true,
+        label: true,
+        metadata: true,
+      },
+    })
 
     // Group database options by type
     const dbOptionsByType: Record<string, ApiOption[]> = {}

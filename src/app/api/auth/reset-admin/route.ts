@@ -1,4 +1,4 @@
-import { execute, generateId, nowISO } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { hashPassword } from '@/lib/auth'
 
@@ -37,19 +37,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Delete all existing admins
-    await execute(`DELETE FROM "Admin"`)
+    await prisma.admin.deleteMany()
 
     // Create new admin from env vars
     const passwordHash = await hashPassword(envPassword)
-    const now = nowISO()
-    await execute(
-      `INSERT INTO "Admin" (id, username, passwordHash, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)`,
-      [generateId(), envUsername, passwordHash, now, now],
-    )
+    const admin = await prisma.admin.create({
+      data: {
+        username: envUsername,
+        passwordHash,
+      },
+    })
 
     return NextResponse.json({
       message: 'Admin reset successful',
-      username: envUsername,
+      username: admin.username,
     })
   } catch (error) {
     console.error('Admin reset failed:', error)
