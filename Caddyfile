@@ -1,3 +1,11 @@
 tff-order-stats.de {
     reverse_proxy app:3000
 }
+
+status.tff-order-stats.de {
+    reverse_proxy uptime-kuma:3001
+}
+
+analytics.tff-order-stats.de {
+    reverse_proxy umami:3000
+}
