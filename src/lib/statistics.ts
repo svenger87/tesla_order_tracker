@@ -1,4 +1,4 @@
-import { Order, COLORS, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS } from './types'
+import { Order, COLORS, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS } from './types'
 
 // Normalize country codes to full names
 const COUNTRY_NAMES: Record<string, string> = {
@@ -467,10 +467,10 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Autopilot distribution
+  // Autopilot distribution (normalized to labels)
   const autopilotCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const autopilot = order.autopilot || 'Kein'
+    const autopilot = normalizeOption(order.autopilot, AUTOPILOT_OPTIONS, 'Kein')
     autopilotCounts[autopilot] = (autopilotCounts[autopilot] || 0) + 1
   })
   const autopilotDistribution = Object.entries(autopilotCounts)
@@ -495,10 +495,10 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Tow hitch (AHK) distribution
+  // Tow hitch (AHK) distribution (normalized to labels)
   const towHitchCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const towHitch = order.towHitch || 'Unbekannt'
+    const towHitch = normalizeOption(order.towHitch, TOW_HITCH_OPTIONS, 'Unbekannt')
     towHitchCounts[towHitch] = (towHitchCounts[towHitch] || 0) + 1
   })
   const towHitchDistribution = Object.entries(towHitchCounts)
@@ -509,22 +509,26 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // Color (Farbe) distribution - use actual car colors
-  const colorCounts: Record<string, number> = {}
+  // Color (Farbe) distribution - use actual car colors with labels
+  const colorCounts: Record<string, { count: number; hex: string | null }> = {}
   filteredOrders.forEach(order => {
-    const color = order.color || 'Unbekannt'
-    colorCounts[color] = (colorCounts[color] || 0) + 1
+    // Look up color label and hex from COLORS constant
+    const colorValue = order.color || ''
+    const colorInfo = COLORS.find(c => c.value === colorValue || c.label.toLowerCase() === colorValue.toLowerCase())
+    const colorLabel = colorInfo?.label || colorValue || 'Unbekannt'
+    const colorHex = colorInfo?.hex || findColorHex(colorValue)
+
+    if (!colorCounts[colorLabel]) {
+      colorCounts[colorLabel] = { count: 0, hex: colorHex }
+    }
+    colorCounts[colorLabel].count++
   })
   const colorDistribution = Object.entries(colorCounts)
-    .map(([name, count], index) => {
-      // Try to find the actual hex color for this car color
-      const hex = findColorHex(name)
-      return {
-        name,
-        count,
-        fill: hex || CONFIG_COLORS[index % CONFIG_COLORS.length],
-      }
-    })
+    .map(([name, { count, hex }], index) => ({
+      name,
+      count,
+      fill: hex || CONFIG_COLORS[index % CONFIG_COLORS.length],
+    }))
     .sort((a, b) => b.count - a.count)
 
   // Delivery location distribution (exclude unknown/empty)

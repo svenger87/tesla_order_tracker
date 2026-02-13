@@ -109,13 +109,14 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Vehicle Type Selector */}
-          <div className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Fahrzeug:</span>
+      {/* Filter Bar - Only applies to charts */}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Vehicle Type Selector */}
+            <div className="flex items-center gap-2">
+              <Car className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">Fahrzeug:</span>
             <Select
               value={selectedVehicle}
               onValueChange={(value) => setSelectedVehicle(value as VehicleType | 'all')}
@@ -173,13 +174,17 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           </div>
         </div>
 
-        {/* Warning for orders without valid dates */}
-        {stats.ordersWithoutDate > 0 && (
-          <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            {stats.ordersWithoutDate} ohne gültiges Datum
-          </Badge>
-        )}
+          {/* Warning for orders without valid dates */}
+          {stats.ordersWithoutDate > 0 && (
+            <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
+              <AlertCircle className="h-3 w-3 mr-1" />
+              {stats.ordersWithoutDate} ohne gültiges Datum
+            </Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle.
+        </p>
       </div>
 
       {/* Main Statistics Tabs */}
