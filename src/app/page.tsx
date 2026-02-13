@@ -323,6 +323,13 @@ export default function Home() {
               <Code2 className="h-3.5 w-3.5" />
               <span>API</span>
             </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link
+              href="/impressum"
+              className="hover:text-foreground transition-colors"
+            >
+              Impressum
+            </Link>
             {settings?.showDonation && (
               <>
                 <span className="hidden sm:inline">·</span>
