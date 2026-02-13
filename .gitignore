@@ -59,3 +59,7 @@ turso-schema.sql
 *.png
 .env*.local
 backups/
+
+# SSH keys
+deploy_key
+deploy_key.pub
