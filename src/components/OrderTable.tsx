@@ -924,6 +924,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
               onEdit={onEdit}
               onDelete={onDelete}
               onGenerateResetCode={onGenerateResetCode}
+              options={{ models, ranges, drives, interiors }}
             />
           ))
         )}
