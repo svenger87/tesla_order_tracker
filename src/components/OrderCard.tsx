@@ -1,7 +1,7 @@
 'use client'
 
 import { Order, COLORS, VehicleType } from '@/lib/types'
-import { useOptions } from '@/hooks/useOptions'
+import type { FormOption } from '@/hooks/useOptions'
 import { OrderProgressBar } from './OrderProgressBar'
 import { TeslaCarThumbnail } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
@@ -26,17 +26,25 @@ function findColorInfo(colorLabel: string | null) {
   )
 }
 
+export interface OrderCardOptions {
+  models: FormOption[]
+  ranges: FormOption[]
+  drives: FormOption[]
+  interiors: FormOption[]
+}
+
 interface OrderCardProps {
   order: Order
   isAdmin: boolean
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  options: OrderCardOptions
 }
 
-export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderCardProps) {
+export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, options }: OrderCardProps) {
   const colorInfo = findColorInfo(order.color)
-  const { models, ranges, drives, interiors } = useOptions()
+  const { models, ranges, drives, interiors } = options
 
   // Helper to lookup label from value
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
