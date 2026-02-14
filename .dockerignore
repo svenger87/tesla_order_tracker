@@ -4,3 +4,4 @@ node_modules
 *.md
 turso_*
 snapshot.md
+staging-src
