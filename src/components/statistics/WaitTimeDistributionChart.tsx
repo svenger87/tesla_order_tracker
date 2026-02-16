@@ -83,7 +83,7 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorWaitTime)"
-            animationDuration={1000}
+            animationDuration={400}
             animationEasing="ease-out"
           />
         </AreaChart>

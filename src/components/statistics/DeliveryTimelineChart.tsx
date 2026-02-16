@@ -71,7 +71,7 @@ export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
             dataKey="count"
             fill="url(#deliveriesGradient)"
             radius={[4, 4, 0, 0]}
-            animationDuration={1000}
+            animationDuration={400}
             animationEasing="ease-out"
           />
         </BarChart>

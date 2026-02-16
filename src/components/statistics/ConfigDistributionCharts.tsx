@@ -99,7 +99,7 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
                 paddingAngle={0}
                 dataKey="count"
                 nameKey="name"
-                animationDuration={800}
+                animationDuration={400}
               >
                 {displayData.map((entry, index) => (
                   <Cell

@@ -81,7 +81,7 @@ export function CountryDistributionChart({ data }: CountryDistributionChartProps
             }}
             formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
           />
-          <Bar dataKey="count" radius={[0, 4, 4, 0]} animationDuration={1000} animationEasing="ease-out">
+          <Bar dataKey="count" radius={[0, 4, 4, 0]} animationDuration={400} animationEasing="ease-out">
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}

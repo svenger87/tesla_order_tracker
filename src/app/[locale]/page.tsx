@@ -3,18 +3,26 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { Order, Settings } from '@/lib/types'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
-import { StatisticsDashboard } from '@/components/statistics/StatisticsDashboard'
 import { CollapsibleOrderSection } from '@/components/CollapsibleOrderSection'
-import { OrderForm } from '@/components/OrderForm'
 import { EditCodeModal } from '@/components/EditCodeModal'
-import { EditByCodeModal } from '@/components/EditByCodeModal'
 import { DonationBanner } from '@/components/DonationBanner'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { triggerCelebration } from '@/components/DeliveryCelebration'
 import { Button } from '@/components/ui/button'
+
+const StatisticsDashboard = dynamic(
+  () => import('@/components/statistics/StatisticsDashboard').then(mod => mod.StatisticsDashboard),
+  { ssr: false }
+)
+const OrderForm = dynamic(
+  () => import('@/components/OrderForm').then(mod => mod.OrderForm)
+)
+const EditByCodeModal = dynamic(
+  () => import('@/components/EditByCodeModal').then(mod => mod.EditByCodeModal)
+)
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -131,7 +139,7 @@ export default function Home() {
 
   const handleDeliveryUpdate = useCallback((hadDeliveryBefore: boolean, hasDeliveryNow: boolean) => {
     if (!hadDeliveryBefore && hasDeliveryNow) {
-      triggerCelebration()
+      import('@/components/DeliveryCelebration').then(mod => mod.triggerCelebration())
     }
   }, [])
 
@@ -163,9 +171,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+      <header
         className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-lg"
       >
         <div className="h-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40" />
@@ -298,7 +304,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-8">
         {/* Statistics Toggle & Dashboard */}
@@ -379,10 +385,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t mt-12">
         <div className="w-full max-w-[98vw] mx-auto px-4 py-6 sm:py-8">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+          <div
             className="flex flex-col items-center gap-4"
           >
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
@@ -415,7 +418,7 @@ export default function Home() {
             <p className="text-xs text-muted-foreground/60">
               {t('footer')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </footer>
 

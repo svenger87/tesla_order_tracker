@@ -71,7 +71,7 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
             dataKey="count"
             fill="url(#ordersGradient)"
             radius={[4, 4, 0, 0]}
-            animationDuration={1000}
+            animationDuration={400}
             animationEasing="ease-out"
           />
         </BarChart>
