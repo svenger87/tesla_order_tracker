@@ -419,7 +419,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="orderDate">Bestelldatum <span className="text-destructive">*</span></Label>
+              <Label htmlFor="orderDate">Bestelldatum *</Label>
               <DatePickerField
                 value={formData.orderDate}
                 onChange={(v) => handleChange('orderDate', v)}
