@@ -250,6 +250,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       return
     }
 
+    if (!formData.orderDate.trim()) {
+      setError('Bestelldatum ist erforderlich')
+      setLoading(false)
+      return
+    }
+
     // Validate required vehicle configuration fields (only for new orders)
     if (!order) {
       const requiredFields = [
@@ -413,7 +419,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="orderDate">Bestelldatum</Label>
+              <Label htmlFor="orderDate">Bestelldatum <span className="text-destructive">*</span></Label>
               <DatePickerField
                 value={formData.orderDate}
                 onChange={(v) => handleChange('orderDate', v)}
