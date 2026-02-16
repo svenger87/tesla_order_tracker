@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState } from 'react'
+import { memo, useState, useCallback, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { COLORS } from '@/lib/types'
 import { useCompositorCodes, lookupCode, type CompositorCodeMap } from '@/lib/CompositorCodesContext'
@@ -141,46 +141,33 @@ interface TeslaCarImageProps {
   className?: string
 }
 
-function buildCompositorUrl(
+function buildOptionsString(
   vehicleType: 'Model Y' | 'Model 3',
   color: string | null | undefined,
   wheels: string | null | undefined,
   model: string | null | undefined,
   drive: string | null | undefined,
   interior: string | null | undefined,
-  view: ViewAngle,
-  size: number,
   codes: CompositorCodeMap | null
 ): string {
-  const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
   const options: string[] = []
 
-  // Body code (trim-specific)
   const bodyCode = resolveBodyCode(vehicleType, model, drive, codes)
-  if (bodyCode) {
-    options.push(`$${bodyCode}`)
-  }
+  if (bodyCode) options.push(`$${bodyCode}`)
 
-  // Color code
   const colorCode = findColorCode(color, vehicleType, codes)
   options.push(`$${colorCode || 'PPSW'}`)
 
-  // Wheel code
   const wheelCode = resolveWheelCode(vehicleType, wheels, model, codes)
-  if (wheelCode) {
-    options.push(`$${wheelCode}`)
-  }
+  if (wheelCode) options.push(`$${wheelCode}`)
 
-  // Interior code (required for proper wheel rendering)
   const interiorCode = resolveInteriorCode(vehicleType, model, interior, drive, codes)
-  if (interiorCode) {
-    options.push(`$${interiorCode}`)
-  }
+  if (interiorCode) options.push(`$${interiorCode}`)
 
-  const optionsStr = options.join(',')
+  return options.join(',')
+}
 
-  // Load directly from Tesla CDN — server-side proxy gets blocked (412/403)
-  // Browser <img> requests work fine as they appear as normal image loads
+function buildTeslaUrl(modelSlug: string, optionsStr: string, view: string, size: number): string {
   const params = new URLSearchParams({
     bkba_opt: '2',
     model: modelSlug,
@@ -188,9 +175,49 @@ function buildCompositorUrl(
     size: size.toString(),
     view,
   })
-
   return `https://static-assets.tesla.com/configurator/compositor?${params.toString()}`
 }
+
+function buildCacheUrl(modelSlug: string, optionsStr: string, view: string, size: number): string {
+  const params = new URLSearchParams({
+    model: modelSlug,
+    options: optionsStr,
+    size: size.toString(),
+    view,
+  })
+  return `/api/compositor-image?${params.toString()}`
+}
+
+// Upload image to server cache via canvas capture
+function uploadToCache(img: HTMLImageElement, cacheUrl: string) {
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(img, 0, 0)
+    canvas.toBlob((blob) => {
+      if (!blob || blob.size < 1024) return
+      // Fire-and-forget upload
+      fetch(cacheUrl, {
+        method: 'POST',
+        body: blob,
+      }).catch(() => {}) // silently ignore upload failures
+    }, 'image/png')
+  } catch {
+    // Canvas tainted or other error — ignore
+  }
+}
+
+// Track which cache URLs have been checked to avoid repeated 404s
+const cacheChecked = new Set<string>()
+
+// Loading stages:
+// 1. 'cache' — try our server cache
+// 2. 'tesla-cors' — load from Tesla CDN with crossOrigin (enables canvas capture)
+// 3. 'tesla-direct' — load from Tesla CDN without crossOrigin (fallback if CORS blocked)
+type LoadStage = 'cache' | 'tesla-cors' | 'tesla-direct'
 
 export const TeslaCarImage = memo(function TeslaCarImage({
   vehicleType,
@@ -204,12 +231,57 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   fetchSize,
   className,
 }: TeslaCarImageProps) {
+  const codes = useCompositorCodes()
+  const imgRef = useRef<HTMLImageElement>(null)
+
+  const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
+  const apiSize = fetchSize || size
+  const optionsStr = buildOptionsString(vehicleType, color, wheels, model, drive, interior, codes)
+  const cacheUrl = buildCacheUrl(modelSlug, optionsStr, view, apiSize)
+  const teslaUrl = buildTeslaUrl(modelSlug, optionsStr, view, apiSize)
+
+  // Skip cache stage if we already know it's a miss
+  const initialStage: LoadStage = cacheChecked.has(cacheUrl) ? 'tesla-cors' : 'cache'
+  const [stage, setStage] = useState<LoadStage>(initialStage)
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const codes = useCompositorCodes()
 
-  const apiSize = fetchSize || size
-  const imageUrl = buildCompositorUrl(vehicleType, color, wheels, model, drive, interior, view, apiSize, codes)
+  const handleLoad = useCallback(() => {
+    setIsLoading(false)
+    // If loaded from Tesla with CORS, try to capture and upload to our cache
+    if (stage === 'tesla-cors' && imgRef.current) {
+      uploadToCache(imgRef.current, cacheUrl)
+    }
+  }, [stage, cacheUrl])
+
+  const handleError = useCallback(() => {
+    if (stage === 'cache') {
+      // Cache miss — remember and try Tesla with CORS
+      cacheChecked.add(cacheUrl)
+      setStage('tesla-cors')
+    } else if (stage === 'tesla-cors') {
+      // CORS blocked — fall back to direct loading (no cache upload possible)
+      setStage('tesla-direct')
+    } else {
+      // All stages failed
+      setHasError(true)
+      setIsLoading(false)
+    }
+  }, [stage, cacheUrl])
+
+  // Determine current src and crossOrigin based on stage
+  let imgSrc: string
+  let crossOrigin: '' | 'anonymous' | undefined
+  if (stage === 'cache') {
+    imgSrc = cacheUrl
+    crossOrigin = undefined
+  } else if (stage === 'tesla-cors') {
+    imgSrc = teslaUrl
+    crossOrigin = 'anonymous'
+  } else {
+    imgSrc = teslaUrl
+    crossOrigin = undefined
+  }
 
   // Collect missing fields for debug display in error fallback
   const missing: string[] = []
@@ -247,18 +319,18 @@ export const TeslaCarImage = memo(function TeslaCarImage({
         </div>
       )}
       <img
-        src={imageUrl}
+        ref={imgRef}
+        key={`${stage}-${imgSrc}`}
+        src={imgSrc}
+        crossOrigin={crossOrigin}
         alt={`${vehicleType} - ${color || 'default'} with ${wheels || 'default'}" wheels`}
         className={cn(
           "object-contain",
           isLoading && "opacity-0"
         )}
         style={{ width: size, height: 'auto', maxHeight: size * 0.6 }}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setHasError(true)
-          setIsLoading(false)
-        }}
+        onLoad={handleLoad}
+        onError={handleError}
         loading="lazy"
       />
     </div>
