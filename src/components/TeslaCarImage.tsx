@@ -102,6 +102,14 @@ function resolveWheelCode(
   return lookupCode(codes, 'wheel', vehicleType, wheelSize)
 }
 
+// Normalize German interior labels to English values
+function normalizeInterior(interior: string | null | undefined): string {
+  const raw = interior?.toLowerCase().trim() || 'black'
+  if (raw === 'schwarz') return 'black'
+  if (raw === 'weiß' || raw === 'weiss') return 'white'
+  return raw
+}
+
 // Resolve interior code from trim + interior color
 function resolveInteriorCode(
   vehicleType: string,
@@ -112,18 +120,25 @@ function resolveInteriorCode(
 ): string | null {
   if (!model) return null
   const trimNorm = model.toLowerCase().trim()
-  const interiorNorm = interior?.toLowerCase().trim() || 'black'
+  const interiorNorm = normalizeInterior(interior)
 
   // Model 3 Premium AWD has its own interior codes
   if (vehicleType === 'Model 3' && trimNorm === 'premium') {
     const driveNorm = drive?.toLowerCase().trim()
     if (driveNorm === 'awd') {
-      return lookupCode(codes, 'interior', vehicleType, `premium_awd_${interiorNorm}`)
+      const code = lookupCode(codes, 'interior', vehicleType, `premium_awd_${interiorNorm}`)
+      if (code) return code
+      // Fall back to black if white doesn't exist for this trim
+      return lookupCode(codes, 'interior', vehicleType, `premium_awd_black`)
     }
   }
 
   const key = `${trimNorm}_${interiorNorm}`
-  return lookupCode(codes, 'interior', vehicleType, key)
+  const code = lookupCode(codes, 'interior', vehicleType, key)
+  if (code) return code
+
+  // Fall back to black interior if requested color doesn't exist for this trim
+  return lookupCode(codes, 'interior', vehicleType, `${trimNorm}_black`)
 }
 
 type ViewAngle = 'STUD_3QTR' | 'STUD_SIDE' | 'STUD_REAR' | 'STUD_FRONT'

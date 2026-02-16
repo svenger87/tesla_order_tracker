@@ -46,7 +46,7 @@ const WHEEL_CODES: CodeDefinition[] = [
 const INTERIOR_CODES: CodeDefinition[] = [
   // Model Y Juniper
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'standard_black', code: 'IBB3', label: 'Standard Schwarz' },
-  { category: 'interior', vehicleType: 'Model Y', lookupKey: 'standard_white', code: 'IBW3', label: 'Standard Weiß' },
+  // Standard MY Juniper only comes in black — no white interior option
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'premium_black', code: 'IPB12', label: 'Premium Schwarz' },
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'premium_white', code: 'IPW12', label: 'Premium Weiß' },
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'performance_black', code: 'IPB14', label: 'Performance Schwarz' },
