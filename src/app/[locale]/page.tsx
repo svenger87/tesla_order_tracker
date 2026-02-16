@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { Order, Settings } from '@/lib/types'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
@@ -178,9 +177,8 @@ export default function Home() {
         <div className="w-full max-w-[98vw] mx-auto px-3 py-3 sm:px-4 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="relative rounded-lg bg-primary p-1.5 w-[38px] h-[44px]"
+              <div
+                className="relative rounded-lg bg-primary p-1.5 w-[38px] h-[44px] transition-transform hover:scale-105"
               >
                 <Image
                   src="/logo.webp"
@@ -189,7 +187,7 @@ export default function Home() {
                   sizes="44px"
                   className="object-contain p-0.5"
                 />
-              </motion.div>
+              </div>
               <div>
                 <h1 className="text-xl font-bold md:text-2xl">
                   <span className="sm:hidden">{t('titleShort')}</span>
