@@ -13,6 +13,7 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV NEXT_PRIVATE_WORKER_THREADS=2
 RUN npx prisma generate
 RUN npm run build
 RUN DATABASE_URL="file:/app/schema-template.db" npx prisma db push --accept-data-loss
