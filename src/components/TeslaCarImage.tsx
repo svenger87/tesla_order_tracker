@@ -198,26 +198,32 @@ function buildCacheUrl(modelSlug: string, optionsStr: string, view: string, size
   return `/api/compositor-image?${params.toString()}`
 }
 
-// Cache check results in memory to avoid re-checking within the same session
-// Maps cacheUrl → true (cached) | false (not cached)
-const cacheStatus = new Map<string, boolean>()
+// Manifest-based cache check: fetch list of cached param keys once, check locally (no 404s)
+let manifestPromise: Promise<Set<string>> | null = null
+let manifestSet = new Set<string>()
 
-// Check cache via fetch (no console noise for 404s unlike img tags)
-async function checkCache(cacheUrl: string): Promise<boolean> {
-  if (cacheStatus.has(cacheUrl)) return cacheStatus.get(cacheUrl)!
-  try {
-    const res = await fetch(cacheUrl, { method: 'HEAD' })
-    const hit = res.ok
-    cacheStatus.set(cacheUrl, hit)
-    return hit
-  } catch {
-    cacheStatus.set(cacheUrl, false)
-    return false
+function fetchManifest(): Promise<Set<string>> {
+  if (!manifestPromise) {
+    manifestPromise = fetch('/api/compositor-image?manifest=true')
+      .then(res => res.ok ? res.json() : [])
+      .then((keys: string[]) => {
+        manifestSet = new Set(keys)
+        return manifestSet
+      })
+      .catch(() => {
+        manifestPromise = null // retry on next call
+        return manifestSet
+      })
   }
+  return manifestPromise
+}
+
+function buildParamKey(modelSlug: string, optionsStr: string, view: string, size: number): string {
+  return `${modelSlug}_${optionsStr}_${view}_${size}`
 }
 
 // Try to fetch image from Tesla via CORS and upload to our cache (fire-and-forget)
-function tryUploadToCache(teslaUrl: string, cacheUrl: string) {
+function tryUploadToCache(teslaUrl: string, cacheUrl: string, paramKey: string) {
   fetch(teslaUrl, { mode: 'cors' })
     .then(res => {
       if (!res.ok) return
@@ -229,8 +235,8 @@ function tryUploadToCache(teslaUrl: string, cacheUrl: string) {
     })
     .then(res => {
       if (res?.ok) {
-        // Mark as cached for future loads in this session
-        cacheStatus.set(cacheUrl, true)
+        // Add to local manifest for future loads in this session
+        manifestSet.add(paramKey)
       }
     })
     .catch(() => {}) // Silently ignore CORS or network failures
@@ -257,34 +263,35 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
   const apiSize = fetchSize || size
   const optionsStr = buildOptionsString(vehicleType, color, wheels, model, drive, interior, codes)
+  const paramKey = buildParamKey(modelSlug, optionsStr, view, apiSize)
   const cacheUrl = buildCacheUrl(modelSlug, optionsStr, view, apiSize)
   const teslaUrl = buildTeslaUrl(modelSlug, optionsStr, view, apiSize)
 
-  // Check cache via fetch, then set the img src
+  // Check manifest (no HTTP requests = no 404 console noise)
   useEffect(() => {
     uploadAttempted.current = false
     setHasError(false)
     setIsLoading(true)
     setImgSrc(null)
 
-    checkCache(cacheUrl).then(cached => {
-      setImgSrc(cached ? cacheUrl : teslaUrl)
+    fetchManifest().then(manifest => {
+      setImgSrc(manifest.has(paramKey) ? cacheUrl : teslaUrl)
     })
-  }, [cacheUrl, teslaUrl])
+  }, [paramKey, cacheUrl, teslaUrl])
 
   const handleLoad = () => {
     setIsLoading(false)
     // If loaded from Tesla, try to upload to cache in background
     if (imgSrc === teslaUrl && !uploadAttempted.current) {
       uploadAttempted.current = true
-      tryUploadToCache(teslaUrl, cacheUrl)
+      tryUploadToCache(teslaUrl, cacheUrl, paramKey)
     }
   }
 
   const handleError = () => {
     if (imgSrc === cacheUrl) {
       // Cache served a bad response, try Tesla directly
-      cacheStatus.set(cacheUrl, false)
+      manifestSet.delete(paramKey)
       setImgSrc(teslaUrl)
     } else {
       setHasError(true)

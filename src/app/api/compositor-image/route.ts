@@ -6,6 +6,7 @@ import { join } from 'path'
 const CACHE_DIR = process.env.NODE_ENV === 'production'
   ? '/app/data/compositor-cache'
   : join(process.cwd(), '.compositor-cache')
+const MANIFEST_PATH = join(CACHE_DIR, 'manifest.json')
 
 function ensureCacheDir() {
   if (!existsSync(CACHE_DIR)) {
@@ -13,16 +14,45 @@ function ensureCacheDir() {
   }
 }
 
-function buildCacheKey(model: string, options: string, view: string, size: string): string {
-  return createHash('md5')
-    .update(`${model}_${options}_${view}_${size}`)
-    .digest('hex')
+function buildParamKey(model: string, options: string, view: string, size: string): string {
+  return `${model}_${options}_${view}_${size}`
 }
 
-// GET /api/compositor-image?model=my&options=...&view=STUD_3QTR&size=800
-// Serves cached image if available, otherwise returns 404
+function buildCacheKey(paramKey: string): string {
+  return createHash('md5').update(paramKey).digest('hex')
+}
+
+// Read manifest: { paramKey: hash, ... }
+function readManifest(): Record<string, string> {
+  try {
+    if (existsSync(MANIFEST_PATH)) {
+      return JSON.parse(readFileSync(MANIFEST_PATH, 'utf-8'))
+    }
+  } catch {}
+  return {}
+}
+
+// Add entry to manifest
+function addToManifest(paramKey: string, hash: string) {
+  const manifest = readManifest()
+  manifest[paramKey] = hash
+  writeFileSync(MANIFEST_PATH, JSON.stringify(manifest))
+}
+
+// GET /api/compositor-image?manifest=true — returns cached param keys (no 404 noise)
+// GET /api/compositor-image?model=my&options=...&size=800&view=STUD_3QTR — serves cached image
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
+
+  // Manifest mode: return all cached param keys
+  if (searchParams.get('manifest') === 'true') {
+    ensureCacheDir()
+    const manifest = readManifest()
+    return NextResponse.json(Object.keys(manifest), {
+      headers: { 'Cache-Control': 'public, max-age=10' },
+    })
+  }
+
   const model = searchParams.get('model')
   const options = searchParams.get('options')
   const view = searchParams.get('view') || 'STUD_3QTR'
@@ -32,11 +62,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing model or options' }, { status: 400 })
   }
 
-  const cacheKey = buildCacheKey(model, options, view, size)
+  const paramKey = buildParamKey(model, options, view, size)
+  const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
   ensureCacheDir()
   if (existsSync(cachePath)) {
+    // Lazy-rebuild: ensure this entry is in the manifest (handles pre-manifest cached files)
+    const manifest = readManifest()
+    if (!manifest[paramKey]) {
+      addToManifest(paramKey, cacheKey)
+    }
+
     const cached = readFileSync(cachePath)
     return new NextResponse(cached, {
       headers: {
@@ -47,12 +84,10 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  // Not cached — client should load from Tesla CDN directly
   return new NextResponse(null, { status: 404 })
 }
 
 // POST /api/compositor-image — client uploads captured image for caching
-// Body: PNG blob, query params identify the image
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const model = searchParams.get('model')
@@ -64,12 +99,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing model or options' }, { status: 400 })
   }
 
-  const cacheKey = buildCacheKey(model, options, view, size)
+  const paramKey = buildParamKey(model, options, view, size)
+  const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
   ensureCacheDir()
 
-  // Don't overwrite existing cache
   if (existsSync(cachePath)) {
     return NextResponse.json({ cached: true, key: cacheKey })
   }
@@ -77,7 +112,6 @@ export async function POST(request: NextRequest) {
   try {
     const buffer = Buffer.from(await request.arrayBuffer())
 
-    // Validate: must be > 1KB and start with PNG magic bytes
     if (buffer.length < 1024) {
       return NextResponse.json({ error: 'Image too small' }, { status: 400 })
     }
@@ -86,6 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     writeFileSync(cachePath, buffer)
+    addToManifest(paramKey, cacheKey)
     return NextResponse.json({ cached: true, key: cacheKey, size: buffer.length })
   } catch (e) {
     console.error('[compositor-cache] Failed to save upload:', e)
