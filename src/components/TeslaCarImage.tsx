@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState, useCallback, useRef } from 'react'
+import { memo, useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { COLORS } from '@/lib/types'
 import { useCompositorCodes, lookupCode, type CompositorCodeMap } from '@/lib/CompositorCodesContext'
@@ -69,12 +69,10 @@ function resolveBodyCode(
   if (!model) return null
   const trimNorm = model.toLowerCase().trim()
 
-  // Performance has no drive suffix
   if (trimNorm === 'performance') {
     return lookupCode(codes, 'body', vehicleType, 'performance')
   }
 
-  // Build lookup key: trim_drive (e.g. "standard_rwd", "premium_awd")
   const driveNorm = drive?.toLowerCase().trim() || 'rwd'
   const key = `${trimNorm}_${driveNorm}`
   return lookupCode(codes, 'body', vehicleType, key)
@@ -90,7 +88,6 @@ function resolveWheelCode(
   const wheelSize = findWheelSize(wheels)
   if (!wheelSize) return null
 
-  // Model 3 has trim-specific wheel codes for 18"
   if (vehicleType === 'Model 3' && wheelSize === '18') {
     const trimNorm = model?.toLowerCase().trim() || 'standard'
     if (trimNorm === 'standard') {
@@ -122,13 +119,11 @@ function resolveInteriorCode(
   const trimNorm = model.toLowerCase().trim()
   const interiorNorm = normalizeInterior(interior)
 
-  // Model 3 Premium AWD has its own interior codes
   if (vehicleType === 'Model 3' && trimNorm === 'premium') {
     const driveNorm = drive?.toLowerCase().trim()
     if (driveNorm === 'awd') {
       const code = lookupCode(codes, 'interior', vehicleType, `premium_awd_${interiorNorm}`)
       if (code) return code
-      // Fall back to black if white doesn't exist for this trim
       return lookupCode(codes, 'interior', vehicleType, `premium_awd_black`)
     }
   }
@@ -203,36 +198,43 @@ function buildCacheUrl(modelSlug: string, optionsStr: string, view: string, size
   return `/api/compositor-image?${params.toString()}`
 }
 
-// Upload image to server cache via canvas capture
-function uploadToCache(img: HTMLImageElement, cacheUrl: string) {
+// Cache check results in memory to avoid re-checking within the same session
+// Maps cacheUrl → true (cached) | false (not cached)
+const cacheStatus = new Map<string, boolean>()
+
+// Check cache via fetch (no console noise for 404s unlike img tags)
+async function checkCache(cacheUrl: string): Promise<boolean> {
+  if (cacheStatus.has(cacheUrl)) return cacheStatus.get(cacheUrl)!
   try {
-    const canvas = document.createElement('canvas')
-    canvas.width = img.naturalWidth
-    canvas.height = img.naturalHeight
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    ctx.drawImage(img, 0, 0)
-    canvas.toBlob((blob) => {
-      if (!blob || blob.size < 1024) return
-      // Fire-and-forget upload
-      fetch(cacheUrl, {
-        method: 'POST',
-        body: blob,
-      }).catch(() => {}) // silently ignore upload failures
-    }, 'image/png')
+    const res = await fetch(cacheUrl, { method: 'HEAD' })
+    const hit = res.ok
+    cacheStatus.set(cacheUrl, hit)
+    return hit
   } catch {
-    // Canvas tainted or other error — ignore
+    cacheStatus.set(cacheUrl, false)
+    return false
   }
 }
 
-// Track which cache URLs have been checked to avoid repeated 404s
-const cacheChecked = new Set<string>()
-
-// Loading stages:
-// 1. 'cache' — try our server cache
-// 2. 'tesla-cors' — load from Tesla CDN with crossOrigin (enables canvas capture)
-// 3. 'tesla-direct' — load from Tesla CDN without crossOrigin (fallback if CORS blocked)
-type LoadStage = 'cache' | 'tesla-cors' | 'tesla-direct'
+// Try to fetch image from Tesla via CORS and upload to our cache (fire-and-forget)
+function tryUploadToCache(teslaUrl: string, cacheUrl: string) {
+  fetch(teslaUrl, { mode: 'cors' })
+    .then(res => {
+      if (!res.ok) return
+      return res.blob()
+    })
+    .then(blob => {
+      if (!blob || blob.size < 1024) return
+      return fetch(cacheUrl, { method: 'POST', body: blob })
+    })
+    .then(res => {
+      if (res?.ok) {
+        // Mark as cached for future loads in this session
+        cacheStatus.set(cacheUrl, true)
+      }
+    })
+    .catch(() => {}) // Silently ignore CORS or network failures
+}
 
 export const TeslaCarImage = memo(function TeslaCarImage({
   vehicleType,
@@ -247,7 +249,10 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   className,
 }: TeslaCarImageProps) {
   const codes = useCompositorCodes()
-  const imgRef = useRef<HTMLImageElement>(null)
+  const [imgSrc, setImgSrc] = useState<string | null>(null)
+  const [hasError, setHasError] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const uploadAttempted = useRef(false)
 
   const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
   const apiSize = fetchSize || size
@@ -255,47 +260,36 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   const cacheUrl = buildCacheUrl(modelSlug, optionsStr, view, apiSize)
   const teslaUrl = buildTeslaUrl(modelSlug, optionsStr, view, apiSize)
 
-  // Skip cache stage if we already know it's a miss
-  const initialStage: LoadStage = cacheChecked.has(cacheUrl) ? 'tesla-cors' : 'cache'
-  const [stage, setStage] = useState<LoadStage>(initialStage)
-  const [hasError, setHasError] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  // Check cache via fetch, then set the img src
+  useEffect(() => {
+    uploadAttempted.current = false
+    setHasError(false)
+    setIsLoading(true)
+    setImgSrc(null)
 
-  const handleLoad = useCallback(() => {
+    checkCache(cacheUrl).then(cached => {
+      setImgSrc(cached ? cacheUrl : teslaUrl)
+    })
+  }, [cacheUrl, teslaUrl])
+
+  const handleLoad = () => {
     setIsLoading(false)
-    // If loaded from Tesla with CORS, try to capture and upload to our cache
-    if (stage === 'tesla-cors' && imgRef.current) {
-      uploadToCache(imgRef.current, cacheUrl)
+    // If loaded from Tesla, try to upload to cache in background
+    if (imgSrc === teslaUrl && !uploadAttempted.current) {
+      uploadAttempted.current = true
+      tryUploadToCache(teslaUrl, cacheUrl)
     }
-  }, [stage, cacheUrl])
+  }
 
-  const handleError = useCallback(() => {
-    if (stage === 'cache') {
-      // Cache miss — remember and try Tesla with CORS
-      cacheChecked.add(cacheUrl)
-      setStage('tesla-cors')
-    } else if (stage === 'tesla-cors') {
-      // CORS blocked — fall back to direct loading (no cache upload possible)
-      setStage('tesla-direct')
+  const handleError = () => {
+    if (imgSrc === cacheUrl) {
+      // Cache served a bad response, try Tesla directly
+      cacheStatus.set(cacheUrl, false)
+      setImgSrc(teslaUrl)
     } else {
-      // All stages failed
       setHasError(true)
       setIsLoading(false)
     }
-  }, [stage, cacheUrl])
-
-  // Determine current src and crossOrigin based on stage
-  let imgSrc: string
-  let crossOrigin: '' | 'anonymous' | undefined
-  if (stage === 'cache') {
-    imgSrc = cacheUrl
-    crossOrigin = undefined
-  } else if (stage === 'tesla-cors') {
-    imgSrc = teslaUrl
-    crossOrigin = 'anonymous'
-  } else {
-    imgSrc = teslaUrl
-    crossOrigin = undefined
   }
 
   // Collect missing fields for debug display in error fallback
@@ -333,21 +327,21 @@ export const TeslaCarImage = memo(function TeslaCarImage({
           <div className="animate-pulse text-muted-foreground text-xs">Loading...</div>
         </div>
       )}
-      <img
-        ref={imgRef}
-        key={`${stage}-${imgSrc}`}
-        src={imgSrc}
-        crossOrigin={crossOrigin}
-        alt={`${vehicleType} - ${color || 'default'} with ${wheels || 'default'}" wheels`}
-        className={cn(
-          "object-contain",
-          isLoading && "opacity-0"
-        )}
-        style={{ width: size, height: 'auto', maxHeight: size * 0.6 }}
-        onLoad={handleLoad}
-        onError={handleError}
-        loading="lazy"
-      />
+      {imgSrc && (
+        <img
+          key={imgSrc}
+          src={imgSrc}
+          alt={`${vehicleType} - ${color || 'default'} with ${wheels || 'default'}" wheels`}
+          className={cn(
+            "object-contain",
+            isLoading && "opacity-0"
+          )}
+          style={{ width: size, height: 'auto', maxHeight: size * 0.6 }}
+          onLoad={handleLoad}
+          onError={handleError}
+          loading="lazy"
+        />
+      )}
     </div>
   )
 })
