@@ -18,4 +18,28 @@ jobs:
           script: |
             cd /opt/tesla-order-tracker
             git pull origin master
-            docker compose up -d --build
+
+            # Tag current image for rollback
+            docker tag tesla-order-tracker-app:latest tesla-order-tracker-app:rollback 2>/dev/null || true
+
+            # Build new image (does not stop running container)
+            docker compose build app
+
+            # Restart only the app service
+            docker compose up -d --no-deps app
+
+            # Wait for health check
+            echo "Waiting for health check..."
+            for i in $(seq 1 30); do
+              if wget -qO- http://localhost:3000/api/health 2>/dev/null | grep -q '"ok"'; then
+                echo "Health check passed!"
+                exit 0
+              fi
+              sleep 2
+            done
+
+            # Rollback on failure
+            echo "Health check FAILED — rolling back"
+            docker tag tesla-order-tracker-app:rollback tesla-order-tracker-app:latest
+            docker compose up -d --no-deps app
+            exit 1

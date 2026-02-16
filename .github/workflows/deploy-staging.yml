@@ -1,0 +1,78 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy staging via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            PROD_DIR="/opt/tesla-order-tracker"
+            STAGING_DIR="$PROD_DIR/staging-src"
+
+            # --- Bootstrap staging repo on first run ---
+            if [ ! -d "$STAGING_DIR" ]; then
+              echo ">>> First run: cloning staging repo..."
+              git clone --branch staging "$(cd $PROD_DIR && git remote get-url origin)" "$STAGING_DIR"
+            fi
+
+            # --- Pull latest staging branch ---
+            echo ">>> Pulling latest staging..."
+            cd "$STAGING_DIR"
+            git fetch origin staging
+            git reset --hard origin/staging
+
+            # --- Create .env.staging if missing ---
+            if [ ! -f "$PROD_DIR/.env.staging" ]; then
+              echo ">>> Creating .env.staging from template..."
+              cp "$PROD_DIR/.env.production" "$PROD_DIR/.env.staging"
+              # Generate a separate JWT secret for staging
+              sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -hex 32)|" "$PROD_DIR/.env.staging"
+              # Remove analytics for staging
+              sed -i '/^UMAMI_WEBSITE_ID/d' "$PROD_DIR/.env.staging"
+            fi
+
+            # --- Update production repo (for Caddyfile & docker-compose changes) ---
+            echo ">>> Syncing production repo (compose + Caddy config)..."
+            cd "$PROD_DIR"
+            git fetch origin staging
+            # Only update Caddyfile and docker-compose.yml from staging
+            git checkout origin/staging -- Caddyfile docker-compose.yml
+
+            # --- Tag current image for rollback ---
+            docker tag tesla-order-tracker-app-staging:latest tesla-order-tracker-app-staging:rollback 2>/dev/null || true
+
+            # --- Build and start staging container ---
+            echo ">>> Building and starting app-staging..."
+            docker compose build app-staging
+            docker compose up -d --no-deps app-staging
+
+            # --- Wait for health check ---
+            echo "Waiting for staging health check..."
+            for i in $(seq 1 30); do
+              if wget -qO- http://localhost:3001/api/health 2>/dev/null | grep -q '"ok"'; then
+                echo "Health check passed!"
+                # Restart Caddy to pick up any config changes
+                docker compose restart caddy
+                echo ">>> Staging deployed to https://staging.tff-order-stats.de"
+                exit 0
+              fi
+              sleep 2
+            done
+
+            # --- Rollback on failure ---
+            echo "Health check FAILED — rolling back staging"
+            docker tag tesla-order-tracker-app-staging:rollback tesla-order-tracker-app-staging:latest
+            docker compose up -d --no-deps app-staging
+            exit 1
