@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 
 interface OrdersTimelineChartProps {
@@ -8,10 +9,11 @@ interface OrdersTimelineChartProps {
 }
 
 export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
+  const t = useTranslations('statistics')
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        Keine Daten verfügbar
+        {t('noDataAvailable')}
       </div>
     )
   }
@@ -62,14 +64,14 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
               color: 'hsl(var(--foreground))',
               fontWeight: 600,
             }}
-            formatter={(value) => [`${value} Bestellungen`, 'Anzahl']}
+            formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar
             dataKey="count"
             fill="url(#ordersGradient)"
             radius={[4, 4, 0, 0]}
-            animationDuration={1000}
+            animationDuration={400}
             animationEasing="ease-out"
           />
         </BarChart>

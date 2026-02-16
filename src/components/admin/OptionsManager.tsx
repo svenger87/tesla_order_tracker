@@ -29,6 +29,7 @@ import {
 import { Settings2, Plus, Pencil, Trash2, GripVertical } from 'lucide-react'
 import { FlagEmojiPicker } from './FlagEmojiPicker'
 import { TwemojiEmoji } from '@/components/TwemojiText'
+import { useTranslations } from 'next-intl'
 
 interface OptionMetadata {
   flag?: string
@@ -62,19 +63,22 @@ const VEHICLE_TYPE_OPTIONS = [
 ]
 
 const OPTION_TYPES = [
-  { type: 'country', label: 'Länder', singular: 'Land', hasFlag: true, valueHint: 'deutschland', labelHint: 'Deutschland' },
-  { type: 'model', label: 'Modelle', singular: 'Modell', valueHint: 'model_y_rwd', labelHint: 'Model Y RWD' },
-  { type: 'range', label: 'Reichweiten', singular: 'Reichweite', valueHint: 'standard', labelHint: 'Standard' },
-  { type: 'drive', label: 'Antriebe', singular: 'Antrieb', valueHint: 'awd', labelHint: 'Allrad (AWD)' },
-  { type: 'color', label: 'Farben', singular: 'Farbe', hasColor: true, valueHint: 'pearl_white', labelHint: 'Pearl White' },
-  { type: 'interior', label: 'Innenräume', singular: 'Innenraum', valueHint: 'schwarz', labelHint: 'Schwarz' },
-  { type: 'wheels', label: 'Felgen', singular: 'Felge', valueHint: 'gemini_19', labelHint: 'Gemini 19"' },
-  { type: 'autopilot', label: 'Autopilot', singular: 'Autopilot', valueHint: 'fsd', labelHint: 'Full Self-Driving' },
-  { type: 'towHitch', label: 'Anhängerkupplung', singular: 'Anhängerkupplung', valueHint: 'yes', labelHint: 'Ja' },
-  { type: 'deliveryLocation', label: 'Auslieferungsorte', singular: 'Auslieferungsort', valueHint: 'muenchen', labelHint: 'München-Parsdorf' },
+  { type: 'country', formKey: 'country', hasFlag: true, valueHint: 'deutschland', labelHint: 'Deutschland' },
+  { type: 'model', formKey: 'model', valueHint: 'model_y_rwd', labelHint: 'Model Y RWD' },
+  { type: 'range', formKey: 'range', valueHint: 'standard', labelHint: 'Standard' },
+  { type: 'drive', formKey: 'drive', valueHint: 'awd', labelHint: 'AWD' },
+  { type: 'color', formKey: 'color', hasColor: true, valueHint: 'pearl_white', labelHint: 'Pearl White' },
+  { type: 'interior', formKey: 'interior', valueHint: 'schwarz', labelHint: 'Black' },
+  { type: 'wheels', formKey: 'wheels', valueHint: 'gemini_19', labelHint: 'Gemini 19"' },
+  { type: 'autopilot', formKey: 'autopilot', valueHint: 'fsd', labelHint: 'Full Self-Driving' },
+  { type: 'towHitch', formKey: 'towHitch', valueHint: 'yes', labelHint: 'Yes' },
+  { type: 'deliveryLocation', formKey: 'deliveryLocation', valueHint: 'muenchen', labelHint: 'Munich' },
 ]
 
 export function OptionsManager() {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
+  const tf = useTranslations('form')
   const [options, setOptions] = useState<Option[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -175,7 +179,7 @@ export function OptionsManager() {
 
         if (!res.ok) {
           const data = await res.json()
-          throw new Error(data.error || 'Fehler beim Speichern')
+          throw new Error(data.error || tc('error'))
         }
       } else {
         // Create
@@ -194,34 +198,34 @@ export function OptionsManager() {
 
         if (!res.ok) {
           const data = await res.json()
-          throw new Error(data.error || 'Fehler beim Erstellen')
+          throw new Error(data.error || tc('error'))
         }
       }
 
-      setSuccess(editingOption ? 'Option aktualisiert!' : 'Option hinzugefügt!')
+      setSuccess(editingOption ? t('optionUpdated') : t('optionAdded'))
       setTimeout(() => setSuccess(''), 3000)
       setDialogOpen(false)
       fetchOptions()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler')
+      setError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (option: Option) => {
-    if (!confirm(`"${option.label}" wirklich löschen?`)) return
+    if (!confirm(`${tc('delete')} "${option.label}"?`)) return
 
     try {
       const res = await fetch(`/api/options?id=${option.id}`, { method: 'DELETE' })
       if (!res.ok) {
-        throw new Error('Fehler beim Löschen')
+        throw new Error(tc('error'))
       }
-      setSuccess('Option gelöscht!')
+      setSuccess(t('optionDeleted'))
       setTimeout(() => setSuccess(''), 3000)
       fetchOptions()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler')
+      setError(err instanceof Error ? err.message : tc('error'))
     }
   }
 
@@ -229,7 +233,7 @@ export function OptionsManager() {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          Lade Optionen...
+          {t('loadingOptions')}
         </CardContent>
       </Card>
     )
@@ -241,10 +245,10 @@ export function OptionsManager() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5" />
-            Dropdown-Optionen verwalten
+            {t('optionsManager')}
           </CardTitle>
           <CardDescription>
-            Verwalte die Auswahlmöglichkeiten für das Bestellformular
+            {t('optionsDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -260,14 +264,14 @@ export function OptionsManager() {
           )}
 
           <Accordion type="multiple" className="w-full">
-            {OPTION_TYPES.map(({ type, label, singular, hasFlag, hasColor }) => {
+            {OPTION_TYPES.map(({ type, formKey, hasFlag, hasColor }) => {
               const typeOptions = getOptionsForType(type)
 
               return (
                 <AccordionItem key={type} value={type}>
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <span>{label}</span>
+                      <span>{tf(formKey as 'country' | 'model' | 'range' | 'drive' | 'color' | 'interior' | 'wheels' | 'autopilot' | 'towHitch' | 'deliveryLocation')}</span>
                       <Badge variant="secondary" className="text-xs">
                         {typeOptions.length}
                       </Badge>
@@ -329,7 +333,7 @@ export function OptionsManager() {
                         onClick={() => openAddDialog(type)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        {singular} hinzufügen
+                        {t('addOption', { type: tf(formKey as 'country' | 'model' | 'range' | 'drive' | 'color' | 'interior' | 'wheels' | 'autopilot' | 'towHitch' | 'deliveryLocation') })}
                       </Button>
                     </div>
                   </AccordionContent>
@@ -345,61 +349,61 @@ export function OptionsManager() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingOption ? 'Option bearbeiten' : 'Neue Option hinzufügen'}
+              {editingOption ? t('editOption') : t('addNewOption')}
             </DialogTitle>
             <DialogDescription>
-              {dialogType && getTypeConfig(dialogType)?.label}
+              {dialogType && tf(getTypeConfig(dialogType)?.formKey as 'country' | 'model' | 'range' | 'drive' | 'color' | 'interior' | 'wheels' | 'autopilot' | 'towHitch' | 'deliveryLocation')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             {!editingOption && (
               <div className="space-y-2">
-                <Label htmlFor="value">Wert (intern)</Label>
+                <Label htmlFor="value">{t('internalValue')}</Label>
                 <Input
                   id="value"
                   value={formData.value}
                   onChange={(e) => setFormData(f => ({ ...f, value: e.target.value }))}
-                  placeholder={`z.B. ${dialogType ? getTypeConfig(dialogType)?.valueHint || 'wert' : 'wert'}`}
+                  placeholder={dialogType ? getTypeConfig(dialogType)?.valueHint || '' : ''}
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="label">Anzeigename</Label>
+              <Label htmlFor="label">{t('displayName')}</Label>
               <Input
                 id="label"
                 value={formData.label}
                 onChange={(e) => setFormData(f => ({ ...f, label: e.target.value }))}
-                placeholder={`z.B. ${dialogType ? getTypeConfig(dialogType)?.labelHint || 'Anzeigename' : 'Anzeigename'}`}
+                placeholder={dialogType ? getTypeConfig(dialogType)?.labelHint || '' : ''}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="vehicleType">Fahrzeugtyp</Label>
+              <Label htmlFor="vehicleType">{t('vehicleType')}</Label>
               <Select
                 value={formData.vehicleType}
                 onValueChange={(v) => setFormData(f => ({ ...f, vehicleType: v }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Alle Fahrzeuge" />
+                  <SelectValue placeholder={t('allVehicles')} />
                 </SelectTrigger>
                 <SelectContent>
                   {VEHICLE_TYPE_OPTIONS.map((vt) => (
                     <SelectItem key={vt.value} value={vt.value}>
-                      {vt.label}
+                      {vt.value === 'all' ? t('allVehicles') : vt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Leer lassen für Optionen die für alle Fahrzeuge gelten
+                {t('vehicleTypeHint')}
               </p>
             </div>
 
             {dialogType && getTypeConfig(dialogType)?.hasFlag && (
               <div className="space-y-2">
-                <Label>Flagge (Emoji)</Label>
+                <Label>{t('flagEmoji')}</Label>
                 <FlagEmojiPicker
                   value={formData.flag || ''}
                   onChange={(flag) => setFormData(f => ({ ...f, flag }))}
@@ -410,7 +414,7 @@ export function OptionsManager() {
             {dialogType && getTypeConfig(dialogType)?.hasColor && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="hex">Farbcode (Hex)</Label>
+                  <Label htmlFor="hex">{t('colorCode')}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="hex"
@@ -433,17 +437,17 @@ export function OptionsManager() {
                     checked={formData.border || false}
                     onChange={(e) => setFormData(f => ({ ...f, border: e.target.checked }))}
                   />
-                  <Label htmlFor="border">Rand anzeigen (für helle Farben)</Label>
+                  <Label htmlFor="border">{t('showBorder')}</Label>
                 </div>
               </>
             )}
 
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Abbrechen
+                {tc('cancel')}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? 'Speichern...' : 'Speichern'}
+                {saving ? tc('saving') : tc('save')}
               </Button>
             </div>
           </div>

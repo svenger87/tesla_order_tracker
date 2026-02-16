@@ -339,6 +339,8 @@ export const TeslaCarImage = memo(function TeslaCarImage({
           key={imgSrc}
           src={imgSrc}
           alt={`${vehicleType} - ${color || 'default'} with ${wheels || 'default'}" wheels`}
+          width={size}
+          height={Math.round(size * 0.6)}
           className={cn(
             "object-contain",
             isLoading && "opacity-0"

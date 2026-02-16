@@ -5,7 +5,8 @@ import { Settings, SyncResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RefreshCw, AlertTriangle, Database, Bug, Download } from 'lucide-react'
-import Link from 'next/link'
+
+import { useTranslations } from 'next-intl'
 
 interface MultiSheetSyncResult extends SyncResult {
   sheets?: Array<SyncResult & { sheetLabel: string }>
@@ -14,6 +15,8 @@ interface MultiSheetSyncResult extends SyncResult {
 }
 
 export function ImportExportTab() {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
   const [settings, setSettings] = useState<Settings | null>(null)
 
   // Sync state
@@ -76,12 +79,12 @@ export function ImportExportTab() {
       const res = await fetch(url, { method: 'POST' })
       const data = await res.json()
 
-      if (!res.ok) throw new Error(data.error || 'Sync fehlgeschlagen')
+      if (!res.ok) throw new Error(data.error || t('syncFailed'))
 
       setSyncResult(data)
       await fetchSettings()
     } catch (err) {
-      setSyncError(err instanceof Error ? err.message : 'Sync fehlgeschlagen')
+      setSyncError(err instanceof Error ? err.message : t('syncFailed'))
     } finally {
       setSyncing(false)
     }
@@ -94,10 +97,10 @@ export function ImportExportTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5" />
-            Google Sheet Sync
+            {t('googleSheetSync')}
           </CardTitle>
           <CardDescription>
-            Importiere Daten aus der Google Tabelle
+            {t('importFromSheet')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -106,16 +109,15 @@ export function ImportExportTab() {
             <div className="text-sm text-amber-700 dark:text-amber-400">
               <p className="font-medium">Hinweis</p>
               <p>
-                Der Sync sollte normalerweise nur einmal durchgeführt werden, um die initialen Daten zu importieren.
-                Alle neuen Bestellungen werden über das Formular der App erfasst.
+                {t('syncNote')}
               </p>
             </div>
           </div>
 
           {settings?.lastSyncTime && (
             <div className="text-sm text-muted-foreground">
-              Letzter Sync: {new Date(settings.lastSyncTime).toLocaleString('de-DE')}
-              {settings.lastSyncCount !== null && ` (${settings.lastSyncCount} Einträge)`}
+              {t('lastSync', { time: new Date(settings.lastSyncTime).toLocaleString('de-DE') })}
+              {settings.lastSyncCount !== null && ` ${t('lastSyncCount', { count: settings.lastSyncCount })}`}
             </div>
           )}
 
@@ -128,7 +130,7 @@ export function ImportExportTab() {
           {syncResult && (
             <div className="bg-green-500/10 text-green-600 dark:text-green-400 px-4 py-3 rounded-md text-sm space-y-2">
               <p className="font-medium">
-                {syncResult.message || 'Sync abgeschlossen!'}
+                {syncResult.message || t('syncCompleted')}
                 {syncResult.vehicleType && <span className="ml-2 px-2 py-0.5 bg-green-500/20 rounded text-xs">{syncResult.vehicleType}</span>}
               </p>
 
@@ -146,20 +148,20 @@ export function ImportExportTab() {
               )}
 
               <div className="flex gap-4 pt-1 border-t border-green-500/20">
-                <span>Neu: {syncResult.created}</span>
-                <span>Aktualisiert: {syncResult.updated}</span>
-                <span>Übersprungen: {syncResult.skipped}</span>
+                <span>{tc('new')}: {syncResult.created}</span>
+                <span>{tc('update')}: {syncResult.updated}</span>
+                <span>Skipped: {syncResult.skipped}</span>
               </div>
 
               {syncResult.errors.length > 0 && (
                 <div className="mt-2 text-amber-600 dark:text-amber-400">
-                  <p className="font-medium">Fehler:</p>
+                  <p className="font-medium">{tc('error')}:</p>
                   <ul className="list-disc list-inside">
                     {syncResult.errors.slice(0, 5).map((err, i) => (
                       <li key={i}>{err}</li>
                     ))}
                     {syncResult.errors.length > 5 && (
-                      <li>...und {syncResult.errors.length - 5} weitere</li>
+                      <li>...+{syncResult.errors.length - 5}</li>
                     )}
                   </ul>
                 </div>
@@ -169,39 +171,39 @@ export function ImportExportTab() {
 
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-medium mb-2">Model Y (TFF Tracker)</p>
+              <p className="text-sm font-medium mb-2">{t('modelYSection')}</p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button onClick={() => handleSync('single')} disabled={syncing} variant="outline">
                   <RefreshCw className={`h-4 w-4 mr-2 ${syncing && syncMode === 'single' ? 'animate-spin' : ''}`} />
-                  {syncing && syncMode === 'single' ? 'Synchronisiere...' : 'Aktuelles Quartal'}
+                  {syncing && syncMode === 'single' ? t('syncing') : t('currentQuarter')}
                 </Button>
                 <Button onClick={() => handleSync('all')} disabled={syncing} variant="default">
                   <Database className={`h-4 w-4 mr-2 ${syncing && syncMode === 'all' ? 'animate-spin' : ''}`} />
-                  {syncing && syncMode === 'all' ? 'Synchronisiere alle...' : 'Alle Quartale (Initial-Import)'}
+                  {syncing && syncMode === 'all' ? t('syncingAll') : t('allQuarters')}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                &quot;Alle Quartale&quot; importiert Q3 2025, Q4 2025 und das aktuelle Quartal für Model Y.
+                {t('allQuartersHint')}
               </p>
             </div>
 
             <div className="border-t pt-3">
-              <p className="text-sm font-medium mb-2">Model 3 (Separate Tabelle)</p>
+              <p className="text-sm font-medium mb-2">{t('model3Section')}</p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button onClick={() => handleSync('m3')} disabled={syncing} variant="secondary">
                   <Database className={`h-4 w-4 mr-2 ${syncing && syncMode === 'm3' ? 'animate-spin' : ''}`} />
-                  {syncing && syncMode === 'm3' ? 'Synchronisiere Model 3...' : 'Model 3 importieren'}
+                  {syncing && syncMode === 'm3' ? t('syncingModel3') : t('importModel3')}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Importiert Model 3 Daten aus der separaten Google Tabelle.
+                {t('model3Hint')}
               </p>
             </div>
 
             <div className="border-t pt-3">
               <Button onClick={handleDebugSheets} disabled={debugging} variant="ghost" size="sm">
                 <Bug className={`h-4 w-4 mr-2 ${debugging ? 'animate-pulse' : ''}`} />
-                {debugging ? 'Prüfe...' : 'Debug Sheets'}
+                {debugging ? t('debugChecking') : t('debugSheets')}
               </Button>
             </div>
           </div>
@@ -239,31 +241,30 @@ export function ImportExportTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
-            Daten-Export
+            {t('dataExport')}
           </CardTitle>
           <CardDescription>
-            Exportiere alle Daten und Statistiken als Excel-Datei (Exit-Plan)
+            {t('dataExportDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Der Export enthält alle Bestellungen, Statistiken, Verteilungen und Dropdown-Optionen
-            als vollständiges Backup. Perfekt als Exit-Plan falls die App nicht mehr gewartet werden kann.
+            {t('exportDescription')}
           </p>
           <div className="text-xs text-muted-foreground space-y-1">
-            <p><strong>Enthaltene Sheets:</strong></p>
+            <p><strong>{t('exportSheets')}</strong></p>
             <ul className="list-disc list-inside ml-2">
-              <li>Alle Bestellungen (Rohdaten)</li>
-              <li>Statistik-Übersicht</li>
-              <li>Modellverteilung</li>
-              <li>Reichweitenverteilung</li>
-              <li>Länderverteilung</li>
-              <li>Farbverteilung</li>
-              <li>Antriebsverteilung</li>
-              <li>Felgenverteilung</li>
-              <li>Bestellungen pro Monat</li>
-              <li>Lieferungen pro Monat</li>
-              <li>Dropdown-Optionen (Admin-Settings)</li>
+              <li>{t('exportAllOrders')}</li>
+              <li>{t('exportStatOverview')}</li>
+              <li>{t('exportModels')}</li>
+              <li>{t('exportRanges')}</li>
+              <li>{t('exportCountries')}</li>
+              <li>{t('exportColors')}</li>
+              <li>{t('exportDrives')}</li>
+              <li>{t('exportWheels')}</li>
+              <li>{t('exportOrdersPerMonth')}</li>
+              <li>{t('exportDeliveriesPerMonth')}</li>
+              <li>{t('exportOptions')}</li>
             </ul>
           </div>
           <Button
@@ -271,7 +272,7 @@ export function ImportExportTab() {
               setExporting(true)
               try {
                 const res = await fetch('/api/admin/export')
-                if (!res.ok) throw new Error('Export fehlgeschlagen')
+                if (!res.ok) throw new Error(t('exportFailed'))
                 const blob = await res.blob()
                 const url = window.URL.createObjectURL(blob)
                 const a = document.createElement('a')
@@ -283,7 +284,7 @@ export function ImportExportTab() {
                 document.body.removeChild(a)
               } catch (err) {
                 console.error('Export error:', err)
-                alert('Export fehlgeschlagen')
+                alert(t('exportFailed'))
               } finally {
                 setExporting(false)
               }
@@ -291,7 +292,7 @@ export function ImportExportTab() {
             disabled={exporting}
           >
             <Download className={`h-4 w-4 mr-2 ${exporting ? 'animate-bounce' : ''}`} />
-            {exporting ? 'Exportiere...' : 'Excel Export herunterladen'}
+            {exporting ? t('exporting') : t('downloadExport')}
           </Button>
         </CardContent>
       </Card>

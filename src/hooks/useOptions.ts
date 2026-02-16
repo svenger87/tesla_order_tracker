@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import {
   COUNTRIES,
   MODELS,
@@ -90,10 +91,15 @@ const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormO
   },
 }
 
+// Option types that have translations in the message files
+const TRANSLATABLE_TYPES = new Set(['country', 'interior', 'range', 'towHitch', 'autopilot'])
+
 export function useOptions(vehicleType?: VehicleType) {
   const [apiOptions, setApiOptions] = useState<ApiOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const to = useTranslations('options')
+  const locale = useLocale()
 
   useEffect(() => {
     async function fetchOptions() {
@@ -139,24 +145,34 @@ export function useOptions(vehicleType?: VehicleType) {
       return FALLBACK_OPTIONS[type] || []
     }
 
-    // Sort countries alphabetically with German locale for proper umlaut handling
-    const sortedCountries = getOptionsForType('country').sort((a, b) =>
-      a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
-    )
+    // Translate option labels for types that have translations
+    const translateOptions = (type: string, opts: FormOption[]): FormOption[] => {
+      if (!TRANSLATABLE_TYPES.has(type)) return opts
+      return opts.map(opt => {
+        const key = `${type}.${opt.value}`
+        return to.has(key as any)
+          ? { ...opt, label: to(key as any) }
+          : opt
+      })
+    }
+
+    // Sort countries alphabetically with current locale for proper sorting
+    const sortedCountries = translateOptions('country', getOptionsForType('country'))
+      .sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: 'base' }))
 
     return {
       countries: sortedCountries,
       models: getOptionsForType('model'),
-      ranges: getOptionsForType('range'),
+      ranges: translateOptions('range', getOptionsForType('range')),
       drives: getOptionsForType('drive'),
       colors: getOptionsForType('color'),
-      interiors: getOptionsForType('interior'),
+      interiors: translateOptions('interior', getOptionsForType('interior')),
       wheels: getOptionsForType('wheels'),
-      autopilot: getOptionsForType('autopilot'),
-      towHitch: getOptionsForType('towHitch'),
+      autopilot: translateOptions('autopilot', getOptionsForType('autopilot')),
+      towHitch: translateOptions('towHitch', getOptionsForType('towHitch')),
       deliveryLocations: getOptionsForType('deliveryLocation'),
     }
-  }, [apiOptions, vehicleType])
+  }, [apiOptions, vehicleType, to, locale])
 
   return {
     options,

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Order, COLORS, VehicleType } from '@/lib/types'
 import type { FormOption } from '@/hooks/useOptions'
 import { OrderProgressBar } from './OrderProgressBar'
@@ -44,6 +45,11 @@ interface OrderCardProps {
 }
 
 export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onImageClick, options }: OrderCardProps) {
+  const t = useTranslations('table')
+  const tc = useTranslations('common')
+  const th = useTranslations('home')
+  const to = useTranslations('options')
+
   const colorInfo = findColorInfo(order.color)
   const { models, ranges, drives, interiors } = options
 
@@ -86,7 +92,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               <h3 className="font-semibold text-base truncate">{order.name}</h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                 <Calendar className="h-3 w-3" />
-                <span>{order.orderDate || 'Kein Datum'}</span>
+                <span>{order.orderDate || tc('noDate')}</span>
                 {order.country && <span>{order.country}</span>}
               </div>
             </div>
@@ -100,12 +106,12 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onEdit(order)}>
                     <Pencil className="mr-2 h-4 w-4" />
-                    Bearbeiten
+                    {tc('edit')}
                   </DropdownMenuItem>
                   {onGenerateResetCode && (
                     <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
                       <KeyRound className="mr-2 h-4 w-4" />
-                      Einmalcode generieren
+                      {th('generateResetCode')}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
@@ -113,7 +119,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                     className="text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Löschen
+                    {tc('delete')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -140,14 +146,14 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
             )}
             {order.range && (
               <Badge variant="outline" className={cn("text-xs",
-                (getLabel(ranges, order.range) === 'Maximale Reichweite' || order.range.toLowerCase().includes('max'))
+                (order.range === 'maximale_reichweite' || order.range.toLowerCase().includes('max'))
                   ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
                   : ''
               )}>
-                {(() => {
-                  const rangeLabel = getLabel(ranges, order.range)
-                  return rangeLabel === 'Maximale Reichweite' ? 'Max. RW' : rangeLabel
-                })()}
+                {order.range === 'maximale_reichweite'
+                  ? to('range.maxRangeShort')
+                  : getLabel(ranges, order.range)
+                }
               </Badge>
             )}
             {order.drive && (
@@ -204,7 +210,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
           {order.deliveryDate && (
             <div className="mt-3 pt-3 border-t">
               <Badge variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white">
-                Geliefert: {order.deliveryDate}
+                {th('delivered', { date: order.deliveryDate })}
               </Badge>
             </div>
           )}

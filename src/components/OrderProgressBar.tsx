@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order } from '@/lib/types'
 import { getOrderStatus } from '@/lib/statistics'
@@ -15,10 +16,10 @@ interface OrderProgressBarProps {
 }
 
 const STEPS = [
-  { key: 'ordered', label: 'Bestellt', icon: ShoppingCart, dateField: 'orderDate' as const },
-  { key: 'vin_received', label: 'VIN erhalten', icon: Hash, dateField: 'vinReceivedDate' as const },
-  { key: 'papers_received', label: 'Papiere', icon: FileText, dateField: 'papersReceivedDate' as const },
-  { key: 'delivered', label: 'Geliefert', icon: Car, dateField: 'deliveryDate' as const },
+  { key: 'ordered', labelKey: 'ordered', icon: ShoppingCart, dateField: 'orderDate' as const },
+  { key: 'vin_received', labelKey: 'vinReceived', icon: Hash, dateField: 'vinReceivedDate' as const },
+  { key: 'papers_received', labelKey: 'papers', icon: FileText, dateField: 'papersReceivedDate' as const },
+  { key: 'delivered', labelKey: 'delivered', icon: Car, dateField: 'deliveryDate' as const },
 ]
 
 type StepKey = 'ordered' | 'vin_received' | 'papers_received' | 'delivery_scheduled' | 'delivered'
@@ -32,6 +33,8 @@ const STEP_INDEX: Record<StepKey, number> = {
 }
 
 export function OrderProgressBar({ order, compact = false, barOnly = false }: OrderProgressBarProps) {
+  const t = useTranslations('progress')
+
   const currentStatus = getOrderStatus(order)
   const currentIndex = STEP_INDEX[currentStatus]
 
@@ -102,7 +105,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="font-medium">
-                    {isScheduledDelivery ? 'Lieferung geplant' : step.label}
+                    {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
                   </p>
                   {dateValue && (
                     <p className="text-xs text-white/80">{dateValue}</p>
@@ -180,7 +183,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
               </TooltipTrigger>
               <TooltipContent>
                 <p className="font-medium">
-                  {isScheduledDelivery ? 'Lieferung geplant' : step.label}
+                  {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
                 </p>
                 {dateValue && (
                   <p className="text-xs text-white/80">{dateValue}</p>

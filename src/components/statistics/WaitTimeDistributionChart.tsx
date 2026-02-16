@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 
 interface WaitTimeDistributionChartProps {
@@ -8,10 +9,12 @@ interface WaitTimeDistributionChartProps {
 }
 
 export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartProps) {
+  const t = useTranslations('statistics')
+  const tc = useTranslations('common')
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        Keine Wartezeit-Daten verfügbar
+        {t('noWaitTimeData')}
       </div>
     )
   }
@@ -42,7 +45,7 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
             tickLine={{ className: 'stroke-muted-foreground' }}
             axisLine={{ className: 'stroke-muted-foreground' }}
             label={{
-              value: 'Tage',
+              value: tc('days'),
               position: 'insideBottomRight',
               offset: -5,
               className: 'fill-muted-foreground text-xs'
@@ -70,7 +73,7 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
             }}
             formatter={(value, _name, props) => {
               const item = props.payload
-              return [`${value} Bestellungen`, `${item.range} Tage`]
+              return [t('ordersCount', { value: String(value) }), t('daysRange', { range: item.range })]
             }}
           />
           <Area
@@ -80,7 +83,7 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorWaitTime)"
-            animationDuration={1000}
+            animationDuration={400}
             animationEasing="ease-out"
           />
         </AreaChart>

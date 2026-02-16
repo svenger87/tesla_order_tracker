@@ -68,13 +68,13 @@ export interface OrderFormData {
   confirmPassword: string
 }
 
-// Validation helper for custom passwords
-export function validateCustomPassword(password: string): { valid: boolean; error?: string } {
+// Validation helper for custom passwords — returns error key for i18n
+export function validateCustomPassword(password: string): { valid: boolean; errorKey?: string } {
   if (password.length < 6) {
-    return { valid: false, error: 'Passwort muss mindestens 6 Zeichen lang sein' }
+    return { valid: false, errorKey: 'passwordMinLength' }
   }
   if (!/\d/.test(password)) {
-    return { valid: false, error: 'Passwort muss mindestens eine Zahl enthalten' }
+    return { valid: false, errorKey: 'passwordNeedsNumber' }
   }
   return { valid: true }
 }
