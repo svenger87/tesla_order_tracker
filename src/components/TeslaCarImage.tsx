@@ -179,15 +179,17 @@ function buildCompositorUrl(
 
   const optionsStr = options.join(',')
 
-  // Use local caching proxy to avoid Tesla rate limits
+  // Load directly from Tesla CDN — server-side proxy gets blocked (412/403)
+  // Browser <img> requests work fine as they appear as normal image loads
   const params = new URLSearchParams({
+    bkba_opt: '2',
     model: modelSlug,
     options: optionsStr,
     size: size.toString(),
     view,
   })
 
-  return `/api/compositor-image?${params.toString()}`
+  return `https://static-assets.tesla.com/configurator/compositor?${params.toString()}`
 }
 
 export const TeslaCarImage = memo(function TeslaCarImage({
