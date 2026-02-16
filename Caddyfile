@@ -10,6 +10,10 @@ tff-order-stats.de {
     reverse_proxy app:3000
 }
 
+staging.tff-order-stats.de {
+    reverse_proxy app-staging:3000
+}
+
 status.tff-order-stats.de {
     reverse_proxy uptime-kuma:3001
 }

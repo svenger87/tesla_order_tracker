@@ -75,7 +75,7 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
   const total = displayData.reduce((sum, item) => sum + item.count, 0)
 
   return (
-    <Card className="h-full min-h-[220px] overflow-hidden">
+    <Card className="h-full min-h-[260px] overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
@@ -84,19 +84,20 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay }}
-          className="h-[180px]"
+          className="h-[220px]"
         >
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <PieChart>
               <Pie
                 data={displayData}
                 cx="50%"
-                cy="40%"
-                innerRadius={28}
-                outerRadius={50}
+                cy="45%"
+                innerRadius={50}
+                outerRadius={80}
                 paddingAngle={0}
                 dataKey="count"
                 nameKey="name"
+                animationDuration={800}
               >
                 {displayData.map((entry, index) => (
                   <Cell
@@ -130,12 +131,13 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
               />
               <Legend
                 verticalAlign="bottom"
-                height={50}
-                wrapperStyle={{ fontSize: '9px', overflow: 'hidden', maxHeight: '50px' }}
+                height={70}
+                wrapperStyle={{ fontSize: '11px', overflow: 'hidden', maxHeight: '80px' }}
                 formatter={(value, entry) => {
                   const count = (entry.payload as DistributionData)?.count || 0
                   const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0'
-                  return <span className="text-foreground text-[10px]">{value} ({percentage}%)</span>
+                  const truncatedValue = typeof value === 'string' && value.length > 16 ? value.slice(0, 16) + '…' : value
+                  return <span className="text-foreground text-xs">{truncatedValue} ({percentage}%)</span>
                 }}
               />
             </PieChart>

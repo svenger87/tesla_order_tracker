@@ -2,6 +2,7 @@
 
 # Development files
 TODO.md
+staging-src/
 page-snapshot.md
 nul
 CLAUDE.md
@@ -63,3 +64,5 @@ backups/
 # SSH keys
 deploy_key
 deploy_key.pub
+DEPLOYMENT.md
+CREDENTIALS.md

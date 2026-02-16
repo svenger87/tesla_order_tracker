@@ -23,7 +23,7 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
       transition={{ duration: 0.5 }}
       className="h-[300px] w-full"
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <AreaChart
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -80,6 +80,8 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorWaitTime)"
+            animationDuration={1000}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>

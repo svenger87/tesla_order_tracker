@@ -62,8 +62,72 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
     )
   }
 
+  // Compact circle progress bar for table view
+  if (compact) {
+    return (
+      <div className="flex items-center gap-0">
+        {STEPS.map((step, index) => {
+          const isCompleted = index <= currentIndex
+          const isCurrent = index === currentIndex
+          const isLastStep = index === STEPS.length - 1
+          const isScheduledDelivery = isLastStep && isScheduled
+          const Icon = isScheduledDelivery ? Calendar : step.icon
+          const dateValue = order[step.dateField]
+
+          return (
+            <Fragment key={step.key}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      'relative flex items-center justify-center rounded-full transition-colors shrink-0',
+                      'h-6 w-6',
+                      isScheduledDelivery
+                        ? 'bg-amber-500 text-white'
+                        : isLastStep && isCompleted && !isScheduled
+                          ? 'bg-green-500 text-white'
+                          : isCompleted
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground',
+                      isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
+                      isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
+                    )}
+                  >
+                    {isCompleted && index < currentIndex && !isScheduledDelivery ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Icon className="h-3 w-3" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-medium">
+                    {isScheduledDelivery ? 'Lieferung geplant' : step.label}
+                  </p>
+                  {dateValue && (
+                    <p className="text-xs text-white/80">{dateValue}</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+
+              {index < STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    'h-px w-1.5 shrink-0',
+                    index < currentIndex ? 'bg-primary' : 'bg-muted'
+                  )}
+                />
+              )}
+            </Fragment>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Full progress bar with step icons
   return (
-    <div className={cn('flex items-center', compact ? 'gap-1' : 'gap-2')}>
+    <div className="flex items-center gap-2">
       {STEPS.map((step, index) => {
         const isCompleted = index <= currentIndex
         const isCurrent = index === currentIndex
@@ -81,8 +145,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
                   className={cn(
-                    'relative flex items-center justify-center rounded-full transition-all',
-                    compact ? 'h-6 w-6' : 'h-8 w-8',
+                    'relative flex items-center justify-center rounded-full transition-all h-8 w-8',
                     isScheduledDelivery
                       ? 'bg-amber-500 text-white'
                       : isCompleted
@@ -93,9 +156,9 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
                   )}
                 >
                   {isCompleted && index < currentIndex && !isScheduledDelivery ? (
-                    <Check className={cn(compact ? 'h-3 w-3' : 'h-4 w-4')} />
+                    <Check className="h-4 w-4" />
                   ) : (
-                    <Icon className={cn(compact ? 'h-3 w-3' : 'h-4 w-4')} />
+                    <Icon className="h-4 w-4" />
                   )}
                   {isCurrent && !isScheduledDelivery && (
                     <motion.div
@@ -128,8 +191,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
             {index < STEPS.length - 1 && (
               <div
                 className={cn(
-                  'h-0.5 flex-1 transition-colors',
-                  compact ? 'min-w-2' : 'min-w-4',
+                  'h-0.5 flex-1 transition-colors min-w-4',
                   index < currentIndex ? 'bg-primary' : 'bg-muted'
                 )}
               />

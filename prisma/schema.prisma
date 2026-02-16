@@ -104,3 +104,20 @@ model OptionConstraint {
   @@index([sourceType, sourceValue, vehicleType, isActive])
   @@index([vehicleType, isActive])
 }
+
+// Tesla compositor codes for car image rendering
+model CompositorCode {
+  id          String   @id @default(cuid())
+  category    String   // 'body' | 'wheel' | 'interior' | 'color'
+  vehicleType String   // 'Model Y' | 'Model 3'
+  lookupKey   String   // e.g. 'standard_rwd', '18', 'standard_black', 'pearl_white'
+  code        String   // Tesla code: 'MTY61', 'WY18P', 'IBB3', 'PPSW'
+  label       String?  // Display: '18" Aperture', 'Standard RWD'
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([category, vehicleType, lookupKey])
+  @@index([category, vehicleType, isActive])
+}

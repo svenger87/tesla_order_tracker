@@ -234,6 +234,10 @@
 }
 
 /* Dark mode table improvements */
+.dark table tbody tr:nth-child(even) {
+  background-color: oklch(0.14 0 0);
+}
+
 .dark table tbody tr:hover {
   background-color: oklch(0.2 0.01 25 / 50%);
 }

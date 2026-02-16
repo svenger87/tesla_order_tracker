@@ -183,8 +183,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Handle custom password if provided
-    let editCode: string | undefined = undefined
+    // Handle edit code: use custom password or auto-generate
+    let editCode: string
     if (body.customPassword) {
       // Validate custom password
       if (body.customPassword.length < 6) {
@@ -212,6 +212,15 @@ export async function POST(request: NextRequest) {
       }
 
       editCode = body.customPassword
+    } else {
+      // Auto-generate a unique 8-char alphanumeric edit code
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+      const generate = () => Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+      editCode = generate()
+      // Ensure uniqueness (retry on collision)
+      while (await prisma.order.findUnique({ where: { editCode } })) {
+        editCode = generate()
+      }
     }
 
     // Calculate time periods from dates
@@ -244,8 +253,7 @@ export async function POST(request: NextRequest) {
         typeVariant: (constrainedData.typeVariant as string) || null,
         deliveryDate: (constrainedData.deliveryDate as string) || null,
         ...timePeriods,
-        // Use custom password as editCode if provided, otherwise Prisma generates cuid
-        ...(editCode && { editCode }),
+        editCode,
       },
     })
 
