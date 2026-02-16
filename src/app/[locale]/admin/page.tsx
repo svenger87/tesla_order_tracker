@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import { SettingsTab } from '@/components/admin/SettingsTab'
 import { ImportExportTab } from '@/components/admin/ImportExportTab'
 import { OptionsTab } from '@/components/admin/OptionsTab'
@@ -14,6 +15,8 @@ import { CompositorTab } from '@/components/admin/CompositorTab'
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
 
   const checkAuth = useCallback(async () => {
     try {
@@ -44,7 +47,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Laden...</p>
+        <p className="text-muted-foreground">{tc('loading')}</p>
       </div>
     )
   }
@@ -55,21 +58,21 @@ export default function AdminDashboard() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
               <p className="text-sm text-muted-foreground">
-                Verwalte Einstellungen und Bestellungen
+                {t('manageDescription')}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Link href="/">
                 <Button variant="outline" size="sm">
                   <Home className="h-4 w-4 mr-2" />
-                  Zur Übersicht
+                  {t('backToOverview')}
                 </Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Abmelden
+                {t('logout')}
               </Button>
             </div>
           </div>
@@ -81,19 +84,19 @@ export default function AdminDashboard() {
           <TabsList className="mb-6">
             <TabsTrigger value="settings">
               <Settings className="h-4 w-4 mr-2" />
-              Einstellungen
+              {t('settings')}
             </TabsTrigger>
             <TabsTrigger value="import-export">
               <ArrowLeftRight className="h-4 w-4 mr-2" />
-              Import & Export
+              {t('importExport')}
             </TabsTrigger>
             <TabsTrigger value="options">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
-              Optionen
+              {t('options')}
             </TabsTrigger>
             <TabsTrigger value="compositor">
               <Image className="h-4 w-4 mr-2" />
-              Compositor
+              {t('compositor')}
             </TabsTrigger>
           </TabsList>
 

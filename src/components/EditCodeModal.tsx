@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Copy, Check, AlertTriangle, CheckCircle, KeyRound } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface EditCodeModalProps {
   open: boolean
@@ -20,6 +21,8 @@ interface EditCodeModalProps {
 }
 
 export function EditCodeModal({ open, onOpenChange, editCode, isCustomPassword = false }: EditCodeModalProps) {
+  const t = useTranslations('editCodeModal')
+  const tc = useTranslations('common')
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -40,10 +43,10 @@ export function EditCodeModal({ open, onOpenChange, editCode, isCustomPassword =
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
-              Bestellung erstellt!
+              {t('orderCreated')}
             </DialogTitle>
             <DialogDescription>
-              Dein Passwort wurde gespeichert.
+              {t('passwordSaved')}
             </DialogDescription>
           </DialogHeader>
 
@@ -52,20 +55,20 @@ export function EditCodeModal({ open, onOpenChange, editCode, isCustomPassword =
               <KeyRound className="h-6 w-6 text-green-600 dark:text-green-400 shrink-0" />
               <div>
                 <p className="font-medium text-green-800 dark:text-green-200">
-                  Passwort gesichert
+                  {t('passwordSecured')}
                 </p>
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  Du kannst dein gewähltes Passwort zum Bearbeiten deiner Bestellung verwenden.
+                  {t('passwordSecuredDescription')}
                 </p>
               </div>
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Klicke auf &ldquo;Bearbeiten&rdquo; und gib dein Passwort ein, um deine Bestelldaten zu ändern.
+              {t('clickEditToChange')}
             </p>
 
             <Button onClick={() => onOpenChange(false)} className="w-full">
-              Alles klar!
+              {tc('allGood')}
             </Button>
           </div>
         </DialogContent>
@@ -80,12 +83,12 @@ export function EditCodeModal({ open, onOpenChange, editCode, isCustomPassword =
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-yellow-500" />
-            Bestellung erstellt!
+            {t('orderCreated')}
           </DialogTitle>
           <DialogDescription>
-            Speichere diesen Code, um deine Bestellung später bearbeiten zu können.
+            {t('saveCodeWarning')}
             <strong className="block mt-2 text-destructive">
-              Dieser Code wird nur einmal angezeigt!
+              {t('codeShownOnce')}
             </strong>
           </DialogDescription>
         </DialogHeader>
@@ -112,11 +115,11 @@ export function EditCodeModal({ open, onOpenChange, editCode, isCustomPassword =
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Mit diesem Code kannst du unter &ldquo;Bestellung bearbeiten&rdquo; deine Daten ändern.
+            {t('codeUsageHint')}
           </p>
 
           <Button onClick={() => onOpenChange(false)} className="w-full">
-            Verstanden, Code gespeichert
+            {tc('understood')}
           </Button>
         </div>
       </DialogContent>

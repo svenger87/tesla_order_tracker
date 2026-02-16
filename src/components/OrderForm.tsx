@@ -31,8 +31,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { CalendarIcon, KeyRound, Shuffle, User, Car, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
+import { useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
+import { Locale } from 'date-fns'
 import { format, parse, isValid } from 'date-fns'
 import { de } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 
 interface OrderFormProps {
   open: boolean
@@ -60,11 +64,13 @@ function formatGermanDate(date: Date | undefined): string {
 function DatePickerField({
   value,
   onChange,
-  placeholder
+  placeholder,
+  locale: calendarLocale
 }: {
   value: string
   onChange: (value: string) => void
   placeholder: string
+  locale?: Locale
 }) {
   const [open, setOpen] = useState(false)
   const date = parseGermanDate(value)
@@ -91,7 +97,7 @@ function DatePickerField({
             onChange(d ? formatGermanDate(d) : '')
             setOpen(false)
           }}
-          locale={de}
+          locale={calendarLocale ?? de}
           initialFocus
         />
       </PopoverContent>
@@ -128,6 +134,12 @@ const emptyFormData: OrderFormData = {
 }
 
 export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess }: OrderFormProps) {
+  const t = useTranslations('form')
+  const tv = useTranslations('form.validation')
+  const tc = useTranslations('common')
+  const locale = useLocale()
+  const dateLocale = locale === 'de' ? de : enUS
+
   const [formData, setFormData] = useState<OrderFormData>(emptyFormData)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -249,13 +261,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     setError('')
 
     if (!formData.name.trim()) {
-      setError('Name ist erforderlich')
+      setError(tv('nameRequired'))
       setLoading(false)
       return
     }
 
     if (!formData.orderDate.trim()) {
-      setError('Bestelldatum ist erforderlich')
+      setError(tv('orderDateRequired'))
       setLoading(false)
       return
     }
@@ -263,19 +275,19 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     // Validate required vehicle configuration fields (only for new orders)
     if (!order) {
       const requiredFields = [
-        { field: 'model', label: 'Model' },
-        { field: 'color', label: 'Farbe' },
-        { field: 'interior', label: 'Innenraum' },
-        { field: 'wheels', label: 'Felgen' },
-        { field: 'towHitch', label: 'AHK' },
-        { field: 'autopilot', label: 'Autopilot' },
-        { field: 'country', label: 'Land' },
-        { field: 'deliveryLocation', label: 'Ort (Auslieferung)' },
+        { field: 'model', label: t('model') },
+        { field: 'color', label: t('color') },
+        { field: 'interior', label: t('interior') },
+        { field: 'wheels', label: t('wheels') },
+        { field: 'towHitch', label: t('towHitch') },
+        { field: 'autopilot', label: t('autopilot') },
+        { field: 'country', label: t('country') },
+        { field: 'deliveryLocation', label: t('deliveryLocation') },
       ] as const
 
       for (const { field, label } of requiredFields) {
         if (!formData[field]) {
-          setError(`${label} ist erforderlich`)
+          setError(tv('fieldRequired', { field: label }))
           setLoading(false)
           return
         }
@@ -286,12 +298,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (!order && formData.useCustomPassword) {
       const validation = validateCustomPassword(formData.customPassword)
       if (!validation.valid) {
-        setError(validation.error || 'Ungültiges Passwort')
+        setError(tv(validation.errorKey as any || 'invalidPassword'))
         setLoading(false)
         return
       }
       if (formData.customPassword !== formData.confirmPassword) {
-        setError('Passwörter stimmen nicht überein')
+        setError(tv('passwordMismatch'))
         setLoading(false)
         return
       }
@@ -301,12 +313,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (order && isLegacy) {
       const validation = validateCustomPassword(newEditCode)
       if (!validation.valid) {
-        setError(validation.error || 'Ungültiges Passwort')
+        setError(tv(validation.errorKey as any || 'invalidPassword'))
         setLoading(false)
         return
       }
       if (newEditCode !== confirmNewEditCode) {
-        setError('Passwörter stimmen nicht überein')
+        setError(tv('passwordMismatch'))
         setLoading(false)
         return
       }
@@ -345,7 +357,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Fehler beim Speichern')
+        throw new Error(data.error || tv('saveError'))
       }
 
       // For legacy orders, show the new edit code in success
@@ -358,7 +370,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setFormData(emptyFormData)
       onOpenChange(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Speichern')
+      setError(err instanceof Error ? err.message : tv('saveError'))
     } finally {
       setLoading(false)
     }
@@ -373,10 +385,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {order ? 'Bestellung bearbeiten' : 'Neue Bestellung'}
+            {order ? t('editOrder') : t('newOrder')}
           </DialogTitle>
           <DialogDescription>
-            {order ? 'Ändere die Daten deiner bestehenden Bestellung.' : 'Erfasse eine neue Tesla-Bestellung mit Konfiguration und Status.'}
+            {order ? t('editOrderDescription') : t('newOrderDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -391,34 +403,35 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <User className="h-4 w-4 text-primary" />
-              Persönliche Daten
+              {t('personalData')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{t('name')} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
-                  placeholder="Benutzername"
+                  placeholder={t('namePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="orderDate">Bestelldatum *</Label>
+                <Label htmlFor="orderDate">{t('orderDate')} *</Label>
                 <DatePickerField
                   value={formData.orderDate}
                   onChange={(v) => handleChange('orderDate', v)}
-                  placeholder="TT.MM.JJJJ"
+                  placeholder={t('datePlaceholder')}
+                  locale={dateLocale}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">Land *</Label>
+                <Label htmlFor="country">{t('country')} *</Label>
                 <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Land wählen" />
+                    <SelectValue placeholder={t('countrySelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((c) => (
@@ -439,11 +452,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <Car className="h-4 w-4 text-primary" />
-              Fahrzeugkonfiguration
+              {t('vehicleConfig')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="vehicleType">Fahrzeug *</Label>
+                <Label htmlFor="vehicleType">{t('vehicle')} *</Label>
                 <Select
                   value={formData.vehicleType}
                   onValueChange={(v) => {
@@ -455,7 +468,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Fahrzeug wählen" />
+                    <SelectValue placeholder={t('vehicleSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {VEHICLE_TYPES.map((vt) => (
@@ -468,7 +481,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="model">Model *</Label>
+                <Label htmlFor="model">{t('model')} *</Label>
                 <Select value={formData.model} onValueChange={(v) => {
                   handleChange('model', v)
                   const modelValue = v
@@ -497,7 +510,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   }
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Model wählen" />
+                    <SelectValue placeholder={t('modelSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {models.map((m) => (
@@ -510,14 +523,14 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="range">Reichweite</Label>
+                <Label htmlFor="range">{t('range')}</Label>
                 <Select
                   value={formData.range}
                   onValueChange={(v) => handleChange('range', v)}
                   disabled={isFieldDisabled(selectedModelValue, 'range')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Reichweite wählen" />
+                    <SelectValue placeholder={t('rangeSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {getFieldOptions('range', ranges).map((r) => (
@@ -529,20 +542,20 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </Select>
                 {modelConstraints.range?.type === 'fixed' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {ranges.find(r => r.value === formData.range)?.label ?? formData.range} ist fest
+                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: ranges.find(r => r.value === formData.range)?.label ?? formData.range })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="drive">Antrieb</Label>
+                <Label htmlFor="drive">{t('drive')}</Label>
                 <Select
                   value={formData.drive}
                   onValueChange={(v) => handleChange('drive', v)}
                   disabled={isFieldDisabled(selectedModelValue, 'drive')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Antrieb wählen" />
+                    <SelectValue placeholder={t('driveSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {getFieldOptions('drive', drives).map((d) => (
@@ -554,16 +567,16 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </Select>
                 {modelConstraints.drive?.type === 'fixed' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {drives.find(d => d.value === formData.drive)?.label ?? formData.drive} ist fest
+                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: drives.find(d => d.value === formData.drive)?.label ?? formData.drive })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="color">Farbe *</Label>
+                <Label htmlFor="color">{t('color')} *</Label>
                 <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Farbe wählen">
+                    <SelectValue placeholder={t('colorSelect')}>
                       {formData.color && (
                         <div className="flex items-center gap-2">
                           {(() => {
@@ -604,20 +617,20 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </Select>
                 {modelConstraints.color?.type === 'allow' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Farbauswahl
+                    {t('constraintColorRestricted', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="interior">Innenraum *</Label>
+                <Label htmlFor="interior">{t('interior')} *</Label>
                 <Select
                   value={formData.interior}
                   onValueChange={(v) => handleChange('interior', v)}
                   disabled={isFieldDisabled(selectedModelValue, 'interior')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Innenraum wählen" />
+                    <SelectValue placeholder={t('interiorSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {getFieldOptions('interior', interiors).map((i) => (
@@ -629,20 +642,20 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </Select>
                 {modelConstraints.interior?.type === 'fixed' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {interiors.find(i => i.value === formData.interior)?.label ?? formData.interior} ist fest
+                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: interiors.find(i => i.value === formData.interior)?.label ?? formData.interior })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="wheels">Felgen *</Label>
+                <Label htmlFor="wheels">{t('wheels')} *</Label>
                 <Select
                   value={formData.wheels}
                   onValueChange={(v) => handleChange('wheels', v)}
                   disabled={isFieldDisabled(selectedModelValue, 'wheels')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Felgen wählen" />
+                    <SelectValue placeholder={t('wheelsSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {getFieldOptions('wheels', wheels).map((w) => (
@@ -654,49 +667,49 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 </Select>
                 {modelConstraints.wheels?.type === 'fixed' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels} ist fest
+                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels })}
                   </p>
                 )}
                 {modelConstraints.wheels?.type === 'allow' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Felgenauswahl
+                    {t('constraintWheelsRestricted', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="towHitch">AHK (Anhängerkupplung) *</Label>
+                <Label htmlFor="towHitch">{t('towHitch')} *</Label>
                 <Select
                   value={formData.towHitch}
                   onValueChange={(v) => handleChange('towHitch', v)}
                   disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="AHK wählen" />
+                    <SelectValue placeholder={t('towHitchSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(modelConstraints.towHitch?.type === 'disable'
                       ? [{ value: 'nein', label: 'Nein' }]
                       : filterOptions(selectedModelValue, 'towHitch', towHitch)
-                    ).map((t) => (
-                      <SelectItem key={t.value} value={t.value}>
-                        {t.label}
+                    ).map((th) => (
+                      <SelectItem key={th.value} value={th.value}>
+                        {th.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {modelConstraints.towHitch?.type === 'disable' && (
                   <p className="text-xs text-muted-foreground">
-                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: AHK nicht verfügbar
+                    {t('constraintTowHitchUnavailable', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="autopilot">Autopilot *</Label>
+                <Label htmlFor="autopilot">{t('autopilot')} *</Label>
                 <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Autopilot wählen" />
+                    <SelectValue placeholder={t('autopilotSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {autopilot.map((a) => (
@@ -714,24 +727,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <MapPin className="h-4 w-4 text-primary" />
-              Lieferung
+              {t('delivery')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="deliveryWindow">Lieferfenster</Label>
+                <Label htmlFor="deliveryWindow">{t('deliveryWindow')}</Label>
                 <Input
                   id="deliveryWindow"
                   value={formData.deliveryWindow}
                   onChange={(e) => handleChange('deliveryWindow', e.target.value)}
-                  placeholder="z.B. 11.02.-18.02.2026"
+                  placeholder={t('deliveryWindowPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="deliveryLocation">Ort (Auslieferung) *</Label>
+                <Label htmlFor="deliveryLocation">{t('deliveryLocation')} *</Label>
                 <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Auslieferungsort wählen" />
+                    <SelectValue placeholder={t('deliveryLocationSelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {deliveryLocations.map((loc) => (
@@ -754,76 +767,80 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             >
               <span className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4 text-primary" />
-                Status & Tracking
+                {t('statusTracking')}
               </span>
               <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", trackingOpen && "rotate-180")} />
             </button>
             {trackingOpen && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="vin">VIN</Label>
+                  <Label htmlFor="vin">{t('vin')}</Label>
                   <Input
                     id="vin"
                     value={formData.vin}
                     onChange={(e) => handleChange('vin', e.target.value)}
-                    placeholder="Fahrzeug-Identnummer"
+                    placeholder={t('vinPlaceholder')}
                     className="font-mono"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="vinReceivedDate">VIN erhalten am</Label>
+                  <Label htmlFor="vinReceivedDate">{t('vinReceivedAt')}</Label>
                   <DatePickerField
                     value={formData.vinReceivedDate}
                     onChange={(v) => handleChange('vinReceivedDate', v)}
-                    placeholder="TT.MM.JJJJ"
+                    placeholder={t('datePlaceholder')}
+                    locale={dateLocale}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="papersReceivedDate">Papiere erhalten am</Label>
+                  <Label htmlFor="papersReceivedDate">{t('papersReceivedAt')}</Label>
                   <DatePickerField
                     value={formData.papersReceivedDate}
                     onChange={(v) => handleChange('papersReceivedDate', v)}
-                    placeholder="TT.MM.JJJJ"
+                    placeholder={t('datePlaceholder')}
+                    locale={dateLocale}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="productionDate">Produktionsdatum</Label>
+                  <Label htmlFor="productionDate">{t('productionDate')}</Label>
                   <DatePickerField
                     value={formData.productionDate}
                     onChange={(v) => handleChange('productionDate', v)}
-                    placeholder="TT.MM.JJJJ"
+                    placeholder={t('datePlaceholder')}
+                    locale={dateLocale}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="typeApproval">Typgenehmigung</Label>
+                  <Label htmlFor="typeApproval">{t('typeApproval')}</Label>
                   <Input
                     id="typeApproval"
                     value={formData.typeApproval}
                     onChange={(e) => handleChange('typeApproval', e.target.value)}
-                    placeholder="Letzte 2 Ziffern"
+                    placeholder={t('typeApprovalPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="typeVariant">Typ-Variante</Label>
+                  <Label htmlFor="typeVariant">{t('typeVariant')}</Label>
                   <Input
                     id="typeVariant"
                     value={formData.typeVariant}
                     onChange={(e) => handleChange('typeVariant', e.target.value)}
-                    placeholder="YS[5L|5M|6M][R|D]"
+                    placeholder={t('typeVariantPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="deliveryDate">Auslieferungsdatum</Label>
+                  <Label htmlFor="deliveryDate">{t('deliveryDate')}</Label>
                   <DatePickerField
                     value={formData.deliveryDate}
                     onChange={(v) => handleChange('deliveryDate', v)}
-                    placeholder="TT.MM.JJJJ"
+                    placeholder={t('datePlaceholder')}
+                    locale={dateLocale}
                   />
                 </div>
               </div>
@@ -836,38 +853,37 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-4 mb-4">
                 <h4 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
                   <KeyRound className="h-4 w-4" />
-                  Neues Passwort erforderlich
+                  {t('legacyPasswordTitle')}
                 </h4>
                 <p className="text-sm text-amber-600 dark:text-amber-300 mt-1">
-                  Dein Eintrag stammt aus der alten Tabelle und hat noch kein Passwort.
-                  Bitte lege jetzt ein Passwort fest, um zukünftige Änderungen vornehmen zu können.
+                  {t('legacyPasswordDescription')}
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newEditCode">Neues Passwort *</Label>
+                  <Label htmlFor="newEditCode">{t('newPassword')} *</Label>
                   <Input
                     id="newEditCode"
                     type="password"
                     value={newEditCode}
                     onChange={(e) => setNewEditCode(e.target.value)}
-                    placeholder="Mindestens 6 Zeichen, eine Zahl"
+                    placeholder={t('passwordPlaceholder')}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmNewEditCode">Passwort bestätigen *</Label>
+                  <Label htmlFor="confirmNewEditCode">{t('confirmNewPassword')} *</Label>
                   <Input
                     id="confirmNewEditCode"
                     type="password"
                     value={confirmNewEditCode}
                     onChange={(e) => setConfirmNewEditCode(e.target.value)}
-                    placeholder="Passwort wiederholen"
+                    placeholder={t('confirmPasswordPlaceholder')}
                     required
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Mindestens 6 Zeichen und mindestens eine Zahl. Dieses Passwort ersetzt deinen Benutzernamen als Bearbeitungscode.
+                  {t('legacyPasswordHint')}
                 </p>
               </div>
             </div>
@@ -878,10 +894,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             <div className="border-t pt-4 mt-4">
               <h4 className="font-medium mb-3 flex items-center gap-2">
                 <KeyRound className="h-4 w-4" />
-                Bearbeitungscode
+                {t('editCode')}
               </h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Mit diesem Code kannst du deine Bestellung später bearbeiten.
+                {t('editCodeDescription')}
               </p>
               <RadioGroup
                 value={formData.useCustomPassword ? 'custom' : 'auto'}
@@ -893,10 +909,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <div className="flex-1">
                     <Label htmlFor="custom" className="flex items-center gap-2 cursor-pointer font-medium">
                       <KeyRound className="h-4 w-4" />
-                      Eigenes Passwort festlegen
+                      {t('customPassword')}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Wähle ein Passwort, das du dir leicht merken kannst.
+                      {t('customPasswordDescription')}
                     </p>
                   </div>
                 </div>
@@ -905,10 +921,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   <div className="flex-1">
                     <Label htmlFor="auto" className="flex items-center gap-2 cursor-pointer font-medium">
                       <Shuffle className="h-4 w-4" />
-                      Code automatisch generieren
+                      {t('autoGenerate')}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Ein sicherer Code wird für dich erstellt. Speichere ihn gut!
+                      {t('autoGenerateDescription')}
                     </p>
                   </div>
                 </div>
@@ -918,27 +934,27 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               {formData.useCustomPassword && (
                 <div className="mt-4 pl-7 space-y-4 border-l-2 border-primary/20">
                   <div className="space-y-2">
-                    <Label htmlFor="customPassword">Passwort</Label>
+                    <Label htmlFor="customPassword">{t('password')}</Label>
                     <Input
                       id="customPassword"
                       type="password"
                       value={formData.customPassword}
                       onChange={(e) => handleChange('customPassword', e.target.value)}
-                      placeholder="Mindestens 6 Zeichen, eine Zahl"
+                      placeholder={t('passwordPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                    <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                     <Input
                       id="confirmPassword"
                       type="password"
                       value={formData.confirmPassword}
                       onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                      placeholder="Passwort wiederholen"
+                      placeholder={t('confirmPasswordPlaceholder')}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Mindestens 6 Zeichen und mindestens eine Zahl.
+                    {t('passwordHint')}
                   </p>
                 </div>
               )}
@@ -947,10 +963,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Abbrechen
+              {tc('cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Speichern...' : order ? 'Aktualisieren' : 'Hinzufügen'}
+              {loading ? tc('saving') : order ? tc('update') : tc('add')}
             </Button>
           </div>
         </form>

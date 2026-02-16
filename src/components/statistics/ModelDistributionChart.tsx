@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
 interface ModelDistributionChartProps {
@@ -21,6 +22,7 @@ const COLORS = [
 const MAX_ITEMS = 5 // Maximum items before combining into "Andere"
 
 export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
+  const t = useTranslations('statistics')
   // Combine small values into "Andere" if more than MAX_ITEMS
   const displayData = useMemo(() => {
     if (data.length <= MAX_ITEMS) return data
@@ -31,7 +33,7 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
     const otherCount = otherItems.reduce((sum, item) => sum + item.count, 0)
 
     if (otherCount > 0) {
-      return [...topItems, { model: 'Andere', count: otherCount, fill: COLORS[5] }]
+      return [...topItems, { model: t('other'), count: otherCount, fill: COLORS[5] }]
     }
     return topItems
   }, [data])
@@ -44,7 +46,7 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        Keine Daten verfügbar
+        {t('noDataAvailable')}
       </div>
     )
   }
@@ -57,13 +59,13 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
       className="h-[300px] w-full"
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-        <PieChart>
+        <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
           <Pie
             data={displayData}
             cx="50%"
             cy="45%"
-            innerRadius={50}
-            outerRadius={85}
+            innerRadius={45}
+            outerRadius={75}
             paddingAngle={3}
             dataKey="count"
             nameKey="model"

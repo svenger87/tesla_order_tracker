@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { AlertCircle, KeyRound } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { OrderForm } from './OrderForm'
 
@@ -25,6 +26,10 @@ interface EditByCodeModalProps {
 }
 
 export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditByCodeModalProps) {
+  const t = useTranslations('editByCode')
+  const tc = useTranslations('common')
+  const tf = useTranslations('form')
+  const tv = useTranslations('form.validation')
   const [editCode, setEditCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -43,7 +48,7 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
     setLoading(true)
 
     if (!editCode.trim()) {
-      setError('Bitte gib deinen Bearbeitungscode/Passwort oder Benutzernamen ein')
+      setError(t('enterCodePrompt'))
       setLoading(false)
       return
     }
@@ -54,20 +59,20 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Ungültiger Code')
+        throw new Error(data.error || t('invalidCode'))
       }
 
       // Find the order in the local list
       const order = orders.find(o => o.id === data.orderId)
       if (!order) {
-        throw new Error('Bestellung nicht gefunden')
+        throw new Error(t('orderNotFound'))
       }
 
       setFoundOrder(order)
       setIsLegacy(data.isLegacy || false)
       setShowEditForm(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Überprüfen des Codes')
+      setError(err instanceof Error ? err.message : t('verifyError'))
     } finally {
       setLoading(false)
     }
@@ -92,25 +97,25 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
     setLoading(true)
 
     if (!resetCode.trim()) {
-      setError('Bitte gib den Einmalcode ein')
+      setError(t('enterResetCode'))
       setLoading(false)
       return
     }
 
     if (newPassword !== confirmNewPassword) {
-      setError('Passwörter stimmen nicht überein')
+      setError(tv('passwordMismatch'))
       setLoading(false)
       return
     }
 
     if (newPassword.length < 6) {
-      setError('Passwort muss mindestens 6 Zeichen lang sein')
+      setError(t('passwordMinLength'))
       setLoading(false)
       return
     }
 
     if (!/\d/.test(newPassword)) {
-      setError('Passwort muss mindestens eine Zahl enthalten')
+      setError(t('passwordNeedsNumber'))
       setLoading(false)
       return
     }
@@ -125,12 +130,12 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Fehler beim Zurücksetzen des Passworts')
+        throw new Error(data.error || t('resetError'))
       }
 
       setResetSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Zurücksetzen des Passworts')
+      setError(err instanceof Error ? err.message : t('resetError'))
     } finally {
       setLoading(false)
     }
@@ -160,18 +165,18 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Bestellung bearbeiten</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Gib deinen Zugangsdaten ein, um deine Bestellung zu ändern.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="edit" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="edit">Bearbeiten</TabsTrigger>
+            <TabsTrigger value="edit">{t('editTab')}</TabsTrigger>
             <TabsTrigger value="reset">
               <KeyRound className="h-3 w-3 mr-1" />
-              Passwort vergessen
+              {t('resetTab')}
             </TabsTrigger>
           </TabsList>
 
@@ -184,29 +189,29 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="editCode">Bearbeitungscode/Passwort oder Benutzername</Label>
+                <Label htmlFor="editCode">{t('codeLabel')}</Label>
                 <Input
                   id="editCode"
                   value={editCode}
                   onChange={(e) => setEditCode(e.target.value)}
-                  placeholder="Code/Passwort oder Benutzername"
+                  placeholder={t('codePlaceholder')}
                   className="font-mono"
                 />
                 <p className="text-xs text-muted-foreground">
                   <Badge variant="outline" className="mr-1 text-xs">
                     <AlertCircle className="h-3 w-3 mr-1" />
-                    Bestandseinträge
+                    {t('legacyBadge')}
                   </Badge>
-                  Wenn dein Eintrag aus der alten Tabelle stammt, nutze deinen Benutzernamen.
+                  {t('legacyHint')}
                 </p>
               </div>
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={handleClose}>
-                  Abbrechen
+                  {tc('cancel')}
                 </Button>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Überprüfen...' : 'Weiter'}
+                  {loading ? tc('checking') : tc('next')}
                 </Button>
               </div>
             </form>
@@ -216,13 +221,13 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
             {resetSuccess ? (
               <div className="space-y-4">
                 <div className="bg-green-500/10 text-green-600 dark:text-green-400 px-4 py-3 rounded-md text-sm">
-                  <p className="font-medium">Passwort erfolgreich geändert!</p>
+                  <p className="font-medium">{t('passwordChanged')}</p>
                   <p className="mt-1">
-                    Du kannst dich jetzt mit deinem neuen Passwort anmelden.
+                    {t('passwordChangedDescription')}
                   </p>
                 </div>
                 <div className="flex justify-end">
-                  <Button onClick={handleClose}>Schließen</Button>
+                  <Button onClick={handleClose}>{tc('close')}</Button>
                 </div>
               </div>
             ) : (
@@ -235,50 +240,50 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
 
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3 text-sm text-blue-700 dark:text-blue-400">
                   <p>
-                    Wenn du einen Einmalcode vom Admin erhalten hast, kannst du hier ein neues Passwort setzen.
+                    {t('resetInfo')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="resetCode">Einmalcode (6 Ziffern)</Label>
+                  <Label htmlFor="resetCode">{t('resetCodeLabel')}</Label>
                   <Input
                     id="resetCode"
                     value={resetCode}
                     onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="123456"
+                    placeholder={t('resetCodePlaceholder')}
                     className="font-mono text-lg tracking-widest text-center"
                     maxLength={6}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Neues Passwort</Label>
+                  <Label htmlFor="newPassword">{t('newPasswordLabel')}</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mindestens 6 Zeichen, eine Zahl"
+                    placeholder={tf('passwordPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmNewPassword">Passwort bestätigen</Label>
+                  <Label htmlFor="confirmNewPassword">{t('confirmPasswordLabel')}</Label>
                   <Input
                     id="confirmNewPassword"
                     type="password"
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
-                    placeholder="Passwort wiederholen"
+                    placeholder={tf('confirmPasswordPlaceholder')}
                   />
                 </div>
 
                 <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={handleClose}>
-                    Abbrechen
+                    {tc('cancel')}
                   </Button>
                   <Button type="submit" disabled={loading || resetCode.length !== 6}>
-                    {loading ? 'Speichern...' : 'Passwort ändern'}
+                    {loading ? tc('saving') : t('changePassword')}
                   </Button>
                 </div>
               </form>

@@ -16,6 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Settings2, Save, Loader2, Check, Database } from 'lucide-react'
 import { VEHICLE_TYPES, VehicleType } from '@/lib/types'
+import { useTranslations } from 'next-intl'
 
 interface Option {
   id: string
@@ -46,15 +47,18 @@ interface FieldConfig {
 
 // Target fields that can have constraints
 const TARGET_FIELDS = [
-  { type: 'wheels', label: 'Felgen' },
-  { type: 'color', label: 'Farben' },
-  { type: 'interior', label: 'Innenraum' },
-  { type: 'range', label: 'Reichweite' },
-  { type: 'drive', label: 'Antrieb' },
-  { type: 'towHitch', label: 'AHK' },
+  { type: 'wheels' },
+  { type: 'color' },
+  { type: 'interior' },
+  { type: 'range' },
+  { type: 'drive' },
+  { type: 'towHitch' },
 ] as const
 
 export function ConstraintManager() {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
+  const tf = useTranslations('form')
   // State
   const [vehicleType, setVehicleType] = useState<VehicleType>('Model Y')
   const [selectedModel, setSelectedModel] = useState<string>('')
@@ -209,7 +213,7 @@ export function ConstraintManager() {
       // Get the model option to find its value
       const modelOption = models.find(m => m.value === selectedModel)
       if (!modelOption) {
-        throw new Error('Modell nicht gefunden')
+        throw new Error(tc('error'))
       }
 
       // Process each field
@@ -233,7 +237,7 @@ export function ConstraintManager() {
             })
             if (!res.ok) {
               const data = await res.json()
-              throw new Error(data.error || `Fehler beim Löschen von ${field.label}`)
+              throw new Error(data.error || tc('error'))
             }
           }
         } else {
@@ -260,7 +264,7 @@ export function ConstraintManager() {
             })
             if (!res.ok) {
               const data = await res.json()
-              throw new Error(data.error || `Fehler beim Aktualisieren von ${field.label}`)
+              throw new Error(data.error || tc('error'))
             }
           } else {
             // Create new
@@ -278,7 +282,7 @@ export function ConstraintManager() {
             })
             if (!res.ok) {
               const data = await res.json()
-              throw new Error(data.error || `Fehler beim Erstellen von ${field.label}`)
+              throw new Error(data.error || tc('error'))
             }
           }
         }
@@ -286,10 +290,10 @@ export function ConstraintManager() {
 
       // Refresh constraints
       await fetchConstraints()
-      setSuccess('Einschränkungen gespeichert!')
+      setSuccess(t('constraintSaved'))
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Speichern')
+      setError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
@@ -309,14 +313,14 @@ export function ConstraintManager() {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Fehler beim Seeden')
+        throw new Error(data.error || tc('error'))
       }
 
-      setSuccess(`${data.created} Einschränkungen erstellt, ${data.skipped} übersprungen`)
+      setSuccess(t('constraintCreated', { created: data.created, skipped: data.skipped }))
       await fetchConstraints()
       setTimeout(() => setSuccess(''), 5000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Seeden')
+      setError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSeeding(false)
     }
@@ -327,7 +331,7 @@ export function ConstraintManager() {
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
           <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-          Lade Einschränkungen...
+          {t('loadingConstraints')}
         </CardContent>
       </Card>
     )
@@ -340,10 +344,10 @@ export function ConstraintManager() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Settings2 className="h-5 w-5" />
-              Modell-Einschränkungen
+              {t('constraintManager')}
             </CardTitle>
             <CardDescription>
-              Konfiguriere welche Optionen für jedes Modell verfügbar sind
+              {t('constraintDescription')}
             </CardDescription>
           </div>
           <Button
@@ -357,7 +361,7 @@ export function ConstraintManager() {
             ) : (
               <Database className="h-4 w-4 mr-2" />
             )}
-            {seeding ? 'Seede...' : 'Standard-Regeln laden'}
+            {seeding ? t('seedingRules') : t('seedDefaultRules')}
           </Button>
         </div>
       </CardHeader>
@@ -377,7 +381,7 @@ export function ConstraintManager() {
         {/* Vehicle and Model Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Fahrzeug</Label>
+            <Label>{t('vehicleType')}</Label>
             <Select
               value={vehicleType}
               onValueChange={(v) => {
@@ -399,13 +403,13 @@ export function ConstraintManager() {
           </div>
 
           <div className="space-y-2">
-            <Label>Modell / Ausstattung</Label>
+            <Label>{t('modelTrim')}</Label>
             <Select
               value={selectedModel}
               onValueChange={setSelectedModel}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Modell wählen..." />
+                <SelectValue placeholder={t('modelSelect')} />
               </SelectTrigger>
               <SelectContent>
                 {models.map((m) => (
@@ -423,7 +427,7 @@ export function ConstraintManager() {
           <div className="space-y-6 border-t pt-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">
-                Einschränkungen für: {models.find(m => m.value === selectedModel)?.label}
+                {t('constraintsFor', { model: models.find(m => m.value === selectedModel)?.label ?? '' })}
               </h3>
               <Badge variant="outline">{vehicleType}</Badge>
             </div>
@@ -435,12 +439,12 @@ export function ConstraintManager() {
               return (
                 <div key={field.type} className="space-y-3 p-4 rounded-lg bg-muted/30">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">{field.label}</Label>
+                    <Label className="text-base font-medium">{tf(field.type as 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch')}</Label>
                     {config.type !== 'none' && (
                       <Badge variant={config.type === 'fixed' ? 'default' : config.type === 'disable' ? 'destructive' : 'secondary'}>
-                        {config.type === 'allow' && 'Eingeschränkt'}
-                        {config.type === 'fixed' && 'Fest'}
-                        {config.type === 'disable' && 'Deaktiviert'}
+                        {config.type === 'allow' && t('restricted')}
+                        {config.type === 'fixed' && t('fixedBadge')}
+                        {config.type === 'disable' && t('disabledBadge')}
                       </Badge>
                     )}
                   </div>
@@ -453,25 +457,25 @@ export function ConstraintManager() {
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="none" id={`${field.type}-none`} />
                       <Label htmlFor={`${field.type}-none`} className="cursor-pointer">
-                        Alle erlaubt
+                        {t('allAllowed')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="allow" id={`${field.type}-allow`} />
                       <Label htmlFor={`${field.type}-allow`} className="cursor-pointer">
-                        Einschränken
+                        {t('restrict')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="fixed" id={`${field.type}-fixed`} />
                       <Label htmlFor={`${field.type}-fixed`} className="cursor-pointer">
-                        Fest (auto-gesetzt)
+                        {t('fixed')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="disable" id={`${field.type}-disable`} />
                       <Label htmlFor={`${field.type}-disable`} className="cursor-pointer">
-                        Deaktiviert
+                        {t('disabled')}
                       </Label>
                     </div>
                   </RadioGroup>
@@ -507,7 +511,7 @@ export function ConstraintManager() {
                         onValueChange={(v) => handleFixedValueChange(field.type, v)}
                       >
                         <SelectTrigger className="w-full md:w-64">
-                          <SelectValue placeholder="Wert wählen..." />
+                          <SelectValue placeholder={t('selectValue')} />
                         </SelectTrigger>
                         <SelectContent>
                           {fieldOptions.map((opt) => (
@@ -529,12 +533,12 @@ export function ConstraintManager() {
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Speichern...
+                    {tc('saving')}
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Einschränkungen speichern
+                    {t('saveConstraints')}
                   </>
                 )}
               </Button>
@@ -544,7 +548,7 @@ export function ConstraintManager() {
 
         {!selectedModel && (
           <div className="text-center py-8 text-muted-foreground">
-            Wähle ein Fahrzeug und Modell, um die Einschränkungen zu konfigurieren
+            {t('selectModelHint')}
           </div>
         )}
       </CardContent>

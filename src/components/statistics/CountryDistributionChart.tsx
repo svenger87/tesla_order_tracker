@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts'
 
 interface CountryDistributionChartProps {
@@ -22,10 +23,11 @@ const COLORS = [
 ]
 
 export function CountryDistributionChart({ data }: CountryDistributionChartProps) {
+  const t = useTranslations('statistics')
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        Keine Daten verfügbar
+        {t('noDataAvailable')}
       </div>
     )
   }
@@ -77,7 +79,7 @@ export function CountryDistributionChart({ data }: CountryDistributionChartProps
               color: 'hsl(var(--foreground))',
               fontWeight: 600,
             }}
-            formatter={(value) => [`${value} Bestellungen`, 'Anzahl']}
+            formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
           />
           <Bar dataKey="count" radius={[0, 4, 4, 0]} animationDuration={1000} animationEasing="ease-out">
             {data.map((entry, index) => (

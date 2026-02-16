@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType, VEHICLE_TYPES } from '@/lib/types'
 import { calculateStatistics, getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
@@ -71,6 +72,8 @@ const PERIOD_STORAGE_KEY = 'tesla-tracker-stats-period'
 const VEHICLE_STORAGE_KEY = 'tesla-tracker-stats-vehicle'
 
 export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
+  const t = useTranslations('statistics')
+  const tc = useTranslations('common')
   const [selectedPeriod, setSelectedPeriod] = useState<StatsPeriod>({ type: 'all' })
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | 'all'>('all')
   const [isHydrated, setIsHydrated] = useState(false)
@@ -116,16 +119,16 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
             {/* Vehicle Type Selector */}
             <div className="flex items-center gap-2">
               <Car className="h-5 w-5 text-muted-foreground hidden sm:block" />
-              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Fahrzeug:</span>
+              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">{t('vehicle')}:</span>
             <Select
               value={selectedVehicle}
               onValueChange={(value) => setSelectedVehicle(value as VehicleType | 'all')}
             >
               <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Fahrzeug wählen" />
+                <SelectValue placeholder={t('vehicleSelect')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alle</SelectItem>
+                <SelectItem value="all">{tc('all')}</SelectItem>
                 {VEHICLE_TYPES.map((vt) => (
                   <SelectItem key={vt.value} value={vt.value}>
                     {vt.label}
@@ -138,21 +141,21 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           {/* Period Selector */}
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-muted-foreground hidden sm:block" />
-            <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Zeitraum:</span>
+            <span className="text-sm font-medium text-muted-foreground hidden sm:inline">{t('period')}:</span>
             <Select
               value={periodToKey(selectedPeriod)}
               onValueChange={(key) => setSelectedPeriod(keyToPeriod(key))}
             >
               <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Zeitraum wählen" />
+                <SelectValue placeholder={t('periodSelect')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Gesamte Zeit</SelectItem>
+                <SelectItem value="all">{t('allTime')}</SelectItem>
                 {availablePeriods.years.length > 0 && (
                   <>
                     {availablePeriods.years.map((year) => (
                       <SelectItem key={`year-${year}`} value={`year-${year}`}>
-                        Jahr {year}
+                        {t('year', { year })}
                       </SelectItem>
                     ))}
                   </>
@@ -178,12 +181,12 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           {stats.ordersWithoutDate > 0 && (
             <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
               <AlertCircle className="h-3 w-3 mr-1" />
-              {stats.ordersWithoutDate} ohne gültiges Datum
+              {t('withoutValidDate', { count: stats.ordersWithoutDate })}
             </Badge>
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle.
+          {t('filterNote')}
         </p>
       </div>
 
@@ -192,27 +195,27 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
         <TabsList className="grid w-full grid-cols-5 gap-1">
           <TabsTrigger value="overview" className="flex items-center gap-1 text-xs sm:text-sm">
             <BarChart3 className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">Stats</span>
-            <span className="hidden sm:inline">Übersicht</span>
+            <span className="sm:hidden">{t('overviewShort')}</span>
+            <span className="hidden sm:inline">{t('overview')}</span>
           </TabsTrigger>
           <TabsTrigger value="config" className="flex items-center gap-1 text-xs sm:text-sm">
             <Car className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">Konfig</span>
-            <span className="hidden sm:inline">Konfiguration</span>
+            <span className="sm:hidden">{t('configurationShort')}</span>
+            <span className="hidden sm:inline">{t('configuration')}</span>
           </TabsTrigger>
           <TabsTrigger value="ausstattung" className="flex items-center gap-1 text-xs sm:text-sm">
             <Settings2 className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">Extras</span>
-            <span className="hidden sm:inline">Ausstattung</span>
+            <span className="sm:hidden">{t('equipmentShort')}</span>
+            <span className="hidden sm:inline">{t('equipment')}</span>
           </TabsTrigger>
           <TabsTrigger value="geo" className="flex items-center gap-1 text-xs sm:text-sm">
             <Globe className="h-4 w-4 shrink-0" />
-            <span>Geo</span>
+            <span>{t('geo')}</span>
           </TabsTrigger>
           <TabsTrigger value="timeline" className="flex items-center gap-1 text-xs sm:text-sm">
             <TrendingUp className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">Zeit</span>
-            <span className="hidden sm:inline">Zeitverlauf</span>
+            <span className="sm:hidden">{t('timelineShort')}</span>
+            <span className="hidden sm:inline">{t('timeline')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -221,36 +224,36 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           {/* Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label="Gesamt"
+              label={t('total')}
               value={stats.totalOrders}
               icon={Car}
-              description="Bestellungen"
-              hint="Gesamtanzahl aller erfassten Bestellungen im gewählten Zeitraum."
+              description={t('orders')}
+              hint={t('hintTotal')}
               variant="hero"
               delay={0}
             />
             <StatCard
-              label="Geliefert"
+              label={t('delivered')}
               value={stats.deliveredOrders}
               icon={CheckCircle2}
               description={`${stats.totalOrders > 0 ? Math.round((stats.deliveredOrders / stats.totalOrders) * 100) : 0}%`}
-              hint="Anzahl der bereits ausgelieferten Fahrzeuge."
+              hint={t('hintDelivered')}
               variant="hero"
               delay={0.1}
             />
             <StatCard
-              label="Ausstehend"
+              label={t('pending')}
               value={stats.pendingOrders}
               icon={Package}
-              description="Warten auf Lieferung"
-              hint="Anzahl der Bestellungen, die noch auf Lieferung warten."
+              description={t('waitingForDelivery')}
+              hint={t('hintPending')}
               delay={0.2}
             />
             <StatCard
-              label="Ø Lieferzeit"
-              value={stats.avgOrderToDelivery !== null ? `${stats.avgOrderToDelivery} Tage` : '-'}
+              label={t('avgDeliveryTime')}
+              value={stats.avgOrderToDelivery !== null ? `${stats.avgOrderToDelivery} ${tc('days')}` : '-'}
               icon={Timer}
-              hint="Durchschnittliche Zeit von Bestellung bis Fahrzeugübergabe. Berechnet aus allen gelieferten Fahrzeugen."
+              hint={t('hintAvgDelivery')}
               delay={0.3}
             />
           </div>
@@ -258,34 +261,34 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           {/* Additional Time Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label="Ø Bestellung → VIN"
-              value={stats.avgOrderToVin !== null ? `${stats.avgOrderToVin} Tage` : '-'}
+              label={t('avgOrderToVin')}
+              value={stats.avgOrderToVin !== null ? `${stats.avgOrderToVin} ${tc('days')}` : '-'}
               icon={Clock}
-              hint="Durchschnittliche Zeit von Bestellung bis zur VIN-Zuweisung. Nur gelieferte Fahrzeuge mit VIN-Datum."
+              hint={t('hintAvgVin')}
               delay={0.4}
             />
             <StatCard
-              label="Ø Bestellung → Papiere"
-              value={stats.avgOrderToPapers !== null ? `${stats.avgOrderToPapers} Tage` : '-'}
+              label={t('avgOrderToPapers')}
+              value={stats.avgOrderToPapers !== null ? `${stats.avgOrderToPapers} ${tc('days')}` : '-'}
               icon={FileText}
               hint={stats.avgOrderToPapers === null
-                ? "Nicht genügend konsistente Daten. Papierdatum wird nicht bei allen Bestellungen erfasst."
-                : "Durchschnittliche Zeit von Bestellung bis zum Erhalt der Fahrzeugpapiere."}
+                ? t('hintAvgPapersNull')
+                : t('hintAvgPapers')}
               delay={0.5}
             />
             <StatCard
-              label="Ø Papiere → Lieferung"
-              value={stats.avgPapersToDelivery !== null ? `${stats.avgPapersToDelivery} Tage` : '-'}
+              label={t('avgPapersToDelivery')}
+              value={stats.avgPapersToDelivery !== null ? `${stats.avgPapersToDelivery} ${tc('days')}` : '-'}
               icon={TrendingUp}
-              hint="Durchschnittliche Zeit vom Erhalt der Papiere bis zur Fahrzeugübergabe."
+              hint={t('hintPapersToDelivery')}
               delay={0.6}
             />
             <StatCard
-              label="Lieferquote"
+              label={t('deliveryRate')}
               value={`${stats.totalOrders > 0 ? Math.round((stats.deliveredOrders / stats.totalOrders) * 100) : 0}%`}
               icon={CheckCircle2}
-              description={`${stats.deliveredOrders} von ${stats.totalOrders}`}
-              hint="Anteil der bereits ausgelieferten Fahrzeuge an allen Bestellungen."
+              description={t('ofTotal', { delivered: stats.deliveredOrders, total: stats.totalOrders })}
+              hint={t('hintDeliveryRate')}
               delay={0.7}
             />
           </div>
@@ -294,20 +297,20 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
         {/* Tab 2: Konfiguration - Modell, Antrieb, Reichweite, Farbe */}
         <TabsContent value="config" className="mt-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MiniPieChart data={stats.modelDistribution} title="Modell" delay={0} />
-            <MiniPieChart data={stats.driveDistribution} title="Antrieb" delay={0.05} />
-            <MiniPieChart data={stats.rangeDistribution} title="Reichweite" delay={0.1} />
-            <MiniPieChart data={stats.colorDistribution} title="Farbe" delay={0.15} />
+            <MiniPieChart data={stats.modelDistribution} title={t('modelDistribution')} delay={0} />
+            <MiniPieChart data={stats.driveDistribution} title={t('driveDistribution')} delay={0.05} />
+            <MiniPieChart data={stats.rangeDistribution} title={t('rangeDistribution')} delay={0.1} />
+            <MiniPieChart data={stats.colorDistribution} title={t('colorDistribution')} delay={0.15} />
           </div>
         </TabsContent>
 
         {/* Tab 3: Ausstattung - Innenraum, Felgen, AHK, Autopilot */}
         <TabsContent value="ausstattung" className="mt-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MiniPieChart data={stats.interiorDistribution} title="Innenraum" delay={0} />
-            <MiniPieChart data={stats.wheelsDistribution} title="Felgen" delay={0.05} />
-            <MiniPieChart data={stats.towHitchDistribution} title="AHK" delay={0.1} />
-            <MiniPieChart data={stats.autopilotDistribution} title="Autopilot" delay={0.15} />
+            <MiniPieChart data={stats.interiorDistribution} title={t('interiorDistribution')} delay={0} />
+            <MiniPieChart data={stats.wheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
+            <MiniPieChart data={stats.towHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
+            <MiniPieChart data={stats.autopilotDistribution} title={t('autopilotDistribution')} delay={0.15} />
           </div>
         </TabsContent>
 
@@ -318,9 +321,9 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Globe className="h-5 w-5 text-primary" />
-                  Länderverteilung
+                  {t('countryDistribution')}
                 </CardTitle>
-                <CardDescription>Top 10 Länder nach Bestellungen</CardDescription>
+                <CardDescription>{t('topCountries')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <CountryDistributionChart data={stats.countryDistribution} />
@@ -330,9 +333,9 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Package className="h-5 w-5 text-primary" />
-                  Lieferorte
+                  {t('deliveryLocations')}
                 </CardTitle>
-                <CardDescription>Top 10 Lieferorte nach Bestellungen</CardDescription>
+                <CardDescription>{t('topLocations')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <CountryDistributionChart data={stats.deliveryLocationDistribution.slice(0, 10)} />
@@ -349,9 +352,9 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <TrendingUp className="h-5 w-5 text-primary" />
-                  Bestellungen über Zeit
+                  {t('ordersOverTime')}
                 </CardTitle>
-                <CardDescription>Neue Bestellungen pro Monat</CardDescription>
+                <CardDescription>{t('ordersPerMonth')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <OrdersTimelineChart data={stats.ordersOverTime} />
@@ -362,9 +365,9 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  Lieferungen über Zeit
+                  {t('deliveriesOverTime')}
                 </CardTitle>
-                <CardDescription>Fahrzeuglieferungen pro Monat</CardDescription>
+                <CardDescription>{t('deliveriesPerMonth')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <DeliveryTimelineChart data={stats.deliveriesOverTime} />
@@ -377,9 +380,9 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Hourglass className="h-5 w-5 text-primary" />
-                Wartezeit-Verteilung
+                {t('waitTimeDistribution')}
               </CardTitle>
-              <CardDescription>Verteilung der Wartezeiten von Bestellung bis Lieferung (in Tagen)</CardDescription>
+              <CardDescription>{t('waitTimeDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <WaitTimeDistributionChart data={stats.waitTimeDistribution} />

@@ -8,9 +8,12 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 
 export function SettingsTab() {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
   const [settings, setSettings] = useState<Settings | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -94,12 +97,12 @@ export function SettingsTab() {
         body: JSON.stringify(settings),
       })
 
-      if (!res.ok) throw new Error('Fehler beim Speichern')
+      if (!res.ok) throw new Error(tc('error'))
 
-      setMessage('Einstellungen gespeichert!')
+      setMessage(t('settingsSaved'))
       setTimeout(() => setMessage(''), 3000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Speichern')
+      setError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
@@ -119,13 +122,13 @@ export function SettingsTab() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Archivierung fehlgeschlagen')
+      if (!res.ok) throw new Error(data.error || t('archiveFailed'))
 
-      setArchiveMessage(`${data.count} Bestellungen archiviert`)
+      setArchiveMessage(t('ordersArchived', { count: data.count }))
       await fetchArchiveInfo(settings.archiveThreshold)
       setTimeout(() => setArchiveMessage(''), 5000)
     } catch (err) {
-      setArchiveError(err instanceof Error ? err.message : 'Archivierung fehlgeschlagen')
+      setArchiveError(err instanceof Error ? err.message : t('archiveFailed'))
     } finally {
       setArchiving(false)
     }
@@ -137,12 +140,12 @@ export function SettingsTab() {
     setPasswordError('')
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Passwörter stimmen nicht überein')
+      setPasswordError(t('passwordMismatch'))
       return
     }
 
     if (newPassword.length < 6) {
-      setPasswordError('Passwort muss mindestens 6 Zeichen haben')
+      setPasswordError(t('passwordMinLength'))
       return
     }
 
@@ -156,22 +159,22 @@ export function SettingsTab() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fehler beim Ändern des Passworts')
+      if (!res.ok) throw new Error(data.error || tc('error'))
 
-      setPasswordMessage('Passwort erfolgreich geändert!')
+      setPasswordMessage(t('passwordChanged'))
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
       setTimeout(() => setPasswordMessage(''), 3000)
     } catch (err) {
-      setPasswordError(err instanceof Error ? err.message : 'Fehler beim Ändern')
+      setPasswordError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setChangingPassword(false)
     }
   }
 
   if (loading) {
-    return <p className="text-muted-foreground p-4">Laden...</p>
+    return <p className="text-muted-foreground p-4">{tc('loading')}</p>
   }
 
   return (
@@ -182,10 +185,10 @@ export function SettingsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5" />
-              Spendeneinstellungen
+              {t('donationSettings')}
             </CardTitle>
             <CardDescription>
-              Konfiguriere den Spenden-Banner auf der Hauptseite
+              {t('donationDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -208,36 +211,36 @@ export function SettingsTab() {
                   setSettings((s) => s ? { ...s, showDonation: !!checked } : null)
                 }
               />
-              <Label htmlFor="showDonation">Spenden-Banner anzeigen</Label>
+              <Label htmlFor="showDonation">{t('showDonationBanner')}</Label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="donationText">Banner-Text</Label>
+              <Label htmlFor="donationText">{t('bannerText')}</Label>
               <Input
                 id="donationText"
                 value={settings?.donationText ?? ''}
                 onChange={(e) =>
                   setSettings((s) => s ? { ...s, donationText: e.target.value } : null)
                 }
-                placeholder="Unterstütze dieses Projekt"
+                placeholder={t('bannerTextPlaceholder')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="donationUrl">Spenden-URL</Label>
+              <Label htmlFor="donationUrl">{t('donationUrl')}</Label>
               <Input
                 id="donationUrl"
                 value={settings?.donationUrl ?? ''}
                 onChange={(e) =>
                   setSettings((s) => s ? { ...s, donationUrl: e.target.value } : null)
                 }
-                placeholder="https://paypal.me/yourusername"
+                placeholder={t('donationUrlPlaceholder')}
               />
             </div>
 
             <Button onClick={handleSaveSettings} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
-              {saving ? 'Speichern...' : 'Speichern'}
+              {saving ? tc('saving') : tc('save')}
             </Button>
           </CardContent>
         </Card>
@@ -247,10 +250,10 @@ export function SettingsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              Passwort ändern
+              {t('changePassword')}
             </CardTitle>
             <CardDescription>
-              Ändere dein Admin-Passwort
+              {t('changePasswordDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -267,7 +270,7 @@ export function SettingsTab() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                <Label htmlFor="currentPassword">{t('currentPassword')}</Label>
                 <Input
                   id="currentPassword"
                   type="password"
@@ -278,7 +281,7 @@ export function SettingsTab() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">Neues Passwort</Label>
+                <Label htmlFor="newPassword">{t('newPassword')}</Label>
                 <Input
                   id="newPassword"
                   type="password"
@@ -290,7 +293,7 @@ export function SettingsTab() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -302,7 +305,7 @@ export function SettingsTab() {
 
               <Button type="submit" disabled={changingPassword}>
                 <Key className="h-4 w-4 mr-2" />
-                {changingPassword ? 'Ändern...' : 'Passwort ändern'}
+                {changingPassword ? t('changingPassword') : t('changePassword')}
               </Button>
             </form>
           </CardContent>
@@ -313,17 +316,17 @@ export function SettingsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code2 className="h-5 w-5" />
-              API für Entwickler
+              {t('apiForDevelopers')}
             </CardTitle>
             <CardDescription>
-              API-Schlüssel für externen Zugriff auf die Daten
+              {t('apiDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {apiKeyConfigured && apiKey ? (
               <>
                 <div className="space-y-2">
-                  <Label>API Key</Label>
+                  <Label>{t('apiKey')}</Label>
                   <div className="flex gap-2">
                     <Input
                       value={apiKey}
@@ -338,7 +341,7 @@ export function SettingsTab() {
                         setApiKeyCopied(true)
                         setTimeout(() => setApiKeyCopied(false), 2000)
                       }}
-                      title="Kopieren"
+                      title={tc('copy')}
                     >
                       {apiKeyCopied ? (
                         <Check className="h-4 w-4 text-green-500" />
@@ -348,7 +351,7 @@ export function SettingsTab() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Diesen Key an Entwickler weitergeben, die die API nutzen möchten.
+                    {t('apiKeyHint')}
                   </p>
                 </div>
 
@@ -356,13 +359,13 @@ export function SettingsTab() {
                   <Link href="/docs" target="_blank">
                     <Button variant="outline" size="sm">
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      API Dokumentation
+                      {t('apiDocs')}
                     </Button>
                   </Link>
                 </div>
 
                 <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                  <p><strong>Verfügbare Endpunkte:</strong></p>
+                  <p><strong>{t('apiEndpoints')}</strong></p>
                   <ul className="list-disc list-inside ml-2 font-mono">
                     <li>GET /api/v1/orders - Alle Bestellungen</li>
                     <li>GET /api/v1/orders/by-name/:name - Nach Name</li>
@@ -374,9 +377,9 @@ export function SettingsTab() {
               </>
             ) : (
               <div className="text-sm text-muted-foreground">
-                <p>API Key nicht konfiguriert.</p>
+                <p>{t('apiNotConfigured')}</p>
                 <p className="mt-2">
-                  Setze <code className="bg-muted px-1 rounded">EXTERNAL_API_KEY</code> in den Umgebungsvariablen.
+                  {t('apiConfigHint', { envVar: 'EXTERNAL_API_KEY' })}
                 </p>
               </div>
             )}
@@ -389,10 +392,10 @@ export function SettingsTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Archive className="h-5 w-5" />
-            Archiv-Verwaltung
+            {t('archiveManagement')}
           </CardTitle>
           <CardDescription>
-            Archiviere inaktive Bestellungen, um die Statistiken sauber zu halten
+            {t('archiveDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -404,7 +407,7 @@ export function SettingsTab() {
                 setSettings((s) => s ? { ...s, archiveEnabled: !!checked } : null)
               }}
             />
-            <Label htmlFor="archiveEnabled">Archivierung aktivieren</Label>
+            <Label htmlFor="archiveEnabled">{t('enableArchive')}</Label>
             <Button
               variant="outline"
               size="sm"
@@ -413,7 +416,7 @@ export function SettingsTab() {
               className="ml-2"
             >
               <Save className="h-4 w-4 mr-1" />
-              Speichern
+              {tc('save')}
             </Button>
           </div>
 
@@ -423,11 +426,7 @@ export function SettingsTab() {
                 <AlertTriangle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-700 dark:text-blue-400">
                   <p className="font-medium">Info</p>
-                  <p>
-                    Diese Funktion archiviert nur <strong>unvollständige Bestellungen</strong> (ohne Lieferdatum),
-                    die lange nicht aktualisiert wurden. Archivierte Einträge werden aus den öffentlichen
-                    Statistiken ausgeblendet, bleiben aber in der Datenbank erhalten.
-                  </p>
+                  <p dangerouslySetInnerHTML={{ __html: t.raw('archiveInfo') as string }} />
                 </div>
               </div>
 
@@ -443,7 +442,7 @@ export function SettingsTab() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="archiveThreshold">Schwellwert für &quot;inaktiv&quot; (Tage ohne Aktualisierung)</Label>
+                <Label htmlFor="archiveThreshold">{t('archiveThreshold')}</Label>
                 <div className="flex gap-2">
                   <Input
                     id="archiveThreshold"
@@ -467,22 +466,20 @@ export function SettingsTab() {
                     disabled={saving}
                   >
                     <Save className="h-4 w-4 mr-1" />
-                    Speichern
+                    {tc('save')}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Nur <strong>unvollständige</strong> Bestellungen (ohne Lieferdatum), die länger als {settings?.archiveThreshold ?? 180} Tage nicht aktualisiert wurden, werden archiviert. Bereits gelieferte Fahrzeuge bleiben immer sichtbar.
-                </p>
+                <p className="text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('archiveThresholdDescription', { days: settings?.archiveThreshold ?? 180 }) }} />
               </div>
 
               {archiveInfo && (
                 <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-md">
                   <div>
-                    <p className="text-sm text-muted-foreground">Inaktive Bestellungen</p>
+                    <p className="text-sm text-muted-foreground">{t('inactiveOrders')}</p>
                     <p className="text-2xl font-bold text-amber-600">{archiveInfo.staleCount}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Bereits archiviert</p>
+                    <p className="text-sm text-muted-foreground">{t('alreadyArchived')}</p>
                     <p className="text-2xl font-bold text-muted-foreground">{archiveInfo.archivedCount}</p>
                   </div>
                 </div>
@@ -495,7 +492,7 @@ export function SettingsTab() {
                   variant="default"
                 >
                   <Archive className={`h-4 w-4 mr-2 ${archiving ? 'animate-pulse' : ''}`} />
-                  {archiving ? 'Archiviere...' : `${archiveInfo?.staleCount ?? 0} inaktive archivieren`}
+                  {archiving ? t('archiving') : t('archiveInactive', { count: archiveInfo?.staleCount ?? 0 })}
                 </Button>
                 <Button
                   variant="ghost"
@@ -503,19 +500,19 @@ export function SettingsTab() {
                   onClick={() => fetchArchiveInfo(settings?.archiveThreshold ?? 180)}
                 >
                   <RotateCcw className="h-4 w-4 mr-1" />
-                  Aktualisieren
+                  {tc('refresh')}
                 </Button>
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Um archivierte Bestellungen zu sehen oder wiederherzustellen, nutze die API unter /api/orders?includeArchived=true
+                {t('archiveApiHint')}
               </p>
             </>
           )}
 
           {!settings?.archiveEnabled && (
             <p className="text-sm text-muted-foreground">
-              Archivierung ist deaktiviert. Aktiviere sie oben, um inaktive Bestellungen zu verwalten.
+              {t('archiveDisabledHint')}
             </p>
           )}
         </CardContent>

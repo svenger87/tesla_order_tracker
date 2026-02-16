@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { LogIn } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -15,6 +16,7 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const t = useTranslations('admin.login')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,12 +33,12 @@ export default function AdminLogin() {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Login fehlgeschlagen')
+        throw new Error(data.error || t('failed'))
       }
 
       router.push('/admin')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login fehlgeschlagen')
+      setError(err instanceof Error ? err.message : t('failed'))
     } finally {
       setLoading(false)
     }
@@ -48,10 +50,10 @@ export default function AdminLogin() {
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center gap-2">
             <LogIn className="h-5 w-5" />
-            Admin Login
+            {t('title')}
           </CardTitle>
           <CardDescription>
-            Melde dich an, um Bestellungen zu verwalten
+            {t('description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -63,7 +65,7 @@ export default function AdminLogin() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="username">Benutzername</Label>
+              <Label htmlFor="username">{t('username')}</Label>
               <Input
                 id="username"
                 value={username}
@@ -74,7 +76,7 @@ export default function AdminLogin() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Passwort</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -86,12 +88,12 @@ export default function AdminLogin() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Anmelden...' : 'Anmelden'}
+              {loading ? t('submitting') : t('submit')}
             </Button>
 
             <div className="text-center">
               <Link href="/" className="text-sm text-muted-foreground hover:underline">
-                Zurück zur Übersicht
+                {t('backToOverview')}
               </Link>
             </div>
           </form>

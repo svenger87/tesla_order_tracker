@@ -23,6 +23,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Image, Plus, Pencil, Trash2, RefreshCw, Database, Eye } from 'lucide-react'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
+import { useTranslations } from 'next-intl'
 
 interface CompositorCode {
   id: string
@@ -45,6 +46,9 @@ const CATEGORIES = [
 const VEHICLE_TYPES = ['Model Y', 'Model 3']
 
 export function CompositorTab() {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
+  const tf = useTranslations('form')
   const [codes, setCodes] = useState<CompositorCode[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('body')
@@ -152,11 +156,11 @@ export function CompositorTab() {
       const res = await fetch(url, { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Seed failed')
-      setSeedMessage(`${data.created} erstellt, ${data.skipped} übersprungen`)
+      setSeedMessage(t('constraintCreated', { created: data.created, skipped: data.skipped }))
       await fetchRawCodes()
       setTimeout(() => setSeedMessage(''), 5000)
     } catch (err) {
-      setSeedMessage(`Fehler: ${err instanceof Error ? err.message : 'Unknown'}`)
+      setSeedMessage(`${tc('error')}: ${err instanceof Error ? err.message : 'Unknown'}`)
     } finally {
       setSeeding(false)
     }
@@ -192,7 +196,7 @@ export function CompositorTab() {
 
   const handleSave = async () => {
     if (!formData.lookupKey || !formData.code) {
-      setFormError('Lookup Key und Code sind Pflichtfelder')
+      setFormError(t('requiredFields'))
       return
     }
 
@@ -232,14 +236,14 @@ export function CompositorTab() {
       setEditDialogOpen(false)
       await fetchRawCodes()
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Fehler beim Speichern')
+      setFormError(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (code: CompositorCode) => {
-    if (!confirm(`"${code.code}" (${code.lookupKey}) wirklich deaktivieren?`)) return
+    if (!confirm(`${tc('delete')} "${code.code}" (${code.lookupKey})?`)) return
 
     try {
       const res = await fetch(`/api/compositor-codes?id=${code.id}`, { method: 'DELETE' })
@@ -265,36 +269,36 @@ export function CompositorTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Image className="h-5 w-5" />
-            Tesla Compositor Codes
+            {t('compositorCodes')}
           </CardTitle>
           <CardDescription>
-            Verwalte die Codes für die Fahrzeugbilder (Body, Felgen, Interieur, Farben)
+            {t('compositorDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => handleSeed(false)} disabled={seeding} variant="outline" size="sm">
               <Database className={`h-4 w-4 mr-2 ${seeding ? 'animate-spin' : ''}`} />
-              {seeding ? 'Seeding...' : 'Fehlende Codes ergänzen'}
+              {seeding ? t('seeding') : t('seedMissing')}
             </Button>
             <Button onClick={() => handleSeed(true)} disabled={seeding} variant="destructive" size="sm">
               <RefreshCw className={`h-4 w-4 mr-2 ${seeding ? 'animate-spin' : ''}`} />
-              Alle zurücksetzen
+              {t('resetAll')}
             </Button>
             <Button onClick={() => setPreviewOpen(true)} variant="secondary" size="sm">
               <Eye className="h-4 w-4 mr-2" />
-              Vorschau
+              {t('preview')}
             </Button>
           </div>
 
           {seedMessage && (
-            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith('Fehler') ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-600'}`}>
+            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith(tc('error')) ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-600'}`}>
               {seedMessage}
             </div>
           )}
 
           <div className="text-sm text-muted-foreground">
-            {codes.length} Codes geladen
+            {t('codesLoaded', { count: codes.length })}
             {CATEGORIES.map(cat => (
               <span key={cat.value} className="ml-3">
                 {cat.label}: {categoryCount(cat.value)}
@@ -327,7 +331,7 @@ export function CompositorTab() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle</SelectItem>
+                  <SelectItem value="all">{tc('all')}</SelectItem>
                   {VEHICLE_TYPES.map(vt => (
                     <SelectItem key={vt} value={vt}>{vt}</SelectItem>
                   ))}
@@ -336,28 +340,28 @@ export function CompositorTab() {
 
               <Button onClick={openCreateDialog} size="sm">
                 <Plus className="h-4 w-4 mr-1" />
-                Neu
+                {tc('new')}
               </Button>
             </div>
           </div>
 
           {loading ? (
-            <p className="text-muted-foreground p-4">Laden...</p>
+            <p className="text-muted-foreground p-4">{tc('loading')}</p>
           ) : filteredCodes.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>Keine Codes gefunden.</p>
-              <p className="text-sm mt-1">Nutze &quot;Fehlende Codes ergänzen&quot; um die Standard-Codes zu laden.</p>
+              <p>{t('noCodes')}</p>
+              <p className="text-sm mt-1">{t('noCodesHint')}</p>
             </div>
           ) : (
             <div className="border rounded-md overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="text-left p-3 font-medium">Fahrzeug</th>
-                    <th className="text-left p-3 font-medium">Lookup Key</th>
-                    <th className="text-left p-3 font-medium">Tesla Code</th>
-                    <th className="text-left p-3 font-medium">Label</th>
-                    <th className="text-right p-3 font-medium">Aktionen</th>
+                    <th className="text-left p-3 font-medium">{t('vehicleType')}</th>
+                    <th className="text-left p-3 font-medium">{t('lookupKey')}</th>
+                    <th className="text-left p-3 font-medium">{t('teslaCode')}</th>
+                    <th className="text-left p-3 font-medium">{t('label')}</th>
+                    <th className="text-right p-3 font-medium">{tc('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -396,11 +400,11 @@ export function CompositorTab() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCode ? 'Code bearbeiten' : 'Neuen Code erstellen'}</DialogTitle>
+            <DialogTitle>{editingCode ? t('editCode') : t('createCode')}</DialogTitle>
             <DialogDescription>
               {editingCode
-                ? `Bearbeite ${editingCode.category}/${editingCode.vehicleType}/${editingCode.lookupKey}`
-                : 'Erstelle einen neuen Compositor Code'}
+                ? t('editCodeDesc', { path: `${editingCode.category}/${editingCode.vehicleType}/${editingCode.lookupKey}` })
+                : t('createCodeDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -415,7 +419,7 @@ export function CompositorTab() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Kategorie</Label>
+                    <Label>{tc('configuration')}</Label>
                     <Select value={formData.category} onValueChange={(v) => setFormData(d => ({ ...d, category: v }))}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -426,7 +430,7 @@ export function CompositorTab() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Fahrzeug</Label>
+                    <Label>{t('vehicleType')}</Label>
                     <Select value={formData.vehicleType} onValueChange={(v) => setFormData(d => ({ ...d, vehicleType: v }))}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -439,7 +443,7 @@ export function CompositorTab() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lookupKey">Lookup Key</Label>
+                  <Label htmlFor="lookupKey">{t('lookupKey')}</Label>
                   <Input
                     id="lookupKey"
                     value={formData.lookupKey}
@@ -452,7 +456,7 @@ export function CompositorTab() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="teslaCode">Tesla Code</Label>
+              <Label htmlFor="teslaCode">{t('teslaCode')}</Label>
               <Input
                 id="teslaCode"
                 value={formData.code}
@@ -463,7 +467,7 @@ export function CompositorTab() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="label">Label (optional)</Label>
+              <Label htmlFor="label">{t('label')}</Label>
               <Input
                 id="label"
                 value={formData.label}
@@ -473,7 +477,7 @@ export function CompositorTab() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sortOrder">Sortierung</Label>
+              <Label htmlFor="sortOrder">{t('sortOrder')}</Label>
               <Input
                 id="sortOrder"
                 type="number"
@@ -484,9 +488,9 @@ export function CompositorTab() {
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Abbrechen</Button>
+              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>{tc('cancel')}</Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? 'Speichere...' : editingCode ? 'Speichern' : 'Erstellen'}
+                {saving ? tc('saving') : editingCode ? tc('save') : tc('add')}
               </Button>
             </div>
           </div>
@@ -497,16 +501,16 @@ export function CompositorTab() {
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Compositor Vorschau</DialogTitle>
+            <DialogTitle>{t('compositorPreview')}</DialogTitle>
             <DialogDescription>
-              Teste die Fahrzeugbilder mit verschiedenen Konfigurationen
+              {t('compositorPreviewDesc')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Fahrzeug</Label>
+                <Label className="text-xs">{t('vehicleType')}</Label>
                 <Select value={previewVehicle} onValueChange={(v) => setPreviewVehicle(v as 'Model Y' | 'Model 3')}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -516,7 +520,7 @@ export function CompositorTab() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Trim</Label>
+                <Label className="text-xs">{t('trim')}</Label>
                 <Select value={previewModel} onValueChange={setPreviewModel}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -527,7 +531,7 @@ export function CompositorTab() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Antrieb</Label>
+                <Label className="text-xs">{tf('drive')}</Label>
                 <Select value={previewDrive} onValueChange={setPreviewDrive}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -537,7 +541,7 @@ export function CompositorTab() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Felgen</Label>
+                <Label className="text-xs">{tf('wheels')}</Label>
                 <Select value={previewWheels} onValueChange={setPreviewWheels}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -549,7 +553,7 @@ export function CompositorTab() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Farbe</Label>
+                <Label className="text-xs">{tf('color')}</Label>
                 <Select value={previewColor} onValueChange={setPreviewColor}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -565,12 +569,12 @@ export function CompositorTab() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Interieur</Label>
+                <Label className="text-xs">{tf('interior')}</Label>
                 <Select value={previewInterior} onValueChange={setPreviewInterior}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="black">Schwarz</SelectItem>
-                    <SelectItem value="white">Weiß</SelectItem>
+                    <SelectItem value="black">Black</SelectItem>
+                    <SelectItem value="white">White</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

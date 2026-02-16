@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Order } from '@/lib/types'
 import { OrderGroup, getQuarterStats } from '@/lib/groupOrders'
@@ -27,6 +28,8 @@ export function CollapsibleOrderSection({
   onDelete,
   onGenerateResetCode,
 }: CollapsibleOrderSectionProps) {
+  const t = useTranslations('home')
+
   // Default to opening the first group
   const defaultValue = groups.length > 0 ? [groups[0].label] : []
 
@@ -37,7 +40,7 @@ export function CollapsibleOrderSection({
         animate={{ opacity: 1 }}
         className="text-center py-12 text-muted-foreground"
       >
-        Keine Bestellungen vorhanden
+        {t('noOrders')}
       </motion.div>
     )
   }

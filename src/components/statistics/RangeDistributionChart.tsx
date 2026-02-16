@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
 interface RangeDistributionChartProps {
@@ -17,6 +18,7 @@ const COLORS = [
 ]
 
 export function RangeDistributionChart({ data }: RangeDistributionChartProps) {
+  const t = useTranslations('statistics')
   const total = useMemo(() =>
     data.reduce((sum, item) => sum + item.count, 0),
     [data]
@@ -25,7 +27,7 @@ export function RangeDistributionChart({ data }: RangeDistributionChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        Keine Daten verfügbar
+        {t('noDataAvailable')}
       </div>
     )
   }

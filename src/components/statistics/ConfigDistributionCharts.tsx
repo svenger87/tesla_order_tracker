@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -48,6 +49,7 @@ interface MiniPieChartProps {
 }
 
 export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieChartProps) {
+  const t = useTranslations('statistics')
   // Filter out "Unbekannt" if there are other values
   const filteredData = data.filter(d => d.name !== 'Unbekannt' || data.length === 1)
 
@@ -58,7 +60,7 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[180px] text-muted-foreground text-sm">
-          Keine Daten
+          {t('noData')}
         </CardContent>
       </Card>
     )
@@ -69,13 +71,13 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
   if (filteredData.length > maxItems + 1) {
     const topItems = filteredData.slice(0, maxItems)
     const otherCount = filteredData.slice(maxItems).reduce((sum, item) => sum + item.count, 0)
-    displayData = [...topItems, { name: 'Andere', count: otherCount, fill: COLORS[4] }]
+    displayData = [...topItems, { name: t('other'), count: otherCount, fill: COLORS[4] }]
   }
 
   const total = displayData.reduce((sum, item) => sum + item.count, 0)
 
   return (
-    <Card className="h-full min-h-[260px] overflow-hidden">
+    <Card className="h-full min-h-[280px] overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
@@ -84,16 +86,16 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay }}
-          className="h-[220px]"
+          className="h-[240px]"
         >
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <PieChart>
+            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
               <Pie
                 data={displayData}
                 cx="50%"
-                cy="45%"
-                innerRadius={50}
-                outerRadius={80}
+                cy="50%"
+                innerRadius={35}
+                outerRadius={60}
                 paddingAngle={0}
                 dataKey="count"
                 nameKey="name"
@@ -131,8 +133,8 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
               />
               <Legend
                 verticalAlign="bottom"
-                height={70}
-                wrapperStyle={{ fontSize: '11px', overflow: 'hidden', maxHeight: '80px' }}
+                height={80}
+                wrapperStyle={{ fontSize: '11px', overflow: 'hidden', maxHeight: '90px', paddingTop: '4px' }}
                 formatter={(value, entry) => {
                   const count = (entry.payload as DistributionData)?.count || 0
                   const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0'
@@ -158,16 +160,17 @@ export function ConfigDistributionCharts({
   colorDistribution,
   deliveryLocationDistribution,
 }: ConfigDistributionChartsProps) {
+  const t = useTranslations('statistics')
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-      <MiniPieChart data={colorDistribution} title="Farbe" delay={0} />
-      <MiniPieChart data={rangeDistribution} title="Reichweite" delay={0.05} />
-      <MiniPieChart data={wheelsDistribution} title="Felgen" delay={0.1} />
-      <MiniPieChart data={interiorDistribution} title="Innenraum" delay={0.15} />
-      <MiniPieChart data={driveDistribution} title="Antrieb" delay={0.2} />
-      <MiniPieChart data={towHitchDistribution} title="AHK" delay={0.25} />
-      <MiniPieChart data={autopilotDistribution} title="Autopilot" delay={0.3} />
-      <MiniPieChart data={deliveryLocationDistribution} title="Lieferort" delay={0.35} maxItems={15} />
+      <MiniPieChart data={colorDistribution} title={t('colorDistribution')} delay={0} />
+      <MiniPieChart data={rangeDistribution} title={t('rangeDistribution')} delay={0.05} />
+      <MiniPieChart data={wheelsDistribution} title={t('wheelsDistribution')} delay={0.1} />
+      <MiniPieChart data={interiorDistribution} title={t('interiorDistribution')} delay={0.15} />
+      <MiniPieChart data={driveDistribution} title={t('driveDistribution')} delay={0.2} />
+      <MiniPieChart data={towHitchDistribution} title={t('towHitchDistribution')} delay={0.25} />
+      <MiniPieChart data={autopilotDistribution} title={t('autopilotDistribution')} delay={0.3} />
+      <MiniPieChart data={deliveryLocationDistribution} title={t('deliveryLocations')} delay={0.35} maxItems={15} />
     </div>
   )
 }

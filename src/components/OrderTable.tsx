@@ -2,12 +2,13 @@
 
 import { useState, useMemo, memo, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions } from '@/hooks/useOptions'
 
-// Format relative time (e.g., "vor 5 Minuten", "vor 3 Tagen")
-function formatRelativeTime(dateString: string | undefined): string {
+// Format relative time using translation function
+function formatRelativeTime(dateString: string | undefined, t: (key: string, values?: Record<string, unknown>) => string): string {
   if (!dateString) return '-'
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return '-'
@@ -19,13 +20,13 @@ function formatRelativeTime(dateString: string | undefined): string {
   const diffHour = Math.floor(diffMin / 60)
   const diffDay = Math.floor(diffHour / 24)
 
-  if (diffSec < 60) return 'gerade eben'
-  if (diffMin < 60) return `vor ${diffMin} Min.`
-  if (diffHour < 24) return `vor ${diffHour} Std.`
-  if (diffDay === 1) return 'gestern'
-  if (diffDay < 7) return `vor ${diffDay} Tagen`
-  if (diffDay < 30) return `vor ${Math.floor(diffDay / 7)} Wo.`
-  return `vor ${Math.floor(diffDay / 30)} Mon.`
+  if (diffSec < 60) return t('timeAgo.justNow')
+  if (diffMin < 60) return t('timeAgo.minutesAgo', { n: diffMin })
+  if (diffHour < 24) return t('timeAgo.hoursAgo', { n: diffHour })
+  if (diffDay === 1) return t('timeAgo.yesterday')
+  if (diffDay < 7) return t('timeAgo.daysAgo', { n: diffDay })
+  if (diffDay < 30) return t('timeAgo.weeksAgo', { n: Math.floor(diffDay / 7) })
+  return t('timeAgo.monthsAgo', { n: Math.floor(diffDay / 30) })
 }
 import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
@@ -238,24 +239,20 @@ function normalizeForSort(str: string): string {
 }
 
 // Compare function for sorting
-function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection): number {
+function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection, countryLabels?: Map<string, string>): number {
   if (!field) return 0
 
   let aVal = a[field]
   let bVal = b[field]
 
-  // Handle country field - look up label from code and normalize umlauts for proper alphabetical sorting
+  // Handle country field - look up translated label for proper alphabetical sorting
   if (field === 'country') {
     const aCode = (aVal as string | null) || ''
     const bCode = (bVal as string | null) || ''
-    // Look up country labels from COUNTRIES constant
-    const aLabel = COUNTRIES.find(c => c.value === aCode)?.label || aCode
-    const bLabel = COUNTRIES.find(c => c.value === bCode)?.label || bCode
-    const aCountry = normalizeForSort(aLabel)
-    const bCountry = normalizeForSort(bLabel)
-    if (aCountry < bCountry) return direction === 'asc' ? -1 : 1
-    if (aCountry > bCountry) return direction === 'asc' ? 1 : -1
-    return 0
+    const aLabel = countryLabels?.get(aCode) || aCode
+    const bLabel = countryLabels?.get(bCode) || bCode
+    const cmp = aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' })
+    return direction === 'asc' ? cmp : -cmp
   }
 
   // Handle date fields
@@ -351,38 +348,38 @@ interface ColumnDef {
 
 const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
-  { key: 'status', label: 'Status', group: 'essential' },
-  { key: 'name', label: 'Name', group: 'essential' },
-  { key: 'vehicleType', label: 'Fahrzeug', group: 'essential' },
-  { key: 'carImage', label: 'Bild', group: 'configuration' },
-  { key: 'orderDate', label: 'Bestelldatum', group: 'essential' },
+  { key: 'status', label: 'status', group: 'essential' },
+  { key: 'name', label: 'name', group: 'essential' },
+  { key: 'vehicleType', label: 'vehicle', group: 'essential' },
+  { key: 'carImage', label: 'image', group: 'configuration' },
+  { key: 'orderDate', label: 'orderDate', group: 'essential' },
   // Configuration
-  { key: 'country', label: 'Land', group: 'configuration' },
-  { key: 'model', label: 'Model', group: 'configuration' },
-  { key: 'range', label: 'Reichweite', group: 'configuration' },
-  { key: 'drive', label: 'Antrieb', group: 'configuration' },
-  { key: 'color', label: 'Farbe', group: 'configuration' },
-  { key: 'interior', label: 'Innen', group: 'configuration' },
-  { key: 'wheels', label: 'Felgen', group: 'configuration' },
-  { key: 'towHitch', label: 'AHK', group: 'configuration' },
-  { key: 'autopilot', label: 'Autopilot', group: 'configuration' },
+  { key: 'country', label: 'country', group: 'configuration' },
+  { key: 'model', label: 'model', group: 'configuration' },
+  { key: 'range', label: 'range', group: 'configuration' },
+  { key: 'drive', label: 'drive', group: 'configuration' },
+  { key: 'color', label: 'color', group: 'configuration' },
+  { key: 'interior', label: 'interior', group: 'configuration' },
+  { key: 'wheels', label: 'wheels', group: 'configuration' },
+  { key: 'towHitch', label: 'towHitch', group: 'configuration' },
+  { key: 'autopilot', label: 'autopilot', group: 'configuration' },
   // Status & Delivery
-  { key: 'deliveryWindow', label: 'Lieferfenster', group: 'configuration' },
-  { key: 'deliveryLocation', label: 'Ort', group: 'configuration' },
-  { key: 'vin', label: 'VIN', group: 'configuration' },
-  { key: 'vinReceivedDate', label: 'VIN am', group: 'configuration' },
-  { key: 'papersReceivedDate', label: 'Papiere am', group: 'configuration' },
-  { key: 'productionDate', label: 'Produktion', group: 'configuration' },
-  { key: 'typeApproval', label: 'Typgen.', group: 'configuration' },
-  { key: 'typeVariant', label: 'Typ-Var.', group: 'configuration' },
-  { key: 'deliveryDate', label: 'Lieferdatum', group: 'configuration' },
+  { key: 'deliveryWindow', label: 'deliveryWindow', group: 'configuration' },
+  { key: 'deliveryLocation', label: 'deliveryLocation', group: 'configuration' },
+  { key: 'vin', label: 'vin', group: 'configuration' },
+  { key: 'vinReceivedDate', label: 'vinDate', group: 'configuration' },
+  { key: 'papersReceivedDate', label: 'papersDate', group: 'configuration' },
+  { key: 'productionDate', label: 'production', group: 'configuration' },
+  { key: 'typeApproval', label: 'typeApproval', group: 'configuration' },
+  { key: 'typeVariant', label: 'typeVariant', group: 'configuration' },
+  { key: 'deliveryDate', label: 'deliveryDate', group: 'configuration' },
   // Detail (time periods & metadata)
-  { key: 'orderToProduction', label: 'B→P', group: 'detail' },
-  { key: 'orderToVin', label: 'B→VIN', group: 'detail' },
-  { key: 'orderToDelivery', label: 'B→L', group: 'detail' },
-  { key: 'orderToPapers', label: 'B→Pap', group: 'detail' },
-  { key: 'papersToDelivery', label: 'Pap→L', group: 'detail' },
-  { key: 'updatedAt', label: 'Änderung', group: 'detail' },
+  { key: 'orderToProduction', label: 'orderToProduction', group: 'detail' },
+  { key: 'orderToVin', label: 'orderToVin', group: 'detail' },
+  { key: 'orderToDelivery', label: 'orderToDelivery', group: 'detail' },
+  { key: 'orderToPapers', label: 'orderToPapers', group: 'detail' },
+  { key: 'papersToDelivery', label: 'papersToDelivery', group: 'detail' },
+  { key: 'updatedAt', label: 'updatedAt', group: 'detail' },
 ]
 
 // All columns visible by default
@@ -395,6 +392,11 @@ const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
 export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderTableProps) {
+  const t = useTranslations('table')
+  const tc = useTranslations('common')
+  const th = useTranslations('home')
+  const to = useTranslations('options')
+
   // Default sort: orderDate ascending (oldest first, newest at bottom)
   const [sortField, setSortField] = useState<SortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -679,11 +681,11 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
     // Apply sort
     if (sortField) {
-      result = [...result].sort((a, b) => compareValues(a, b, sortField, sortDirection))
+      result = [...result].sort((a, b) => compareValues(a, b, sortField, sortDirection, countryLabelMap))
     }
 
     return result
-  }, [orders, filters, sortField, sortDirection])
+  }, [orders, filters, sortField, sortDirection, countryLabelMap])
 
   return (
     <div className="space-y-2">
@@ -694,7 +696,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Name suchen..."
+            placeholder={tc('searchName')}
             value={filters.nameSearch}
             onChange={(e) => setFilters(f => ({ ...f, nameSearch: e.target.value }))}
             className="h-8 w-[140px] sm:w-[180px] pl-8 text-sm"
@@ -718,14 +720,14 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
               <Columns3 className="h-4 w-4" />
-              Spalten
+              {tc('columns')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[240px] p-3" align="start">
             <div className="space-y-3">
-              <p className="text-sm font-medium">Sichtbare Spalten</p>
+              <p className="text-sm font-medium">{tc('visibleColumns')}</p>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Konfiguration</p>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tc('configuration')}</p>
                 {COLUMN_DEFS.filter(c => c.group === 'configuration').map(col => (
                   <div key={col.key} className="flex items-center gap-2">
                     <Checkbox
@@ -733,12 +735,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                       checked={isColumnVisible(col.key)}
                       onCheckedChange={() => toggleColumn(col.key)}
                     />
-                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{col.label}</Label>
+                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{t(col.label)}</Label>
                   </div>
                 ))}
               </div>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Detail</p>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tc('detail')}</p>
                 {COLUMN_DEFS.filter(c => c.group === 'detail').map(col => (
                   <div key={col.key} className="flex items-center gap-2">
                     <Checkbox
@@ -746,7 +748,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                       checked={isColumnVisible(col.key)}
                       onCheckedChange={() => toggleColumn(col.key)}
                     />
-                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{col.label}</Label>
+                    <Label htmlFor={`col-${col.key}`} className="text-sm cursor-pointer">{t(col.label)}</Label>
                   </div>
                 ))}
               </div>
@@ -756,7 +758,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         {activeFilterCount > 0 && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
             <X className="h-3 w-3" />
-            <span className="hidden sm:inline">Filter zurücksetzen</span>
+            <span className="hidden sm:inline">{tc('resetFilters')}</span>
           </Button>
         )}
         <span className="text-xs sm:text-sm text-muted-foreground ml-auto">
@@ -769,50 +771,50 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md overflow-x-auto">
           <Select value={filters.vehicleType} onValueChange={(v) => setFilters(f => ({ ...f, vehicleType: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[120px] h-8">
-              <SelectValue placeholder="Fahrzeug" />
+              <SelectValue placeholder={t('vehicle')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Fahrzeuge</SelectItem>
+              <SelectItem value="all">{t('allVehicles')}</SelectItem>
               {filterOptions.vehicleType.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.model} onValueChange={(v) => setFilters(f => ({ ...f, model: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[130px] h-8">
-              <SelectValue placeholder="Model" />
+              <SelectValue placeholder={t('model')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Models</SelectItem>
+              <SelectItem value="all">{t('allModels')}</SelectItem>
               {filterOptions.model.map(v => <SelectItem key={v} value={v}>{getLabel(models, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.range} onValueChange={(v) => setFilters(f => ({ ...f, range: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[160px] h-8">
-              <SelectValue placeholder="Reichweite" />
+              <SelectValue placeholder={t('range')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Reichweiten</SelectItem>
-              {filterOptions.range.map(v => <SelectItem key={v} value={v}>{getLabel(ranges, v) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, v)}</SelectItem>)}
+              <SelectItem value="all">{t('allRanges')}</SelectItem>
+              {filterOptions.range.map(v => <SelectItem key={v} value={v}>{v === 'maximale_reichweite' ? to('range.maxRangeShort') : getLabel(ranges, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.drive} onValueChange={(v) => setFilters(f => ({ ...f, drive: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[100px] h-8">
-              <SelectValue placeholder="Antrieb" />
+              <SelectValue placeholder={t('drive')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
               {filterOptions.drive.map(v => <SelectItem key={v} value={v}>{getLabel(drives, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.color} onValueChange={(v) => setFilters(f => ({ ...f, color: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[140px] h-8">
-              <SelectValue placeholder="Farbe" />
+              <SelectValue placeholder={t('color')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Farben</SelectItem>
+              <SelectItem value="all">{t('allColors')}</SelectItem>
               {filterOptions.color.map(v => {
                 const colorInfo = findColorInfo(v)
                 return (
@@ -834,10 +836,10 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
           <Select value={filters.country} onValueChange={(v) => setFilters(f => ({ ...f, country: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[150px] h-8">
-              <SelectValue placeholder="Land" />
+              <SelectValue placeholder={t('country')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Länder</SelectItem>
+              <SelectItem value="all">{t('allCountries')}</SelectItem>
               {sortCountryCodes(filterOptions.country).map(v => {
                 const countryInfo = countries.find(c => c.value === v)
                 return (
@@ -854,50 +856,50 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
 
           <Select value={filters.deliveryLocation} onValueChange={(v) => setFilters(f => ({ ...f, deliveryLocation: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[130px] h-8">
-              <SelectValue placeholder="Ort" />
+              <SelectValue placeholder={t('deliveryLocation')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Orte</SelectItem>
+              <SelectItem value="all">{t('allLocations')}</SelectItem>
               {filterOptions.deliveryLocation.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.wheels} onValueChange={(v) => setFilters(f => ({ ...f, wheels: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder="Felgen" />
+              <SelectValue placeholder={t('wheels')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Felgen</SelectItem>
+              <SelectItem value="all">{t('allWheels')}</SelectItem>
               {filterOptions.wheels.map(v => <SelectItem key={v} value={v}>{getLabel(wheels, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.interior} onValueChange={(v) => setFilters(f => ({ ...f, interior: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[120px] h-8">
-              <SelectValue placeholder="Innenraum" />
+              <SelectValue placeholder={t('interior')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
               {filterOptions.interior.map(v => <SelectItem key={v} value={v}>{getLabel(interiors, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.towHitch} onValueChange={(v) => setFilters(f => ({ ...f, towHitch: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[90px] h-8">
-              <SelectValue placeholder="AHK" />
+              <SelectValue placeholder={t('towHitch')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
               {filterOptions.towHitch.map(v => <SelectItem key={v} value={v}>{getLabel(towHitchOptions, v)}</SelectItem>)}
             </SelectContent>
           </Select>
 
           <Select value={filters.autopilot} onValueChange={(v) => setFilters(f => ({ ...f, autopilot: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder="Autopilot" />
+              <SelectValue placeholder={t('autopilot')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
               {filterOptions.autopilot.map(v => <SelectItem key={v} value={v}>{getLabel(autopilotOptions, v)}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -907,20 +909,20 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
               <SelectValue placeholder="VIN" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
-              <SelectItem value="yes">Mit VIN</SelectItem>
-              <SelectItem value="no">Ohne VIN</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
+              <SelectItem value="yes">{t('withVin')}</SelectItem>
+              <SelectItem value="no">{t('withoutVin')}</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={filters.hasDelivery} onValueChange={(v) => setFilters(f => ({ ...f, hasDelivery: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder="Geliefert" />
+              <SelectValue placeholder={t('deliveredFilter')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle</SelectItem>
-              <SelectItem value="yes">Geliefert</SelectItem>
-              <SelectItem value="no">Ausstehend</SelectItem>
+              <SelectItem value="all">{tc('all')}</SelectItem>
+              <SelectItem value="yes">{t('deliveredFilter')}</SelectItem>
+              <SelectItem value="no">{t('pendingFilter')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -930,7 +932,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       <div className="md:hidden space-y-3 px-1">
         {filteredAndSortedOrders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            {orders.length === 0 ? 'Keine Bestellungen vorhanden' : 'Keine Einträge mit diesen Filtern'}
+            {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
           </div>
         ) : (
           filteredAndSortedOrders.map((order) => (
@@ -957,38 +959,38 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
         <table className="w-full min-w-max caption-bottom text-xs">
         <TableHeader className="sticky top-0 z-20">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
-            {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>}
-            {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>Name</SortableHeader>}
-            {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>Fahrzeug</SortableHeader>}
-            {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Bild</TableHead>}
-            {isColumnVisible('orderDate') && <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Bestelldatum</SortableHeader>}
-            {isColumnVisible('country') && <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>Land</SortableHeader>}
-            {isColumnVisible('model') && <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>Model</SortableHeader>}
-            {isColumnVisible('range') && <SortableHeader field="range" currentField={sortField} direction={sortDirection} onSort={handleSort}>Reichweite</SortableHeader>}
-            {isColumnVisible('drive') && <SortableHeader field="drive" currentField={sortField} direction={sortDirection} onSort={handleSort}>Antrieb</SortableHeader>}
-            {isColumnVisible('color') && <SortableHeader field="color" currentField={sortField} direction={sortDirection} onSort={handleSort}>Farbe</SortableHeader>}
-            {isColumnVisible('interior') && <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>Innen</SortableHeader>}
-            {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>Felgen</SortableHeader>}
-            {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>AHK</SortableHeader>}
-            {isColumnVisible('autopilot') && <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>Autopilot</SortableHeader>}
-            {isColumnVisible('deliveryWindow') && <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferfenster</SortableHeader>}
-            {isColumnVisible('deliveryLocation') && <SortableHeader field="deliveryLocation" currentField={sortField} direction={sortDirection} onSort={handleSort}>Ort</SortableHeader>}
-            {isColumnVisible('vin') && <SortableHeader field="vin" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN</SortableHeader>}
-            {isColumnVisible('vinReceivedDate') && <SortableHeader field="vinReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>VIN am</SortableHeader>}
-            {isColumnVisible('papersReceivedDate') && <SortableHeader field="papersReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Papiere am</SortableHeader>}
-            {isColumnVisible('productionDate') && <SortableHeader field="productionDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Produktion</SortableHeader>}
-            {isColumnVisible('typeApproval') && <SortableHeader field="typeApproval" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typgen.</SortableHeader>}
-            {isColumnVisible('typeVariant') && <SortableHeader field="typeVariant" currentField={sortField} direction={sortDirection} onSort={handleSort}>Typ-Var.</SortableHeader>}
-            {isColumnVisible('deliveryDate') && <SortableHeader field="deliveryDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Lieferdatum</SortableHeader>}
-            {isColumnVisible('orderToProduction') && <SortableHeader field="orderToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→P</SortableHeader>}
-            {isColumnVisible('orderToVin') && <SortableHeader field="orderToVin" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→VIN</SortableHeader>}
-            {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→L</SortableHeader>}
-            {isColumnVisible('orderToPapers') && <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>B→Pap</SortableHeader>}
-            {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>Pap→L</SortableHeader>}
-            {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>Änderung</SortableHeader>}
+            {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
+            {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
+            {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
+            {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('image')}</TableHead>}
+            {isColumnVisible('orderDate') && <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderDate')}</SortableHeader>}
+            {isColumnVisible('country') && <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('country')}</SortableHeader>}
+            {isColumnVisible('model') && <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('model')}</SortableHeader>}
+            {isColumnVisible('range') && <SortableHeader field="range" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('range')}</SortableHeader>}
+            {isColumnVisible('drive') && <SortableHeader field="drive" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('drive')}</SortableHeader>}
+            {isColumnVisible('color') && <SortableHeader field="color" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('color')}</SortableHeader>}
+            {isColumnVisible('interior') && <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('interior')}</SortableHeader>}
+            {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('wheels')}</SortableHeader>}
+            {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('towHitch')}</SortableHeader>}
+            {isColumnVisible('autopilot') && <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('autopilot')}</SortableHeader>}
+            {isColumnVisible('deliveryWindow') && <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryWindow')}</SortableHeader>}
+            {isColumnVisible('deliveryLocation') && <SortableHeader field="deliveryLocation" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryLocation')}</SortableHeader>}
+            {isColumnVisible('vin') && <SortableHeader field="vin" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vin')}</SortableHeader>}
+            {isColumnVisible('vinReceivedDate') && <SortableHeader field="vinReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vinDate')}</SortableHeader>}
+            {isColumnVisible('papersReceivedDate') && <SortableHeader field="papersReceivedDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersDate')}</SortableHeader>}
+            {isColumnVisible('productionDate') && <SortableHeader field="productionDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('production')}</SortableHeader>}
+            {isColumnVisible('typeApproval') && <SortableHeader field="typeApproval" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('typeApproval')}</SortableHeader>}
+            {isColumnVisible('typeVariant') && <SortableHeader field="typeVariant" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('typeVariant')}</SortableHeader>}
+            {isColumnVisible('deliveryDate') && <SortableHeader field="deliveryDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryDate')}</SortableHeader>}
+            {isColumnVisible('orderToProduction') && <SortableHeader field="orderToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToProduction')}</SortableHeader>}
+            {isColumnVisible('orderToVin') && <SortableHeader field="orderToVin" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToVin')}</SortableHeader>}
+            {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
+            {isColumnVisible('orderToPapers') && <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToPapers')}</SortableHeader>}
+            {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
+            {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
             {isAdmin && (
               <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
-                Aktionen
+                {tc('actions')}
               </TableHead>
             )}
           </TableRow>
@@ -997,7 +999,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
               <TableCell colSpan={visibleColumns.size + (isAdmin ? 1 : 0)} className="text-center py-8 text-muted-foreground">
-                {orders.length === 0 ? 'Keine Bestellungen vorhanden' : 'Keine Einträge mit diesen Filtern'}
+                {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
               </TableCell>
             </TableRow>
           ) : (
@@ -1186,7 +1188,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                 )}
                 {isColumnVisible('updatedAt') && (
                   <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                    {formatRelativeTime(order.updatedAt)}
+                    {formatRelativeTime(order.updatedAt, t as any)}
                   </TableCell>
                 )}
                 {isAdmin && (
@@ -1200,12 +1202,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onEdit(order)}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          Bearbeiten
+                          {tc('edit')}
                         </DropdownMenuItem>
                         {onGenerateResetCode && (
                           <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
                             <KeyRound className="mr-2 h-4 w-4" />
-                            Einmalcode generieren
+                            {th('generateResetCode')}
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
@@ -1213,7 +1215,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Löschen
+                          {tc('delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -1242,7 +1244,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       <Dialog open={!!imageModalOrder} onOpenChange={(open) => { if (!open) setImageModalOrder(null) }}>
         <DialogContent className="max-w-md p-4" aria-describedby={undefined}>
           <VisuallyHidden>
-            <DialogTitle>Fahrzeugbild</DialogTitle>
+            <DialogTitle>{th('vehicleImage')}</DialogTitle>
           </VisuallyHidden>
           {imageModalOrder && imageModalOrder.vehicleType && (imageModalOrder.vehicleType === 'Model Y' || imageModalOrder.vehicleType === 'Model 3') && (
             <div className="space-y-3">

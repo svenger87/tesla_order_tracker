@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, Settings } from '@/lib/types'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
@@ -11,6 +12,7 @@ import { EditCodeModal } from '@/components/EditCodeModal'
 import { EditByCodeModal } from '@/components/EditByCodeModal'
 import { DonationBanner } from '@/components/DonationBanner'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { triggerCelebration } from '@/components/DeliveryCelebration'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,10 +31,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 
 export default function Home() {
+  const t = useTranslations('home')
+  const tc = useTranslations('common')
   const [orders, setOrders] = useState<Order[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -141,7 +145,7 @@ export default function Home() {
       })
       const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Fehler beim Generieren des Codes')
+        throw new Error(data.error || t('errorGeneratingCode'))
       }
       setResetCodeDialog({
         open: true,
@@ -150,11 +154,11 @@ export default function Home() {
       })
     } catch (error) {
       console.error('Failed to generate reset code:', error)
-      alert(error instanceof Error ? error.message : 'Fehler beim Generieren des Codes')
+      alert(error instanceof Error ? error.message : t('errorGeneratingCode'))
     } finally {
       setGeneratingResetCode(false)
     }
-  }, [])
+  }, [t])
 
   return (
     <div className="min-h-screen bg-background">
@@ -182,11 +186,11 @@ export default function Home() {
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold md:text-2xl">
-                  <span className="sm:hidden">Tesla Tracker</span>
-                  <span className="hidden sm:inline">Tesla Bestellungen und Statistiken</span>
+                  <span className="sm:hidden">{t('titleShort')}</span>
+                  <span className="hidden sm:inline">{t('title')}</span>
                 </h1>
                 <p className="hidden text-sm text-muted-foreground sm:block">
-                  Verfolge Tesla Bestellungen
+                  {t('subtitle')}
                 </p>
               </div>
             </div>
@@ -200,11 +204,11 @@ export default function Home() {
                   className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
                 >
                   <Coffee className="h-3.5 w-3.5" />
-                  <span>Unterstützen</span>
+                  <span>{tc('support')}</span>
                 </a>
               )}
               <Link href="/docs" className="hidden sm:inline-flex">
-                <Button variant="ghost" size="icon" className="h-9 w-9" title="API Dokumentation">
+                <Button variant="ghost" size="icon" className="h-9 w-9" title="API Docs">
                   <Code2 className="h-4 w-4" />
                   <span className="sr-only">API Docs</span>
                 </Button>
@@ -220,13 +224,14 @@ export default function Home() {
                   <span className="sr-only">GitHub</span>
                 </Button>
               </a>
+              <LanguageSwitcher />
               <ThemeToggle />
               {/* Mobile overflow menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="sm:hidden">
                   <Button variant="ghost" size="icon" className="h-9 w-9">
                     <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Menü</span>
+                    <span className="sr-only">{tc('menu')}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -254,7 +259,7 @@ export default function Home() {
                         rel="noopener noreferrer"
                       >
                         <Coffee className="mr-2 h-4 w-4" />
-                        Unterstützen
+                        {tc('support')}
                       </a>
                     </DropdownMenuItem>
                   )}
@@ -305,7 +310,7 @@ export default function Home() {
             className="gap-2"
           >
             <BarChart3 className="h-4 w-4" />
-            {showStats ? 'Statistiken ausblenden' : 'Statistiken anzeigen'}
+            {showStats ? t('hideStats') : t('showStats')}
             <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
           </Button>
         </div>
@@ -317,7 +322,7 @@ export default function Home() {
         {/* Section Divider */}
         <div className="relative flex items-center py-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-          <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Bestellungen</span>
+          <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('orders')}</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         </div>
 
@@ -328,25 +333,25 @@ export default function Home() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Car className="h-5 w-5 text-primary" />
-                  Bestellungen
+                  {t('orders')}
                 </CardTitle>
                 <CardDescription>
-                  {orders.length} {orders.length === 1 ? 'Bestellung' : 'Bestellungen'} insgesamt
-                  {orderGroups.length > 0 && ` in ${orderGroups.length} ${orderGroups.length === 1 ? 'Quartal' : 'Quartalen'}`}
+                  {t('ordersCount', { count: orders.length })}
+                  {orderGroups.length > 0 && ` ${t('quartersCount', { count: orderGroups.length })}`}
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={fetchOrders} className="text-muted-foreground">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Aktualisieren</span>
+                  <span className="hidden sm:inline">{tc('refresh')}</span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setShowEditByCode(true)}>
                   <Pencil className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Bearbeiten</span>
+                  <span className="hidden sm:inline">{tc('edit')}</span>
                 </Button>
                 <Button size="sm" onClick={() => setShowAddForm(true)} className="shadow-sm">
                   <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Neue Bestellung</span>
+                  <span className="hidden sm:inline">{t('newOrder')}</span>
                 </Button>
               </div>
             </div>
@@ -408,7 +413,7 @@ export default function Home() {
               )}
             </div>
             <p className="text-xs text-muted-foreground/60">
-              Tesla Bestellungen und Statistiken — Ein Community Projekt der TFF
+              {t('footer')}
             </p>
           </motion.div>
         </div>
@@ -445,7 +450,6 @@ export default function Home() {
             setEditingOrder(null)
             fetchOrders().then(() => {
               // Check if delivery was just added
-              // This is a simplified check - in production you'd track the actual update
             })
           }}
         />
@@ -454,17 +458,17 @@ export default function Home() {
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Bestellung löschen?</DialogTitle>
+            <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
             <DialogDescription>
-              Diese Aktion kann nicht rückgängig gemacht werden.
+              {t('deleteConfirmDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
-              Abbrechen
+              {tc('cancel')}
             </Button>
             <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>
-              Löschen
+              {tc('delete')}
             </Button>
           </div>
         </DialogContent>
@@ -476,10 +480,10 @@ export default function Home() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <KeyRound className="h-5 w-5 text-primary" />
-              Einmalcode generiert
+              {t('resetCodeTitle')}
             </DialogTitle>
             <DialogDescription>
-              Code für &quot;{resetCodeDialog.orderName}&quot; - Gültig für 24 Stunden
+              {t('resetCodeDescription', { name: resetCodeDialog.orderName })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -497,7 +501,7 @@ export default function Home() {
                   setResetCodeCopied(true)
                   setTimeout(() => setResetCodeCopied(false), 2000)
                 }}
-                title="Kopieren"
+                title={tc('copy')}
               >
                 {resetCodeCopied ? (
                   <Check className="h-4 w-4 text-green-500" />
@@ -507,17 +511,17 @@ export default function Home() {
               </Button>
             </div>
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3 text-sm text-amber-700 dark:text-amber-400">
-              <p className="font-medium">Wichtig:</p>
+              <p className="font-medium">{t('resetCodeImportant')}</p>
               <ul className="list-disc list-inside mt-1 space-y-1">
-                <li>Teile diesen Code dem Benutzer mit</li>
-                <li>Der Benutzer kann damit ein neues Passwort setzen</li>
-                <li>Der Code ist nur einmal verwendbar</li>
+                <li>{t('resetCodeShareInfo')}</li>
+                <li>{t('resetCodeSetPassword')}</li>
+                <li>{t('resetCodeOneTime')}</li>
               </ul>
             </div>
           </div>
           <div className="flex justify-end">
             <Button onClick={() => setResetCodeDialog({ ...resetCodeDialog, open: false })}>
-              Schließen
+              {tc('close')}
             </Button>
           </div>
         </DialogContent>
