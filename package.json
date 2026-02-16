@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-better-sqlite3": "^7.4.0",
     "@prisma/client": "^7.3.0",
+    "@swc/helpers": "^0.5.18",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
     "canvas-confetti": "^1.9.4",
