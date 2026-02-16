@@ -11,6 +11,12 @@ services:
       - DATABASE_URL=file:/app/data/prod.db
     volumes:
       - sqlite_data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   app-staging:
     build:
@@ -28,6 +34,12 @@ services:
       - DATABASE_URL=file:/app/data/staging.db
     volumes:
       - sqlite_data_staging:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   caddy:
     image: caddy:2-alpine

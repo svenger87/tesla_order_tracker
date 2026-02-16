@@ -2,7 +2,7 @@ name: Deploy Staging
 
 on:
   push:
-    branches: [redesign]
+    branches: [staging]
   workflow_dispatch:
 
 jobs:
@@ -24,14 +24,14 @@ jobs:
             # --- Bootstrap staging repo on first run ---
             if [ ! -d "$STAGING_DIR" ]; then
               echo ">>> First run: cloning staging repo..."
-              git clone --branch redesign "$(cd $PROD_DIR && git remote get-url origin)" "$STAGING_DIR"
+              git clone --branch staging "$(cd $PROD_DIR && git remote get-url origin)" "$STAGING_DIR"
             fi
 
-            # --- Pull latest redesign branch ---
-            echo ">>> Pulling latest redesign..."
+            # --- Pull latest staging branch ---
+            echo ">>> Pulling latest staging..."
             cd "$STAGING_DIR"
-            git fetch origin redesign
-            git reset --hard origin/redesign
+            git fetch origin staging
+            git reset --hard origin/staging
 
             # --- Create .env.staging if missing ---
             if [ ! -f "$PROD_DIR/.env.staging" ]; then
@@ -46,16 +46,33 @@ jobs:
             # --- Update production repo (for Caddyfile & docker-compose changes) ---
             echo ">>> Syncing production repo (compose + Caddy config)..."
             cd "$PROD_DIR"
-            git fetch origin redesign
-            # Only update Caddyfile and docker-compose.yml from redesign
-            git checkout origin/redesign -- Caddyfile docker-compose.yml
+            git fetch origin staging
+            # Only update Caddyfile and docker-compose.yml from staging
+            git checkout origin/staging -- Caddyfile docker-compose.yml
+
+            # --- Tag current image for rollback ---
+            docker tag tesla-order-tracker-app-staging:latest tesla-order-tracker-app-staging:rollback 2>/dev/null || true
 
             # --- Build and start staging container ---
             echo ">>> Building and starting app-staging..."
-            docker compose up -d --build app-staging
+            docker compose build app-staging
+            docker compose up -d --no-deps app-staging
 
-            # --- Restart Caddy to pick up config changes ---
-            echo ">>> Restarting Caddy..."
-            docker compose restart caddy
+            # --- Wait for health check ---
+            echo "Waiting for staging health check..."
+            for i in $(seq 1 30); do
+              if wget -qO- http://localhost:3001/api/health 2>/dev/null | grep -q '"ok"'; then
+                echo "Health check passed!"
+                # Restart Caddy to pick up any config changes
+                docker compose restart caddy
+                echo ">>> Staging deployed to https://staging.tff-order-stats.de"
+                exit 0
+              fi
+              sleep 2
+            done
 
-            echo ">>> Staging deployed to https://staging.tff-order-stats.de"
+            # --- Rollback on failure ---
+            echo "Health check FAILED — rolling back staging"
+            docker tag tesla-order-tracker-app-staging:rollback tesla-order-tracker-app-staging:latest
+            docker compose up -d --no-deps app-staging
+            exit 1
