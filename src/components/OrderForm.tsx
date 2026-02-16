@@ -7,6 +7,7 @@ import { useConstraints } from '@/hooks/useConstraints'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -27,7 +28,7 @@ import {
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CalendarIcon, KeyRound, Shuffle } from 'lucide-react'
+import { CalendarIcon, KeyRound, Shuffle, User, Car, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { format, parse, isValid } from 'date-fns'
@@ -133,6 +134,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   // For legacy orders: new password fields
   const [newEditCode, setNewEditCode] = useState('')
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
+  // Tracking section: expanded by default
+  const [trackingOpen, setTrackingOpen] = useState(true)
 
   // Load dynamic options from API (filtered by vehicle type)
   const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
@@ -236,6 +239,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setNewEditCode('')
       setConfirmNewEditCode('')
       setError('')
+      setTrackingOpen(true)
     }
   }, [open, order])
 
@@ -371,6 +375,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           <DialogTitle>
             {order ? 'Bestellung bearbeiten' : 'Neue Bestellung'}
           </DialogTitle>
+          <DialogDescription>
+            {order ? 'Ändere die Daten deiner bestehenden Bestellung.' : 'Erfasse eine neue Tesla-Bestellung mit Konfiguration und Status.'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -380,420 +387,447 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-                placeholder="Benutzername"
-                required
-              />
+          {/* Section 1: Persönliche Daten */}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+              <User className="h-4 w-4 text-primary" />
+              Persönliche Daten
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  placeholder="Benutzername"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="orderDate">Bestelldatum *</Label>
+                <DatePickerField
+                  value={formData.orderDate}
+                  onChange={(v) => handleChange('orderDate', v)}
+                  placeholder="TT.MM.JJJJ"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Land *</Label>
+                <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Land wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        <span className="flex items-center gap-2">
+                          {c.flag && <TwemojiEmoji emoji={c.flag} size={16} />}
+                          {c.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="vehicleType">Fahrzeug *</Label>
-              <Select
-                value={formData.vehicleType}
-                onValueChange={(v) => {
-                  handleChange('vehicleType', v as VehicleType)
-                  // Reset model when vehicle type changes
-                  handleChange('model', '')
-                  handleChange('range', '')
-                  handleChange('drive', '')
-                  handleChange('wheels', '')
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Fahrzeug wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VEHICLE_TYPES.map((vt) => (
-                    <SelectItem key={vt.value} value={vt.value}>
-                      {vt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Section 2: Fahrzeugkonfiguration */}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+              <Car className="h-4 w-4 text-primary" />
+              Fahrzeugkonfiguration
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="vehicleType">Fahrzeug *</Label>
+                <Select
+                  value={formData.vehicleType}
+                  onValueChange={(v) => {
+                    handleChange('vehicleType', v as VehicleType)
+                    handleChange('model', '')
+                    handleChange('range', '')
+                    handleChange('drive', '')
+                    handleChange('wheels', '')
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Fahrzeug wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VEHICLE_TYPES.map((vt) => (
+                      <SelectItem key={vt.value} value={vt.value}>
+                        {vt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="orderDate">Bestelldatum *</Label>
-              <DatePickerField
-                value={formData.orderDate}
-                onChange={(v) => handleChange('orderDate', v)}
-                placeholder="TT.MM.JJJJ"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="model">Model *</Label>
+                <Select value={formData.model} onValueChange={(v) => {
+                  handleChange('model', v)
+                  const modelValue = v
+                  if (!modelValue) return
 
-            <div className="space-y-2">
-              <Label htmlFor="country">Land *</Label>
-              <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Land wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>
-                      <span className="flex items-center gap-2">
-                        {c.flag && <TwemojiEmoji emoji={c.flag} size={16} />}
-                        {c.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                  const constraints = getConstraintsForModel(modelValue)
 
-            <div className="space-y-2">
-              <Label htmlFor="model">Model *</Label>
-              <Select value={formData.model} onValueChange={(v) => {
-                handleChange('model', v)
-                // v is now the model value directly (not label)
-                const modelValue = v
-                if (!modelValue) return
-
-                // Get constraints for this model
-                const constraints = getConstraintsForModel(modelValue)
-
-                // Auto-set fields based on constraints
-                const fields = ['range', 'wheels', 'drive', 'interior'] as const
-                for (const field of fields) {
-                  const fieldConstraint = constraints[field]
-                  if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
-                    // Use the fixed value directly (not label)
-                    handleChange(field, fieldConstraint.fixedValue)
+                  const fields = ['range', 'wheels', 'drive', 'interior'] as const
+                  for (const field of fields) {
+                    const fieldConstraint = constraints[field]
+                    if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
+                      handleChange(field, fieldConstraint.fixedValue)
+                    }
                   }
-                }
 
-                // Reset color if not in allowed values
-                if (constraints.color?.type === 'allow' && formData.color) {
-                  // formData.color is already a value, not label
-                  if (constraints.color.allowedValues && !constraints.color.allowedValues.includes(formData.color)) {
-                    handleChange('color', '')
+                  if (constraints.color?.type === 'allow' && formData.color) {
+                    if (constraints.color.allowedValues && !constraints.color.allowedValues.includes(formData.color)) {
+                      handleChange('color', '')
+                    }
                   }
-                }
 
-                // Auto-set towHitch if field is disabled (not available for this model)
-                if (constraints.towHitch?.type === 'disable') {
-                  handleChange('towHitch', 'nein')
-                } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
-                  handleChange('towHitch', constraints.towHitch.fixedValue)
-                }
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Model wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {models.map((m) => (
-                    <SelectItem key={m.value} value={m.value}>
-                      {m.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                  if (constraints.towHitch?.type === 'disable') {
+                    handleChange('towHitch', 'nein')
+                  } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
+                    handleChange('towHitch', constraints.towHitch.fixedValue)
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Model wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {models.map((m) => (
+                      <SelectItem key={m.value} value={m.value}>
+                        {m.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Reichweite - shown for all models, disabled if constrained */}
-            <div className="space-y-2">
-              <Label htmlFor="range">Reichweite</Label>
-              <Select
-                value={formData.range}
-                onValueChange={(v) => handleChange('range', v)}
-                disabled={isFieldDisabled(selectedModelValue, 'range')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Reichweite wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getFieldOptions('range', ranges).map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if field is fixed */}
-              {modelConstraints.range?.type === 'fixed' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {ranges.find(r => r.value === formData.range)?.label ?? formData.range} ist fest
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="range">Reichweite</Label>
+                <Select
+                  value={formData.range}
+                  onValueChange={(v) => handleChange('range', v)}
+                  disabled={isFieldDisabled(selectedModelValue, 'range')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Reichweite wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getFieldOptions('range', ranges).map((r) => (
+                      <SelectItem key={r.value} value={r.value}>
+                        {r.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.range?.type === 'fixed' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {ranges.find(r => r.value === formData.range)?.label ?? formData.range} ist fest
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="drive">Antrieb</Label>
-              <Select
-                value={formData.drive}
-                onValueChange={(v) => handleChange('drive', v)}
-                disabled={isFieldDisabled(selectedModelValue, 'drive')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Antrieb wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getFieldOptions('drive', drives).map((d) => (
-                    <SelectItem key={d.value} value={d.value}>
-                      {d.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if field is fixed */}
-              {modelConstraints.drive?.type === 'fixed' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {drives.find(d => d.value === formData.drive)?.label ?? formData.drive} ist fest
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="drive">Antrieb</Label>
+                <Select
+                  value={formData.drive}
+                  onValueChange={(v) => handleChange('drive', v)}
+                  disabled={isFieldDisabled(selectedModelValue, 'drive')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Antrieb wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getFieldOptions('drive', drives).map((d) => (
+                      <SelectItem key={d.value} value={d.value}>
+                        {d.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.drive?.type === 'fixed' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {drives.find(d => d.value === formData.drive)?.label ?? formData.drive} ist fest
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="color">Farbe *</Label>
-              <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Farbe wählen">
-                    {formData.color && (
-                      <div className="flex items-center gap-2">
-                        {(() => {
-                          const colorOpt = colors.find(c => c.value === formData.color)
-                          return colorOpt?.hex ? (
+              <div className="space-y-2">
+                <Label htmlFor="color">Farbe *</Label>
+                <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Farbe wählen">
+                      {formData.color && (
+                        <div className="flex items-center gap-2">
+                          {(() => {
+                            const colorOpt = colors.find(c => c.value === formData.color)
+                            return colorOpt?.hex ? (
+                              <span
+                                className={cn(
+                                  "w-4 h-4 rounded-full inline-block",
+                                  colorOpt.border && "border border-border"
+                                )}
+                                style={{ backgroundColor: colorOpt.hex }}
+                              />
+                            ) : null
+                          })()}
+                          {colors.find(c => c.value === formData.color)?.label || formData.color}
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getFieldOptions('color', colors).map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        <div className="flex items-center gap-2">
+                          {c.hex && (
                             <span
                               className={cn(
                                 "w-4 h-4 rounded-full inline-block",
-                                colorOpt.border && "border border-border"
+                                c.border && "border border-border"
                               )}
-                              style={{ backgroundColor: colorOpt.hex }}
+                              style={{ backgroundColor: c.hex }}
                             />
-                          ) : null
-                        })()}
-                        {colors.find(c => c.value === formData.color)?.label || formData.color}
-                      </div>
-                    )}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {getFieldOptions('color', colors).map((c) => (
-                    <SelectItem key={c.value} value={c.value}>
-                      <div className="flex items-center gap-2">
-                        {c.hex && (
-                          <span
-                            className={cn(
-                              "w-4 h-4 rounded-full inline-block",
-                              c.border && "border border-border"
-                            )}
-                            style={{ backgroundColor: c.hex }}
-                          />
-                        )}
-                        {c.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if colors are restricted */}
-              {modelConstraints.color?.type === 'allow' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Farbauswahl
-                </p>
-              )}
-            </div>
+                          )}
+                          {c.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.color?.type === 'allow' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Farbauswahl
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="interior">Innenraum *</Label>
-              <Select
-                value={formData.interior}
-                onValueChange={(v) => handleChange('interior', v)}
-                disabled={isFieldDisabled(selectedModelValue, 'interior')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Innenraum wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getFieldOptions('interior', interiors).map((i) => (
-                    <SelectItem key={i.value} value={i.value}>
-                      {i.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if interior is fixed */}
-              {modelConstraints.interior?.type === 'fixed' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {interiors.find(i => i.value === formData.interior)?.label ?? formData.interior} ist fest
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="interior">Innenraum *</Label>
+                <Select
+                  value={formData.interior}
+                  onValueChange={(v) => handleChange('interior', v)}
+                  disabled={isFieldDisabled(selectedModelValue, 'interior')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Innenraum wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getFieldOptions('interior', interiors).map((i) => (
+                      <SelectItem key={i.value} value={i.value}>
+                        {i.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.interior?.type === 'fixed' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {interiors.find(i => i.value === formData.interior)?.label ?? formData.interior} ist fest
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="wheels">Felgen *</Label>
-              <Select
-                value={formData.wheels}
-                onValueChange={(v) => handleChange('wheels', v)}
-                disabled={isFieldDisabled(selectedModelValue, 'wheels')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Felgen wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getFieldOptions('wheels', wheels).map((w) => (
-                    <SelectItem key={w.value} value={w.value}>
-                      {w.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if wheels are fixed */}
-              {modelConstraints.wheels?.type === 'fixed' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: {wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels} ist fest
-                </p>
-              )}
-              {/* Show hint if wheels are restricted */}
-              {modelConstraints.wheels?.type === 'allow' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Felgenauswahl
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="wheels">Felgen *</Label>
+                <Select
+                  value={formData.wheels}
+                  onValueChange={(v) => handleChange('wheels', v)}
+                  disabled={isFieldDisabled(selectedModelValue, 'wheels')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Felgen wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getFieldOptions('wheels', wheels).map((w) => (
+                      <SelectItem key={w.value} value={w.value}>
+                        {w.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.wheels?.type === 'fixed' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: {wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels} ist fest
+                  </p>
+                )}
+                {modelConstraints.wheels?.type === 'allow' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: eingeschränkte Felgenauswahl
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="towHitch">AHK (Anhängerkupplung) *</Label>
-              <Select
-                value={formData.towHitch}
-                onValueChange={(v) => handleChange('towHitch', v)}
-                disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="AHK wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(modelConstraints.towHitch?.type === 'disable'
-                    ? [{ value: 'nein', label: 'Nein' }]
-                    : filterOptions(selectedModelValue, 'towHitch', towHitch)
-                  ).map((t) => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Show hint if tow hitch is disabled */}
-              {modelConstraints.towHitch?.type === 'disable' && (
-                <p className="text-xs text-muted-foreground">
-                  {models.find(m => m.value === formData.model)?.label ?? formData.model}: AHK nicht verfügbar
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="towHitch">AHK (Anhängerkupplung) *</Label>
+                <Select
+                  value={formData.towHitch}
+                  onValueChange={(v) => handleChange('towHitch', v)}
+                  disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="AHK wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(modelConstraints.towHitch?.type === 'disable'
+                      ? [{ value: 'nein', label: 'Nein' }]
+                      : filterOptions(selectedModelValue, 'towHitch', towHitch)
+                    ).map((t) => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {modelConstraints.towHitch?.type === 'disable' && (
+                  <p className="text-xs text-muted-foreground">
+                    {models.find(m => m.value === formData.model)?.label ?? formData.model}: AHK nicht verfügbar
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="autopilot">Autopilot *</Label>
-              <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Autopilot wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {autopilot.map((a) => (
-                    <SelectItem key={a.value} value={a.value}>
-                      {a.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label htmlFor="autopilot">Autopilot *</Label>
+                <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Autopilot wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {autopilot.map((a) => (
+                      <SelectItem key={a.value} value={a.value}>
+                        {a.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deliveryWindow">Lieferfenster</Label>
-              <Input
-                id="deliveryWindow"
-                value={formData.deliveryWindow}
-                onChange={(e) => handleChange('deliveryWindow', e.target.value)}
-                placeholder="z.B. 11.02.-18.02.2026"
-              />
-            </div>
+          {/* Section 3: Lieferung */}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              Lieferung
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="deliveryWindow">Lieferfenster</Label>
+                <Input
+                  id="deliveryWindow"
+                  value={formData.deliveryWindow}
+                  onChange={(e) => handleChange('deliveryWindow', e.target.value)}
+                  placeholder="z.B. 11.02.-18.02.2026"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deliveryLocation">Ort (Auslieferung) *</Label>
-              <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Auslieferungsort wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {deliveryLocations.map((loc) => (
-                    <SelectItem key={loc.value} value={loc.value}>
-                      {loc.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label htmlFor="deliveryLocation">Ort (Auslieferung) *</Label>
+                <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Auslieferungsort wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deliveryLocations.map((loc) => (
+                      <SelectItem key={loc.value} value={loc.value}>
+                        {loc.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="vin">VIN</Label>
-              <Input
-                id="vin"
-                value={formData.vin}
-                onChange={(e) => handleChange('vin', e.target.value)}
-                placeholder="Fahrzeug-Identnummer"
-                className="font-mono"
-              />
-            </div>
+          {/* Section 4: Status & Tracking (collapsible) */}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <button
+              type="button"
+              onClick={() => setTrackingOpen(!trackingOpen)}
+              className="flex items-center justify-between w-full text-sm font-semibold border-b pb-2"
+            >
+              <span className="flex items-center gap-2">
+                <ClipboardList className="h-4 w-4 text-primary" />
+                Status & Tracking
+              </span>
+              <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", trackingOpen && "rotate-180")} />
+            </button>
+            {trackingOpen && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="vin">VIN</Label>
+                  <Input
+                    id="vin"
+                    value={formData.vin}
+                    onChange={(e) => handleChange('vin', e.target.value)}
+                    placeholder="Fahrzeug-Identnummer"
+                    className="font-mono"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="vinReceivedDate">VIN erhalten am</Label>
-              <DatePickerField
-                value={formData.vinReceivedDate}
-                onChange={(v) => handleChange('vinReceivedDate', v)}
-                placeholder="TT.MM.JJJJ"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vinReceivedDate">VIN erhalten am</Label>
+                  <DatePickerField
+                    value={formData.vinReceivedDate}
+                    onChange={(v) => handleChange('vinReceivedDate', v)}
+                    placeholder="TT.MM.JJJJ"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="papersReceivedDate">Papiere erhalten am</Label>
-              <DatePickerField
-                value={formData.papersReceivedDate}
-                onChange={(v) => handleChange('papersReceivedDate', v)}
-                placeholder="TT.MM.JJJJ"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="papersReceivedDate">Papiere erhalten am</Label>
+                  <DatePickerField
+                    value={formData.papersReceivedDate}
+                    onChange={(v) => handleChange('papersReceivedDate', v)}
+                    placeholder="TT.MM.JJJJ"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="productionDate">Produktionsdatum</Label>
-              <DatePickerField
-                value={formData.productionDate}
-                onChange={(v) => handleChange('productionDate', v)}
-                placeholder="TT.MM.JJJJ"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="productionDate">Produktionsdatum</Label>
+                  <DatePickerField
+                    value={formData.productionDate}
+                    onChange={(v) => handleChange('productionDate', v)}
+                    placeholder="TT.MM.JJJJ"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="typeApproval">Typgenehmigung</Label>
-              <Input
-                id="typeApproval"
-                value={formData.typeApproval}
-                onChange={(e) => handleChange('typeApproval', e.target.value)}
-                placeholder="Letzte 2 Ziffern"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="typeApproval">Typgenehmigung</Label>
+                  <Input
+                    id="typeApproval"
+                    value={formData.typeApproval}
+                    onChange={(e) => handleChange('typeApproval', e.target.value)}
+                    placeholder="Letzte 2 Ziffern"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="typeVariant">Typ-Variante</Label>
-              <Input
-                id="typeVariant"
-                value={formData.typeVariant}
-                onChange={(e) => handleChange('typeVariant', e.target.value)}
-                placeholder="YS[5L|5M|6M][R|D]"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="typeVariant">Typ-Variante</Label>
+                  <Input
+                    id="typeVariant"
+                    value={formData.typeVariant}
+                    onChange={(e) => handleChange('typeVariant', e.target.value)}
+                    placeholder="YS[5L|5M|6M][R|D]"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deliveryDate">Auslieferungsdatum</Label>
-              <DatePickerField
-                value={formData.deliveryDate}
-                onChange={(v) => handleChange('deliveryDate', v)}
-                placeholder="TT.MM.JJJJ"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deliveryDate">Auslieferungsdatum</Label>
+                  <DatePickerField
+                    value={formData.deliveryDate}
+                    onChange={(v) => handleChange('deliveryDate', v)}
+                    placeholder="TT.MM.JJJJ"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* New Password for Legacy Orders */}

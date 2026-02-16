@@ -176,6 +176,7 @@ export default function Home() {
                   src="/logo.webp"
                   alt="Tesla Tracker Logo"
                   fill
+                  sizes="44px"
                   className="object-contain p-0.5"
                 />
               </motion.div>

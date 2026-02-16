@@ -343,44 +343,6 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
 
         {/* Tab 5: Timeline & Wait Times */}
         <TabsContent value="timeline" className="mt-6 space-y-6">
-          {/* Wait time stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              label="Ø Lieferzeit"
-              value={stats.avgOrderToDelivery !== null ? `${stats.avgOrderToDelivery} Tage` : '-'}
-              icon={Timer}
-              description="Bestellung bis Lieferung"
-              hint="Durchschnittliche Gesamtwartezeit von Bestellung bis Fahrzeugübergabe."
-              delay={0}
-            />
-            <StatCard
-              label="Ø VIN-Zeit"
-              value={stats.avgOrderToVin !== null ? `${stats.avgOrderToVin} Tage` : '-'}
-              icon={Clock}
-              description="Bestellung bis VIN"
-              hint="Durchschnittliche Zeit bis zur VIN-Zuweisung. Nur Fahrzeuge mit erfasstem VIN-Datum."
-              delay={0.1}
-            />
-            <StatCard
-              label="Ø Papier-Zeit"
-              value={stats.avgOrderToPapers !== null ? `${stats.avgOrderToPapers} Tage` : '-'}
-              icon={FileText}
-              description="Bestellung bis Papiere"
-              hint={stats.avgOrderToPapers === null
-                ? "Nicht genügend konsistente Daten verfügbar."
-                : "Durchschnittliche Zeit bis zum Erhalt der Fahrzeugpapiere."}
-              delay={0.2}
-            />
-            <StatCard
-              label="Ø Endspurt"
-              value={stats.avgPapersToDelivery !== null ? `${stats.avgPapersToDelivery} Tage` : '-'}
-              icon={Hourglass}
-              description="Papiere bis Lieferung"
-              hint="Durchschnittliche Zeit vom Papiererhalt bis zur Fahrzeugübergabe."
-              delay={0.3}
-            />
-          </div>
-
           {/* Timeline charts */}
           <div className="grid md:grid-cols-2 gap-6">
             <Card>

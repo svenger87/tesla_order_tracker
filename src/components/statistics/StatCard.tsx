@@ -40,7 +40,9 @@ export function StatCard({ label, value, icon: Icon, description, hint, variant 
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="h-3 w-3 text-muted-foreground/60 cursor-help shrink-0" />
+                    <span className="min-w-[28px] min-h-[28px] flex items-center justify-center">
+                      <Info className="h-3 w-3 text-muted-foreground/60 cursor-help shrink-0" />
+                    </span>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-[250px] text-xs">
                     <p>{hint}</p>

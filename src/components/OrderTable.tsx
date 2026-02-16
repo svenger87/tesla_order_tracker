@@ -29,6 +29,7 @@ function formatRelativeTime(dateString: string | undefined): string {
 }
 import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
+import { TeslaCarImage } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
 
 // Pre-build color lookup map for O(1) access
@@ -156,6 +157,12 @@ import {
 } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import {
   Select,
   SelectContent,
@@ -347,6 +354,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'status', label: 'Status', group: 'essential' },
   { key: 'name', label: 'Name', group: 'essential' },
   { key: 'vehicleType', label: 'Fahrzeug', group: 'essential' },
+  { key: 'carImage', label: 'Bild', group: 'configuration' },
   { key: 'orderDate', label: 'Bestelldatum', group: 'essential' },
   // Configuration
   { key: 'country', label: 'Land', group: 'configuration' },
@@ -394,6 +402,9 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   const [showFilters, setShowFilters] = useState(false)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(DEFAULT_VISIBLE_COLUMNS)
   const [isHydrated, setIsHydrated] = useState(false)
+
+  // Car image modal
+  const [imageModalOrder, setImageModalOrder] = useState<Order | null>(null)
 
   // Get options from useOptions hook (includes labels for values)
   const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions } = useOptions()
@@ -472,13 +483,19 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       }
     }
 
-    // Load column visibility
+    // Load column visibility, auto-including any new columns not in saved set
     const savedColumns = localStorage.getItem(COLUMNS_STORAGE_KEY)
     if (savedColumns) {
       try {
         const parsed = JSON.parse(savedColumns)
         if (Array.isArray(parsed)) {
-          setVisibleColumns(new Set(parsed))
+          const saved = new Set(parsed)
+          // Add any columns that exist in COLUMN_DEFS but weren't in saved prefs (newly added)
+          const allKeys = new Set(COLUMN_DEFS.map(c => c.key))
+          for (const key of allKeys) {
+            if (!saved.has(key)) saved.add(key)
+          }
+          setVisibleColumns(saved)
         }
       } catch (e) {
         console.error('Failed to parse saved columns:', e)
@@ -690,7 +707,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           className="gap-2"
         >
           <Filter className="h-4 w-4" />
-          <span className="hidden xs:inline">Filter</span>
+          Filter
           {activeFilterCount > 0 && (
             <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
               {activeFilterCount}
@@ -701,7 +718,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
               <Columns3 className="h-4 w-4" />
-              <span className="hidden xs:inline">Spalten</span>
+              Spalten
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[240px] p-3" align="start">
@@ -924,6 +941,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
               onEdit={onEdit}
               onDelete={onDelete}
               onGenerateResetCode={onGenerateResetCode}
+              onImageClick={setImageModalOrder}
               options={{ models, ranges, drives, interiors }}
             />
           ))
@@ -942,6 +960,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Status</TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>Name</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>Fahrzeug</SortableHeader>}
+            {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">Bild</TableHead>}
             {isColumnVisible('orderDate') && <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>Bestelldatum</SortableHeader>}
             {isColumnVisible('country') && <SortableHeader field="country" currentField={sortField} direction={sortDirection} onSort={handleSort}>Land</SortableHeader>}
             {isColumnVisible('model') && <SortableHeader field="model" currentField={sortField} direction={sortDirection} onSort={handleSort}>Model</SortableHeader>}
@@ -1006,6 +1025,28 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                       <Badge variant="outline" className="text-xs">
                         {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
                       </Badge>
+                    ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('carImage') && (
+                  <TableCell className="p-1">
+                    {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') ? (
+                      <button
+                        type="button"
+                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setImageModalOrder(order)}
+                      >
+                        <TeslaCarImage
+                          vehicleType={order.vehicleType as 'Model Y' | 'Model 3'}
+                          color={order.color}
+                          wheels={order.wheels}
+                          model={order.model}
+                          drive={order.drive}
+                          interior={order.interior}
+                          size={80}
+                          fetchSize={400}
+                        />
+                      </button>
                     ) : '-'}
                   </TableCell>
                 )}
@@ -1196,6 +1237,39 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           <div style={{ width: scrollWidth, height: '1px' }} />
         </div>
       )}
+
+      {/* Car image modal */}
+      <Dialog open={!!imageModalOrder} onOpenChange={(open) => { if (!open) setImageModalOrder(null) }}>
+        <DialogContent className="max-w-md p-4" aria-describedby={undefined}>
+          <VisuallyHidden>
+            <DialogTitle>Fahrzeugbild</DialogTitle>
+          </VisuallyHidden>
+          {imageModalOrder && imageModalOrder.vehicleType && (imageModalOrder.vehicleType === 'Model Y' || imageModalOrder.vehicleType === 'Model 3') && (
+            <div className="space-y-3">
+              <div className="flex justify-center">
+                <TeslaCarImage
+                  vehicleType={imageModalOrder.vehicleType as 'Model Y' | 'Model 3'}
+                  color={imageModalOrder.color}
+                  wheels={imageModalOrder.wheels}
+                  model={imageModalOrder.model}
+                  drive={imageModalOrder.drive}
+                  interior={imageModalOrder.interior}
+                  size={400}
+                  fetchSize={800}
+                />
+              </div>
+              <div className="text-center text-sm text-muted-foreground">
+                <span className="font-medium">{imageModalOrder.name}</span>
+                {' — '}
+                {imageModalOrder.vehicleType}
+                {imageModalOrder.model ? ` ${imageModalOrder.model}` : ''}
+                {imageModalOrder.color ? ` · ${imageModalOrder.color}` : ''}
+                {imageModalOrder.wheels ? ` · ${imageModalOrder.wheels}"` : ''}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

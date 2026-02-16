@@ -23,7 +23,7 @@ export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
       transition={{ duration: 0.5 }}
       className="h-[300px] w-full"
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <BarChart
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}

@@ -86,14 +86,14 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
           transition={{ duration: 0.4, delay }}
           className="h-[220px]"
         >
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <PieChart>
               <Pie
                 data={displayData}
                 cx="50%"
-                cy="35%"
-                innerRadius={28}
-                outerRadius={50}
+                cy="45%"
+                innerRadius={50}
+                outerRadius={80}
                 paddingAngle={0}
                 dataKey="count"
                 nameKey="name"
@@ -131,13 +131,13 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
               />
               <Legend
                 verticalAlign="bottom"
-                height={60}
-                wrapperStyle={{ fontSize: '9px', overflow: 'hidden', maxHeight: '60px' }}
+                height={70}
+                wrapperStyle={{ fontSize: '11px', overflow: 'hidden', maxHeight: '80px' }}
                 formatter={(value, entry) => {
                   const count = (entry.payload as DistributionData)?.count || 0
                   const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0'
-                  const truncatedValue = typeof value === 'string' && value.length > 12 ? value.slice(0, 12) + '…' : value
-                  return <span className="text-foreground text-[10px]">{truncatedValue} ({percentage}%)</span>
+                  const truncatedValue = typeof value === 'string' && value.length > 16 ? value.slice(0, 16) + '…' : value
+                  return <span className="text-foreground text-xs">{truncatedValue} ({percentage}%)</span>
                 }}
               />
             </PieChart>

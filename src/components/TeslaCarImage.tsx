@@ -3,50 +3,36 @@
 import { memo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { COLORS } from '@/lib/types'
+import { useCompositorCodes, lookupCode, type CompositorCodeMap } from '@/lib/CompositorCodesContext'
 
-// Tesla compositor base URL - using configurator/compositor endpoint
-const COMPOSITOR_BASE = 'https://static-assets.tesla.com/configurator/compositor'
-
-// Color value to Tesla compositor option code mapping
-// Source: tesla-order-status-tracker.de (2026-02-07) + POC verification
-const COLOR_CODES: Record<string, string> = {
-  // Current colors (2025 Model Y Juniper / Model 3 Highland)
+// Hardcoded fallback color codes (used when DB codes not yet loaded)
+const FALLBACK_COLOR_CODES: Record<string, string> = {
   'pearl_white': 'PPSW',
   'solid_black': 'PBSB',
-  'diamond_black': 'PX02',      // Updated for Juniper
+  'diamond_black': 'PX02',
   'stealth_grey': 'PN01',
   'quicksilver': 'PN00',
   'ultra_red': 'PR01',
-  'glacier_blue': 'PB01',       // New Juniper color
-  'marine_blue': 'PB02',        // New Juniper color (updated code)
+  'glacier_blue': 'PB01',
+  'marine_blue': 'PB02',
   'deep_blue': 'PPSB',
   'midnight_cherry': 'PR00',
-  // Legacy colors (discontinued but appear in historical orders)
   'midnight_silver': 'PMNG',
   'red_multi': 'PPMR',
   'silver_metallic': 'PMSS',
-  'obsidian_black': 'PMBL',     // Old Model Y
-  'anza_brown': 'PMAB',
-  'monterey_blue': 'PMMB',
-  'green_metallic': 'PMSG',
-  'dolphin_grey': 'PMTG',
-  'signature_red': 'PPSR',
-  'titanium': 'PPTI',
-  'solid_white': 'PBCW',
 }
 
 // Find color code from color value or label
-function findColorCode(colorInput: string | null | undefined): string | null {
+function findColorCode(colorInput: string | null | undefined, vehicleType: string, codes: CompositorCodeMap | null): string | null {
   if (!colorInput) return null
 
   const normalizedInput = colorInput.toLowerCase().trim().replace(/[\s-]+/g, '_')
 
-  // Direct match on value
-  if (COLOR_CODES[normalizedInput]) {
-    return COLOR_CODES[normalizedInput]
-  }
+  // Try DB codes first
+  const dbCode = lookupCode(codes, 'color', vehicleType, normalizedInput)
+  if (dbCode) return dbCode
 
-  // Try to match via COLORS array (value or label)
+  // Try matching via COLORS array to normalize the value
   const color = COLORS.find(c =>
     c.value === normalizedInput ||
     c.label.toLowerCase().replace(/[\s-]+/g, '_') === normalizedInput ||
@@ -54,110 +40,163 @@ function findColorCode(colorInput: string | null | undefined): string | null {
     c.value.includes(normalizedInput)
   )
 
-  if (color?.value && COLOR_CODES[color.value]) {
-    return COLOR_CODES[color.value]
+  if (color?.value) {
+    const dbCodeFromValue = lookupCode(codes, 'color', vehicleType, color.value)
+    if (dbCodeFromValue) return dbCodeFromValue
   }
+
+  // Hardcoded fallback
+  if (color?.value && FALLBACK_COLOR_CODES[color.value]) return FALLBACK_COLOR_CODES[color.value]
+  if (FALLBACK_COLOR_CODES[normalizedInput]) return FALLBACK_COLOR_CODES[normalizedInput]
 
   return null
 }
 
-// Extract wheel size number from value or label (e.g., "19" from '19"' or '19')
+// Extract wheel size number from value or label
 function findWheelSize(wheelInput: string | null | undefined): string | null {
   if (!wheelInput) return null
-
-  // Extract just the number portion
   const match = wheelInput.match(/(\d{2})/)
   return match ? match[1] : null
 }
 
-// Model Y wheel codes (2025 Juniper + legacy)
-// Source: tesla-order-status-tracker.de + POC verification
-const MODEL_Y_WHEEL_CODES: Record<string, string> = {
-  '18': 'WY18B',    // 18" Aero
-  '19': 'WY19B',    // 19" Sport (pre-Juniper: Gemini)
-  '20': 'WY20A',    // 20" Helix (Juniper) - updated from WY0S
-  '21': 'WY21A',    // 21" Arachnid 2.0 (Juniper) - updated from WY1S
+// Resolve body code from model (trim) + drive
+function resolveBodyCode(
+  vehicleType: string,
+  model: string | null | undefined,
+  drive: string | null | undefined,
+  codes: CompositorCodeMap | null
+): string | null {
+  if (!model) return null
+  const trimNorm = model.toLowerCase().trim()
+
+  // Performance has no drive suffix
+  if (trimNorm === 'performance') {
+    return lookupCode(codes, 'body', vehicleType, 'performance')
+  }
+
+  // Build lookup key: trim_drive (e.g. "standard_rwd", "premium_awd")
+  const driveNorm = drive?.toLowerCase().trim() || 'rwd'
+  const key = `${trimNorm}_${driveNorm}`
+  return lookupCode(codes, 'body', vehicleType, key)
 }
 
-// Model 3 wheel codes (Highland 2024+)
-// Source: tesla-order-status-tracker.de + POC verification
-const MODEL_3_WHEEL_CODES: Record<string, string> = {
-  '18': 'W38A',     // 18" Photon (Highland default) - updated from W38B
-  '19': 'W39B',     // 19" Sport
-  '20': 'W32P',     // 20" Performance
+// Resolve wheel code from size + trim context
+function resolveWheelCode(
+  vehicleType: string,
+  wheels: string | null | undefined,
+  model: string | null | undefined,
+  codes: CompositorCodeMap | null
+): string | null {
+  const wheelSize = findWheelSize(wheels)
+  if (!wheelSize) return null
+
+  // Model 3 has trim-specific wheel codes for 18"
+  if (vehicleType === 'Model 3' && wheelSize === '18') {
+    const trimNorm = model?.toLowerCase().trim() || 'standard'
+    if (trimNorm === 'standard') {
+      return lookupCode(codes, 'wheel', vehicleType, '18_standard')
+    }
+    return lookupCode(codes, 'wheel', vehicleType, '18_premium')
+  }
+
+  return lookupCode(codes, 'wheel', vehicleType, wheelSize)
 }
 
-// View angles
+// Resolve interior code from trim + interior color
+function resolveInteriorCode(
+  vehicleType: string,
+  model: string | null | undefined,
+  interior: string | null | undefined,
+  drive: string | null | undefined,
+  codes: CompositorCodeMap | null
+): string | null {
+  if (!model) return null
+  const trimNorm = model.toLowerCase().trim()
+  const interiorNorm = interior?.toLowerCase().trim() || 'black'
+
+  // Model 3 Premium AWD has its own interior codes
+  if (vehicleType === 'Model 3' && trimNorm === 'premium') {
+    const driveNorm = drive?.toLowerCase().trim()
+    if (driveNorm === 'awd') {
+      return lookupCode(codes, 'interior', vehicleType, `premium_awd_${interiorNorm}`)
+    }
+  }
+
+  const key = `${trimNorm}_${interiorNorm}`
+  return lookupCode(codes, 'interior', vehicleType, key)
+}
+
 type ViewAngle = 'STUD_3QTR' | 'STUD_SIDE' | 'STUD_REAR' | 'STUD_FRONT'
 
 interface TeslaCarImageProps {
   vehicleType: 'Model Y' | 'Model 3'
   color?: string | null
   wheels?: string | null
+  model?: string | null
+  drive?: string | null
+  interior?: string | null
   view?: ViewAngle
-  size?: number // Display size in CSS pixels
-  fetchSize?: number // Resolution to request from API (for high-DPI screens)
+  size?: number
+  fetchSize?: number
   className?: string
 }
-
-// Body style / generation codes for current models
-// Source: POC testing (2026-02-12) - verified with Tesla compositor API
-// Model 3: Default (no code) = Highland body
-// Model Y: MTY70 = Juniper body (without this, shows pre-Juniper)
-const MODEL_Y_JUNIPER_CODE = 'MTY70'
 
 function buildCompositorUrl(
   vehicleType: 'Model Y' | 'Model 3',
   color: string | null | undefined,
   wheels: string | null | undefined,
+  model: string | null | undefined,
+  drive: string | null | undefined,
+  interior: string | null | undefined,
   view: ViewAngle,
-  size: number
+  size: number,
+  codes: CompositorCodeMap | null
 ): string {
-  const model = vehicleType === 'Model Y' ? 'my' : 'm3'
-  const wheelCodes = vehicleType === 'Model Y' ? MODEL_Y_WHEEL_CODES : MODEL_3_WHEEL_CODES
-
-  // Build options array
+  const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
   const options: string[] = []
 
-  // Add color code - resolve from value or label
-  const colorCode = findColorCode(color)
-  if (colorCode) {
-    options.push(`$${colorCode}`)
-  } else {
-    // Default to Pearl White
-    options.push('$PPSW')
+  // Body code (trim-specific)
+  const bodyCode = resolveBodyCode(vehicleType, model, drive, codes)
+  if (bodyCode) {
+    options.push(`$${bodyCode}`)
   }
 
-  // Add wheel code - extract wheel size from value or label
-  const wheelSize = findWheelSize(wheels)
-  if (wheelSize && wheelCodes[wheelSize]) {
-    options.push(`$${wheelCodes[wheelSize]}`)
-  } else {
-    // Default to base wheels (Juniper/Highland defaults)
-    options.push(vehicleType === 'Model Y' ? '$WY19B' : '$W38A')
+  // Color code
+  const colorCode = findColorCode(color, vehicleType, codes)
+  options.push(`$${colorCode || 'PPSW'}`)
+
+  // Wheel code
+  const wheelCode = resolveWheelCode(vehicleType, wheels, model, codes)
+  if (wheelCode) {
+    options.push(`$${wheelCode}`)
   }
 
-  // Add body style code for Juniper Model Y
-  // Model 3 Highland is default (no additional code needed)
-  if (vehicleType === 'Model Y') {
-    options.push(`$${MODEL_Y_JUNIPER_CODE}`)
+  // Interior code (required for proper wheel rendering)
+  const interiorCode = resolveInteriorCode(vehicleType, model, interior, drive, codes)
+  if (interiorCode) {
+    options.push(`$${interiorCode}`)
   }
 
+  const optionsStr = options.join(',')
+
+  // Use local caching proxy to avoid Tesla rate limits
   const params = new URLSearchParams({
-    bkba_opt: '2',  // Transparent background (using value 2 as per teslahunt library)
-    model,
-    options: options.join(','),
+    model: modelSlug,
+    options: optionsStr,
     size: size.toString(),
     view,
   })
 
-  return `${COMPOSITOR_BASE}?${params.toString()}`
+  return `/api/compositor-image?${params.toString()}`
 }
 
 export const TeslaCarImage = memo(function TeslaCarImage({
   vehicleType,
   color,
   wheels,
+  model,
+  drive,
+  interior,
   view = 'STUD_3QTR',
   size = 400,
   fetchSize,
@@ -165,23 +204,32 @@ export const TeslaCarImage = memo(function TeslaCarImage({
 }: TeslaCarImageProps) {
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const codes = useCompositorCodes()
 
-  // Use fetchSize if provided, otherwise use size (for backwards compatibility)
-  // For high-DPI screens, request a larger image than display size
   const apiSize = fetchSize || size
-  const imageUrl = buildCompositorUrl(vehicleType, color, wheels, view, apiSize)
+  const imageUrl = buildCompositorUrl(vehicleType, color, wheels, model, drive, interior, view, apiSize, codes)
+
+  // Collect missing fields for debug display in error fallback
+  const missing: string[] = []
+  if (!color) missing.push('Farbe')
+  if (!wheels) missing.push('Felgen')
+  if (!model) missing.push('Modell')
+  if (!drive) missing.push('Antrieb')
+  if (!interior) missing.push('Interieur')
 
   if (hasError) {
-    // Fallback: show a placeholder or text
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-muted rounded-lg text-muted-foreground text-sm",
+          "flex flex-col items-center justify-center gap-1 bg-muted rounded-lg text-muted-foreground",
           className
         )}
         style={{ width: size, height: size * 0.5 }}
       >
-        {vehicleType}
+        <span className="text-sm font-medium">{vehicleType}</span>
+        {missing.length > 0 && (
+          <span className="text-[10px] opacity-70">Fehlt: {missing.join(', ')}</span>
+        )}
       </div>
     )
   }
@@ -215,11 +263,14 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   )
 })
 
-// Compact version for cards - requests high-res image for crisp display on retina screens
+// Compact version for cards
 export const TeslaCarThumbnail = memo(function TeslaCarThumbnail({
   vehicleType,
   color,
   wheels,
+  model,
+  drive,
+  interior,
   className,
 }: Omit<TeslaCarImageProps, 'view' | 'size' | 'fetchSize'>) {
   return (
@@ -227,9 +278,12 @@ export const TeslaCarThumbnail = memo(function TeslaCarThumbnail({
       vehicleType={vehicleType}
       color={color}
       wheels={wheels}
+      model={model}
+      drive={drive}
+      interior={interior}
       view="STUD_3QTR"
-      size={200} // Display size
-      fetchSize={800} // Request 800px for high-DPI screens (4x)
+      size={200}
+      fetchSize={800}
       className={className}
     />
   )

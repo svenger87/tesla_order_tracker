@@ -39,10 +39,11 @@ interface OrderCardProps {
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  onImageClick?: (order: Order) => void
   options: OrderCardOptions
 }
 
-export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, options }: OrderCardProps) {
+export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onImageClick, options }: OrderCardProps) {
   const colorInfo = findColorInfo(order.color)
   const { models, ranges, drives, interiors } = options
 
@@ -62,13 +63,20 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
 
         {/* Car image */}
         {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') && (
-          <div className="flex justify-center py-2 bg-gradient-to-b from-muted/30 to-transparent">
+          <button
+            type="button"
+            className="flex justify-center py-2 bg-gradient-to-b from-muted/30 to-transparent w-full cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => onImageClick?.(order)}
+          >
             <TeslaCarThumbnail
               vehicleType={order.vehicleType as VehicleType}
               color={order.color}
               wheels={order.wheels}
+              model={order.model}
+              drive={order.drive}
+              interior={order.interior}
             />
-          </div>
+          </button>
         )}
 
         <CardContent className="p-4">

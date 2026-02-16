@@ -30,9 +30,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./nod
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/src/generated ./src/generated
 COPY --from=builder --chown=nextjs:nodejs /app/schema-template.db ./schema-template.db
-RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate-schema.mjs ./scripts/migrate-schema.mjs
+RUN mkdir -p /app/data /app/data/compositor-cache && chown -R nextjs:nodejs /app/data
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 ENV DATABASE_URL=file:/app/data/prod.db
-CMD ["sh", "-c", "if [ ! -f /app/data/prod.db ]; then cp /app/schema-template.db /app/data/prod.db; fi && node server.js"]
+CMD ["sh", "-c", "node scripts/migrate-schema.mjs && node server.js"]
