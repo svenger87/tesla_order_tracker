@@ -67,6 +67,14 @@
     "delivered": "Delivered: {date}",
     "errorGeneratingCode": "Error generating code"
   },
+  "search": {
+    "placeholder": "Search orders by name, VIN, country...",
+    "noResults": "No orders found.",
+    "title": "Search Orders",
+    "description": "Find an order across all quarters",
+    "hint": "Navigate with arrow keys, select with Enter",
+    "openSearch": "Search"
+  },
   "form": {
     "personalData": "Personal data",
     "vehicleConfig": "Vehicle configuration",

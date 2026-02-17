@@ -67,6 +67,14 @@
     "delivered": "Geliefert: {date}",
     "errorGeneratingCode": "Fehler beim Generieren des Codes"
   },
+  "search": {
+    "placeholder": "Bestellungen nach Name, VIN, Land suchen...",
+    "noResults": "Keine Bestellungen gefunden.",
+    "title": "Bestellungen suchen",
+    "description": "Finde eine Bestellung über alle Quartale",
+    "hint": "Mit Pfeiltasten navigieren, mit Enter auswählen",
+    "openSearch": "Suche"
+  },
   "form": {
     "personalData": "Persönliche Daten",
     "vehicleConfig": "Fahrzeugkonfiguration",

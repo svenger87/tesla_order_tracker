@@ -301,6 +301,7 @@ interface OrderTableProps {
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  highlightOrderId?: string | null
 }
 
 interface SortableHeaderProps {
@@ -391,7 +392,7 @@ const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode }: OrderTableProps) {
+export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, highlightOrderId }: OrderTableProps) {
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
@@ -936,16 +937,24 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           </div>
         ) : (
           filteredAndSortedOrders.map((order) => (
-            <OrderCard
+            <div
               key={order.id}
-              order={order}
-              isAdmin={isAdmin}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onGenerateResetCode={onGenerateResetCode}
-              onImageClick={setImageModalOrder}
-              options={{ models, ranges, drives, interiors }}
-            />
+              data-order-id={order.id}
+              className={cn(
+                "rounded-lg transition-colors duration-500",
+                highlightOrderId === order.id && "ring-2 ring-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20 animate-pulse"
+              )}
+            >
+              <OrderCard
+                order={order}
+                isAdmin={isAdmin}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onGenerateResetCode={onGenerateResetCode}
+                onImageClick={setImageModalOrder}
+                options={{ models, ranges, drives, interiors }}
+              />
+            </div>
           ))
         )}
       </div>
@@ -1005,12 +1014,15 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
           ) : (
             filteredAndSortedOrders.map((order) => {
               const isHighlighted = highlightUser && order.name.toLowerCase() === highlightUser
+              const isSearchHighlighted = highlightOrderId === order.id
               return (
               <TableRow
                 key={order.id}
+                data-order-id={order.id}
                 className={cn(
                   "border-b hover:bg-muted/50",
-                  isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25"
+                  isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25",
+                  isSearchHighlighted && "bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
                 )}
               >
                 {isColumnVisible('status') && (
