@@ -60,7 +60,8 @@ export default function Home() {
   const [showStats, setShowStats] = useState(true)
   // Search state
   const [showSearch, setShowSearch] = useState(false)
-  const [expandedQuarters, setExpandedQuarters] = useState<string[] | undefined>(undefined)
+  const [expandedQuarters, setExpandedQuarters] = useState<string[]>([])
+  const [accordionInitialized, setAccordionInitialized] = useState(false)
   const [highlightOrderId, setHighlightOrderId] = useState<string | null>(null)
   // Reset code dialog state
   const [resetCodeDialog, setResetCodeDialog] = useState<{
@@ -108,6 +109,14 @@ export default function Home() {
       setLoading(false)
     })
   }, [fetchOrders, fetchSettings, checkAuth])
+
+  // Initialize accordion with first group open once orders load
+  useEffect(() => {
+    if (!accordionInitialized && orderGroups.length > 0) {
+      setExpandedQuarters([orderGroups[0].label])
+      setAccordionInitialized(true)
+    }
+  }, [orderGroups, accordionInitialized])
 
   // Auto-refresh orders every 30 seconds
   useEffect(() => {
@@ -174,26 +183,27 @@ export default function Home() {
   }, [t])
 
   const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
-    // Expand the target quarter (keep others as-is or initialize)
+    // Expand the target quarter, keeping already-open ones
     setExpandedQuarters(prev => {
-      const current = prev ?? orderGroups.map(g => g.label).slice(0, 1)
-      return current.includes(quarterLabel) ? current : [...current, quarterLabel]
+      return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
     })
     setHighlightOrderId(orderId)
 
-    // Scroll to the order after accordion animation
-    setTimeout(() => {
+    // Poll for the element to appear in the DOM (accordion may still be animating)
+    let attempts = 0
+    const tryScroll = () => {
       const el = document.querySelector(`[data-order-id="${orderId}"]`)
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        // Clear highlight after 3 seconds
+        setTimeout(() => setHighlightOrderId(null), 3000)
+      } else if (attempts < 20) {
+        attempts++
+        requestAnimationFrame(tryScroll)
       }
-    }, 350)
-
-    // Clear highlight after 3 seconds
-    setTimeout(() => {
-      setHighlightOrderId(null)
-    }, 3000)
-  }, [orderGroups])
+    }
+    requestAnimationFrame(tryScroll)
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
