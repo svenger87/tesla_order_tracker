@@ -189,15 +189,17 @@ export default function Home() {
     })
     setHighlightOrderId(orderId)
 
-    // Poll for the element to appear in the DOM (accordion may still be animating)
+    // Poll for the visible element (both mobile cards and desktop rows share the
+    // same data-order-id; querySelector returns the first DOM match which is the
+    // mobile card — hidden on desktop. Pick the one that's actually visible.)
     let attempts = 0
     const tryScroll = () => {
-      const el = document.querySelector(`[data-order-id="${orderId}"]`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Clear highlight after 3 seconds
+      const els = document.querySelectorAll(`[data-order-id="${orderId}"]`)
+      const visible = Array.from(els).find(el => (el as HTMLElement).offsetParent !== null)
+      if (visible) {
+        visible.scrollIntoView({ behavior: 'smooth', block: 'center' })
         setTimeout(() => setHighlightOrderId(null), 3000)
-      } else if (attempts < 20) {
+      } else if (attempts < 30) {
         attempts++
         requestAnimationFrame(tryScroll)
       }
