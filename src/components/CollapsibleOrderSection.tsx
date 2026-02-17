@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Order } from '@/lib/types'
@@ -19,6 +20,9 @@ interface CollapsibleOrderSectionProps {
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  expandedQuarters?: string[]
+  onExpandedChange?: (vals: string[]) => void
+  highlightOrderId?: string | null
 }
 
 export function CollapsibleOrderSection({
@@ -27,11 +31,22 @@ export function CollapsibleOrderSection({
   onEdit,
   onDelete,
   onGenerateResetCode,
+  expandedQuarters,
+  onExpandedChange,
+  highlightOrderId,
 }: CollapsibleOrderSectionProps) {
   const t = useTranslations('home')
 
   // Default to opening the first group
-  const defaultValue = groups.length > 0 ? [groups[0].label] : []
+  const defaultExpanded = groups.length > 0 ? [groups[0].label] : []
+  const [internalExpanded, setInternalExpanded] = useState<string[]>(defaultExpanded)
+
+  // Use controlled or uncontrolled mode
+  const isControlled = expandedQuarters !== undefined
+  const value = isControlled ? expandedQuarters : internalExpanded
+  const onValueChange = isControlled
+    ? (onExpandedChange ?? (() => {}))
+    : setInternalExpanded
 
   if (groups.length === 0) {
     return (
@@ -46,7 +61,7 @@ export function CollapsibleOrderSection({
   }
 
   return (
-    <Accordion type="multiple" defaultValue={defaultValue} className="space-y-3">
+    <Accordion type="multiple" value={value} onValueChange={onValueChange} className="space-y-3">
       <AnimatePresence mode="popLayout">
         {groups.map((group, index) => {
           const stats = getQuarterStats(group)
@@ -83,6 +98,7 @@ export function CollapsibleOrderSection({
                       onEdit={onEdit}
                       onDelete={onDelete}
                       onGenerateResetCode={onGenerateResetCode}
+                      highlightOrderId={highlightOrderId}
                     />
                   </motion.div>
                 </AccordionContent>

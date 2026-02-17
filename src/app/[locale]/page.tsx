@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { Order, Settings } from '@/lib/types'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
 import { CollapsibleOrderSection } from '@/components/CollapsibleOrderSection'
+import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
 import { DonationBanner } from '@/components/DonationBanner'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -31,7 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp } from 'lucide-react'
+import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp, Search } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,7 @@ import Image from 'next/image'
 export default function Home() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
+  const ts = useTranslations('search')
   const [orders, setOrders] = useState<Order[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -56,6 +58,10 @@ export default function Home() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(true)
+  // Search state
+  const [showSearch, setShowSearch] = useState(false)
+  const [expandedQuarters, setExpandedQuarters] = useState<string[] | undefined>(undefined)
+  const [highlightOrderId, setHighlightOrderId] = useState<string | null>(null)
   // Reset code dialog state
   const [resetCodeDialog, setResetCodeDialog] = useState<{
     open: boolean
@@ -167,6 +173,28 @@ export default function Home() {
     }
   }, [t])
 
+  const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
+    // Expand the target quarter (keep others as-is or initialize)
+    setExpandedQuarters(prev => {
+      const current = prev ?? orderGroups.map(g => g.label).slice(0, 1)
+      return current.includes(quarterLabel) ? current : [...current, quarterLabel]
+    })
+    setHighlightOrderId(orderId)
+
+    // Scroll to the order after accordion animation
+    setTimeout(() => {
+      const el = document.querySelector(`[data-order-id="${orderId}"]`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 350)
+
+    // Clear highlight after 3 seconds
+    setTimeout(() => {
+      setHighlightOrderId(null)
+    }, 3000)
+  }, [orderGroups])
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -228,6 +256,29 @@ export default function Home() {
                   <span className="sr-only">GitHub</span>
                 </Button>
               </a>
+              {/* Desktop search button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSearch(true)}
+                className="hidden sm:inline-flex gap-2 text-muted-foreground"
+              >
+                <Search className="h-4 w-4" />
+                {ts('openSearch')}
+                <kbd className="pointer-events-none ml-1 hidden h-5 select-none items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
+              {/* Mobile search button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSearch(true)}
+                className="sm:hidden h-9 w-9"
+              >
+                <Search className="h-4 w-4" />
+                <span className="sr-only">{ts('openSearch')}</span>
+              </Button>
               <LanguageSwitcher />
               <ThemeToggle />
               {/* Mobile overflow menu */}
@@ -374,6 +425,9 @@ export default function Home() {
                 onEdit={handleEdit}
                 onDelete={(id) => setDeleteConfirm(id)}
                 onGenerateResetCode={isAdmin ? handleGenerateResetCode : undefined}
+                expandedQuarters={expandedQuarters}
+                onExpandedChange={setExpandedQuarters}
+                highlightOrderId={highlightOrderId}
               />
             )}
           </CardContent>
@@ -419,6 +473,15 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Order Search */}
+      <OrderSearch
+        open={showSearch}
+        onOpenChange={setShowSearch}
+        orders={orders}
+        orderGroups={orderGroups}
+        onSelectOrder={handleSearchSelect}
+      />
 
       {/* Modals */}
       <OrderForm
