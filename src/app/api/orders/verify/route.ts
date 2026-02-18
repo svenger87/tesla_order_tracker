@@ -15,6 +15,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const editCode = searchParams.get('editCode')
     const orderId = searchParams.get('orderId')
+    const checkOnly = searchParams.get('checkOnly') === 'true'
+
+    // Lightweight auth-type check: returns whether order has a password or is legacy
+    if (checkOnly && orderId) {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, editCode: true },
+      })
+
+      if (!order) {
+        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+      }
+
+      const hasPassword = !!(order.editCode && order.editCode !== '')
+      return NextResponse.json({ hasPassword })
+    }
 
     if (!editCode) {
       return NextResponse.json({ error: 'Edit code required' }, { status: 400 })

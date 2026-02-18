@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Order } from '@/lib/types'
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AlertCircle, ChevronDown, Info, KeyRound } from 'lucide-react'
+import { AlertCircle, ChevronDown, Info, KeyRound, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 interface PasswordPromptModalProps {
@@ -40,11 +40,31 @@ export function PasswordPromptModal({
   const [loading, setLoading] = useState(false)
   const [showReset, setShowReset] = useState(false)
 
+  // Auth type detection
+  const [authType, setAuthType] = useState<'loading' | 'password' | 'legacy'>('loading')
+
   // Reset code flow state
   const [resetCode, setResetCode] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
+
+  // Check auth type when modal opens
+  useEffect(() => {
+    if (!open) return
+    setAuthType('loading')
+    fetch(`/api/orders/verify?orderId=${encodeURIComponent(order.id)}&checkOnly=true`)
+      .then(res => res.json())
+      .then(data => {
+        setAuthType(data.hasPassword ? 'password' : 'legacy')
+      })
+      .catch(() => {
+        // Fallback: assume password (most common)
+        setAuthType('password')
+      })
+  }, [open, order.id])
+
+  const isLegacy = authType === 'legacy'
 
   const handleClose = () => {
     setPassword('')
@@ -63,7 +83,7 @@ export function PasswordPromptModal({
     setError('')
 
     if (!password.trim()) {
-      setError(t('enterCodePrompt'))
+      setError(isLegacy ? t('enterUsernamePrompt') : t('enterCodePrompt'))
       return
     }
 
@@ -140,20 +160,27 @@ export function PasswordPromptModal({
         <DialogHeader>
           <DialogTitle>{t('passwordPromptTitle')}</DialogTitle>
           <DialogDescription>
-            {t('passwordPromptDescription', { name: order.name })}
+            {isLegacy
+              ? t('legacyPromptDescription', { name: order.name })
+              : t('passwordPromptDescription', { name: order.name })}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Help box */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3 text-sm text-blue-700 dark:text-blue-400">
-          <div className="flex gap-2">
-            <Info className="h-4 w-4 shrink-0 mt-0.5" />
-            <div>
-              <p>{t('passwordHelp')}</p>
-              <p className="mt-1 text-blue-600/80 dark:text-blue-400/80">{t('legacyHelp')}</p>
+        {/* Help box — adapted to auth type */}
+        {authType !== 'loading' && (
+          <div className={isLegacy
+            ? "bg-amber-500/10 border border-amber-500/20 rounded-md p-3 text-sm text-amber-700 dark:text-amber-400"
+            : "bg-blue-500/10 border border-blue-500/20 rounded-md p-3 text-sm text-blue-700 dark:text-blue-400"
+          }>
+            <div className="flex gap-2">
+              {isLegacy
+                ? <User className="h-4 w-4 shrink-0 mt-0.5" />
+                : <Info className="h-4 w-4 shrink-0 mt-0.5" />
+              }
+              <p>{isLegacy ? t('legacyHelpDetailed') : t('passwordHelp')}</p>
             </div>
           </div>
-        </div>
+        )}
 
         {error && (
           <div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md text-sm flex items-center gap-2">
@@ -165,32 +192,37 @@ export function PasswordPromptModal({
         {!showReset ? (
           <form onSubmit={handleVerify} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">{tf('password')}</Label>
+              <Label htmlFor="password">
+                {isLegacy ? t('usernameLabel') : tf('password')}
+              </Label>
               <Input
                 id="password"
-                type="password"
+                type={isLegacy ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={tf('passwordPlaceholder')}
+                placeholder={isLegacy ? t('usernamePlaceholder') : tf('passwordPlaceholder')}
                 autoFocus
+                disabled={authType === 'loading'}
               />
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowReset(true)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <KeyRound className="h-3 w-3" />
-              {t('forgotPassword')}
-              <ChevronDown className="h-3 w-3" />
-            </button>
+            {!isLegacy && (
+              <button
+                type="button"
+                onClick={() => setShowReset(true)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              >
+                <KeyRound className="h-3 w-3" />
+                {t('forgotPassword')}
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            )}
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={handleClose}>
                 {tc('cancel')}
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading || authType === 'loading'}>
                 {loading ? tc('checking') : tc('next')}
               </Button>
             </div>

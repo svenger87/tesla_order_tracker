@@ -163,8 +163,12 @@
   "editByCode": {
     "passwordPromptTitle": "Bestellung bearbeiten",
     "passwordPromptDescription": "Gib dein Passwort ein, um {name}s Bestellung zu bearbeiten.",
+    "legacyPromptDescription": "Gib deinen Benutzernamen ein, um {name}s Bestellung zu bearbeiten.",
     "passwordHelp": "Verwende das Passwort, das du beim Erstellen deiner Bestellung festgelegt hast.",
-    "legacyHelp": "Bestandseinträge: Gib deinen Benutzernamen ein.",
+    "legacyHelpDetailed": "Dieser Eintrag stammt aus der alten Tabelle. Gib deinen Benutzernamen ein, um dich zu verifizieren. Danach wirst du aufgefordert, ein Passwort festzulegen.",
+    "usernameLabel": "Benutzername",
+    "usernamePlaceholder": "Dein TFF-Benutzername",
+    "enterUsernamePrompt": "Bitte gib deinen Benutzernamen ein",
     "forgotPassword": "Passwort vergessen?",
     "forgotPasswordHelp": "Bitte einen Admin um einen Einmalcode.",
     "enterCodePrompt": "Bitte gib dein Passwort ein",

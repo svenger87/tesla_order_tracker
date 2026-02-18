@@ -163,8 +163,12 @@
   "editByCode": {
     "passwordPromptTitle": "Edit order",
     "passwordPromptDescription": "Enter your password to edit {name}'s order.",
+    "legacyPromptDescription": "Enter your username to edit {name}'s order.",
     "passwordHelp": "Use the password you set when creating your order.",
-    "legacyHelp": "Legacy entries: Enter your username.",
+    "legacyHelpDetailed": "This entry is from the old spreadsheet. Enter your username to verify your identity. You will then be asked to set a password.",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Your TFF username",
+    "enterUsernamePrompt": "Please enter your username",
     "forgotPassword": "Forgot password?",
     "forgotPasswordHelp": "Ask an admin for a one-time code.",
     "enterCodePrompt": "Please enter your password",
