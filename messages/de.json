@@ -167,7 +167,7 @@
     "passwordHelp": "Verwende das Passwort, das du beim Erstellen deiner Bestellung festgelegt hast.",
     "legacyHelpDetailed": "Dieser Eintrag stammt aus der alten Tabelle. Gib deinen Benutzernamen ein, um dich zu verifizieren. Danach wirst du aufgefordert, ein Passwort festzulegen.",
     "usernameLabel": "Benutzername",
-    "usernamePlaceholder": "Dein TFF-Benutzername",
+    "usernamePlaceholder": "Dein Benutzername aus der Google Sheet",
     "enterUsernamePrompt": "Bitte gib deinen Benutzernamen ein",
     "forgotPassword": "Passwort vergessen?",
     "forgotPasswordHelp": "Bitte einen Admin um einen Einmalcode.",

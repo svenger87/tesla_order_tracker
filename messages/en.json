@@ -167,7 +167,7 @@
     "passwordHelp": "Use the password you set when creating your order.",
     "legacyHelpDetailed": "This entry is from the old spreadsheet. Enter your username to verify your identity. You will then be asked to set a password.",
     "usernameLabel": "Username",
-    "usernamePlaceholder": "Your TFF username",
+    "usernamePlaceholder": "Your username from the old Google sheet",
     "enterUsernamePrompt": "Please enter your username",
     "forgotPassword": "Forgot password?",
     "forgotPasswordHelp": "Ask an admin for a one-time code.",
