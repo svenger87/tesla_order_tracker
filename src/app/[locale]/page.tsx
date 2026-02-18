@@ -8,6 +8,7 @@ import { groupOrdersByQuarter } from '@/lib/groupOrders'
 import { CollapsibleOrderSection } from '@/components/CollapsibleOrderSection'
 import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
+import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { DonationBanner } from '@/components/DonationBanner'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -20,9 +21,6 @@ const StatisticsDashboard = dynamic(
 const OrderForm = dynamic(
   () => import('@/components/OrderForm').then(mod => mod.OrderForm)
 )
-const EditByCodeModal = dynamic(
-  () => import('@/components/EditByCodeModal').then(mod => mod.EditByCodeModal)
-)
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -32,7 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp, Search } from 'lucide-react'
+import { Plus, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp, Search } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,10 +50,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
   const [showEditCodeModal, setShowEditCodeModal] = useState(false)
-  const [showEditByCode, setShowEditByCode] = useState(false)
   const [newEditCode, setNewEditCode] = useState('')
   const [isCustomPassword, setIsCustomPassword] = useState(false)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
+  const [editByCodeOrder, setEditByCodeOrder] = useState<Order | null>(null)
+  const [editByCodePassword, setEditByCodePassword] = useState('')
+  const [editByCodeIsLegacy, setEditByCodeIsLegacy] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(true)
   // Search state
@@ -126,14 +126,23 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [fetchOrders])
 
-  const handleOrderSuccess = (editCode?: string) => {
-    // If no editCode is passed, user chose a custom password
-    // If editCode is passed, it was auto-generated
-    setIsCustomPassword(!editCode)
-    setNewEditCode(editCode || '')
+  const handleOrderSuccess = () => {
+    setIsCustomPassword(true)
+    setNewEditCode('')
     setShowEditCodeModal(true)
     fetchOrders()
   }
+
+  const handleEditByCode = useCallback((order: Order) => {
+    setEditByCodeOrder(order)
+  }, [])
+
+  const handleEditByCodeVerified = useCallback((order: Order, password: string, isLegacy: boolean) => {
+    setEditByCodeOrder(null)
+    setEditByCodePassword(password)
+    setEditByCodeIsLegacy(isLegacy)
+    setEditingOrder(order)
+  }, [])
 
   const handleEdit = (order: Order) => {
     setEditingOrder(order)
@@ -412,10 +421,6 @@ export default function Home() {
                   <RefreshCw className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">{tc('refresh')}</span>
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setShowEditByCode(true)}>
-                  <Pencil className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">{tc('edit')}</span>
-                </Button>
                 <Button size="sm" onClick={() => setShowAddForm(true)} className="shadow-sm">
                   <Plus className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">{t('newOrder')}</span>
@@ -437,6 +442,7 @@ export default function Home() {
                 onEdit={handleEdit}
                 onDelete={(id) => setDeleteConfirm(id)}
                 onGenerateResetCode={isAdmin ? handleGenerateResetCode : undefined}
+                onEditByCode={!isAdmin ? handleEditByCode : undefined}
                 expandedQuarters={expandedQuarters}
                 onExpandedChange={setExpandedQuarters}
                 highlightOrderId={highlightOrderId}
@@ -509,24 +515,34 @@ export default function Home() {
         isCustomPassword={isCustomPassword}
       />
 
-      <EditByCodeModal
-        open={showEditByCode}
-        onOpenChange={setShowEditByCode}
-        orders={orders}
-        onSuccess={fetchOrders}
-      />
+      {editByCodeOrder && (
+        <PasswordPromptModal
+          open={!!editByCodeOrder}
+          onOpenChange={(open) => !open && setEditByCodeOrder(null)}
+          order={editByCodeOrder}
+          onVerified={handleEditByCodeVerified}
+          onSuccess={fetchOrders}
+        />
+      )}
 
       {editingOrder && (
         <OrderForm
           open={!!editingOrder}
-          onOpenChange={(open) => !open && setEditingOrder(null)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingOrder(null)
+              setEditByCodePassword('')
+              setEditByCodeIsLegacy(false)
+            }
+          }}
           order={editingOrder}
+          editCode={editByCodePassword || undefined}
+          isLegacy={editByCodeIsLegacy || undefined}
           onSuccess={() => {
-            const hadDelivery = !!editingOrder.deliveryDate
             setEditingOrder(null)
-            fetchOrders().then(() => {
-              // Check if delivery was just added
-            })
+            setEditByCodePassword('')
+            setEditByCodeIsLegacy(false)
+            fetchOrders()
           }}
         />
       )}

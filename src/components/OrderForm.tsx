@@ -28,8 +28,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CalendarIcon, KeyRound, Shuffle, User, Car, Palette, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
+import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useTranslations } from 'next-intl'
@@ -54,7 +53,7 @@ interface OrderFormProps {
   order?: Order | null
   editCode?: string
   isLegacy?: boolean // Legacy order from old spreadsheet import (no editCode)
-  onSuccess: (editCode?: string) => void
+  onSuccess: () => void
 }
 
 // Helper to parse German date format (DD.MM.YYYY) to Date object
@@ -343,8 +342,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       }
     }
 
-    // Validate custom password if selected (only for new orders)
-    if (!order && formData.useCustomPassword) {
+    // Validate password (required for new orders)
+    if (!order) {
       const validation = validateCustomPassword(formData.customPassword)
       if (!validation.valid) {
         setError(tv(validation.errorKey as any || 'invalidPassword'))
@@ -388,7 +387,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       } else {
         requestBody = {
           ...orderData,
-          customPassword: useCustomPassword ? customPassword : undefined,
+          customPassword,
         }
       }
 
@@ -404,11 +403,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         throw new Error(data.error || tv('saveError'))
       }
 
-      if (isLegacy && data.editCode) {
-        onSuccess(data.editCode)
-      } else {
-        onSuccess(formData.useCustomPassword ? undefined : data.editCode)
-      }
+      onSuccess()
       setFormData(emptyFormData)
       onOpenChange(false)
     } catch (err) {
@@ -578,7 +573,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       steps.push({
         id: 'password',
         icon: KeyRound,
-        label: order && isLegacy ? t('legacyPasswordTitle') : t('editCode'),
+        label: order && isLegacy ? t('legacyPasswordTitle') : t('password'),
         content: (
           <PasswordStep
             formData={formData}
@@ -1110,75 +1105,41 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </div>
           )}
 
-          {/* Password Choice - only for new orders */}
+          {/* Password - only for new orders */}
           {!order && (
-            <div className="border-t pt-4 mt-4">
-              <h4 className="font-medium mb-3 flex items-center gap-2">
-                <KeyRound className="h-4 w-4" />
-                {t('editCode')}
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+              <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+                <KeyRound className="h-4 w-4 text-primary" />
+                {t('password')}
               </h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t('editCodeDescription')}
+              <p className="text-sm text-muted-foreground">
+                {t('passwordDescription')}
               </p>
-              <RadioGroup
-                value={formData.useCustomPassword ? 'custom' : 'auto'}
-                onValueChange={(value) => handleChange('useCustomPassword', value === 'custom')}
-                className="space-y-3"
-              >
-                <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="custom" id="custom" className="mt-1" />
-                  <div className="flex-1">
-                    <Label htmlFor="custom" className="flex items-center gap-2 cursor-pointer font-medium">
-                      <KeyRound className="h-4 w-4" />
-                      {t('customPassword')}
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {t('customPasswordDescription')}
-                    </p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customPassword">{t('password')} *</Label>
+                  <Input
+                    id="customPassword"
+                    type="password"
+                    value={formData.customPassword}
+                    onChange={(e) => handleChange('customPassword', e.target.value)}
+                    placeholder={t('passwordPlaceholder')}
+                  />
                 </div>
-                <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="auto" id="auto" className="mt-1" />
-                  <div className="flex-1">
-                    <Label htmlFor="auto" className="flex items-center gap-2 cursor-pointer font-medium">
-                      <Shuffle className="h-4 w-4" />
-                      {t('autoGenerate')}
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {t('autoGenerateDescription')}
-                    </p>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">{t('confirmPassword')} *</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                    placeholder={t('confirmPasswordPlaceholder')}
+                  />
                 </div>
-              </RadioGroup>
-
-              {/* Custom password fields */}
-              {formData.useCustomPassword && (
-                <div className="mt-4 pl-7 space-y-4 border-l-2 border-primary/20">
-                  <div className="space-y-2">
-                    <Label htmlFor="customPassword">{t('password')}</Label>
-                    <Input
-                      id="customPassword"
-                      type="password"
-                      value={formData.customPassword}
-                      onChange={(e) => handleChange('customPassword', e.target.value)}
-                      placeholder={t('passwordPlaceholder')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                      placeholder={t('confirmPasswordPlaceholder')}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('passwordHint')}
-                  </p>
-                </div>
-              )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('passwordHint')}
+              </p>
             </div>
           )}
 

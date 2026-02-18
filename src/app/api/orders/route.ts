@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { parse, differenceInDays, isValid } from 'date-fns'
+import bcrypt from 'bcryptjs'
 import {
   MODEL_3_TOW_HITCH_AVAILABLE,
   COLORS,
@@ -55,6 +56,14 @@ function normalizeOrderData(data: Record<string, unknown>): Record<string, unkno
   if (result.towHitch === '-') result.towHitch = 'nv'
 
   return result
+}
+
+// Bcrypt-aware password comparison
+async function comparePassword(input: string, stored: string): Promise<boolean> {
+  if (stored.startsWith('$2')) {
+    return bcrypt.compare(input, stored)
+  }
+  return input === stored
 }
 
 // Helper to parse German date format (DD.MM.YYYY) and calculate days between dates
@@ -234,45 +243,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Handle edit code: use custom password or auto-generate
-    let editCode: string
-    if (body.customPassword) {
-      // Validate custom password
-      if (body.customPassword.length < 6) {
-        return NextResponse.json(
-          { error: 'Passwort muss mindestens 6 Zeichen lang sein' },
-          { status: 400 }
-        )
-      }
-      if (!/\d/.test(body.customPassword)) {
-        return NextResponse.json(
-          { error: 'Passwort muss mindestens eine Zahl enthalten' },
-          { status: 400 }
-        )
-      }
-
-      // Check uniqueness
-      const existing = await prisma.order.findUnique({
-        where: { editCode: body.customPassword },
-      })
-      if (existing) {
-        return NextResponse.json(
-          { error: 'Dieses Passwort ist bereits vergeben. Bitte wähle ein anderes.' },
-          { status: 400 }
-        )
-      }
-
-      editCode = body.customPassword
-    } else {
-      // Auto-generate a unique 8-char alphanumeric edit code
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
-      const generate = () => Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-      editCode = generate()
-      // Ensure uniqueness (retry on collision)
-      while (await prisma.order.findUnique({ where: { editCode } })) {
-        editCode = generate()
-      }
+    // Validate password (required for all new orders)
+    if (!body.customPassword) {
+      return NextResponse.json(
+        { error: 'Passwort ist erforderlich' },
+        { status: 400 }
+      )
     }
+    if (body.customPassword.length < 6) {
+      return NextResponse.json(
+        { error: 'Passwort muss mindestens 6 Zeichen lang sein' },
+        { status: 400 }
+      )
+    }
+    if (!/\d/.test(body.customPassword)) {
+      return NextResponse.json(
+        { error: 'Passwort muss mindestens eine Zahl enthalten' },
+        { status: 400 }
+      )
+    }
+
+    // Hash the password with bcrypt
+    const editCode = await bcrypt.hash(body.customPassword, 10)
 
     // Normalize display labels → internal values
     const normalizedBody = normalizeOrderData(body)
@@ -313,8 +305,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: order.id,
-      editCode: order.editCode,
-      isCustomPassword: !!body.customPassword,
+      isCustomPassword: true,
       message: 'Order created successfully'
     })
   } catch (error) {
@@ -356,11 +347,8 @@ export async function PUT(request: NextRequest) {
           return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
         }
 
-        // Check uniqueness
-        const existing = await prisma.order.findUnique({ where: { editCode: newEditCode } })
-        if (existing) {
-          return NextResponse.json({ error: 'Dieses Passwort ist bereits vergeben' }, { status: 400 })
-        }
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newEditCode, 10)
 
         // Calculate time periods from dates
         const timePeriods = calculateTimePeriods(data)
@@ -368,11 +356,11 @@ export async function PUT(request: NextRequest) {
         // Apply Model 3 constraints
         const constrainedData = applyModel3Constraints(data)
 
-        // Update order with new editCode
+        // Update order with new hashed password
         const updated = await prisma.order.update({
           where: { id },
           data: {
-            editCode: newEditCode, // Set the new password
+            editCode: hashedPassword, // Set the new hashed password
             name: constrainedData.name as string,
             vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
             orderDate: (constrainedData.orderDate as string) || null,
@@ -400,7 +388,6 @@ export async function PUT(request: NextRequest) {
 
         return NextResponse.json({
           id: updated.id,
-          editCode: newEditCode,
           message: 'Eintrag aktualisiert und neues Passwort gesetzt!',
         })
       }
@@ -410,7 +397,7 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Edit code required' }, { status: 401 })
       }
 
-      if (order.editCode !== editCode) {
+      if (!order.editCode || !(await comparePassword(editCode, order.editCode))) {
         return NextResponse.json({ error: 'Invalid edit code' }, { status: 401 })
       }
     }
