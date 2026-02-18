@@ -952,7 +952,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                 onDelete={onDelete}
                 onGenerateResetCode={onGenerateResetCode}
                 onImageClick={setImageModalOrder}
-                options={{ models, ranges, drives, interiors }}
+                options={{ models, ranges, drives, interiors, countries }}
               />
             </div>
           ))

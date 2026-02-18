@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Order, OrderFormData, validateCustomPassword, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
-import { useConstraints } from '@/hooks/useConstraints'
+import { useConstraints, ConstraintsForModel } from '@/hooks/useConstraints'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import {
   Dialog,
   DialogContent,
@@ -28,7 +29,7 @@ import {
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CalendarIcon, KeyRound, Shuffle, User, Car, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
+import { CalendarIcon, KeyRound, Shuffle, User, Car, Palette, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useTranslations } from 'next-intl'
@@ -37,6 +38,15 @@ import { Locale } from 'date-fns'
 import { format, parse, isValid } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
+import { FormWizard, WizardStep } from '@/components/FormWizard'
+import {
+  PersonalDataStep,
+  VehicleStep,
+  AppearanceStep,
+  DeliveryStep,
+  TrackingStep,
+  PasswordStep,
+} from '@/components/form-steps'
 
 interface OrderFormProps {
   open: boolean
@@ -139,6 +149,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const tc = useTranslations('common')
   const locale = useLocale()
   const dateLocale = locale === 'de' ? de : enUS
+  const isMobile = useIsMobile()
 
   const [formData, setFormData] = useState<OrderFormData>(emptyFormData)
   const [loading, setLoading] = useState(false)
@@ -148,6 +159,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
   // Tracking section: expanded by default
   const [trackingOpen, setTrackingOpen] = useState(true)
+  // Wizard step index (mobile only)
+  const [wizardStep, setWizardStep] = useState(0)
 
   // Load dynamic options from API (filtered by vehicle type)
   const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
@@ -167,7 +180,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   }, [selectedModelValue, getConstraintsForModel])
 
   // Helper: get options for a constrained field, ensuring fixed values always have a matching SelectItem
-  const getFieldOptions = <T extends { value: string; label: string }>(
+  const getFieldOptions = useCallback(<T extends { value: string; label: string }>(
     fieldType: keyof typeof modelConstraints,
     options: T[],
     allOptions: T[] = options
@@ -176,7 +189,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (filtered.length > 0) return filtered
 
     // For fixed fields: ensure the fixed value appears even if options haven't loaded
-    const constraint = modelConstraints[fieldType]
+    const constraint = modelConstraints[fieldType as keyof ConstraintsForModel]
     if (constraint?.type === 'fixed' && constraint.fixedValue) {
       const fallback = allOptions.find(o => o.value === constraint.fixedValue)
       if (fallback) return [fallback]
@@ -184,11 +197,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       return [{ value: constraint.fixedValue, label: constraint.fixedValue } as T]
     }
     return filtered
-  }
+  }, [filterOptions, selectedModelValue, modelConstraints])
 
   // Apply fixed constraint values when constraints load or model changes
-  // This ensures fixed fields (e.g., Performance wheels=20) show the correct value
-  // even when opening an existing order where the DB value might be empty
   useEffect(() => {
     if (!formData.model) return
     const constraints = getConstraintsForModel(formData.model)
@@ -204,7 +215,6 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       if (constraint?.type === 'disable') {
         const current = formData[field]
         if (!current || current === '' || current === '-') {
-          // For towHitch, use 'nein' (Nein) since AHK is not available
           setFormData(prev => ({ ...prev, [field]: field === 'towHitch' ? 'nein' : '-' }))
         }
       }
@@ -220,7 +230,6 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           vehicleType: (order.vehicleType as VehicleType) || 'Model Y',
           orderDate: order.orderDate || '',
           country: order.country || '',
-          // Use raw values from database - SelectItems now use value directly
           model: order.model || '',
           range: order.range || '',
           drive: order.drive || '',
@@ -238,25 +247,65 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           typeApproval: order.typeApproval || '',
           typeVariant: order.typeVariant || '',
           deliveryDate: order.deliveryDate || '',
-          // Password not editable when editing
           useCustomPassword: false,
           customPassword: '',
           confirmPassword: '',
         })
       } else {
-        // New order - reset to defaults with custom password enabled
         setFormData(emptyFormData)
       }
-      // Reset legacy password fields
       setNewEditCode('')
       setConfirmNewEditCode('')
       setError('')
       setTrackingOpen(true)
+      setWizardStep(0)
     }
   }, [open, order])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleChange = useCallback((field: keyof OrderFormData, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }, [])
+
+  // Model change handler (shared between mobile/desktop)
+  const handleModelChange = useCallback((v: string) => {
+    handleChange('model', v)
+    const modelValue = v
+    if (!modelValue) return
+
+    const constraints = getConstraintsForModel(modelValue)
+
+    const fields = ['range', 'wheels', 'drive', 'interior'] as const
+    for (const field of fields) {
+      const fieldConstraint = constraints[field]
+      if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
+        handleChange(field, fieldConstraint.fixedValue)
+      }
+    }
+
+    if (constraints.color?.type === 'allow' && formData.color) {
+      if (constraints.color.allowedValues && !constraints.color.allowedValues.includes(formData.color)) {
+        handleChange('color', '')
+      }
+    }
+
+    if (constraints.towHitch?.type === 'disable') {
+      handleChange('towHitch', 'nein')
+    } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
+      handleChange('towHitch', constraints.towHitch.fixedValue)
+    }
+  }, [handleChange, getConstraintsForModel, formData.color])
+
+  // Vehicle type change handler
+  const handleVehicleTypeChange = useCallback((v: VehicleType) => {
+    handleChange('vehicleType', v)
+    handleChange('model', '')
+    handleChange('range', '')
+    handleChange('drive', '')
+    handleChange('wheels', '')
+  }, [handleChange])
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     setLoading(true)
     setError('')
 
@@ -328,22 +377,17 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const url = '/api/orders'
       const method = order ? 'PUT' : 'POST'
 
-      // Build request body - strip internal form fields that don't belong in the DB
       const { useCustomPassword, customPassword, confirmPassword, ...orderData } = formData
       let requestBody
       if (order) {
         if (isLegacy) {
-          // Legacy order: include isLegacy flag and newEditCode
           requestBody = { id: order.id, isLegacy: true, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         } else {
-          // Normal edit: include editCode and expectedUpdatedAt for conflict detection
           requestBody = { id: order.id, editCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         }
       } else {
-        // New order
         requestBody = {
           ...orderData,
-          // Include custom password if user chose to set one
           customPassword: useCustomPassword ? customPassword : undefined,
         }
       }
@@ -360,11 +404,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         throw new Error(data.error || tv('saveError'))
       }
 
-      // For legacy orders, show the new edit code in success
       if (isLegacy && data.editCode) {
         onSuccess(data.editCode)
       } else {
-        // Pass whether it was a custom password to the success handler
         onSuccess(formData.useCustomPassword ? undefined : data.editCode)
       }
       setFormData(emptyFormData)
@@ -376,10 +418,221 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     }
   }
 
-  const handleChange = (field: keyof OrderFormData, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+  // Whether password step should be visible
+  const showPasswordStep = !order || isLegacy
+
+  // Step validation for wizard (returns error message or empty string)
+  const validateWizardStep = useCallback((stepIndex: number): string => {
+    // Build same visible steps list to map index → step id
+    const stepIds = ['personal', 'vehicle', 'appearance', 'delivery', 'tracking']
+    if (showPasswordStep) stepIds.push('password')
+
+    const stepId = stepIds[stepIndex]
+
+    switch (stepId) {
+      case 'personal':
+        if (!formData.name.trim()) {
+          setError(tv('nameRequired'))
+          return tv('nameRequired')
+        }
+        if (!formData.orderDate.trim()) {
+          setError(tv('orderDateRequired'))
+          return tv('orderDateRequired')
+        }
+        if (!formData.country && !order) {
+          const msg = tv('fieldRequired', { field: t('country') })
+          setError(msg)
+          return msg
+        }
+        break
+      case 'vehicle':
+        if (!formData.model && !order) {
+          const msg = tv('fieldRequired', { field: t('model') })
+          setError(msg)
+          return msg
+        }
+        break
+      case 'appearance':
+        if (!order) {
+          const checks = [
+            { field: 'color' as const, label: t('color') },
+            { field: 'interior' as const, label: t('interior') },
+            { field: 'wheels' as const, label: t('wheels') },
+            { field: 'towHitch' as const, label: t('towHitch') },
+            { field: 'autopilot' as const, label: t('autopilot') },
+          ]
+          for (const { field, label } of checks) {
+            if (!formData[field]) {
+              const msg = tv('fieldRequired', { field: label })
+              setError(msg)
+              return msg
+            }
+          }
+        }
+        break
+      case 'delivery':
+        if (!formData.deliveryLocation && !order) {
+          const msg = tv('fieldRequired', { field: t('deliveryLocation') })
+          setError(msg)
+          return msg
+        }
+        break
+      // tracking + password: no required fields to gate navigation
+    }
+    setError('')
+    return ''
+  }, [formData, order, showPasswordStep, tv, t])
+
+  // Build wizard steps
+  const wizardSteps: WizardStep[] = useMemo(() => {
+    const steps: WizardStep[] = [
+      {
+        id: 'personal',
+        icon: User,
+        label: t('personalData'),
+        content: (
+          <PersonalDataStep
+            formData={formData}
+            handleChange={handleChange}
+            countries={countries}
+            t={(key: string) => t(key)}
+            DatePickerField={DatePickerField}
+            dateLocale={dateLocale}
+          />
+        ),
+      },
+      {
+        id: 'vehicle',
+        icon: Car,
+        label: t('vehicle'),
+        content: (
+          <VehicleStep
+            formData={formData}
+            handleChange={handleChange}
+            models={models}
+            ranges={ranges}
+            drives={drives}
+            selectedModelValue={selectedModelValue}
+            modelConstraints={modelConstraints}
+            isFieldDisabled={isFieldDisabled}
+            getFieldOptions={getFieldOptions}
+            onModelChange={handleModelChange}
+            onVehicleTypeChange={handleVehicleTypeChange}
+            t={(key: string, values?: Record<string, string>) => t(key, values)}
+          />
+        ),
+      },
+      {
+        id: 'appearance',
+        icon: Palette,
+        label: t('appearance'),
+        content: (
+          <AppearanceStep
+            formData={formData}
+            handleChange={handleChange}
+            colors={colors}
+            interiors={interiors}
+            wheels={wheels}
+            towHitch={towHitch}
+            autopilot={autopilot}
+            models={models}
+            selectedModelValue={selectedModelValue}
+            modelConstraints={modelConstraints}
+            isFieldDisabled={isFieldDisabled}
+            getFieldOptions={getFieldOptions}
+            filterOptions={filterOptions}
+            t={(key: string, values?: Record<string, string>) => t(key, values)}
+          />
+        ),
+      },
+      {
+        id: 'delivery',
+        icon: MapPin,
+        label: t('delivery'),
+        content: (
+          <DeliveryStep
+            formData={formData}
+            handleChange={handleChange}
+            deliveryLocations={deliveryLocations}
+            t={(key: string) => t(key)}
+          />
+        ),
+      },
+      {
+        id: 'tracking',
+        icon: ClipboardList,
+        label: t('statusTracking'),
+        content: (
+          <TrackingStep
+            formData={formData}
+            handleChange={handleChange}
+            t={(key: string) => t(key)}
+            DatePickerField={DatePickerField}
+            dateLocale={dateLocale}
+          />
+        ),
+      },
+    ]
+
+    if (showPasswordStep) {
+      steps.push({
+        id: 'password',
+        icon: KeyRound,
+        label: order && isLegacy ? t('legacyPasswordTitle') : t('editCode'),
+        content: (
+          <PasswordStep
+            formData={formData}
+            handleChange={handleChange}
+            order={order}
+            isLegacy={isLegacy}
+            newEditCode={newEditCode}
+            setNewEditCode={setNewEditCode}
+            confirmNewEditCode={confirmNewEditCode}
+            setConfirmNewEditCode={setConfirmNewEditCode}
+            t={(key: string) => t(key)}
+          />
+        ),
+      })
+    }
+
+    return steps
+  }, [
+    formData, handleChange, countries, models, ranges, drives, colors, interiors,
+    wheels, towHitch, autopilot, deliveryLocations, selectedModelValue, modelConstraints,
+    isFieldDisabled, getFieldOptions, filterOptions, handleModelChange, handleVehicleTypeChange,
+    dateLocale, order, isLegacy, newEditCode, confirmNewEditCode, showPasswordStep, t,
+  ])
+
+  // ─── Mobile Wizard ────────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-[95vw] max-h-[90vh] flex flex-col overflow-hidden p-4">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle>
+              {order ? t('editOrder') : t('newOrder')}
+            </DialogTitle>
+            <DialogDescription>
+              {order ? t('editOrderDescription') : t('newOrderDescription')}
+            </DialogDescription>
+          </DialogHeader>
+
+          <FormWizard
+            steps={wizardSteps}
+            currentStep={wizardStep}
+            onStepChange={setWizardStep}
+            onSubmit={() => handleSubmit()}
+            loading={loading}
+            isEdit={!!order}
+            error={error}
+            validateStep={validateWizardStep}
+          />
+        </DialogContent>
+      </Dialog>
+    )
   }
 
+  // ─── Desktop Layout (unchanged) ───────────────────────────────
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -459,13 +712,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 <Label htmlFor="vehicleType">{t('vehicle')} *</Label>
                 <Select
                   value={formData.vehicleType}
-                  onValueChange={(v) => {
-                    handleChange('vehicleType', v as VehicleType)
-                    handleChange('model', '')
-                    handleChange('range', '')
-                    handleChange('drive', '')
-                    handleChange('wheels', '')
-                  }}
+                  onValueChange={(v) => handleVehicleTypeChange(v as VehicleType)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={t('vehicleSelect')} />
@@ -482,33 +729,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
               <div className="space-y-2">
                 <Label htmlFor="model">{t('model')} *</Label>
-                <Select value={formData.model} onValueChange={(v) => {
-                  handleChange('model', v)
-                  const modelValue = v
-                  if (!modelValue) return
-
-                  const constraints = getConstraintsForModel(modelValue)
-
-                  const fields = ['range', 'wheels', 'drive', 'interior'] as const
-                  for (const field of fields) {
-                    const fieldConstraint = constraints[field]
-                    if (fieldConstraint?.type === 'fixed' && fieldConstraint.fixedValue) {
-                      handleChange(field, fieldConstraint.fixedValue)
-                    }
-                  }
-
-                  if (constraints.color?.type === 'allow' && formData.color) {
-                    if (constraints.color.allowedValues && !constraints.color.allowedValues.includes(formData.color)) {
-                      handleChange('color', '')
-                    }
-                  }
-
-                  if (constraints.towHitch?.type === 'disable') {
-                    handleChange('towHitch', 'nein')
-                  } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
-                    handleChange('towHitch', constraints.towHitch.fixedValue)
-                  }
-                }}>
+                <Select value={formData.model} onValueChange={handleModelChange}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('modelSelect')} />
                   </SelectTrigger>
