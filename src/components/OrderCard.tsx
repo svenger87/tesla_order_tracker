@@ -42,11 +42,12 @@ interface OrderCardProps {
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  onEditByCode?: (order: Order) => void
   onImageClick?: (order: Order) => void
   options: OrderCardOptions
 }
 
-export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onImageClick, options }: OrderCardProps) {
+export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onImageClick, options }: OrderCardProps) {
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
@@ -106,7 +107,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                 })()}
               </div>
             </div>
-            {isAdmin && (
+            {isAdmin ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -133,6 +134,16 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => onEditByCode?.(order)}
+                title={tc('edit')}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
             )}
           </div>
 

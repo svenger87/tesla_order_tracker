@@ -1,16 +1,60 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
+import bcrypt from 'bcryptjs'
+
+// Bcrypt-aware password comparison
+async function comparePassword(input: string, stored: string): Promise<boolean> {
+  if (stored.startsWith('$2')) {
+    return bcrypt.compare(input, stored)
+  }
+  return input === stored
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const editCode = searchParams.get('editCode')
+    const orderId = searchParams.get('orderId')
 
     if (!editCode) {
       return NextResponse.json({ error: 'Edit code required' }, { status: 400 })
     }
 
-    // First, try to find by editCode (standard flow)
+    // Per-order verification: look up specific order and compare password
+    if (orderId) {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, name: true, editCode: true },
+      })
+
+      if (!order) {
+        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+      }
+
+      // Legacy order (no editCode) — match by username
+      if (!order.editCode || order.editCode === '') {
+        const inputLower = editCode.trim().toLowerCase()
+        const nameLower = (order.name || '').trim().toLowerCase()
+        if (inputLower === nameLower) {
+          return NextResponse.json({
+            orderId: order.id,
+            isLegacy: true,
+            message: 'Bestandseintrag gefunden. Bitte setze ein neues Passwort.',
+          })
+        }
+        return NextResponse.json({ error: 'Ungültiges Passwort oder Benutzername' }, { status: 401 })
+      }
+
+      // Compare password (bcrypt-aware)
+      const match = await comparePassword(editCode, order.editCode)
+      if (match) {
+        return NextResponse.json({ orderId: order.id, isLegacy: false })
+      }
+
+      return NextResponse.json({ error: 'Ungültiges Passwort' }, { status: 401 })
+    }
+
+    // Legacy flow (no orderId): search by editCode directly (plain-text match via DB unique index)
     const order = await prisma.order.findUnique({
       where: { editCode },
       select: { id: true },
@@ -21,46 +65,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Fallback: For legacy orders (imported without editCode), allow using username
-    // Only works for orders that have NO editCode set
-    // Use case-insensitive matching and trim whitespace
     const searchName = editCode.trim().toLowerCase()
 
-    // Get all orders and filter for those without editCode
-    // (Prisma has issues with null comparisons, so we filter in JS)
     const allOrders = await prisma.order.findMany({
       select: { id: true, name: true, editCode: true },
     })
 
-    // Filter for legacy orders (no editCode - null OR empty string) and match by name case-insensitively
     const legacyOrder = allOrders.find(o =>
       (!o.editCode || o.editCode === '') && o.name && o.name.trim().toLowerCase() === searchName
     )
 
-    // Debug logging
-    if (!legacyOrder) {
-      const legacyCount = allOrders.filter(o => !o.editCode || o.editCode === '').length
-      console.log(`[Legacy Verify] No match for "${editCode}" (searched: "${searchName}")`)
-      console.log(`[Legacy Verify] Total orders: ${allOrders.length}, Legacy (no editCode): ${legacyCount}`)
-      // Log first few legacy names to help debug
-      const sampleNames = allOrders
-        .filter(o => !o.editCode || o.editCode === '')
-        .slice(0, 10)
-        .map(o => `"${o.name}"`)
-      console.log(`[Legacy Verify] Sample legacy names: ${sampleNames.join(', ')}`)
-
-      // Also check if user exists but has an editCode
-      const userWithCode = allOrders.find(o =>
-        o.name && o.name.trim().toLowerCase() === searchName && o.editCode
-      )
-      if (userWithCode) {
-        console.log(`[Legacy Verify] User "${searchName}" exists but already has an editCode set!`)
-      }
-    }
-
     if (legacyOrder) {
       return NextResponse.json({
         orderId: legacyOrder.id,
-        isLegacy: true, // Flag to indicate user needs to set a new password
+        isLegacy: true,
         message: 'Bestandseintrag gefunden. Bitte setze ein neues Passwort.',
       })
     }

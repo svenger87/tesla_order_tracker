@@ -301,6 +301,7 @@ interface OrderTableProps {
   onEdit: (order: Order) => void
   onDelete: (orderId: string) => void
   onGenerateResetCode?: (orderId: string, orderName: string) => void
+  onEditByCode?: (order: Order) => void
   highlightOrderId?: string | null
 }
 
@@ -392,7 +393,7 @@ const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, highlightOrderId }: OrderTableProps) {
+export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, highlightOrderId }: OrderTableProps) {
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
@@ -951,6 +952,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onGenerateResetCode={onGenerateResetCode}
+                onEditByCode={onEditByCode}
                 onImageClick={setImageModalOrder}
                 options={{ models, ranges, drives, interiors, countries }}
               />
@@ -997,17 +999,15 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             {isColumnVisible('orderToPapers') && <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToPapers')}</SortableHeader>}
             {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
-            {isAdmin && (
-              <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
-                {tc('actions')}
-              </TableHead>
-            )}
+            <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
+              {tc('actions')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={visibleColumns.size + (isAdmin ? 1 : 0)} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={visibleColumns.size + 1} className="text-center py-8 text-muted-foreground">
                 {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
               </TableCell>
             </TableRow>
@@ -1203,8 +1203,8 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                     {formatRelativeTime(order.updatedAt, t as any)}
                   </TableCell>
                 )}
-                {isAdmin && (
-                  <TableCell className="sticky right-0 bg-card dark:bg-card shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-10">
+                <TableCell className="sticky right-0 bg-card dark:bg-card shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-10">
+                  {isAdmin ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -1231,8 +1231,18 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
-                )}
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => onEditByCode?.(order)}
+                      title={tc('edit')}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
               </TableRow>
             )})
           )}
