@@ -4,7 +4,58 @@ import { getAdminFromCookie } from '@/lib/auth'
 import { parse, differenceInDays, isValid } from 'date-fns'
 import {
   MODEL_3_TOW_HITCH_AVAILABLE,
+  COLORS,
+  INTERIORS,
+  AUTOPILOT_OPTIONS,
+  TOW_HITCH_OPTIONS,
+  COUNTRIES,
 } from '@/lib/types'
+
+// Build reverse lookup maps: display label → internal value
+function buildLabelToValueMap(options: { value: string; label: string }[]): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const opt of options) {
+    // Map both the label and a lowercase version for case-insensitive matching
+    map.set(opt.label.toLowerCase(), opt.value)
+    map.set(opt.value.toLowerCase(), opt.value)
+  }
+  return map
+}
+
+const COLOR_MAP = buildLabelToValueMap(COLORS)
+const INTERIOR_MAP = buildLabelToValueMap(INTERIORS)
+const AUTOPILOT_MAP = buildLabelToValueMap(AUTOPILOT_OPTIONS)
+const TOW_HITCH_MAP = buildLabelToValueMap(TOW_HITCH_OPTIONS)
+// Country map includes "flag + label" patterns like "🇦🇹 Österreich" → "at"
+const COUNTRY_MAP = new Map<string, string>()
+for (const c of COUNTRIES) {
+  COUNTRY_MAP.set(c.value.toLowerCase(), c.value)
+  COUNTRY_MAP.set(c.label.toLowerCase(), c.value)
+  COUNTRY_MAP.set(`${c.flag} ${c.label}`.toLowerCase(), c.value)
+}
+
+// Normalize order field values: map display labels back to internal values
+function normalizeOrderData(data: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...data }
+
+  const normalize = (field: string, map: Map<string, string>) => {
+    const val = result[field]
+    if (typeof val !== 'string' || !val.trim()) return
+    const lookup = map.get(val.toLowerCase().trim())
+    if (lookup) result[field] = lookup
+  }
+
+  normalize('color', COLOR_MAP)
+  normalize('interior', INTERIOR_MAP)
+  normalize('autopilot', AUTOPILOT_MAP)
+  normalize('towHitch', TOW_HITCH_MAP)
+  normalize('country', COUNTRY_MAP)
+
+  // Normalize stray "-" to "nv" for towHitch
+  if (result.towHitch === '-') result.towHitch = 'nv'
+
+  return result
+}
 
 // Helper to parse German date format (DD.MM.YYYY) and calculate days between dates
 function parseGermanDate(dateStr: string | null | undefined): Date | null {
@@ -39,7 +90,7 @@ function applyModel3Constraints(data: Record<string, unknown>): Record<string, u
     : null
 
   if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
-    result.towHitch = '-'
+    result.towHitch = 'nv'
   }
 
   return result
@@ -223,11 +274,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate time periods from dates
-    const timePeriods = calculateTimePeriods(body)
+    // Normalize display labels → internal values
+    const normalizedBody = normalizeOrderData(body)
 
-    // Apply Model 3 constraints (set unavailable options to "-")
-    const constrainedData = applyModel3Constraints(body)
+    // Calculate time periods from dates
+    const timePeriods = calculateTimePeriods(normalizedBody)
+
+    // Apply Model 3 constraints (set unavailable options to "nv")
+    const constrainedData = applyModel3Constraints(normalizedBody)
 
     const order = await prisma.order.create({
       data: {
@@ -272,7 +326,10 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, editCode, isLegacy, newEditCode, expectedUpdatedAt, ...data } = body
+    const { id, editCode, isLegacy, newEditCode, expectedUpdatedAt, ...rawData } = body
+
+    // Normalize display labels → internal values
+    const data = normalizeOrderData(rawData) as typeof rawData
 
     const admin = await getAdminFromCookie()
 
