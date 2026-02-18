@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { MoreVertical, Pencil, Trash2, MapPin, Calendar, Car, Hash, KeyRound } from 'lucide-react'
+import { TwemojiEmoji } from '@/components/TwemojiText'
 
 // Helper to find color info by label
 function findColorInfo(colorLabel: string | null) {
@@ -32,6 +33,7 @@ export interface OrderCardOptions {
   ranges: FormOption[]
   drives: FormOption[]
   interiors: FormOption[]
+  countries: FormOption[]
 }
 
 interface OrderCardProps {
@@ -51,7 +53,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
   const to = useTranslations('options')
 
   const colorInfo = findColorInfo(order.color)
-  const { models, ranges, drives, interiors } = options
+  const { models, ranges, drives, interiors, countries } = options
 
   // Helper to lookup label from value
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
@@ -93,7 +95,15 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                 <Calendar className="h-3 w-3" />
                 <span>{order.orderDate || tc('noDate')}</span>
-                {order.country && <span>{order.country}</span>}
+                {order.country && (() => {
+                  const countryOpt = countries.find(c => c.value === order.country)
+                  return (
+                    <span className="flex items-center gap-1">
+                      {countryOpt?.flag && <TwemojiEmoji emoji={countryOpt.flag} size={14} />}
+                      {countryOpt?.label || order.country}
+                    </span>
+                  )
+                })()}
               </div>
             </div>
             {isAdmin && (
