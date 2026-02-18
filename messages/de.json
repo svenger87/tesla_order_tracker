@@ -79,6 +79,8 @@
     "personalData": "Persönliche Daten",
     "vehicleConfig": "Fahrzeugkonfiguration",
     "delivery": "Lieferung",
+    "appearance": "Ausstattung",
+    "stepOf": "Schritt {current} von {total}",
     "statusTracking": "Status & Tracking",
     "newOrder": "Neue Bestellung",
     "editOrder": "Bestellung bearbeiten",

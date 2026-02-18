@@ -1,0 +1,6 @@
+export { PersonalDataStep } from './PersonalDataStep'
+export { VehicleStep } from './VehicleStep'
+export { AppearanceStep } from './AppearanceStep'
+export { DeliveryStep } from './DeliveryStep'
+export { TrackingStep } from './TrackingStep'
+export { PasswordStep } from './PasswordStep'
