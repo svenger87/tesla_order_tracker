@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Order } from '@/lib/types'
@@ -24,6 +24,7 @@ interface CollapsibleOrderSectionProps {
   expandedQuarters?: string[]
   onExpandedChange?: (vals: string[]) => void
   highlightOrderId?: string | null
+  onFilteredOrdersChange?: (quarterLabel: string, orders: Order[]) => void
 }
 
 export function CollapsibleOrderSection({
@@ -36,6 +37,7 @@ export function CollapsibleOrderSection({
   expandedQuarters,
   onExpandedChange,
   highlightOrderId,
+  onFilteredOrdersChange,
 }: CollapsibleOrderSectionProps) {
   const t = useTranslations('home')
 
@@ -102,6 +104,10 @@ export function CollapsibleOrderSection({
                       onGenerateResetCode={onGenerateResetCode}
                       onEditByCode={onEditByCode}
                       highlightOrderId={highlightOrderId}
+                      onFilteredOrdersChange={onFilteredOrdersChange
+                        ? (filtered) => onFilteredOrdersChange(group.label, filtered)
+                        : undefined
+                      }
                     />
                   </motion.div>
                 </AccordionContent>

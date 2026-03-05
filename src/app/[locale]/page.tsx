@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { Order, Settings } from '@/lib/types'
@@ -71,6 +71,24 @@ export default function Home() {
   }>({ open: false, code: '', orderName: '' })
   const [resetCodeCopied, setResetCodeCopied] = useState(false)
   const [generatingResetCode, setGeneratingResetCode] = useState(false)
+
+  // Track table-filtered orders per quarter for statistics integration
+  const [tableFilteredMap, setTableFilteredMap] = useState<Map<string, Order[]>>(new Map())
+
+  const handleFilteredOrdersChange = useCallback((quarterLabel: string, filtered: Order[]) => {
+    setTableFilteredMap(prev => {
+      const next = new Map(prev)
+      next.set(quarterLabel, filtered)
+      return next
+    })
+  }, [])
+
+  const tableFilteredOrders = useMemo(() => {
+    if (tableFilteredMap.size === 0) return orders
+    return Array.from(tableFilteredMap.values()).flat()
+  }, [tableFilteredMap, orders])
+
+  const hasActiveTableFilters = tableFilteredOrders.length < orders.length
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(orders), [orders])
 
@@ -392,7 +410,11 @@ export default function Home() {
         </div>
 
         {showStats && !loading && (
-          <StatisticsDashboard orders={orders} />
+          <StatisticsDashboard
+            orders={tableFilteredOrders}
+            totalOrderCount={orders.length}
+            hasActiveTableFilters={hasActiveTableFilters}
+          />
         )}
 
         {/* Section Divider */}
@@ -446,6 +468,7 @@ export default function Home() {
                 expandedQuarters={expandedQuarters}
                 onExpandedChange={setExpandedQuarters}
                 highlightOrderId={highlightOrderId}
+                onFilteredOrdersChange={handleFilteredOrdersChange}
               />
             )}
           </CardContent>

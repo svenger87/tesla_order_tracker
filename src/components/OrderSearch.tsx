@@ -59,12 +59,12 @@ export function OrderSearch({
     onOpenChange(false)
   }
 
-  // Custom filter: search across name, VIN, country, delivery location, vehicle type
+  // Custom filter: AND logic — all search words must match somewhere in the value
   const filterOrder = (value: string, search: string) => {
-    const searchLower = search.toLowerCase()
-    // value is the CommandItem's value (order id), but we stored searchable text as keywords
-    // cmdk uses value for filtering, so we encode searchable data in the value
-    return value.toLowerCase().includes(searchLower) ? 1 : 0
+    const valueLower = value.toLowerCase()
+    const words = search.toLowerCase().split(/\s+/).filter(Boolean)
+    if (words.length === 0) return 1
+    return words.every(word => valueLower.includes(word)) ? 1 : 0
   }
 
   return (
@@ -74,6 +74,7 @@ export function OrderSearch({
       title={t('title')}
       description={t('description')}
       showCloseButton={false}
+      filter={filterOrder}
     >
       <CommandInput placeholder={t('placeholder')} />
       <CommandList>
@@ -84,7 +85,6 @@ export function OrderSearch({
               // Build a searchable value string containing all fields
               const vinSuffix = order.vin ? order.vin.slice(-6) : ''
               const searchValue = [
-                order.id,
                 order.name,
                 order.vin || '',
                 vinSuffix,

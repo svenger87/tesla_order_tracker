@@ -309,6 +309,11 @@
     "count": "Anzahl",
     "daysRange": "{range} Tage",
     "other": "Andere",
+    "vinWeekday": "VIN-Zuweisung nach Wochentag",
+    "vinWeekdayDescription": "An welchen Wochentagen werden VINs zugewiesen?",
+    "vinWeekdayCount": "{value} VINs",
+    "notEnoughVinData": "Nicht genügend VIN-Daten (mind. 5 benötigt)",
+    "tableFiltersActive": "Tabellenfilter aktiv ({filtered} von {total})",
     "filterNote": "Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle."
   },
   "admin": {

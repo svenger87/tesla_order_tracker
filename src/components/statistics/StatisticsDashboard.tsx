@@ -10,6 +10,7 @@ import { CountryDistributionChart } from './CountryDistributionChart'
 import { OrdersTimelineChart } from './OrdersTimelineChart'
 import { DeliveryTimelineChart } from './DeliveryTimelineChart'
 import { WaitTimeDistributionChart } from './WaitTimeDistributionChart'
+import { VinWeekdayChart } from './VinWeekdayChart'
 import { MiniPieChart } from './ConfigDistributionCharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -35,10 +36,13 @@ import {
   Settings2,
   Hourglass,
   Package,
+  Filter,
 } from 'lucide-react'
 
 interface StatisticsDashboardProps {
   orders: Order[]
+  totalOrderCount?: number
+  hasActiveTableFilters?: boolean
 }
 
 // Convert period to string key for select
@@ -71,7 +75,7 @@ function formatQuarter(year: number, quarter: number): string {
 const PERIOD_STORAGE_KEY = 'tesla-tracker-stats-period'
 const VEHICLE_STORAGE_KEY = 'tesla-tracker-stats-vehicle'
 
-export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
+export function StatisticsDashboard({ orders, totalOrderCount, hasActiveTableFilters }: StatisticsDashboardProps) {
   const t = useTranslations('statistics')
   const tc = useTranslations('common')
   const [selectedPeriod, setSelectedPeriod] = useState<StatsPeriod>({ type: 'all' })
@@ -177,6 +181,13 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
           </div>
         </div>
 
+          {/* Table filters active indicator */}
+          {hasActiveTableFilters && totalOrderCount !== undefined && (
+            <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
+              <Filter className="h-3 w-3 mr-1" />
+              {t('tableFiltersActive', { filtered: orders.length, total: totalOrderCount })}
+            </Badge>
+          )}
           {/* Warning for orders without valid dates */}
           {stats.ordersWithoutDate > 0 && (
             <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
@@ -185,9 +196,11 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
             </Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {t('filterNote')}
-        </p>
+        {!hasActiveTableFilters && (
+          <p className="text-xs text-muted-foreground">
+            {t('filterNote')}
+          </p>
+        )}
       </div>
 
       {/* Main Statistics Tabs */}
@@ -374,6 +387,20 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               </CardContent>
             </Card>
           </div>
+
+          {/* VIN weekday distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Calendar className="h-5 w-5 text-primary" />
+                {t('vinWeekday')}
+              </CardTitle>
+              <CardDescription>{t('vinWeekdayDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <VinWeekdayChart data={stats.vinWeekdayDistribution} />
+            </CardContent>
+          </Card>
 
           {/* Wait time distribution */}
           <Card>
