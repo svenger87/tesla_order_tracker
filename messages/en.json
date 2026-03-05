@@ -37,7 +37,8 @@
     "noDate": "No date",
     "actions": "Actions",
     "new": "New",
-    "projectSupport": "Support this project"
+    "projectSupport": "Support this project",
+    "reset": "Reset"
   },
   "home": {
     "title": "Tesla Orders and Statistics",
@@ -53,7 +54,6 @@
     "deleteConfirmTitle": "Delete order?",
     "deleteConfirmDescription": "This action cannot be undone.",
     "footer": "Tesla Orders and Statistics — A community project by TFF",
-    "statsFilterNote": "These filters only apply to statistics and charts, not to the table.",
     "noOrders": "No orders available",
     "noFilterResults": "No entries match these filters",
     "resetCodeTitle": "One-time code generated",
@@ -309,7 +309,15 @@
     "count": "Count",
     "daysRange": "{range} days",
     "other": "Other",
-    "filterNote": "These filters only apply to statistics and charts, not to the table."
+    "vinWeekday": "VIN assignment by weekday",
+    "vinWeekdayDescription": "Which days of the week are VINs assigned?",
+    "vinWeekdayCount": "{value} VINs",
+    "notEnoughVinData": "Not enough VIN data (at least 5 needed)",
+    "statsFiltersActive": "Filters active: {filtered} of {total} orders",
+    "filterNote": "These filters only apply to statistics and charts, not to the table.",
+    "allModels": "All models",
+    "allColors": "All colors",
+    "allDrives": "All drives"
   },
   "admin": {
     "dashboard": "Admin Dashboard",

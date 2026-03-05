@@ -37,7 +37,8 @@
     "noDate": "Kein Datum",
     "actions": "Aktionen",
     "new": "Neu",
-    "projectSupport": "Projekt unterstützen"
+    "projectSupport": "Projekt unterstützen",
+    "reset": "Zurücksetzen"
   },
   "home": {
     "title": "Tesla Bestellungen und Statistiken",
@@ -53,7 +54,6 @@
     "deleteConfirmTitle": "Bestellung löschen?",
     "deleteConfirmDescription": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "footer": "Tesla Bestellungen und Statistiken — Ein Community Projekt der TFF",
-    "statsFilterNote": "Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle.",
     "noOrders": "Keine Bestellungen vorhanden",
     "noFilterResults": "Keine Einträge mit diesen Filtern",
     "resetCodeTitle": "Einmalcode generiert",
@@ -309,7 +309,15 @@
     "count": "Anzahl",
     "daysRange": "{range} Tage",
     "other": "Andere",
-    "filterNote": "Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle."
+    "vinWeekday": "VIN-Zuweisung nach Wochentag",
+    "vinWeekdayDescription": "An welchen Wochentagen werden VINs zugewiesen?",
+    "vinWeekdayCount": "{value} VINs",
+    "notEnoughVinData": "Nicht genügend VIN-Daten (mind. 5 benötigt)",
+    "statsFiltersActive": "Filter aktiv: {filtered} von {total} Bestellungen",
+    "filterNote": "Diese Filter gelten nur für die Statistiken und Diagramme, nicht für die Tabelle.",
+    "allModels": "Alle Models",
+    "allColors": "Alle Farben",
+    "allDrives": "Alle Antriebe"
   },
   "admin": {
     "dashboard": "Admin Dashboard",

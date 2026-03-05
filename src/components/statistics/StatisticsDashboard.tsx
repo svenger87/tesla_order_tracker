@@ -3,13 +3,14 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
-import { Order, VehicleType, VEHICLE_TYPES } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
 import { calculateStatistics, getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { StatCard } from './StatCard'
 import { CountryDistributionChart } from './CountryDistributionChart'
 import { OrdersTimelineChart } from './OrdersTimelineChart'
 import { DeliveryTimelineChart } from './DeliveryTimelineChart'
 import { WaitTimeDistributionChart } from './WaitTimeDistributionChart'
+import { VinWeekdayChart } from './VinWeekdayChart'
 import { MiniPieChart } from './ConfigDistributionCharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -35,11 +36,22 @@ import {
   Settings2,
   Hourglass,
   Package,
+  Filter,
+  X,
 } from 'lucide-react'
 
 interface StatisticsDashboardProps {
   orders: Order[]
 }
+
+interface StatsFilters {
+  model: string
+  color: string
+  drive: string
+}
+
+const emptyFilters: StatsFilters = { model: '', color: '', drive: '' }
+const STATS_FILTERS_STORAGE_KEY = 'tesla-tracker-stats-filters'
 
 // Convert period to string key for select
 function periodToKey(period: StatsPeriod): string {
@@ -76,6 +88,7 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
   const tc = useTranslations('common')
   const [selectedPeriod, setSelectedPeriod] = useState<StatsPeriod>({ type: 'all' })
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | 'all'>('all')
+  const [filters, setFilters] = useState<StatsFilters>(emptyFilters)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Load from localStorage after hydration
@@ -88,21 +101,73 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
     if (savedVehicle && (savedVehicle === 'all' || savedVehicle === 'Model Y' || savedVehicle === 'Model 3')) {
       setSelectedVehicle(savedVehicle)
     }
+    const savedFilters = localStorage.getItem(STATS_FILTERS_STORAGE_KEY)
+    if (savedFilters) {
+      try { setFilters(JSON.parse(savedFilters)) } catch { /* ignore */ }
+    }
     setIsHydrated(true)
   }, [])
 
-  // Save to localStorage whenever period or vehicle changes (only after hydration)
+  // Save to localStorage whenever filters change (only after hydration)
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(PERIOD_STORAGE_KEY, periodToKey(selectedPeriod))
       localStorage.setItem(VEHICLE_STORAGE_KEY, selectedVehicle)
+      localStorage.setItem(STATS_FILTERS_STORAGE_KEY, JSON.stringify(filters))
     }
-  }, [selectedPeriod, selectedVehicle, isHydrated])
+  }, [selectedPeriod, selectedVehicle, filters, isHydrated])
+
+  // Pre-filter orders by stats filters (model, color, drive)
+  const filteredOrders = useMemo(() => {
+    let result = orders
+    if (filters.model) {
+      result = result.filter(o => o.model === filters.model)
+    }
+    if (filters.color) {
+      result = result.filter(o => o.color === filters.color)
+    }
+    if (filters.drive) {
+      result = result.filter(o => o.drive === filters.drive)
+    }
+    return result
+  }, [orders, filters])
+
+  const hasActiveFilters = filters.model !== '' || filters.color !== '' || filters.drive !== ''
+
+  // Build available filter options from actual order data
+  const filterOptions = useMemo(() => {
+    const models = new Set<string>()
+    const colors = new Set<string>()
+    const drives = new Set<string>()
+    orders.forEach(o => {
+      if (o.model) models.add(o.model)
+      if (o.color) colors.add(o.color)
+      if (o.drive) drives.add(o.drive)
+    })
+
+    const allTrims = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]
+    const modelOptions = Array.from(models).map(v => {
+      const trim = allTrims.find(t => t.value === v)
+      return { value: v, label: trim?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
+    const colorOptions = Array.from(colors).map(v => {
+      const c = COLORS.find(c => c.value === v)
+      return { value: v, label: c?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
+    const driveOptions = Array.from(drives).map(v => {
+      const d = DRIVES.find(d => d.value === v)
+      return { value: v, label: d?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
+    return { modelOptions, colorOptions, driveOptions }
+  }, [orders])
 
   const availablePeriods = useMemo(() => getAvailablePeriods(orders), [orders])
   const stats = useMemo(
-    () => calculateStatistics(orders, selectedPeriod, selectedVehicle === 'all' ? undefined : selectedVehicle),
-    [orders, selectedPeriod, selectedVehicle]
+    () => calculateStatistics(filteredOrders, selectedPeriod, selectedVehicle === 'all' ? undefined : selectedVehicle),
+    [filteredOrders, selectedPeriod, selectedVehicle]
   )
 
   return (
@@ -175,8 +240,90 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Model Filter */}
+          {filterOptions.modelOptions.length > 1 && (
+            <Select
+              value={filters.model || '_all'}
+              onValueChange={(v) => setFilters(f => ({ ...f, model: v === '_all' ? '' : v }))}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder={t('modelDistribution')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_all">{t('modelDistribution')}: {tc('all')}</SelectItem>
+                {filterOptions.modelOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Color Filter */}
+          {filterOptions.colorOptions.length > 1 && (
+            <Select
+              value={filters.color || '_all'}
+              onValueChange={(v) => setFilters(f => ({ ...f, color: v === '_all' ? '' : v }))}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder={t('colorDistribution')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_all">{t('colorDistribution')}: {tc('all')}</SelectItem>
+                {filterOptions.colorOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    <span className="flex items-center gap-2">
+                      {COLORS.find(c => c.value === o.value)?.hex && (
+                        <span
+                          className="w-3 h-3 rounded-full inline-block shrink-0 border border-border"
+                          style={{ backgroundColor: COLORS.find(c => c.value === o.value)?.hex }}
+                        />
+                      )}
+                      {o.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Drive Filter */}
+          {filterOptions.driveOptions.length > 1 && (
+            <Select
+              value={filters.drive || '_all'}
+              onValueChange={(v) => setFilters(f => ({ ...f, drive: v === '_all' ? '' : v }))}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder={t('driveDistribution')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_all">{t('driveDistribution')}: {tc('all')}</SelectItem>
+                {filterOptions.driveOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <button
+              onClick={() => setFilters(emptyFilters)}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              <X className="h-3 w-3" />
+              {tc('reset')}
+            </button>
+          )}
         </div>
 
+          {/* Active filters indicator */}
+          {hasActiveFilters && (
+            <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
+              <Filter className="h-3 w-3 mr-1" />
+              {t('statsFiltersActive', { filtered: filteredOrders.length, total: orders.length })}
+            </Badge>
+          )}
           {/* Warning for orders without valid dates */}
           {stats.ordersWithoutDate > 0 && (
             <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
@@ -185,9 +332,6 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
             </Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {t('filterNote')}
-        </p>
       </div>
 
       {/* Main Statistics Tabs */}
@@ -374,6 +518,20 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
               </CardContent>
             </Card>
           </div>
+
+          {/* VIN weekday distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Calendar className="h-5 w-5 text-primary" />
+                {t('vinWeekday')}
+              </CardTitle>
+              <CardDescription>{t('vinWeekdayDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <VinWeekdayChart data={stats.vinWeekdayDistribution} />
+            </CardContent>
+          </Card>
 
           {/* Wait time distribution */}
           <Card>
