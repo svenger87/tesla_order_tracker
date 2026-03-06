@@ -53,6 +53,7 @@ const TARGET_FIELDS = [
   { type: 'range' },
   { type: 'drive' },
   { type: 'towHitch' },
+  { type: 'seats' },
 ] as const
 
 export function ConstraintManager() {
@@ -61,7 +62,9 @@ export function ConstraintManager() {
   const tf = useTranslations('form')
   // State
   const [vehicleType, setVehicleType] = useState<VehicleType>('Model Y')
+  const [sourceType, setSourceType] = useState<'model' | 'drive'>('model')
   const [selectedModel, setSelectedModel] = useState<string>('')
+  const [selectedDrive, setSelectedDrive] = useState<string>('')
   const [options, setOptions] = useState<Option[]>([])
   const [constraints, setConstraints] = useState<Constraint[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,6 +115,15 @@ export function ConstraintManager() {
     (o.vehicleType === vehicleType || o.vehicleType === null)
   )
 
+  // Get drives for selected vehicle type
+  const drives = options.filter(o =>
+    o.type === 'drive' &&
+    (o.vehicleType === vehicleType || o.vehicleType === null)
+  )
+
+  // Selected source value (model or drive depending on sourceType)
+  const selectedSourceValue = sourceType === 'model' ? selectedModel : selectedDrive
+
   // Get options for a target field
   const getOptionsForField = (fieldType: string) => {
     return options.filter(o =>
@@ -120,17 +132,17 @@ export function ConstraintManager() {
     )
   }
 
-  // Load existing constraints when model changes
+  // Load existing constraints when source selection changes
   useEffect(() => {
-    if (!selectedModel) {
+    if (!selectedSourceValue) {
       setFieldConfigs({})
       return
     }
 
-    // Find existing constraints for this model
-    const modelConstraints = constraints.filter(c =>
-      c.sourceType === 'model' &&
-      c.sourceValue === selectedModel &&
+    // Find existing constraints for the selected source
+    const sourceConstraints = constraints.filter(c =>
+      c.sourceType === sourceType &&
+      c.sourceValue === selectedSourceValue &&
       (c.vehicleType === vehicleType || c.vehicleType === null)
     )
 
@@ -138,7 +150,7 @@ export function ConstraintManager() {
     const configs: Record<string, FieldConfig> = {}
 
     for (const field of TARGET_FIELDS) {
-      const constraint = modelConstraints.find(c => c.targetType === field.type)
+      const constraint = sourceConstraints.find(c => c.targetType === field.type)
 
       if (constraint) {
         configs[field.type] = {
@@ -156,7 +168,7 @@ export function ConstraintManager() {
     }
 
     setFieldConfigs(configs)
-  }, [selectedModel, vehicleType, constraints])
+  }, [selectedSourceValue, sourceType, vehicleType, constraints])
 
   // Handle constraint type change
   const handleConstraintTypeChange = (fieldType: string, type: ConstraintType) => {
@@ -203,19 +215,13 @@ export function ConstraintManager() {
 
   // Save constraints
   const handleSave = async () => {
-    if (!selectedModel) return
+    if (!selectedSourceValue) return
 
     setSaving(true)
     setError('')
     setSuccess('')
 
     try {
-      // Get the model option to find its value
-      const modelOption = models.find(m => m.value === selectedModel)
-      if (!modelOption) {
-        throw new Error(tc('error'))
-      }
-
       // Process each field
       for (const field of TARGET_FIELDS) {
         const config = fieldConfigs[field.type]
@@ -223,8 +229,8 @@ export function ConstraintManager() {
 
         // Find existing constraint
         const existingConstraint = constraints.find(c =>
-          c.sourceType === 'model' &&
-          c.sourceValue === selectedModel &&
+          c.sourceType === sourceType &&
+          c.sourceValue === selectedSourceValue &&
           c.targetType === field.type &&
           (c.vehicleType === vehicleType || c.vehicleType === null)
         )
@@ -272,8 +278,8 @@ export function ConstraintManager() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                sourceType: 'model',
-                sourceValue: selectedModel,
+                sourceType: sourceType,
+                sourceValue: selectedSourceValue,
                 vehicleType: vehicleType,
                 targetType: field.type,
                 constraintType: config.type,
@@ -378,8 +384,8 @@ export function ConstraintManager() {
           </div>
         )}
 
-        {/* Vehicle and Model Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Vehicle Type and Source Type Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>{t('vehicleType')}</Label>
             <Select
@@ -387,6 +393,7 @@ export function ConstraintManager() {
               onValueChange={(v) => {
                 setVehicleType(v as VehicleType)
                 setSelectedModel('')
+                setSelectedDrive('')
               }}
             >
               <SelectTrigger>
@@ -403,31 +410,74 @@ export function ConstraintManager() {
           </div>
 
           <div className="space-y-2">
-            <Label>{t('modelTrim')}</Label>
-            <Select
-              value={selectedModel}
-              onValueChange={setSelectedModel}
+            <Label>{t('sourceType')}</Label>
+            <RadioGroup
+              value={sourceType}
+              onValueChange={(v) => {
+                setSourceType(v as 'model' | 'drive')
+                setSelectedModel('')
+                setSelectedDrive('')
+              }}
+              className="flex gap-4 pt-2"
             >
-              <SelectTrigger>
-                <SelectValue placeholder={t('modelSelect')} />
-              </SelectTrigger>
-              <SelectContent>
-                {models.map((m) => (
-                  <SelectItem key={m.id} value={m.value}>
-                    {m.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="model" id="source-model" />
+                <Label htmlFor="source-model" className="cursor-pointer">{t('sourceModel')}</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="drive" id="source-drive" />
+                <Label htmlFor="source-drive" className="cursor-pointer">{t('sourceDrive')}</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{sourceType === 'model' ? t('modelTrim') : tf('drive')}</Label>
+            {sourceType === 'model' ? (
+              <Select
+                value={selectedModel}
+                onValueChange={setSelectedModel}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('modelSelect')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.map((m) => (
+                    <SelectItem key={m.id} value={m.value}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Select
+                value={selectedDrive}
+                onValueChange={setSelectedDrive}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={tf('driveSelect')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {drives.map((d) => (
+                    <SelectItem key={d.id} value={d.value}>
+                      {d.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
 
         {/* Constraint Configuration */}
-        {selectedModel && (
+        {selectedSourceValue && (
           <div className="space-y-6 border-t pt-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">
-                {t('constraintsFor', { model: models.find(m => m.value === selectedModel)?.label ?? '' })}
+                {t('constraintsFor', { model: sourceType === 'model'
+                  ? (models.find(m => m.value === selectedModel)?.label ?? '')
+                  : (drives.find(d => d.value === selectedDrive)?.label ?? '')
+                })}
               </h3>
               <Badge variant="outline">{vehicleType}</Badge>
             </div>
@@ -439,7 +489,7 @@ export function ConstraintManager() {
               return (
                 <div key={field.type} className="space-y-3 p-4 rounded-lg bg-muted/30">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">{tf(field.type as 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch')}</Label>
+                    <Label className="text-base font-medium">{tf(field.type as 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch' | 'seats')}</Label>
                     {config.type !== 'none' && (
                       <Badge variant={config.type === 'fixed' ? 'default' : config.type === 'disable' ? 'destructive' : 'secondary'}>
                         {config.type === 'allow' && t('restricted')}
@@ -546,7 +596,7 @@ export function ConstraintManager() {
           </div>
         )}
 
-        {!selectedModel && (
+        {!selectedSourceValue && (
           <div className="text-center py-8 text-muted-foreground">
             {t('selectModelHint')}
           </div>

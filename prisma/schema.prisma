@@ -24,6 +24,7 @@ model Order {
   wheels                String?  // Felgen
   towHitch              String?  // AHK (ja/nein)
   autopilot             String?  // Autopilot
+  seats                 String?  // Sitze (5/7)
   deliveryWindow        String?  // Lieferfenster
   deliveryLocation      String?  // Ort (Auslieferung)
   vin                   String?  // VIN

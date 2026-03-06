@@ -18,10 +18,12 @@ interface AppearanceStepProps {
   interiors: FormOption[]
   wheels: FormOption[]
   towHitch: FormOption[]
+  seats: FormOption[]
   autopilot: FormOption[]
   models: FormOption[]
   selectedModelValue: string
   modelConstraints: ConstraintsForModel
+  mergedConstraints: ConstraintsForModel
   isFieldDisabled: (modelValue: string, fieldType: keyof ConstraintsForModel) => boolean
   getFieldOptions: <T extends { value: string; label: string }>(
     fieldType: keyof ConstraintsForModel,
@@ -39,10 +41,12 @@ export function AppearanceStep({
   interiors,
   wheels,
   towHitch,
+  seats,
   autopilot,
   models,
   selectedModelValue,
   modelConstraints,
+  mergedConstraints,
   isFieldDisabled,
   getFieldOptions,
   filterOptions,
@@ -179,6 +183,41 @@ export function AppearanceStep({
         {modelConstraints.towHitch?.type === 'disable' && (
           <p className="text-xs text-muted-foreground">
             {t('constraintTowHitchUnavailable', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="seats">{t('seats')} *</Label>
+        <Select
+          value={formData.seats}
+          onValueChange={(v) => handleChange('seats', v)}
+          disabled={mergedConstraints.seats?.type === 'fixed'}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={t('seatsSelect')} />
+          </SelectTrigger>
+          <SelectContent>
+            {(() => {
+              const seatsConstraint = mergedConstraints.seats
+              if (seatsConstraint?.type === 'fixed' && seatsConstraint.fixedValue) {
+                const opt = seats.find(s => s.value === seatsConstraint.fixedValue)
+                return opt ? [opt] : [{ value: seatsConstraint.fixedValue, label: seatsConstraint.fixedValue }]
+              }
+              if (seatsConstraint?.type === 'allow' && seatsConstraint.allowedValues) {
+                return seats.filter(s => seatsConstraint.allowedValues!.includes(s.value))
+              }
+              return seats
+            })().map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {mergedConstraints.seats?.type === 'fixed' && (
+          <p className="text-xs text-muted-foreground">
+            {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: seats.find(s => s.value === formData.seats)?.label ?? formData.seats })}
           </p>
         )}
       </div>

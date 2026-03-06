@@ -1,4 +1,4 @@
-import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS } from './types'
+import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
 
 // Build COUNTRY_NAMES from the canonical COUNTRIES constant to stay in sync
 const COUNTRY_NAMES: Record<string, string> = Object.fromEntries(
@@ -61,6 +61,7 @@ export interface OrderStatistics {
   autopilotDistribution: { name: string; count: number; fill: string }[]
   driveDistribution: { name: string; count: number; fill: string }[]
   towHitchDistribution: { name: string; count: number; fill: string }[]
+  seatsDistribution: { name: string; count: number; fill: string }[]
   colorDistribution: { name: string; count: number; fill: string }[]
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
   vinWeekdayDistribution: { name: string; count: number }[]
@@ -490,6 +491,20 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
+  // Seats (Sitze) distribution - null treated as 5-Sitzer
+  const seatsCounts: Record<string, number> = {}
+  filteredOrders.forEach(order => {
+    const seats = normalizeOption(order.seats || '5', SEATS_OPTIONS, '5-Sitzer')
+    seatsCounts[seats] = (seatsCounts[seats] || 0) + 1
+  })
+  const seatsDistribution = Object.entries(seatsCounts)
+    .map(([name, count], index) => ({
+      name,
+      count,
+      fill: CONFIG_COLORS[index % CONFIG_COLORS.length],
+    }))
+    .sort((a, b) => b.count - a.count)
+
   // Color (Farbe) distribution - use actual car colors with labels
   const colorCounts: Record<string, { count: number; hex: string | null }> = {}
   filteredOrders.forEach(order => {
@@ -561,6 +576,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     autopilotDistribution,
     driveDistribution,
     towHitchDistribution,
+    seatsDistribution,
     colorDistribution,
     deliveryLocationDistribution,
     vinWeekdayDistribution,

@@ -127,6 +127,7 @@ const emptyFormData: OrderFormData = {
   wheels: '',
   towHitch: '',
   autopilot: '',
+  seats: '',
   deliveryWindow: '',
   deliveryLocation: '',
   vin: '',
@@ -162,10 +163,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [wizardStep, setWizardStep] = useState(0)
 
   // Load dynamic options from API (filtered by vehicle type)
-  const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, deliveryLocations } = useOptions(formData.vehicleType)
+  const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, seats, deliveryLocations } = useOptions(formData.vehicleType)
 
   // Load constraints from database
-  const { getConstraintsForModel, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
+  const { getConstraintsForModel, getMergedConstraints, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
 
   // Get the model value for constraint lookups (formData.model is already a value)
   const selectedModelValue = useMemo(() => {
@@ -177,6 +178,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (!selectedModelValue) return {}
     return getConstraintsForModel(selectedModelValue)
   }, [selectedModelValue, getConstraintsForModel])
+
+  // Get merged constraints (model + drive) for fields like seats
+  const mergedConstraints = useMemo(() => {
+    if (!selectedModelValue) return {}
+    return getMergedConstraints(selectedModelValue, formData.drive)
+  }, [selectedModelValue, formData.drive, getMergedConstraints])
 
   // Helper: get options for a constrained field, ensuring fixed values always have a matching SelectItem
   const getFieldOptions = useCallback(<T extends { value: string; label: string }>(
@@ -220,6 +227,21 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     }
   }, [formData.model, getConstraintsForModel]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Apply merged constraints (model + drive) for seats when model or drive changes
+  useEffect(() => {
+    if (!formData.model) return
+    const merged = getMergedConstraints(formData.model, formData.drive)
+    const seatsConstraint = merged.seats
+    if (seatsConstraint?.type === 'fixed' && seatsConstraint.fixedValue) {
+      setFormData(prev => ({ ...prev, seats: seatsConstraint.fixedValue! }))
+    } else if (seatsConstraint?.type === 'allow' && seatsConstraint.allowedValues) {
+      // If current value is not in allowed list, reset
+      if (formData.seats && !seatsConstraint.allowedValues.includes(formData.seats)) {
+        setFormData(prev => ({ ...prev, seats: '' }))
+      }
+    }
+  }, [formData.model, formData.drive, getMergedConstraints]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
@@ -237,6 +259,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           wheels: order.wheels || '',
           towHitch: order.towHitch || '',
           autopilot: order.autopilot || '',
+          seats: order.seats || '',
           deliveryWindow: order.deliveryWindow || '',
           deliveryLocation: order.deliveryLocation || '',
           vin: order.vin || '',
@@ -292,7 +315,15 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     } else if (constraints.towHitch?.type === 'fixed' && constraints.towHitch.fixedValue) {
       handleChange('towHitch', constraints.towHitch.fixedValue)
     }
-  }, [handleChange, getConstraintsForModel, formData.color])
+
+    // Apply seats constraint (merged with drive)
+    const merged = getMergedConstraints(modelValue, formData.drive)
+    if (merged.seats?.type === 'fixed' && merged.seats.fixedValue) {
+      handleChange('seats', merged.seats.fixedValue)
+    } else {
+      handleChange('seats', '')
+    }
+  }, [handleChange, getConstraintsForModel, getMergedConstraints, formData.color, formData.drive])
 
   // Vehicle type change handler
   const handleVehicleTypeChange = useCallback((v: VehicleType) => {
@@ -328,6 +359,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         { field: 'interior', label: t('interior') },
         { field: 'wheels', label: t('wheels') },
         { field: 'towHitch', label: t('towHitch') },
+        { field: 'seats', label: t('seats') },
         { field: 'autopilot', label: t('autopilot') },
         { field: 'country', label: t('country') },
         { field: 'deliveryLocation', label: t('deliveryLocation') },
@@ -529,10 +561,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             interiors={interiors}
             wheels={wheels}
             towHitch={towHitch}
+            seats={seats}
             autopilot={autopilot}
             models={models}
             selectedModelValue={selectedModelValue}
             modelConstraints={modelConstraints}
+            mergedConstraints={mergedConstraints}
             isFieldDisabled={isFieldDisabled}
             getFieldOptions={getFieldOptions}
             filterOptions={filterOptions}
@@ -593,7 +627,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return steps
   }, [
     formData, handleChange, countries, models, ranges, drives, colors, interiors,
-    wheels, towHitch, autopilot, deliveryLocations, selectedModelValue, modelConstraints,
+    wheels, towHitch, seats, autopilot, deliveryLocations, selectedModelValue, modelConstraints, mergedConstraints,
     isFieldDisabled, getFieldOptions, filterOptions, handleModelChange, handleVehicleTypeChange,
     dateLocale, order, isLegacy, newEditCode, confirmNewEditCode, showPasswordStep, t,
   ])
@@ -917,6 +951,41 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 {modelConstraints.towHitch?.type === 'disable' && (
                   <p className="text-xs text-muted-foreground">
                     {t('constraintTowHitchUnavailable', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="seats">{t('seats')} *</Label>
+                <Select
+                  value={formData.seats}
+                  onValueChange={(v) => handleChange('seats', v)}
+                  disabled={mergedConstraints.seats?.type === 'fixed'}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('seatsSelect')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(() => {
+                      const seatsConstraint = mergedConstraints.seats
+                      if (seatsConstraint?.type === 'fixed' && seatsConstraint.fixedValue) {
+                        const opt = seats.find(s => s.value === seatsConstraint.fixedValue)
+                        return opt ? [opt] : [{ value: seatsConstraint.fixedValue, label: seatsConstraint.fixedValue }]
+                      }
+                      if (seatsConstraint?.type === 'allow' && seatsConstraint.allowedValues) {
+                        return seats.filter(s => seatsConstraint.allowedValues!.includes(s.value))
+                      }
+                      return seats
+                    })().map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {mergedConstraints.seats?.type === 'fixed' && (
+                  <p className="text-xs text-muted-foreground">
+                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: seats.find(s => s.value === formData.seats)?.label ?? formData.seats })}
                   </p>
                 )}
               </div>

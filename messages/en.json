@@ -108,6 +108,8 @@
     "wheelsSelect": "Select wheels",
     "towHitch": "Tow hitch",
     "towHitchSelect": "Select tow hitch",
+    "seats": "Seats",
+    "seatsSelect": "Select seats",
     "autopilot": "Autopilot",
     "autopilotSelect": "Select autopilot",
     "deliveryWindow": "Delivery window",
@@ -199,6 +201,7 @@
     "interior": "Interior",
     "wheels": "Wheels",
     "towHitch": "Tow hitch",
+    "seats": "Seats",
     "autopilot": "Autopilot",
     "deliveryWindow": "Delivery window",
     "deliveryLocation": "Location",
@@ -290,6 +293,7 @@
     "interiorDistribution": "Interior",
     "wheelsDistribution": "Wheels",
     "towHitchDistribution": "Tow hitch",
+    "seatsDistribution": "Seats",
     "autopilotDistribution": "Autopilot",
     "hintTotal": "Total number of all recorded orders in the selected period.",
     "hintDelivered": "Number of vehicles already delivered.",
@@ -452,7 +456,10 @@
     "colorCode": "Color code (Hex)",
     "showBorder": "Show border (for light colors)",
     "constraintManager": "Model constraints",
-    "constraintDescription": "Configure which options are available for each model",
+    "constraintDescription": "Configure which options are available for each model or drive type",
+    "sourceType": "Source",
+    "sourceModel": "Model",
+    "sourceDrive": "Drive",
     "seedDefaultRules": "Load default rules",
     "seedingRules": "Seeding...",
     "modelTrim": "Model / Trim",
@@ -519,6 +526,10 @@
       "ja": "Yes",
       "nein": "No",
       "nv": "N/A"
+    },
+    "seats": {
+      "5": "5-Seater",
+      "7": "7-Seater"
     },
     "autopilot": {
       "none": "None",

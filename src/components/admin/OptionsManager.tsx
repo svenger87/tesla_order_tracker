@@ -72,6 +72,7 @@ const OPTION_TYPES = [
   { type: 'wheels', formKey: 'wheels', valueHint: 'gemini_19', labelHint: 'Gemini 19"' },
   { type: 'autopilot', formKey: 'autopilot', valueHint: 'fsd', labelHint: 'Full Self-Driving' },
   { type: 'towHitch', formKey: 'towHitch', valueHint: 'yes', labelHint: 'Yes' },
+  { type: 'seats', formKey: 'seats', valueHint: '7', labelHint: '7-Sitzer' },
   { type: 'deliveryLocation', formKey: 'deliveryLocation', valueHint: 'muenchen', labelHint: 'Munich' },
 ]
 

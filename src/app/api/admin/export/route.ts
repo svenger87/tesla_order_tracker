@@ -38,6 +38,7 @@ export async function GET() {
       { header: 'Innenraum', key: 'interior', width: 15 },
       { header: 'Felgen', key: 'wheels', width: 10 },
       { header: 'AHK', key: 'towHitch', width: 10 },
+      { header: 'Sitze', key: 'seats', width: 10 },
       { header: 'Autopilot', key: 'autopilot', width: 15 },
       { header: 'Lieferfenster', key: 'deliveryWindow', width: 20 },
       { header: 'Lieferort', key: 'deliveryLocation', width: 25 },

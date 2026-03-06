@@ -13,6 +13,7 @@ export interface ApiOrder {
   wheels: string | null
   towHitch: string | null
   autopilot: string | null
+  seats: string | null
   deliveryWindow: string | null
   deliveryLocation: string | null
   vin: string | null
@@ -47,6 +48,7 @@ export interface CreateOrderRequest {
   wheels?: string
   towHitch?: string
   autopilot?: string
+  seats?: string
   deliveryWindow?: string
   deliveryLocation?: string
   vin?: string
@@ -74,6 +76,7 @@ export interface UpdateOrderRequest {
   wheels?: string
   towHitch?: string
   autopilot?: string
+  seats?: string
   deliveryWindow?: string
   deliveryLocation?: string
   vin?: string
@@ -105,6 +108,7 @@ export interface ApiOptions {
   wheels: ApiOption[]
   autopilot: ApiOption[]
   towHitch: ApiOption[]
+  seats: ApiOption[]
   deliveryLocation: ApiOption[]
 }
 

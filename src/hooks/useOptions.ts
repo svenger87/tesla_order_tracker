@@ -14,6 +14,7 @@ import {
   MODEL_3_WHEELS,
   AUTOPILOT_OPTIONS,
   TOW_HITCH_OPTIONS,
+  SEATS_OPTIONS,
   VehicleType,
 } from '@/lib/types'
 
@@ -77,6 +78,7 @@ const FALLBACK_OPTIONS: Record<string, FormOption[]> = {
   wheels: hardcodedToFormOptions(WHEELS),  // Model Y wheels
   autopilot: hardcodedToFormOptions(AUTOPILOT_OPTIONS),
   towHitch: hardcodedToFormOptions(TOW_HITCH_OPTIONS),
+  seats: hardcodedToFormOptions(SEATS_OPTIONS),
 }
 
 // Vehicle-specific fallback overrides
@@ -92,7 +94,7 @@ const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormO
 }
 
 // Option types that have translations in the message files
-const TRANSLATABLE_TYPES = new Set(['country', 'interior', 'range', 'towHitch', 'autopilot'])
+const TRANSLATABLE_TYPES = new Set(['country', 'interior', 'range', 'towHitch', 'autopilot', 'seats'])
 
 export function useOptions(vehicleType?: VehicleType) {
   const [apiOptions, setApiOptions] = useState<ApiOption[]>([])
@@ -170,6 +172,7 @@ export function useOptions(vehicleType?: VehicleType) {
       wheels: getOptionsForType('wheels'),
       autopilot: translateOptions('autopilot', getOptionsForType('autopilot')),
       towHitch: translateOptions('towHitch', getOptionsForType('towHitch')),
+      seats: translateOptions('seats', getOptionsForType('seats')),
       deliveryLocations: getOptionsForType('deliveryLocation'),
     }
   }, [apiOptions, vehicleType, to, locale])

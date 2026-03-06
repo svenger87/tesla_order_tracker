@@ -454,7 +454,8 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
             <MiniPieChart data={stats.interiorDistribution} title={t('interiorDistribution')} delay={0} />
             <MiniPieChart data={stats.wheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
             <MiniPieChart data={stats.towHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
-            <MiniPieChart data={stats.autopilotDistribution} title={t('autopilotDistribution')} delay={0.15} />
+            <MiniPieChart data={stats.seatsDistribution} title={t('seatsDistribution')} delay={0.15} />
+            <MiniPieChart data={stats.autopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
           </div>
         </TabsContent>
 

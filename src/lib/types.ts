@@ -20,6 +20,7 @@ export interface Order {
   wheels: string | null
   towHitch: string | null
   autopilot: string | null
+  seats: string | null
   deliveryWindow: string | null
   deliveryLocation: string | null
   vin: string | null
@@ -53,6 +54,7 @@ export interface OrderFormData {
   wheels: string
   towHitch: string
   autopilot: string
+  seats: string
   deliveryWindow: string
   deliveryLocation: string
   vin: string
@@ -240,4 +242,9 @@ export const TOW_HITCH_OPTIONS = [
   { value: 'ja', label: 'Ja' },
   { value: 'nein', label: 'Nein' },
   { value: 'nv', label: 'n.v.' },  // nicht verfügbar - for models without AHK option
+]
+
+export const SEATS_OPTIONS = [
+  { value: '5', label: '5-Sitzer' },
+  { value: '7', label: '7-Sitzer' },
 ]

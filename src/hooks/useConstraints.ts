@@ -30,6 +30,31 @@ export interface ConstraintsForModel {
   drive?: FieldConstraint
   towHitch?: FieldConstraint
   autopilot?: FieldConstraint
+  seats?: FieldConstraint
+}
+
+function buildFieldConstraint(constraint: Constraint): FieldConstraint {
+  const fieldConstraint: FieldConstraint = {
+    type: constraint.constraintType,
+  }
+  if (constraint.constraintType === 'allow') {
+    fieldConstraint.allowedValues = constraint.values as string[]
+  } else if (constraint.constraintType === 'fixed') {
+    fieldConstraint.fixedValue = constraint.values as string
+  }
+  return fieldConstraint
+}
+
+const TARGET_KEYS: (keyof ConstraintsForModel)[] = ['wheels', 'color', 'interior', 'range', 'drive', 'towHitch', 'autopilot', 'seats']
+
+function constraintsToMap(filtered: Constraint[]): ConstraintsForModel {
+  const result: ConstraintsForModel = {}
+  for (const constraint of filtered) {
+    if (TARGET_KEYS.includes(constraint.targetType as keyof ConstraintsForModel)) {
+      result[constraint.targetType as keyof ConstraintsForModel] = buildFieldConstraint(constraint)
+    }
+  }
+  return result
 }
 
 export function useConstraints(vehicleType?: VehicleType) {
@@ -40,8 +65,8 @@ export function useConstraints(vehicleType?: VehicleType) {
   useEffect(() => {
     async function fetchConstraints() {
       try {
+        // Fetch all constraints (both model and drive based)
         const params = new URLSearchParams()
-        params.set('sourceType', 'model') // We only care about model-based constraints for now
         if (vehicleType) {
           params.set('vehicleType', vehicleType)
         }
@@ -63,56 +88,36 @@ export function useConstraints(vehicleType?: VehicleType) {
     fetchConstraints()
   }, [vehicleType])
 
-  // Get constraints for a specific model/trim
+  // Get constraints for a specific model/trim (model-based only)
   const getConstraintsForModel = useCallback((modelValue: string): ConstraintsForModel => {
-    const result: ConstraintsForModel = {}
-
-    // Find all constraints where source is this model
     const modelConstraints = constraints.filter(c =>
       c.sourceType === 'model' &&
       c.sourceValue === modelValue &&
       c.isActive
     )
-
-    for (const constraint of modelConstraints) {
-      const fieldConstraint: FieldConstraint = {
-        type: constraint.constraintType,
-      }
-
-      if (constraint.constraintType === 'allow') {
-        fieldConstraint.allowedValues = constraint.values as string[]
-      } else if (constraint.constraintType === 'fixed') {
-        fieldConstraint.fixedValue = constraint.values as string
-      }
-
-      // Map targetType to result
-      switch (constraint.targetType) {
-        case 'wheels':
-          result.wheels = fieldConstraint
-          break
-        case 'color':
-          result.color = fieldConstraint
-          break
-        case 'interior':
-          result.interior = fieldConstraint
-          break
-        case 'range':
-          result.range = fieldConstraint
-          break
-        case 'drive':
-          result.drive = fieldConstraint
-          break
-        case 'towHitch':
-          result.towHitch = fieldConstraint
-          break
-        case 'autopilot':
-          result.autopilot = fieldConstraint
-          break
-      }
-    }
-
-    return result
+    return constraintsToMap(modelConstraints)
   }, [constraints])
+
+  // Get constraints for a specific drive value (drive-based only)
+  const getConstraintsForDrive = useCallback((driveValue: string): ConstraintsForModel => {
+    const driveConstraints = constraints.filter(c =>
+      c.sourceType === 'drive' &&
+      c.sourceValue === driveValue &&
+      c.isActive
+    )
+    return constraintsToMap(driveConstraints)
+  }, [constraints])
+
+  // Merge model + drive constraints; drive overrides model for same target field
+  const getMergedConstraints = useCallback((modelValue: string, driveValue: string): ConstraintsForModel => {
+    const modelResult = getConstraintsForModel(modelValue)
+    if (!driveValue) return modelResult
+
+    const driveResult = getConstraintsForDrive(driveValue)
+
+    // Drive constraints override model constraints for same field
+    return { ...modelResult, ...driveResult }
+  }, [getConstraintsForModel, getConstraintsForDrive])
 
   // Helper to check if a value is allowed for a field given the model constraints
   const isValueAllowed = useCallback((
@@ -200,6 +205,8 @@ export function useConstraints(vehicleType?: VehicleType) {
     loading,
     error,
     getConstraintsForModel,
+    getConstraintsForDrive,
+    getMergedConstraints,
     isValueAllowed,
     getFixedValue,
     isFieldDisabled,

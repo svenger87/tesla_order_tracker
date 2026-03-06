@@ -186,6 +186,7 @@ interface Filters {
   wheels: string
   interior: string
   towHitch: string
+  seats: string
   autopilot: string
   hasVin: string
   hasDelivery: string
@@ -203,6 +204,7 @@ const emptyFilters: Filters = {
   wheels: '',
   interior: '',
   towHitch: '',
+  seats: '',
   autopilot: '',
   hasVin: '',
   hasDelivery: '',
@@ -364,6 +366,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'interior', label: 'interior', group: 'configuration' },
   { key: 'wheels', label: 'wheels', group: 'configuration' },
   { key: 'towHitch', label: 'towHitch', group: 'configuration' },
+  { key: 'seats', label: 'seats', group: 'configuration' },
   { key: 'autopilot', label: 'autopilot', group: 'configuration' },
   // Status & Delivery
   { key: 'deliveryWindow', label: 'deliveryWindow', group: 'configuration' },
@@ -411,7 +414,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
   const [imageModalOrder, setImageModalOrder] = useState<Order | null>(null)
 
   // Get options from useOptions hook (includes labels for values)
-  const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions } = useOptions()
+  const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions, seats: seatsOptions } = useOptions()
 
   // Helper to lookup label from value (falls back to hardcoded trims for model)
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
@@ -605,6 +608,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
       interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
       towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
+      seats: [...new Set(orders.map(o => o.seats).filter(Boolean))].sort() as string[],
       autopilot: [...new Set(orders.map(o => o.autopilot).filter(Boolean))].sort() as string[],
     }
   }, [orders])
@@ -666,6 +670,9 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
     }
     if (filters.towHitch) {
       result = result.filter(o => o.towHitch === filters.towHitch)
+    }
+    if (filters.seats) {
+      result = result.filter(o => o.seats === filters.seats)
     }
     if (filters.autopilot) {
       result = result.filter(o => o.autopilot === filters.autopilot)
@@ -896,6 +903,16 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             </SelectContent>
           </Select>
 
+          <Select value={filters.seats} onValueChange={(v) => setFilters(f => ({ ...f, seats: v === 'all' ? '' : v }))}>
+            <SelectTrigger className="w-[90px] h-8">
+              <SelectValue placeholder={t('seats')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{tc('all')}</SelectItem>
+              {filterOptions.seats.map(v => <SelectItem key={v} value={v}>{getLabel(seatsOptions, v)}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
           <Select value={filters.autopilot} onValueChange={(v) => setFilters(f => ({ ...f, autopilot: v === 'all' ? '' : v }))}>
             <SelectTrigger className="w-[110px] h-8">
               <SelectValue placeholder={t('autopilot')} />
@@ -983,6 +1000,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
             {isColumnVisible('interior') && <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('interior')}</SortableHeader>}
             {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('wheels')}</SortableHeader>}
             {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('towHitch')}</SortableHeader>}
+            {isColumnVisible('seats') && <SortableHeader field="seats" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('seats')}</SortableHeader>}
             {isColumnVisible('autopilot') && <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('autopilot')}</SortableHeader>}
             {isColumnVisible('deliveryWindow') && <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryWindow')}</SortableHeader>}
             {isColumnVisible('deliveryLocation') && <SortableHeader field="deliveryLocation" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryLocation')}</SortableHeader>}
@@ -1119,6 +1137,11 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                         {getLabel(towHitchOptions, order.towHitch)}
                       </Badge>
                     ) : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('seats') && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.seats ? getLabel(seatsOptions, order.seats) : '5-Sitzer'}
                   </TableCell>
                 )}
                 {isColumnVisible('autopilot') && (

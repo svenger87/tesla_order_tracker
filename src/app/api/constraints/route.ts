@@ -7,7 +7,7 @@ const VALID_CONSTRAINT_TYPES = ['allow', 'fixed', 'disable'] as const
 type ConstraintType = typeof VALID_CONSTRAINT_TYPES[number]
 
 // Valid source/target types
-const VALID_OPTION_TYPES = ['model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch'] as const
+const VALID_OPTION_TYPES = ['model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'seats'] as const
 
 // Valid vehicle types
 const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const

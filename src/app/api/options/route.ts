@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 // Valid option types
-const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'deliveryLocation'] as const
+const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'seats', 'deliveryLocation'] as const
 
 // Valid vehicle types
 const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const

@@ -108,6 +108,8 @@
     "wheelsSelect": "Felgen wählen",
     "towHitch": "AHK (Anhängerkupplung)",
     "towHitchSelect": "AHK wählen",
+    "seats": "Sitze",
+    "seatsSelect": "Sitze wählen",
     "autopilot": "Autopilot",
     "autopilotSelect": "Autopilot wählen",
     "deliveryWindow": "Lieferfenster",
@@ -199,6 +201,7 @@
     "interior": "Innen",
     "wheels": "Felgen",
     "towHitch": "AHK",
+    "seats": "Sitze",
     "autopilot": "Autopilot",
     "deliveryWindow": "Lieferfenster",
     "deliveryLocation": "Ort",
@@ -290,6 +293,7 @@
     "interiorDistribution": "Innenraum",
     "wheelsDistribution": "Felgen",
     "towHitchDistribution": "AHK",
+    "seatsDistribution": "Sitze",
     "autopilotDistribution": "Autopilot",
     "hintTotal": "Gesamtanzahl aller erfassten Bestellungen im gewählten Zeitraum.",
     "hintDelivered": "Anzahl der bereits ausgelieferten Fahrzeuge.",
@@ -452,7 +456,10 @@
     "colorCode": "Farbcode (Hex)",
     "showBorder": "Rand anzeigen (für helle Farben)",
     "constraintManager": "Modell-Einschränkungen",
-    "constraintDescription": "Konfiguriere welche Optionen für jedes Modell verfügbar sind",
+    "constraintDescription": "Konfiguriere welche Optionen für jedes Modell oder Antrieb verfügbar sind",
+    "sourceType": "Quelle",
+    "sourceModel": "Modell",
+    "sourceDrive": "Antrieb",
     "seedDefaultRules": "Standard-Regeln laden",
     "seedingRules": "Seede...",
     "modelTrim": "Modell / Ausstattung",
@@ -519,6 +526,10 @@
       "ja": "Ja",
       "nein": "Nein",
       "nv": "n.v."
+    },
+    "seats": {
+      "5": "5-Sitzer",
+      "7": "7-Sitzer"
     },
     "autopilot": {
       "none": "Kein",

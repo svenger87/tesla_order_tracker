@@ -13,6 +13,7 @@ import {
   WHEELS,
   AUTOPILOT_OPTIONS,
   TOW_HITCH_OPTIONS,
+  SEATS_OPTIONS,
 } from '@/lib/types'
 
 // Valid option types
@@ -26,6 +27,7 @@ const VALID_TYPES = [
   'wheels',
   'autopilot',
   'towHitch',
+  'seats',
   'deliveryLocation',
 ] as const
 type OptionType = (typeof VALID_TYPES)[number]
@@ -116,6 +118,7 @@ export const GET = withApiAuth(async (request: NextRequest) => {
         wheels: toApiOptions(WHEELS),
         autopilot: toApiOptions(AUTOPILOT_OPTIONS),
         towHitch: toApiOptions(TOW_HITCH_OPTIONS),
+        seats: toApiOptions(SEATS_OPTIONS),
         deliveryLocation: [],
       }
 
@@ -134,6 +137,7 @@ export const GET = withApiAuth(async (request: NextRequest) => {
       wheels: buildOptions('wheels', toApiOptions(WHEELS)),
       autopilot: buildOptions('autopilot', toApiOptions(AUTOPILOT_OPTIONS)),
       towHitch: buildOptions('towHitch', toApiOptions(TOW_HITCH_OPTIONS)),
+      seats: buildOptions('seats', toApiOptions(SEATS_OPTIONS)),
       deliveryLocation: buildOptions('deliveryLocation', []),
     }
 

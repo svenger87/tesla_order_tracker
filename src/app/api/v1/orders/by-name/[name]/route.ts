@@ -19,6 +19,7 @@ const orderSelectFields = {
   wheels: true,
   towHitch: true,
   autopilot: true,
+  seats: true,
   deliveryWindow: true,
   deliveryLocation: true,
   vin: true,

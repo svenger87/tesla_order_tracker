@@ -4,10 +4,10 @@ import { getAdminFromCookie } from '@/lib/auth'
 import { validateApiKey } from '@/lib/api-auth'
 
 interface ConstraintDefinition {
-  sourceType: 'model'
+  sourceType: 'model' | 'drive'
   sourceValue: string
   vehicleType: 'Model Y' | 'Model 3'
-  targetType: 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch'
+  targetType: 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch' | 'seats'
   constraintType: 'allow' | 'fixed' | 'disable'
   values: string[] | string
 }
@@ -21,19 +21,20 @@ const MODEL_3_CONSTRAINTS: ConstraintDefinition[] = [
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'interior', constraintType: 'fixed', values: 'black' },
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'color', constraintType: 'allow', values: ['pearl_white', 'diamond_black', 'stealth_grey'] },
-  // towHitch is available for Standard, so no constraint needed
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
 
   // Premium
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'allow', values: ['18', '19'] },
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  // Note: Premium can be RWD or AWD, so no drive constraint
+  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
 
   // Performance
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '20' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
 ]
 
 // All Model Y constraints
@@ -43,18 +44,26 @@ const MODEL_Y_CONSTRAINTS: ConstraintDefinition[] = [
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'range', constraintType: 'fixed', values: 'standard' },
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'fixed', values: '18' },
   { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
 
   // Performance
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'fixed', values: '21' },
   { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
 
-  // Premium - wheels constrained but user can choose
+  // Premium - wheels constrained but user can choose, seats allow 5 or 7
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'allow', values: ['19', '20'] },
-  // Note: Premium can be RWD or AWD, so no drive constraint
+  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'allow', values: ['5', '7'] },
 ]
 
-const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS]
+// Drive-based constraints (override model constraints when drive is selected)
+const DRIVE_CONSTRAINTS: ConstraintDefinition[] = [
+  // RWD overrides Premium's seats allow [5,7] → fixed 5
+  { sourceType: 'drive', sourceValue: 'rwd', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
+]
+
+const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS, ...DRIVE_CONSTRAINTS]
 
 // POST - Seed constraints from hardcoded rules (admin or API key auth)
 export async function POST(request: NextRequest) {
@@ -160,6 +169,7 @@ export async function GET(request: NextRequest) {
     })),
     modelYCount: MODEL_Y_CONSTRAINTS.length,
     model3Count: MODEL_3_CONSTRAINTS.length,
+    driveCount: DRIVE_CONSTRAINTS.length,
     totalCount: ALL_CONSTRAINTS.length,
   })
 }
