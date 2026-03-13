@@ -32,7 +32,7 @@ info:
   contact:
     name: tff order stats
 servers:
-  - url: 'https://tff-order-stats.vercel.app/api/v1'
+  - url: 'https://tff-order-stats.de/api/v1'
     description: Production
   - url: 'http://localhost:3000/api/v1'
     description: Local Development
@@ -43,6 +43,11 @@ security:
 tags:
   - name: Orders
     description: Order management operations
+  - name: TOST
+    description: |
+      TOST (tesla-order-status-tracker.de) integration endpoints.
+      These endpoints allow TOST to create, claim, and update orders as a trusted service partner.
+      All TOST endpoints require authentication via a separate `TOST_API_KEY`.
   - name: Options
     description: Form dropdown options
 
@@ -130,6 +135,9 @@ paths:
                     wheels: "21"
                     towHitch: "ja"
                     autopilot: "fsd"
+                    seats: "5"
+                    source: null
+                    tostUserId: null
                     deliveryWindow: "Februar 2025"
                     deliveryLocation: "München"
                     vin: null
@@ -185,6 +193,7 @@ paths:
               wheels: "21"
               towHitch: "ja"
               autopilot: "fsd"
+              seats: "5"
               deliveryWindow: "Februar 2025"
               deliveryLocation: "München"
               editCode: "MySecure123"
@@ -374,6 +383,264 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /tost/orders:
+    get:
+      tags:
+        - TOST
+      summary: Find orders by username
+      description: |
+        Returns all non-archived orders matching the given username.
+        TOST uses this to find existing orders before claiming or creating new ones.
+      operationId: tostFindOrders
+      security:
+        - TostApiKeyAuth: []
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Username to search for (exact match)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders found (may be empty array)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+                      meta:
+                        allOf:
+                          - $ref: '#/components/schemas/Meta'
+                          - type: object
+                            properties:
+                              count:
+                                type: integer
+                                description: Number of orders found
+              example:
+                success: true
+                data:
+                  - id: "clx123abc"
+                    name: "MaxMustermann"
+                    vehicleType: "Model Y"
+                    orderDate: "15.01.2025"
+                    source: null
+                    tostUserId: null
+                meta:
+                  timestamp: "2026-03-13T10:30:00.000Z"
+                  version: "v1"
+                  count: 1
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - TOST
+      summary: Create a TOST-managed order
+      description: |
+        Creates a new order with `source` automatically set to `"tost"`.
+        No editCode is required. The order will be exclusively managed by TOST.
+      operationId: tostCreateOrder
+      security:
+        - TostApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TostCreateOrderRequest'
+            example:
+              name: "MaxMustermann"
+              vehicleType: "Model Y"
+              orderDate: "15.01.2025"
+              country: "de"
+              model: "performance"
+              drive: "awd"
+              color: "ultra_red"
+              interior: "black"
+              wheels: "21"
+              towHitch: "ja"
+              autopilot: "fsd"
+              seats: "5"
+              tostUserId: "tost_user_abc123"
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Created order ID
+                          message:
+                            type: string
+              example:
+                success: true
+                data:
+                  id: "clx789ghi"
+                  message: "Order created successfully"
+                meta:
+                  timestamp: "2026-03-13T10:30:00.000Z"
+                  version: "v1"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /tost/orders/{id}:
+    put:
+      tags:
+        - TOST
+      summary: Update a TOST-owned order
+      description: |
+        Updates an order that is owned by TOST (`source = "tost"`).
+        Returns 403 if the order is not TOST-managed — claim it first via `POST /tost/claim/{id}`.
+        No editCode is required. Supports optimistic locking via `expectedUpdatedAt`.
+      operationId: tostUpdateOrder
+      security:
+        - TostApiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TostUpdateOrderRequest'
+            example:
+              vin: "5YJ3E1EA1NF123456"
+              vinReceivedDate: "10.02.2025"
+              deliveryWindow: "März 2025"
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UpdateOrderResponse'
+              example:
+                success: true
+                data:
+                  id: "clx123abc"
+                  updatedAt: "2026-03-13T10:35:00.000Z"
+                  message: "Order updated successfully"
+                meta:
+                  timestamp: "2026-03-13T10:35:00.000Z"
+                  version: "v1"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /tost/claim/{id}:
+    post:
+      tags:
+        - TOST
+      summary: Claim an existing order for TOST
+      description: |
+        Claims an existing order so it becomes TOST-managed.
+        Sets `source` to `"tost"` and optionally associates a `tostUserId`.
+        Returns 409 if the order is already claimed by TOST.
+        After claiming, the order can no longer be edited via the webapp.
+      operationId: tostClaimOrder
+      security:
+        - TostApiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Order ID to claim
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tostUserId:
+                  type: string
+                  description: TOST's internal user identifier (optional)
+            example:
+              tostUserId: "tost_user_abc123"
+      responses:
+        '200':
+          description: Order claimed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          updatedAt:
+                            type: string
+                            format: date-time
+                          message:
+                            type: string
+              example:
+                success: true
+                data:
+                  id: "clx123abc"
+                  name: "MaxMustermann"
+                  updatedAt: "2026-03-13T10:30:00.000Z"
+                  message: "Order claimed successfully"
+                meta:
+                  timestamp: "2026-03-13T10:30:00.000Z"
+                  version: "v1"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /options:
     get:
       tags:
@@ -397,6 +664,7 @@ paths:
               - wheels
               - autopilot
               - towHitch
+              - seats
               - deliveryLocation
         - name: vehicleType
           in: query
@@ -476,7 +744,12 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
-      description: API key for authentication
+      description: API key for general API authentication
+    TostApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Dedicated API key for TOST integration (separate from general API key)
 
   schemas:
     Order:
@@ -535,13 +808,27 @@ components:
         towHitch:
           type: string
           nullable: true
-          enum: [ja, nein]
+          enum: [ja, nein, nv]
           description: Tow hitch option
         autopilot:
           type: string
           nullable: true
-          enum: [none, ap, eap, fsd, fsd_transfer]
+          enum: [none, ap, eap, eap_transfer, fsd, fsd_transfer]
           description: Autopilot package
+        seats:
+          type: string
+          nullable: true
+          enum: ['5', '7']
+          description: Seat configuration (5 or 7 seater, 7 only for Model Y Premium AWD)
+        source:
+          type: string
+          nullable: true
+          enum: [tost]
+          description: Order source — "tost" for TOST-managed orders, null for manually created orders
+        tostUserId:
+          type: string
+          nullable: true
+          description: TOST's internal user identifier (only set for TOST-managed orders)
         deliveryWindow:
           type: string
           nullable: true
@@ -654,10 +941,14 @@ components:
           enum: ['18', '19', '20', '21']
         towHitch:
           type: string
-          enum: [ja, nein]
+          enum: [ja, nein, nv]
         autopilot:
           type: string
-          enum: [none, ap, eap, fsd, fsd_transfer]
+          enum: [none, ap, eap, eap_transfer, fsd, fsd_transfer]
+        seats:
+          type: string
+          enum: ['5', '7']
+          description: Seat configuration (5 or 7 seater)
         deliveryWindow:
           type: string
         deliveryLocation:
@@ -714,6 +1005,9 @@ components:
           type: string
         autopilot:
           type: string
+        seats:
+          type: string
+          enum: ['5', '7']
         deliveryWindow:
           type: string
         deliveryLocation:
@@ -762,6 +1056,126 @@ components:
           description: New update timestamp
         message:
           type: string
+
+    TostCreateOrderRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Customer username (required)
+        vehicleType:
+          type: string
+          enum: [Model Y, Model 3]
+          description: Vehicle type (defaults to Model Y)
+        orderDate:
+          type: string
+          description: Order date (DD.MM.YYYY format)
+        country:
+          type: string
+        model:
+          type: string
+        range:
+          type: string
+          enum: [maximale_reichweite, standard]
+        drive:
+          type: string
+          enum: [rwd, awd]
+        color:
+          type: string
+        interior:
+          type: string
+          enum: [black, white]
+        wheels:
+          type: string
+          enum: ['18', '19', '20', '21']
+        towHitch:
+          type: string
+          enum: [ja, nein, nv]
+        autopilot:
+          type: string
+          enum: [none, ap, eap, eap_transfer, fsd, fsd_transfer]
+        seats:
+          type: string
+          enum: ['5', '7']
+        deliveryWindow:
+          type: string
+        deliveryLocation:
+          type: string
+        vin:
+          type: string
+        vinReceivedDate:
+          type: string
+        papersReceivedDate:
+          type: string
+        productionDate:
+          type: string
+        typeApproval:
+          type: string
+        typeVariant:
+          type: string
+        deliveryDate:
+          type: string
+        tostUserId:
+          type: string
+          description: TOST's internal user identifier (optional)
+
+    TostUpdateOrderRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        vehicleType:
+          type: string
+          enum: [Model Y, Model 3]
+        orderDate:
+          type: string
+        country:
+          type: string
+        model:
+          type: string
+        range:
+          type: string
+        drive:
+          type: string
+        color:
+          type: string
+        interior:
+          type: string
+        wheels:
+          type: string
+        towHitch:
+          type: string
+        autopilot:
+          type: string
+        seats:
+          type: string
+        deliveryWindow:
+          type: string
+        deliveryLocation:
+          type: string
+        vin:
+          type: string
+        vinReceivedDate:
+          type: string
+        papersReceivedDate:
+          type: string
+        productionDate:
+          type: string
+        typeApproval:
+          type: string
+        typeVariant:
+          type: string
+        deliveryDate:
+          type: string
+        tostUserId:
+          type: string
+          description: TOST's internal user identifier
+        expectedUpdatedAt:
+          type: string
+          format: date-time
+          description: For optimistic locking — fails with 409 if order was modified after this time
 
     Option:
       type: object
@@ -817,6 +1231,10 @@ components:
           items:
             $ref: '#/components/schemas/Option'
         towHitch:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        seats:
           type: array
           items:
             $ref: '#/components/schemas/Option'
@@ -897,6 +1315,21 @@ components:
               message: "API key required. Use X-API-Key header."
             meta:
               timestamp: "2025-02-12T10:30:00.000Z"
+              version: "v1"
+
+    Forbidden:
+      description: Action not allowed (e.g., updating a non-TOST order via TOST API)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "FORBIDDEN"
+              message: "Order is not managed by TOST. Claim it first."
+            meta:
+              timestamp: "2026-03-13T10:30:00.000Z"
               version: "v1"
 
     NotFound:

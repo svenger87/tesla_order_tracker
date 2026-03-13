@@ -1049,7 +1049,14 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                   </TableCell>
                 )}
                 {isColumnVisible('name') && (
-                  <TableCell className="font-medium whitespace-nowrap">{order.name}</TableCell>
+                  <TableCell className="font-medium whitespace-nowrap">
+                    {order.name}
+                    {order.source === 'tost' && (
+                      <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 align-middle">
+                        TOST
+                      </span>
+                    )}
+                  </TableCell>
                 )}
                 {isColumnVisible('vehicleType') && (
                   <TableCell className="whitespace-nowrap">
@@ -1235,10 +1242,12 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(order)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          {tc('edit')}
-                        </DropdownMenuItem>
+                        {order.source !== 'tost' && (
+                          <DropdownMenuItem onClick={() => onEdit(order)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            {tc('edit')}
+                          </DropdownMenuItem>
+                        )}
                         {onGenerateResetCode && (
                           <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
                             <KeyRound className="mr-2 h-4 w-4" />
@@ -1254,7 +1263,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  ) : (
+                  ) : order.source !== 'tost' ? (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1264,7 +1273,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                  )}
+                  ) : null}
                 </TableCell>
               </TableRow>
             )})

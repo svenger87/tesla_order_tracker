@@ -14,6 +14,8 @@ export interface ApiOrder {
   towHitch: string | null
   autopilot: string | null
   seats: string | null
+  source: string | null
+  tostUserId: string | null
   deliveryWindow: string | null
   deliveryLocation: string | null
   vin: string | null

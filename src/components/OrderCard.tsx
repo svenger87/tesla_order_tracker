@@ -92,7 +92,14 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
           {/* Header row: Name + Admin menu */}
           <div className="flex items-start justify-between gap-2 mb-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-base truncate">{order.name}</h3>
+              <h3 className="font-semibold text-base truncate">
+                {order.name}
+                {order.source === 'tost' && (
+                  <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 align-middle">
+                    TOST
+                  </span>
+                )}
+              </h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                 <Calendar className="h-3 w-3" />
                 <span>{order.orderDate || tc('noDate')}</span>
@@ -115,10 +122,12 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEdit(order)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    {tc('edit')}
-                  </DropdownMenuItem>
+                  {order.source !== 'tost' && (
+                    <DropdownMenuItem onClick={() => onEdit(order)}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      {tc('edit')}
+                    </DropdownMenuItem>
+                  )}
                   {onGenerateResetCode && (
                     <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
                       <KeyRound className="mr-2 h-4 w-4" />
@@ -134,7 +143,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
+            ) : order.source !== 'tost' ? (
               <Button
                 variant="ghost"
                 size="icon"
@@ -144,7 +153,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               >
                 <Pencil className="h-4 w-4" />
               </Button>
-            )}
+            ) : null}
           </div>
 
           {/* Car config badges */}

@@ -1,0 +1,87 @@
+import { prisma } from '@/lib/db'
+import { NextRequest } from 'next/server'
+import { withTostAuth } from '@/lib/tost-auth'
+import { RouteContext } from '@/lib/api-auth'
+import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
+import { calculateTimePeriods } from '@/lib/tost-helpers'
+
+// PUT /api/v1/tost/orders/[id] - Update a TOST-owned order
+export const PUT = withTostAuth(
+  async (request: NextRequest, context: RouteContext<{ id: string }>) => {
+    try {
+      const { id } = await context.params
+      const body = await request.json()
+
+      // Find the order and check ownership
+      const order = await prisma.order.findUnique({
+        where: { id },
+        select: { id: true, source: true, updatedAt: true },
+      })
+
+      if (!order) {
+        return ApiErrors.notFound('Order')
+      }
+
+      if (order.source !== 'tost') {
+        return ApiErrors.forbidden('Order is not managed by TOST. Claim it first.')
+      }
+
+      // Optimistic locking
+      if (body.expectedUpdatedAt) {
+        const expectedTime = new Date(body.expectedUpdatedAt).getTime()
+        const actualTime = order.updatedAt.getTime()
+        if (actualTime > expectedTime) {
+          return ApiErrors.conflict(
+            'Order was modified since last read. Please refresh and try again.'
+          )
+        }
+      }
+
+      // Build update data from provided fields
+      const updateData: Record<string, unknown> = {}
+      const allowedFields = [
+        'name', 'vehicleType', 'orderDate', 'country', 'model', 'range',
+        'drive', 'color', 'interior', 'wheels', 'towHitch', 'autopilot',
+        'seats', 'deliveryWindow', 'deliveryLocation', 'vin',
+        'vinReceivedDate', 'papersReceivedDate', 'productionDate',
+        'typeApproval', 'typeVariant', 'deliveryDate', 'tostUserId',
+      ]
+
+      for (const field of allowedFields) {
+        if (field in body) {
+          updateData[field] = body[field] || null
+        }
+      }
+
+      // Recalculate time periods
+      const dateFields = {
+        orderDate: (updateData.orderDate as string) ?? undefined,
+        productionDate: (updateData.productionDate as string) ?? undefined,
+        vinReceivedDate: (updateData.vinReceivedDate as string) ?? undefined,
+        deliveryDate: (updateData.deliveryDate as string) ?? undefined,
+        papersReceivedDate: (updateData.papersReceivedDate as string) ?? undefined,
+      }
+      const timePeriods = calculateTimePeriods(dateFields)
+      for (const [key, value] of Object.entries(timePeriods)) {
+        if (value !== null) {
+          updateData[key] = value
+        }
+      }
+
+      const updated = await prisma.order.update({
+        where: { id },
+        data: updateData,
+        select: { id: true, updatedAt: true },
+      })
+
+      return createApiSuccessResponse({
+        id: updated.id,
+        updatedAt: updated.updatedAt.toISOString(),
+        message: 'Order updated successfully',
+      })
+    } catch (error) {
+      console.error('TOST orders PUT error:', error)
+      return ApiErrors.serverError('Failed to update order')
+    }
+  }
+)

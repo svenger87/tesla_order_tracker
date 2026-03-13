@@ -84,6 +84,9 @@ export const ApiErrors = {
   invalidApiKey: () =>
     createApiErrorResponse('UNAUTHORIZED', 'Invalid API key', 401),
 
+  forbidden: (message = 'Forbidden') =>
+    createApiErrorResponse('FORBIDDEN', message, 403),
+
   notFound: (resource = 'Resource') =>
     createApiErrorResponse('NOT_FOUND', `${resource} not found`, 404),
 

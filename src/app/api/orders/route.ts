@@ -152,6 +152,8 @@ export async function GET(request: NextRequest) {
           towHitch: true,
           autopilot: true,
           seats: true,
+          source: true,
+          tostUserId: true,
           deliveryWindow: true,
           deliveryLocation: true,
           vin: true,
@@ -191,6 +193,8 @@ export async function GET(request: NextRequest) {
           towHitch: true,
           autopilot: true,
           seats: true,
+          source: true,
+          tostUserId: true,
           deliveryWindow: true,
           deliveryLocation: true,
           vin: true,
@@ -326,6 +330,12 @@ export async function PUT(request: NextRequest) {
     const data = normalizeOrderData(rawData) as typeof rawData
 
     const admin = await getAdminFromCookie()
+
+    // Check if order is TOST-managed (cannot be edited via webapp)
+    const tostCheck = await prisma.order.findUnique({ where: { id }, select: { source: true } })
+    if (tostCheck?.source === 'tost') {
+      return NextResponse.json({ error: 'This order is managed by TOST and cannot be edited here.' }, { status: 403 })
+    }
 
     // Check authorization - either admin or valid edit code
     if (!admin) {

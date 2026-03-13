@@ -20,6 +20,8 @@ const orderSelectFields = {
   towHitch: true,
   autopilot: true,
   seats: true,
+  source: true,
+  tostUserId: true,
   deliveryWindow: true,
   deliveryLocation: true,
   vin: true,

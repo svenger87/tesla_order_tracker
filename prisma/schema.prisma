@@ -25,6 +25,8 @@ model Order {
   towHitch              String?  // AHK (ja/nein)
   autopilot             String?  // Autopilot
   seats                 String?  // Sitze (5/7)
+  source                String?  // "tost" for TOST-managed orders, null for manual
+  tostUserId            String?  // TOST's internal user identifier
   deliveryWindow        String?  // Lieferfenster
   deliveryLocation      String?  // Ort (Auslieferung)
   vin                   String?  // VIN
@@ -47,6 +49,8 @@ model Order {
   @@unique([name, orderDate], name: "unique_name_orderDate")
   @@index([archived])
   @@index([vehicleType])
+  @@index([source])
+  @@index([tostUserId])
 }
 
 model Admin {
