@@ -6,12 +6,41 @@ import { calculateTimePeriods, orderSelectFields } from '@/lib/tost-helpers'
 import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 
-// POST /api/v1/tost/orders - Create a new TOST-managed order
+// Build the data fields from a TOST request body
+function buildOrderData(body: Record<string, unknown>) {
+  return {
+    name: (body.name as string).trim(),
+    vehicleType: (body.vehicleType as string) || 'Model Y',
+    orderDate: (body.orderDate as string) || null,
+    country: (body.country as string) || null,
+    model: (body.model as string) || null,
+    range: (body.range as string) || null,
+    drive: (body.drive as string) || null,
+    color: (body.color as string) || null,
+    interior: (body.interior as string) || null,
+    wheels: (body.wheels as string) || null,
+    towHitch: (body.towHitch as string) || null,
+    autopilot: (body.autopilot as string) || null,
+    seats: (body.seats as string) || null,
+    deliveryWindow: (body.deliveryWindow as string) || null,
+    deliveryLocation: (body.deliveryLocation as string) || null,
+    vin: (body.vin as string) || null,
+    vinReceivedDate: (body.vinReceivedDate as string) || null,
+    papersReceivedDate: (body.papersReceivedDate as string) || null,
+    productionDate: (body.productionDate as string) || null,
+    typeApproval: (body.typeApproval as string) || null,
+    typeVariant: (body.typeVariant as string) || null,
+    deliveryDate: (body.deliveryDate as string) || null,
+    tostUserId: (body.tostUserId as string) || null,
+  }
+}
+
+// POST /api/v1/tost/orders - Create or auto-claim a TOST-managed order
+// If an order with the same name already exists, it will be claimed and updated
+// (TOST orderDate always overwrites the existing one)
 export const POST = withTostAuth(async (request: NextRequest) => {
-  let customId: string | undefined
   try {
     const body = await request.json()
-    customId = body.id
 
     if (!body.name?.trim()) {
       return ApiErrors.validationError('Validation failed', {
@@ -19,36 +48,42 @@ export const POST = withTostAuth(async (request: NextRequest) => {
       })
     }
 
+    const name = (body.name as string).trim()
     const timePeriods = calculateTimePeriods(body)
+    const orderData = buildOrderData(body)
 
+    // Check if an order with this name already exists (not yet TOST-claimed)
+    const existing = await prisma.order.findFirst({
+      where: { name, archived: false },
+      select: { id: true, source: true },
+    })
+
+    if (existing) {
+      // Auto-claim and update: TOST takes over, orderDate gets overwritten
+      const updated = await prisma.order.update({
+        where: { id: existing.id },
+        data: {
+          ...orderData,
+          source: 'tost',
+          ...timePeriods,
+        },
+        select: { id: true, updatedAt: true },
+      })
+
+      trackApiEvent({ name: 'tost-auto-claim-order', url: '/api/v1/tost/orders', data: { orderId: updated.id, vehicleType: body.vehicleType || 'Model Y' } })
+
+      return createApiSuccessResponse(
+        { id: updated.id, message: 'Existing order claimed and updated by TOST', claimed: true },
+        { status: 200 }
+      )
+    }
+
+    // No existing order — create new
     const order = await prisma.order.create({
       data: {
-        // Use TOST-provided ID if given, otherwise auto-generate
         ...(body.id && { id: body.id }),
-        name: body.name.trim(),
-        vehicleType: body.vehicleType || 'Model Y',
-        orderDate: body.orderDate || null,
-        country: body.country || null,
-        model: body.model || null,
-        range: body.range || null,
-        drive: body.drive || null,
-        color: body.color || null,
-        interior: body.interior || null,
-        wheels: body.wheels || null,
-        towHitch: body.towHitch || null,
-        autopilot: body.autopilot || null,
-        seats: body.seats || null,
-        deliveryWindow: body.deliveryWindow || null,
-        deliveryLocation: body.deliveryLocation || null,
-        vin: body.vin || null,
-        vinReceivedDate: body.vinReceivedDate || null,
-        papersReceivedDate: body.papersReceivedDate || null,
-        productionDate: body.productionDate || null,
-        typeApproval: body.typeApproval || null,
-        typeVariant: body.typeVariant || null,
-        deliveryDate: body.deliveryDate || null,
+        ...orderData,
         source: 'tost',
-        tostUserId: body.tostUserId || null,
         ...timePeriods,
       },
     })
@@ -56,17 +91,14 @@ export const POST = withTostAuth(async (request: NextRequest) => {
     trackApiEvent({ name: 'tost-create-order', url: '/api/v1/tost/orders', data: { orderId: order.id, vehicleType: body.vehicleType || 'Model Y', customId: !!body.id } })
 
     return createApiSuccessResponse(
-      { id: order.id, message: 'Order created successfully' },
+      { id: order.id, message: 'Order created successfully', claimed: false },
       { status: 201 }
     )
   } catch (error) {
     console.error('TOST orders POST error:', error)
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
     if (errorMsg.includes('Unique constraint')) {
-      if (customId) {
-        return ApiErrors.conflict('An order with this ID already exists')
-      }
-      return ApiErrors.conflict('An order with this name and date already exists')
+      return ApiErrors.conflict('An order with this ID already exists')
     }
     return ApiErrors.serverError('Failed to create order')
   }
