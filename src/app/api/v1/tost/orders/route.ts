@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { withTostAuth } from '@/lib/tost-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { calculateTimePeriods, orderSelectFields } from '@/lib/tost-helpers'
+import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 
 // POST /api/v1/tost/orders - Create a new TOST-managed order
@@ -51,6 +52,8 @@ export const POST = withTostAuth(async (request: NextRequest) => {
         ...timePeriods,
       },
     })
+
+    trackApiEvent({ name: 'tost-create-order', url: '/api/v1/tost/orders', data: { orderId: order.id, vehicleType: body.vehicleType || 'Model Y', customId: !!body.id } })
 
     return createApiSuccessResponse(
       { id: order.id, message: 'Order created successfully' },
@@ -122,6 +125,8 @@ export const GET = withTostAuth(async (request: NextRequest) => {
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
     }))
+
+    trackApiEvent({ name: 'tost-find-orders', url: '/api/v1/tost/orders', data: { filterBy: id ? 'id' : name ? 'name' : 'tostUserId', resultCount: apiOrders.length } })
 
     return createApiSuccessResponse(apiOrders, { count: apiOrders.length })
   } catch (error) {

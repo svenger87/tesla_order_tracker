@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { withTostAuth } from '@/lib/tost-auth'
 import { RouteContext } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
+import { trackApiEvent } from '@/lib/umami'
 
 // POST /api/v1/tost/claim/[id] - Claim an existing order for TOST
 export const POST = withTostAuth(
@@ -32,6 +33,8 @@ export const POST = withTostAuth(
         },
         select: { id: true, name: true, updatedAt: true },
       })
+
+      trackApiEvent({ name: 'tost-claim-order', url: `/api/v1/tost/claim/${id}`, data: { orderName: updated.name } })
 
       return createApiSuccessResponse({
         id: updated.id,

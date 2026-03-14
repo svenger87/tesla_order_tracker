@@ -4,6 +4,7 @@ import { withTostAuth } from '@/lib/tost-auth'
 import { RouteContext } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { calculateTimePeriods } from '@/lib/tost-helpers'
+import { trackApiEvent } from '@/lib/umami'
 
 // DELETE /api/v1/tost/orders/[id] - Delete a TOST-owned order
 export const DELETE = withTostAuth(
@@ -25,6 +26,8 @@ export const DELETE = withTostAuth(
       }
 
       await prisma.order.delete({ where: { id } })
+
+      trackApiEvent({ name: 'tost-delete-order', url: `/api/v1/tost/orders/${id}` })
 
       return createApiSuccessResponse({
         id: order.id,
@@ -105,6 +108,8 @@ export const PUT = withTostAuth(
         data: updateData,
         select: { id: true, updatedAt: true },
       })
+
+      trackApiEvent({ name: 'tost-update-order', url: `/api/v1/tost/orders/${id}`, data: { fieldsUpdated: Object.keys(updateData).length } })
 
       return createApiSuccessResponse({
         id: updated.id,
