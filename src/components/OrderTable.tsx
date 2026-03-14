@@ -1052,9 +1052,7 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
                   <TableCell className="font-medium whitespace-nowrap">
                     {order.name}
                     {order.source === 'tost' && (
-                      <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 align-middle">
-                        TOST
-                      </span>
+                      <img src="/tost-badge.svg" alt="TOST" className="ml-1.5 inline-block h-4 w-auto align-middle" />
                     )}
                   </TableCell>
                 )}

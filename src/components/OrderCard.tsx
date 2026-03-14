@@ -95,9 +95,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               <h3 className="font-semibold text-base truncate">
                 {order.name}
                 {order.source === 'tost' && (
-                  <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 align-middle">
-                    TOST
-                  </span>
+                  <img src="/tost-badge.svg" alt="TOST" className="ml-1.5 inline-block h-4 w-auto align-middle" />
                 )}
               </h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
