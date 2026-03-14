@@ -15,7 +15,10 @@ export function trackApiEvent({ name, url, data }: TrackEventOptions) {
   // Fire and forget — never block the API response
   fetch(`${UMAMI_HOST}/api/send`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'tff-order-stats/1.0 (TOST-API)',
+    },
     body: JSON.stringify({
       payload: {
         website: WEBSITE_ID,
@@ -23,6 +26,7 @@ export function trackApiEvent({ name, url, data }: TrackEventOptions) {
         url: url || '/api',
         hostname: 'tff-order-stats.de',
         language: 'en',
+        screen: '1920x1080',
         data,
       },
       type: 'event',
