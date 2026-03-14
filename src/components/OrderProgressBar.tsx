@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment } from 'react'
+import { Fragment, memo } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order } from '@/lib/types'
@@ -32,6 +32,74 @@ const STEP_INDEX: Record<StepKey, number> = {
   delivered: 3,
 }
 
+// Memoized compact progress bar — no animations, pure CSS
+const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: Order }) {
+  const t = useTranslations('progress')
+  const currentStatus = getOrderStatus(order)
+  const currentIndex = STEP_INDEX[currentStatus]
+  const isScheduled = currentStatus === 'delivery_scheduled'
+
+  return (
+    <div className="flex items-center gap-0">
+      {STEPS.map((step, index) => {
+        const isCompleted = index <= currentIndex
+        const isCurrent = index === currentIndex
+        const isLastStep = index === STEPS.length - 1
+        const isScheduledDelivery = isLastStep && isScheduled
+        const Icon = isScheduledDelivery ? Calendar : step.icon
+        const dateValue = order[step.dateField]
+
+        return (
+          <Fragment key={step.key}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className={cn(
+                    'relative flex items-center justify-center rounded-full transition-colors shrink-0',
+                    'h-6 w-6',
+                    isScheduledDelivery
+                      ? 'bg-amber-500 text-white'
+                      : isLastStep && isCompleted && !isScheduled
+                        ? 'bg-green-500 text-white'
+                        : isCompleted
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground',
+                    isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
+                    isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
+                  )}
+                >
+                  {isCompleted && index < currentIndex && !isScheduledDelivery ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Icon className="h-3 w-3" />
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-medium">
+                  {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
+                </p>
+                {dateValue && (
+                  <p className="text-xs text-white/80">{dateValue}</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+
+            {index < STEPS.length - 1 && (
+              <div
+                className={cn(
+                  'h-px w-1.5 shrink-0',
+                  index < currentIndex ? 'bg-primary' : 'bg-muted'
+                )}
+              />
+            )}
+          </Fragment>
+        )
+      })}
+    </div>
+  )
+})
+
 export function OrderProgressBar({ order, compact = false, barOnly = false }: OrderProgressBarProps) {
   const t = useTranslations('progress')
 
@@ -55,80 +123,20 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
 
     return (
       <div className="h-full w-full bg-muted">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={cn('h-full', barColor)}
+        <div
+          className={cn('h-full transition-[width] duration-500 ease-out', barColor)}
+          style={{ width: `${progress}%` }}
         />
       </div>
     )
   }
 
-  // Compact circle progress bar for table view
+  // Compact circle progress bar for table view — memoized, no Framer Motion
   if (compact) {
-    return (
-      <div className="flex items-center gap-0">
-        {STEPS.map((step, index) => {
-          const isCompleted = index <= currentIndex
-          const isCurrent = index === currentIndex
-          const isLastStep = index === STEPS.length - 1
-          const isScheduledDelivery = isLastStep && isScheduled
-          const Icon = isScheduledDelivery ? Calendar : step.icon
-          const dateValue = order[step.dateField]
-
-          return (
-            <Fragment key={step.key}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className={cn(
-                      'relative flex items-center justify-center rounded-full transition-colors shrink-0',
-                      'h-6 w-6',
-                      isScheduledDelivery
-                        ? 'bg-amber-500 text-white'
-                        : isLastStep && isCompleted && !isScheduled
-                          ? 'bg-green-500 text-white'
-                          : isCompleted
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted text-muted-foreground',
-                      isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
-                      isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
-                    )}
-                  >
-                    {isCompleted && index < currentIndex && !isScheduledDelivery ? (
-                      <Check className="h-3 w-3" />
-                    ) : (
-                      <Icon className="h-3 w-3" />
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="font-medium">
-                    {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
-                  </p>
-                  {dateValue && (
-                    <p className="text-xs text-white/80">{dateValue}</p>
-                  )}
-                </TooltipContent>
-              </Tooltip>
-
-              {index < STEPS.length - 1 && (
-                <div
-                  className={cn(
-                    'h-px w-1.5 shrink-0',
-                    index < currentIndex ? 'bg-primary' : 'bg-muted'
-                  )}
-                />
-              )}
-            </Fragment>
-          )
-        })}
-      </div>
-    )
+    return <CompactProgressBar order={order} />
   }
 
-  // Full progress bar with step icons
+  // Full progress bar with step icons (only used in detail views, not in tables)
   return (
     <div className="flex items-center gap-2">
       {STEPS.map((step, index) => {

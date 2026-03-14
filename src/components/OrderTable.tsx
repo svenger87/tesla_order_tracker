@@ -396,7 +396,7 @@ const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, highlightOrderId }: OrderTableProps) {
+export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, highlightOrderId }: OrderTableProps) {
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
@@ -1328,4 +1328,4 @@ export function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetC
       </Dialog>
     </div>
   )
-}
+})
