@@ -92,6 +92,7 @@ const VEHICLE_STORAGE_KEY = 'tesla-tracker-stats-vehicle'
 export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
   const t = useTranslations('statistics')
   const tc = useTranslations('common')
+  const tcd = useTranslations('countryDelivery')
   const [selectedPeriod, setSelectedPeriod] = useState<StatsPeriod>({ type: 'all' })
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | 'all'>('all')
   const [filters, setFilters] = useState<StatsFilters>(emptyFilters)
@@ -515,7 +516,7 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
                   <div className="rounded-lg bg-primary/10 p-1.5">
                     <MapPin className="h-4 w-4 text-primary" />
                   </div>
-                  {tc('countryDelivery' as 'all') || 'Delivery Speed by Country'}
+                  {tcd('title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
@@ -523,10 +524,10 @@ export function StatisticsDashboard({ orders }: StatisticsDashboardProps) {
                   <TableHeader>
                     <TableRow>
                       <TableHead>#</TableHead>
-                      <TableHead>{t('countryDistribution')}</TableHead>
-                      <TableHead className="text-right tabular-nums">{t('avgDeliveryTime')}</TableHead>
-                      <TableHead className="text-right tabular-nums">Median</TableHead>
-                      <TableHead className="text-right tabular-nums">{t('orders')}</TableHead>
+                      <TableHead>{tcd('country')}</TableHead>
+                      <TableHead className="text-right tabular-nums">{tcd('avgWait')}</TableHead>
+                      <TableHead className="text-right tabular-nums">{tcd('medianWait')}</TableHead>
+                      <TableHead className="text-right tabular-nums">{tcd('orders')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
