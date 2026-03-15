@@ -132,7 +132,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                   {order.source === 'tost' && onEditTostFields && (
                     <DropdownMenuItem onClick={() => onEditTostFields(order)}>
                       <FileText className="mr-2 h-4 w-4" />
-                      Papiere / COC
+                      {t('editTostFields')}
                     </DropdownMenuItem>
                   )}
                   {onGenerateResetCode && order.source !== 'tost' && (
@@ -156,7 +156,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 onClick={() => onEditTostFields(order)}
-                title="Papiere / COC"
+                title={t('editTostFields')}
               >
                 <FileText className="h-4 w-4" />
               </Button>

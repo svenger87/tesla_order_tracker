@@ -43,7 +43,7 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
       await onSave(order.id, data)
       onClose()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Fehler beim Speichern')
+      setError(e instanceof Error ? e.message : t('saveError'))
     } finally {
       setSaving(false)
     }
@@ -52,9 +52,9 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
   return (
     <Dialog open={!!order} onOpenChange={(open) => { if (!open) onClose() }}>
       <DialogContent className="max-w-sm">
-        <DialogTitle>{order.name} — Papiere / COC</DialogTitle>
+        <DialogTitle>{order.name} — {t('editTostFields')}</DialogTitle>
         <DialogDescription>
-          Diese Felder können manuell bearbeitet werden, auch bei TOST-verwalteten Bestellungen.
+          {t('editTostFieldsDescription')}
         </DialogDescription>
 
         <div className="space-y-4 mt-2">

@@ -1257,7 +1257,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                         {order.source === 'tost' && onEditTostFields && (
                           <DropdownMenuItem onClick={() => onEditTostFields(order)}>
                             <FileText className="mr-2 h-4 w-4" />
-                            Papiere / COC
+                            {t('editTostFields')}
                           </DropdownMenuItem>
                         )}
                         {onGenerateResetCode && order.source !== 'tost' && (
@@ -1281,7 +1281,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       size="icon"
                       className="h-8 w-8"
                       onClick={() => onEditTostFields(order)}
-                      title=Papiere / COC
+                      title={t('editTostFields')}
                     >
                       <FileText className="h-4 w-4" />
                     </Button>

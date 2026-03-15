@@ -239,7 +239,11 @@
       "weeksAgo": "{n}w ago",
       "monthsAgo": "{n}mo ago"
     },
-    "deliveryScheduled": "Delivery scheduled"
+    "deliveryScheduled": "Delivery scheduled",
+    "editTostFields": "Papers / COC",
+    "editTostFieldsDescription": "These fields can be edited manually, even for TOST-managed orders.",
+    "papersReceivedDate": "Papers received on",
+    "saveError": "Error saving"
   },
   "progress": {
     "ordered": "Ordered",
