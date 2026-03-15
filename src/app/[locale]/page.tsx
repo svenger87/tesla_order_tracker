@@ -3,8 +3,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
-import { Order, Settings } from '@/lib/types'
+import { Order, Settings, VehicleType } from '@/lib/types'
+import { filterOrdersByPeriod } from '@/lib/statistics'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
+import { GlobalFilterBar, GlobalFilters, defaultGlobalFilters, keyToPeriod } from '@/components/GlobalFilterBar'
 import { CollapsibleOrderSection } from '@/components/CollapsibleOrderSection'
 import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { OrderSearch } from '@/components/OrderSearch'
@@ -71,7 +73,70 @@ export default function Home() {
   const [resetCodeCopied, setResetCodeCopied] = useState(false)
   const [generatingResetCode, setGeneratingResetCode] = useState(false)
 
-  const orderGroups = useMemo(() => groupOrdersByQuarter(orders), [orders])
+  // Global filters
+  const GLOBAL_FILTERS_KEY = 'tesla-tracker-filters'
+  const [globalFilters, setGlobalFilters] = useState<GlobalFilters>(defaultGlobalFilters)
+  const [filtersHydrated, setFiltersHydrated] = useState(false)
+
+  // Load global filters from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(GLOBAL_FILTERS_KEY)
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        // Reconstruct period from serialized form
+        if (parsed.periodKey) {
+          parsed.period = keyToPeriod(parsed.periodKey)
+          delete parsed.periodKey
+        }
+        setGlobalFilters({ ...defaultGlobalFilters, ...parsed })
+      } catch { /* ignore */ }
+    }
+    setFiltersHydrated(true)
+  }, [])
+
+  // Save global filters to localStorage
+  useEffect(() => {
+    if (filtersHydrated) {
+      // Serialize period as a string key for localStorage
+      const periodKey = globalFilters.period.type === 'all' ? 'all'
+        : globalFilters.period.type === 'year' ? `year-${globalFilters.period.year}`
+        : `quarter-${globalFilters.period.year}-${globalFilters.period.quarter}`
+      const toSave = { ...globalFilters, period: undefined, periodKey }
+      localStorage.setItem(GLOBAL_FILTERS_KEY, JSON.stringify(toSave))
+    }
+  }, [globalFilters, filtersHydrated])
+
+  // Apply global filters to orders
+  const filteredOrders = useMemo(() => {
+    let result = orders
+    // Vehicle type
+    if (globalFilters.vehicle !== 'all') {
+      result = result.filter(o => o.vehicleType === globalFilters.vehicle)
+    }
+    // Period
+    result = filterOrdersByPeriod(result, globalFilters.period)
+    // Model
+    if (globalFilters.model) {
+      result = result.filter(o => o.model === globalFilters.model)
+    }
+    // Color
+    if (globalFilters.color) {
+      result = result.filter(o => o.color === globalFilters.color)
+    }
+    // Drive
+    if (globalFilters.drive) {
+      result = result.filter(o => o.drive === globalFilters.drive)
+    }
+    // Country
+    if (globalFilters.country) {
+      result = result.filter(o => o.country === globalFilters.country)
+    }
+    return result
+  }, [orders, globalFilters])
+
+  const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
+  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.country !== ''
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -230,6 +295,15 @@ export default function Home() {
         {/* Community Pulse */}
         <CommunityPulse />
 
+        {/* Global Filter Bar */}
+        {!loading && (
+          <GlobalFilterBar
+            orders={orders}
+            filters={globalFilters}
+            onChange={setGlobalFilters}
+          />
+        )}
+
         <div className="flex items-center justify-between">
           <Button
             variant="outline"
@@ -246,8 +320,12 @@ export default function Home() {
         {showStats && !loading && (
           <>
             {/* Delivery Prediction */}
-            <DeliveryPrediction orders={orders} />
-            <StatisticsDashboard orders={orders} />
+            <DeliveryPrediction orders={filteredOrders} />
+            <StatisticsDashboard
+              orders={filteredOrders}
+              selectedPeriod={globalFilters.period}
+              selectedVehicle={globalFilters.vehicle}
+            />
           </>
         )}
 
@@ -268,7 +346,9 @@ export default function Home() {
                   {t('orders')}
                 </CardTitle>
                 <CardDescription>
-                  {t('ordersCount', { count: orders.length })}
+                  {hasActiveGlobalFilters
+                    ? `${filteredOrders.length} von ${orders.length} ${t('orders')}`
+                    : t('ordersCount', { count: orders.length })}
                   {orderGroups.length > 0 && ` ${t('quartersCount', { count: orderGroups.length })}`}
                 </CardDescription>
               </div>
