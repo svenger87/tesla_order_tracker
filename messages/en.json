@@ -610,5 +610,15 @@
     "avgWait": "Avg wait",
     "medianWait": "Median",
     "orders": "Orders"
+  },
+  "hero": {
+    "title": "Tesla Orders and Statistics",
+    "subtitle": "The largest community database for Tesla delivery timelines. Model Y, Model 3 — worldwide.",
+    "findMyOrder": "Find my order"
+  },
+  "footer": {
+    "operatedBy": "Operated by Sven",
+    "supportDevelopment": "Support hosting & development",
+    "stats": "{orders} orders · {delivered} delivered"
   }
 }

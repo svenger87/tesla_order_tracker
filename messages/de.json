@@ -610,5 +610,15 @@
     "avgWait": "Ø Wartezeit",
     "medianWait": "Median",
     "orders": "Bestellungen"
+  },
+  "hero": {
+    "title": "Tesla Bestellungen und Statistiken",
+    "subtitle": "Die größte Community-Datenbank für Tesla Lieferzeiten. Model Y, Model 3 — weltweit.",
+    "findMyOrder": "Meine Bestellung finden"
+  },
+  "footer": {
+    "operatedBy": "Betrieben von Sven",
+    "supportDevelopment": "Hosting & Entwicklung unterstützen",
+    "stats": "{orders} Bestellungen · {delivered} ausgeliefert"
   }
 }
