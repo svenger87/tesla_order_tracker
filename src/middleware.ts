@@ -7,5 +7,7 @@ export default createMiddleware({
 });
 
 export const config = {
-  matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)'
+  // Allow dots in /track/ paths (e.g. /track/sven.7687) while still
+  // excluding static files (.css, .js, .ico, .webp, etc.)
+  matcher: ['/((?!api|trpc|_next|_vercel|.*\\.(?:css|js|json|ico|png|jpg|jpeg|gif|webp|svg|woff|woff2|ttf|eot|map|txt|xml)$).*)']
 };
