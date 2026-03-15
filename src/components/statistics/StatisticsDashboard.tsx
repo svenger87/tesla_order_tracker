@@ -36,6 +36,8 @@ import {
   Package,
   Zap,
   MapPin,
+  Users,
+  Link2,
 } from 'lucide-react'
 
 interface StatisticsDashboardProps {
@@ -213,6 +215,26 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     semanticColor="success"
                     minimal
                     delay={0.7}
+                  />
+                  <StatCard
+                    label={t('manualOrders')}
+                    value={stats.manualOrders}
+                    icon={Users}
+                    description={`${stats.totalOrders > 0 ? Math.round((stats.manualOrders / stats.totalOrders) * 100) : 0}%`}
+                    hint={t('hintManualOrders')}
+                    semanticColor="data"
+                    minimal
+                    delay={0.8}
+                  />
+                  <StatCard
+                    label={t('tostOrders')}
+                    value={stats.tostOrders}
+                    icon={Link2}
+                    description={`${stats.totalOrders > 0 ? Math.round((stats.tostOrders / stats.totalOrders) * 100) : 0}%`}
+                    hint={t('hintTostOrders')}
+                    semanticColor="data"
+                    minimal
+                    delay={0.9}
                   />
                 </div>
               </div>

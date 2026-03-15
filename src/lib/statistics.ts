@@ -66,6 +66,8 @@ export interface OrderStatistics {
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
   vinWeekdayDistribution: { name: string; count: number }[]
   countryDeliveryStats: { country: string; avgDays: number; medianDays: number; count: number }[]
+  tostOrders: number
+  manualOrders: number
 }
 
 // Period filter types
@@ -579,6 +581,10 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     })
     .sort((a, b) => a.medianDays - b.medianDays)
 
+  // Source distribution
+  const tostOrders = filteredOrders.filter(o => o.source === 'tost').length
+  const manualOrders = totalOrders - tostOrders
+
   return {
     totalOrders,
     deliveredOrders,
@@ -604,6 +610,8 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     deliveryLocationDistribution,
     vinWeekdayDistribution,
     countryDeliveryStats,
+    tostOrders,
+    manualOrders,
   }
 }
 
