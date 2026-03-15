@@ -665,6 +665,10 @@
     "orderToPapers": "Order → Documents",
     "papersToDelivery": "Documents → Delivery"
   },
+  "support": {
+    "communityMessage": "This data is maintained by the community for the community. If this site helps you, you can support the server costs.",
+    "supportButton": "Support"
+  },
   "footer": {
     "operatedBy": "Operated by Sven",
     "supportDevelopment": "Support hosting & development",

@@ -72,6 +72,8 @@ model Settings {
   lastSyncCount      Int?
   archiveEnabled     Boolean   @default(true) // Enable/disable archiving feature
   archiveThreshold   Int       @default(180) // Days without updates to consider order "stale"
+  yearlyGoal         Int?
+  yearlyRaised       Int?
   updatedAt          DateTime  @updatedAt
 }
 
