@@ -150,7 +150,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Filter, X, Search, KeyRound, Columns3, FileText } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Search, KeyRound, Columns3, FileText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
   Popover,
@@ -165,51 +165,20 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 type SortDirection = 'asc' | 'desc'
 type SortField = keyof Order | null
 
-interface Filters {
-  vehicleType: string
-  model: string
-  range: string
-  drive: string
-  color: string
-  country: string
-  deliveryLocation: string
-  wheels: string
-  interior: string
-  towHitch: string
-  seats: string
-  autopilot: string
-  hasVin: string
-  hasDelivery: string
+interface TableLocalFilters {
   nameSearch: string
+  hasVin: '' | 'yes' | 'no'
+  hasDelivery: '' | 'yes' | 'no'
 }
 
-const emptyFilters: Filters = {
-  vehicleType: '',
-  model: '',
-  range: '',
-  drive: '',
-  color: '',
-  country: '',
-  deliveryLocation: '',
-  wheels: '',
-  interior: '',
-  towHitch: '',
-  seats: '',
-  autopilot: '',
+const emptyLocalFilters: TableLocalFilters = {
+  nameSearch: '',
   hasVin: '',
   hasDelivery: '',
-  nameSearch: '',
 }
 
 // Parse date string (DD.MM.YYYY format) to Date for sorting
@@ -396,7 +365,6 @@ const DEFAULT_VISIBLE_COLUMNS = new Set(
 )
 
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
-const FILTERS_STORAGE_KEY = 'tesla-tracker-table-filters'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
 export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId }: OrderTableProps) {
@@ -404,13 +372,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
-  const to = useTranslations('options')
 
   // Default sort: orderDate ascending (oldest first, newest at bottom)
   const [sortField, setSortField] = useState<SortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
-  const [filters, setFilters] = useState<Filters>(emptyFilters)
-  const [showFilters, setShowFilters] = useState(false)
+  const [localFilters, setLocalFilters] = useState<TableLocalFilters>(emptyLocalFilters)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(DEFAULT_VISIBLE_COLUMNS)
   const [isHydrated, setIsHydrated] = useState(false)
 
@@ -442,19 +408,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     return map
   }, [countries])
 
-  // Sort country codes by their labels with umlaut normalization
-  const sortCountryCodes = useCallback((codes: string[]) => {
-    return [...codes].sort((a, b) => {
-      const labelA = countryLabelMap.get(a) || a
-      const labelB = countryLabelMap.get(b) || b
-      const normA = normalizeForSort(labelA)
-      const normB = normalizeForSort(labelB)
-      if (normA < normB) return -1
-      if (normA > normB) return 1
-      return 0
-    })
-  }, [countryLabelMap])
-
   // Refs for sticky scrollbar sync
   const tableContainerRef = useRef<HTMLDivElement>(null)
   const scrollbarRef = useRef<HTMLDivElement>(null)
@@ -466,22 +419,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const searchParams = useSearchParams()
   const highlightUser = searchParams.get('user')?.toLowerCase()
 
-  // Load filters, sorting, and column visibility from localStorage on mount
+  // Load sorting and column visibility from localStorage on mount
   useEffect(() => {
-    // Load filters
-    const savedFilters = localStorage.getItem(FILTERS_STORAGE_KEY)
-    if (savedFilters) {
-      try {
-        const parsed = JSON.parse(savedFilters)
-        setFilters({ ...emptyFilters, ...parsed })
-        if (Object.values(parsed).some(Boolean)) {
-          setShowFilters(true)
-        }
-      } catch (e) {
-        console.error('Failed to parse saved filters:', e)
-      }
-    }
-
     // Load sorting
     const savedSort = localStorage.getItem(SORT_STORAGE_KEY)
     if (savedSort) {
@@ -515,13 +454,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
 
     setIsHydrated(true)
   }, [])
-
-  // Save filters to localStorage whenever they change
-  useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(filters))
-    }
-  }, [filters, isHydrated])
 
   // Save sorting to localStorage whenever it changes
   useEffect(() => {
@@ -596,29 +528,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     requestAnimationFrame(() => { isSyncingScroll.current = false })
   }, [])
 
-  // Extract unique values for filter dropdowns
-  const filterOptions = useMemo(() => {
-    return {
-      vehicleType: [...new Set(orders.map(o => o.vehicleType).filter(Boolean))].sort() as string[],
-      model: [...new Set(orders.map(o => o.model).filter(Boolean))].sort() as string[],
-      range: [...new Set(orders.map(o => o.range).filter(Boolean))].sort() as string[],
-      drive: [...new Set(orders.map(o => o.drive).filter(Boolean))].sort() as string[],
-      color: [...new Set(orders.map(o => o.color).filter(Boolean))].sort() as string[],
-      // Don't sort here - sortCountryCodes handles it at render time with proper fallback
-      country: [...new Set(orders.map(o => o.country).filter(Boolean))] as string[],
-      deliveryLocation: ([...new Set(orders.map(o => o.deliveryLocation).filter(Boolean))] as string[]).sort((a, b) =>
-        normalizeForSort(a).localeCompare(normalizeForSort(b))
-      ),
-      wheels: [...new Set(orders.map(o => o.wheels).filter(Boolean))].sort() as string[],
-      interior: [...new Set(orders.map(o => o.interior).filter(Boolean))].sort() as string[],
-      towHitch: [...new Set(orders.map(o => o.towHitch).filter(Boolean))].sort() as string[],
-      seats: [...new Set(orders.map(o => o.seats).filter(Boolean))].sort() as string[],
-      autopilot: [...new Set(orders.map(o => o.autopilot).filter(Boolean))].sort() as string[],
-    }
-  }, [orders])
-
-  const activeFilterCount = Object.values(filters).filter(Boolean).length
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       // Toggle direction if same field
@@ -630,65 +539,27 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     }
   }
 
-  const clearFilters = () => setFilters(emptyFilters)
-
-  // Apply filters then sort
+  // Apply local filters (nameSearch, hasVin, hasDelivery) then sort
   const filteredAndSortedOrders = useMemo(() => {
     let result = orders
 
     // Apply name search filter
-    if (filters.nameSearch) {
-      const searchLower = filters.nameSearch.toLowerCase()
+    if (localFilters.nameSearch) {
+      const searchLower = localFilters.nameSearch.toLowerCase()
       result = result.filter(o => o.name.toLowerCase().includes(searchLower))
     }
 
-    // Apply vehicle type filter
-    if (filters.vehicleType) {
-      result = result.filter(o => o.vehicleType === filters.vehicleType)
-    }
-
-    // Apply filters
-    if (filters.model) {
-      result = result.filter(o => o.model === filters.model)
-    }
-    if (filters.range) {
-      result = result.filter(o => o.range === filters.range)
-    }
-    if (filters.drive) {
-      result = result.filter(o => o.drive === filters.drive)
-    }
-    if (filters.color) {
-      result = result.filter(o => o.color === filters.color)
-    }
-    if (filters.country) {
-      result = result.filter(o => o.country === filters.country)
-    }
-    if (filters.deliveryLocation) {
-      result = result.filter(o => o.deliveryLocation === filters.deliveryLocation)
-    }
-    if (filters.wheels) {
-      result = result.filter(o => o.wheels === filters.wheels)
-    }
-    if (filters.interior) {
-      result = result.filter(o => o.interior === filters.interior)
-    }
-    if (filters.towHitch) {
-      result = result.filter(o => o.towHitch === filters.towHitch)
-    }
-    if (filters.seats) {
-      result = result.filter(o => o.seats === filters.seats)
-    }
-    if (filters.autopilot) {
-      result = result.filter(o => o.autopilot === filters.autopilot)
-    }
-    if (filters.hasVin === 'yes') {
+    // Apply hasVin filter
+    if (localFilters.hasVin === 'yes') {
       result = result.filter(o => !!o.vin)
-    } else if (filters.hasVin === 'no') {
+    } else if (localFilters.hasVin === 'no') {
       result = result.filter(o => !o.vin)
     }
-    if (filters.hasDelivery === 'yes') {
+
+    // Apply hasDelivery filter
+    if (localFilters.hasDelivery === 'yes') {
       result = result.filter(o => !!o.deliveryDate)
-    } else if (filters.hasDelivery === 'no') {
+    } else if (localFilters.hasDelivery === 'no') {
       result = result.filter(o => !o.deliveryDate)
     }
 
@@ -698,11 +569,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     }
 
     return result
-  }, [orders, filters, sortField, sortDirection, countryLabelMap])
+  }, [orders, localFilters, sortField, sortDirection, countryLabelMap])
 
   return (
     <div className="space-y-2">
-      {/* Filter Toggle and Bar */}
+      {/* Toolbar: Search, VIN/Delivery toggles, Columns */}
       <div className="flex flex-wrap items-center gap-2 px-2">
         {/* Name Search */}
         <div className="relative">
@@ -710,24 +581,34 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <Input
             type="text"
             placeholder={tc('searchName')}
-            value={filters.nameSearch}
-            onChange={(e) => setFilters(f => ({ ...f, nameSearch: e.target.value }))}
+            value={localFilters.nameSearch}
+            onChange={(e) => setLocalFilters(f => ({ ...f, nameSearch: e.target.value }))}
             className="h-8 w-[140px] sm:w-[180px] pl-8 text-sm"
           />
         </div>
+        {/* VIN pill toggle */}
         <Button
-          variant={showFilters ? "secondary" : "outline"}
+          variant={localFilters.hasVin === 'yes' ? 'default' : localFilters.hasVin === 'no' ? 'secondary' : 'outline'}
           size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className="gap-2"
+          className="h-8 text-xs"
+          onClick={() => setLocalFilters(f => ({
+            ...f,
+            hasVin: f.hasVin === '' ? 'yes' : f.hasVin === 'yes' ? 'no' : ''
+          }))}
         >
-          <Filter className="h-4 w-4" />
-          Filter
-          {activeFilterCount > 0 && (
-            <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
-              {activeFilterCount}
-            </Badge>
-          )}
+          VIN {localFilters.hasVin === 'yes' ? '\u2713' : localFilters.hasVin === 'no' ? '\u2717' : ''}
+        </Button>
+        {/* Delivery pill toggle */}
+        <Button
+          variant={localFilters.hasDelivery === 'yes' ? 'default' : localFilters.hasDelivery === 'no' ? 'secondary' : 'outline'}
+          size="sm"
+          className="h-8 text-xs"
+          onClick={() => setLocalFilters(f => ({
+            ...f,
+            hasDelivery: f.hasDelivery === '' ? 'yes' : f.hasDelivery === 'yes' ? 'no' : ''
+          }))}
+        >
+          {t('deliveredFilter')} {localFilters.hasDelivery === 'yes' ? '\u2713' : localFilters.hasDelivery === 'no' ? '\u2717' : ''}
         </Button>
         <Popover>
           <PopoverTrigger asChild>
@@ -768,188 +649,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             </div>
           </PopoverContent>
         </Popover>
-        {activeFilterCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
-            <X className="h-3 w-3" />
-            <span className="hidden sm:inline">{tc('resetFilters')}</span>
-          </Button>
-        )}
         <span className="text-xs sm:text-sm text-muted-foreground ml-auto">
           {filteredAndSortedOrders.length} / {orders.length}
         </span>
       </div>
-
-      {/* Filter Row */}
-      {showFilters && (
-        <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md overflow-x-auto">
-          <Select value={filters.vehicleType} onValueChange={(v) => setFilters(f => ({ ...f, vehicleType: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[120px] h-8">
-              <SelectValue placeholder={t('vehicle')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allVehicles')}</SelectItem>
-              {filterOptions.vehicleType.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.model} onValueChange={(v) => setFilters(f => ({ ...f, model: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[130px] h-8">
-              <SelectValue placeholder={t('model')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allModels')}</SelectItem>
-              {filterOptions.model.map(v => <SelectItem key={v} value={v}>{getLabel(models, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.range} onValueChange={(v) => setFilters(f => ({ ...f, range: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[160px] h-8">
-              <SelectValue placeholder={t('range')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allRanges')}</SelectItem>
-              {filterOptions.range.map(v => <SelectItem key={v} value={v}>{v === 'maximale_reichweite' ? to('range.maxRangeShort') : getLabel(ranges, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.drive} onValueChange={(v) => setFilters(f => ({ ...f, drive: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[100px] h-8">
-              <SelectValue placeholder={t('drive')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              {filterOptions.drive.map(v => <SelectItem key={v} value={v}>{getLabel(drives, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.color} onValueChange={(v) => setFilters(f => ({ ...f, color: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[140px] h-8">
-              <SelectValue placeholder={t('color')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allColors')}</SelectItem>
-              {filterOptions.color.map(v => {
-                const colorInfo = findColorInfo(v)
-                return (
-                  <SelectItem key={v} value={v}>
-                    <span className="flex items-center gap-2">
-                      {colorInfo?.hex && (
-                        <span
-                          className={cn("w-3 h-3 rounded-full inline-block", colorInfo.border && "border border-border")}
-                          style={{ backgroundColor: colorInfo.hex }}
-                        />
-                      )}
-                      {colorInfo?.label || v}
-                    </span>
-                  </SelectItem>
-                )
-              })}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.country} onValueChange={(v) => setFilters(f => ({ ...f, country: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[150px] h-8">
-              <SelectValue placeholder={t('country')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allCountries')}</SelectItem>
-              {sortCountryCodes(filterOptions.country).map(v => {
-                const countryInfo = countries.find(c => c.value === v)
-                return (
-                  <SelectItem key={v} value={v}>
-                    <span className="flex items-center gap-2">
-                      {countryInfo?.flag && <TwemojiEmoji emoji={countryInfo.flag} size={16} />}
-                      {countryInfo?.label || v}
-                    </span>
-                  </SelectItem>
-                )
-              })}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.deliveryLocation} onValueChange={(v) => setFilters(f => ({ ...f, deliveryLocation: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[130px] h-8">
-              <SelectValue placeholder={t('deliveryLocation')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allLocations')}</SelectItem>
-              {filterOptions.deliveryLocation.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.wheels} onValueChange={(v) => setFilters(f => ({ ...f, wheels: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder={t('wheels')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('allWheels')}</SelectItem>
-              {filterOptions.wheels.map(v => <SelectItem key={v} value={v}>{getLabel(wheels, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.interior} onValueChange={(v) => setFilters(f => ({ ...f, interior: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[120px] h-8">
-              <SelectValue placeholder={t('interior')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              {filterOptions.interior.map(v => <SelectItem key={v} value={v}>{getLabel(interiors, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.towHitch} onValueChange={(v) => setFilters(f => ({ ...f, towHitch: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[90px] h-8">
-              <SelectValue placeholder={t('towHitch')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              {filterOptions.towHitch.map(v => <SelectItem key={v} value={v}>{getLabel(towHitchOptions, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.seats} onValueChange={(v) => setFilters(f => ({ ...f, seats: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[90px] h-8">
-              <SelectValue placeholder={t('seats')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              {filterOptions.seats.map(v => <SelectItem key={v} value={v}>{getLabel(seatsOptions, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.autopilot} onValueChange={(v) => setFilters(f => ({ ...f, autopilot: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder={t('autopilot')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              {filterOptions.autopilot.map(v => <SelectItem key={v} value={v}>{getLabel(autopilotOptions, v)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.hasVin} onValueChange={(v) => setFilters(f => ({ ...f, hasVin: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[100px] h-8">
-              <SelectValue placeholder="VIN" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              <SelectItem value="yes">{t('withVin')}</SelectItem>
-              <SelectItem value="no">{t('withoutVin')}</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.hasDelivery} onValueChange={(v) => setFilters(f => ({ ...f, hasDelivery: v === 'all' ? '' : v }))}>
-            <SelectTrigger className="w-[110px] h-8">
-              <SelectValue placeholder={t('deliveredFilter')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{tc('all')}</SelectItem>
-              <SelectItem value="yes">{t('deliveredFilter')}</SelectItem>
-              <SelectItem value="no">{t('pendingFilter')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
       {/* Mobile Card View - only rendered on small screens */}
       {isMobile ? (
