@@ -1054,8 +1054,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 <span className="font-medium">{imageModalOrder.name}</span>
                 {' — '}
                 {imageModalOrder.vehicleType}
-                {imageModalOrder.model ? ` ${imageModalOrder.model}` : ''}
-                {imageModalOrder.color ? ` · ${imageModalOrder.color}` : ''}
+                {imageModalOrder.model ? ` ${getLabel(models, imageModalOrder.model)}` : ''}
+                {imageModalOrder.color ? ` · ${getLabel(COLORS.map(c => ({ value: c.value, label: c.label })), imageModalOrder.color)}` : ''}
                 {imageModalOrder.wheels ? ` · ${imageModalOrder.wheels}"` : ''}
               </div>
             </div>

@@ -227,7 +227,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
                   )}
                   style={{ backgroundColor: colorInfo.hex }}
                 />
-                {order.color}
+                {colorInfo?.label || order.color}
               </Badge>
             )}
             {order.interior && (
