@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
-import { Order, COLORS, COUNTRIES, VehicleType } from '@/lib/types'
+import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
 import { Link } from '@/i18n/navigation'
@@ -216,19 +216,28 @@ export default async function TrackPage({ params }: { params: Promise<{ name: st
     }
   }
 
+  // Resolve internal values to display labels
+  const resolve = (value: string | null, options: { value: string; label: string }[]): string | null => {
+    if (!value) return null
+    const match = options.find(o => o.value === value || o.label.toLowerCase() === value.toLowerCase())
+    return match?.label || value
+  }
+
+  const allTrims = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]
+
   // Build detail fields
   const detailFields: { label: string; value: string | null }[] = [
     { label: t('orderDate'), value: order.orderDate },
     { label: t('vehicle'), value: order.vehicleType },
-    { label: t('model'), value: order.model },
-    { label: t('range'), value: order.range },
-    { label: t('drive'), value: order.drive },
-    { label: t('color'), value: order.color },
-    { label: t('interior'), value: order.interior },
+    { label: t('model'), value: resolve(order.model, allTrims) },
+    { label: t('range'), value: resolve(order.range, RANGES) },
+    { label: t('drive'), value: resolve(order.drive, DRIVES) },
+    { label: t('color'), value: colorInfo?.label || order.color },
+    { label: t('interior'), value: resolve(order.interior, INTERIORS) },
     { label: t('wheels'), value: order.wheels ? `${order.wheels}"` : null },
-    { label: t('towHitch'), value: order.towHitch },
-    { label: t('seats'), value: order.seats },
-    { label: t('autopilot'), value: order.autopilot },
+    { label: t('towHitch'), value: resolve(order.towHitch, TOW_HITCH_OPTIONS) },
+    { label: t('seats'), value: resolve(order.seats, SEATS_OPTIONS) },
+    { label: t('autopilot'), value: resolve(order.autopilot, AUTOPILOT_OPTIONS) },
     { label: t('country'), value: countryInfo?.label || order.country },
     { label: t('deliveryWindow'), value: order.deliveryWindow },
     { label: t('deliveryLocation'), value: order.deliveryLocation },
@@ -272,6 +281,12 @@ export default async function TrackPage({ params }: { params: Promise<{ name: st
       colorInfo={colorInfo ? { hex: colorInfo.hex, border: colorInfo.border } : null}
       countryInfo={countryInfo ? { label: countryInfo.label, flag: countryInfo.flag } : null}
       donationUrl={settings?.donationUrl}
+      resolvedLabels={{
+        model: resolve(order.model, allTrims),
+        range: resolve(order.range, RANGES),
+        drive: resolve(order.drive, DRIVES),
+        interior: resolve(order.interior, INTERIORS),
+      }}
     />
   )
 }

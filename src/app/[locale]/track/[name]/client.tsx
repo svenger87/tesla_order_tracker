@@ -35,6 +35,12 @@ interface TrackingPageClientProps {
   colorInfo: { hex: string; border: boolean } | null
   countryInfo: { label: string; flag: string } | null
   donationUrl?: string | null
+  resolvedLabels: {
+    model: string | null
+    range: string | null
+    drive: string | null
+    interior: string | null
+  }
 }
 
 export function TrackingPageClient({
@@ -47,6 +53,7 @@ export function TrackingPageClient({
   colorInfo,
   countryInfo,
   donationUrl,
+  resolvedLabels,
 }: TrackingPageClientProps) {
   const t = useTranslations('tracking')
   const [copied, setCopied] = useState(false)
@@ -165,25 +172,25 @@ export function TrackingPageClient({
                         {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
                       </Badge>
                     )}
-                    {order.model && (
+                    {resolvedLabels.model && (
                       <Badge
-                        variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
+                        variant={resolvedLabels.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
                         className={cn(
-                          order.model.toLowerCase().includes('premium')
+                          resolvedLabels.model.toLowerCase().includes('premium')
                             ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800'
                             : ''
                         )}
                       >
-                        {order.model}
+                        {resolvedLabels.model}
                       </Badge>
                     )}
-                    {order.drive && (
+                    {resolvedLabels.drive && (
                       <Badge variant="outline" className={cn("font-mono",
-                        order.drive.toLowerCase().includes('awd')
+                        resolvedLabels.drive.toLowerCase().includes('awd')
                           ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800'
                           : ''
                       )}>
-                        {order.drive.toUpperCase()}
+                        {resolvedLabels.drive}
                       </Badge>
                     )}
                     {colorInfo && (
