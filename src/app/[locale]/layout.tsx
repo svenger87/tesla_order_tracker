@@ -52,6 +52,13 @@ export async function generateMetadata({
       type: 'website',
       locale: locale === 'de' ? 'de_DE' : 'en_US',
     },
+    alternates: {
+      canonical: `https://tff-order-stats.de${locale === 'de' ? '' : '/en'}`,
+      languages: {
+        'de': 'https://tff-order-stats.de',
+        'en': 'https://tff-order-stats.de/en',
+      },
+    },
     twitter: {
       card: 'summary',
       title: t('title'),
