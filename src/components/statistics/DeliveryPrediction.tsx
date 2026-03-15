@@ -62,7 +62,6 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
-        {!isExpanded && <p className="text-sm text-muted-foreground mt-1">{t('description')}</p>}
       </CardHeader>
 
       <AnimatePresence>

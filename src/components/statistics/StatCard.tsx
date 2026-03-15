@@ -17,12 +17,24 @@ interface StatCardProps {
   hint?: string
   trend?: 'up' | 'down' | 'neutral'
   variant?: 'default' | 'hero'
+  semanticColor?: 'success' | 'data' | 'pending' | 'brand'
+  minimal?: boolean
   delay?: number
   watermark?: boolean
 }
 
-export function StatCard({ label, value, icon: Icon, description, hint, variant = 'default', delay = 0, watermark = false }: StatCardProps) {
+const colorMap = {
+  brand: { bg: 'bg-primary/10', text: 'text-primary', bar: 'from-primary/60 to-primary/20', hoverBg: 'group-hover:bg-primary/15' },
+  success: { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', bar: 'from-green-500/60 to-green-500/20', hoverBg: 'group-hover:bg-green-500/15' },
+  data: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', bar: 'from-blue-500/60 to-blue-500/20', hoverBg: 'group-hover:bg-blue-500/15' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', bar: 'from-amber-500/60 to-amber-500/20', hoverBg: 'group-hover:bg-amber-500/15' },
+}
+
+export function StatCard({ label, value, icon: Icon, description, hint, variant = 'default', semanticColor = 'brand', minimal = false, delay = 0, watermark = false }: StatCardProps) {
   const isHero = variant === 'hero'
+  const colors = colorMap[semanticColor]
+  const displayValue = (value === 0 || value === '0') ? '\u2014' : value
+  const isZeroValue = value === 0 || value === '0'
 
   return (
     <motion.div
@@ -36,9 +48,11 @@ export function StatCard({ label, value, icon: Icon, description, hint, variant 
       }`}
     >
       {/* Left accent bar */}
-      <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b from-primary/60 to-primary/20 ${
-        isHero ? 'opacity-100' : 'opacity-60'
-      }`} />
+      {!minimal && (
+        <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b ${colors.bar} ${
+          isHero ? 'opacity-100' : 'opacity-60'
+        }`} />
+      )}
 
       <div className="flex items-start justify-between gap-3 pl-2">
         <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
@@ -61,13 +75,13 @@ export function StatCard({ label, value, icon: Icon, description, hint, variant 
           </div>
           <p className={`font-bold tracking-tight truncate tabular-nums ${
             isHero ? 'text-xl sm:text-3xl' : 'text-lg sm:text-2xl'
-          }`}>{value}</p>
+          } ${isZeroValue ? 'text-muted-foreground' : ''}`}>{displayValue}</p>
           {description && (
             <p className="text-xs sm:text-sm text-muted-foreground/80 truncate">{description}</p>
           )}
         </div>
-        <div className={`rounded-xl bg-primary/10 p-2.5 sm:p-3 shrink-0 transition-colors group-hover:bg-primary/15`}>
-          <Icon className={`text-primary ${isHero ? 'h-5 w-5 sm:h-6 sm:w-6' : 'h-5 w-5 sm:h-6 sm:w-6'}`} />
+        <div className={`rounded-xl ${colors.bg} p-2.5 sm:p-3 shrink-0 transition-colors ${colors.hoverBg}`}>
+          <Icon className={`${colors.text} ${isHero ? 'h-5 w-5 sm:h-6 sm:w-6' : 'h-5 w-5 sm:h-6 sm:w-6'}`} />
         </div>
       </div>
 

@@ -28,10 +28,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown } from 'lucide-react'
+import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { Locale } from 'date-fns'
 import { format, parse, isValid } from 'date-fns'
@@ -54,6 +56,7 @@ interface OrderFormProps {
   editCode?: string
   isLegacy?: boolean // Legacy order from old spreadsheet import (no editCode)
   onSuccess: () => void
+  mode?: 'page' | 'modal'
 }
 
 // Helper to parse German date format (DD.MM.YYYY) to Date object
@@ -143,10 +146,11 @@ const emptyFormData: OrderFormData = {
   confirmPassword: '',
 }
 
-export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess }: OrderFormProps) {
+export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess, mode = 'modal' }: OrderFormProps) {
   const t = useTranslations('form')
   const tv = useTranslations('form.validation')
   const tc = useTranslations('common')
+  const te = useTranslations('editCodeModal')
   const locale = useLocale()
   const dateLocale = locale === 'de' ? de : enUS
   const isMobile = useIsMobile()
@@ -154,6 +158,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [formData, setFormData] = useState<OrderFormData>(emptyFormData)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Page mode: track submitted state and order name for success view
+  const [pageSubmitted, setPageSubmitted] = useState(false)
+  const [submittedName, setSubmittedName] = useState('')
   // For legacy orders: new password fields
   const [newEditCode, setNewEditCode] = useState('')
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
@@ -435,9 +442,14 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         throw new Error(data.error || tv('saveError'))
       }
 
-      onSuccess()
-      setFormData(emptyFormData)
-      onOpenChange(false)
+      if (mode === 'page') {
+        setSubmittedName(formData.name)
+        setPageSubmitted(true)
+      } else {
+        onSuccess()
+        setFormData(emptyFormData)
+        onOpenChange(false)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : tv('saveError'))
     } finally {
@@ -632,8 +644,66 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     dateLocale, order, isLegacy, newEditCode, confirmNewEditCode, showPasswordStep, t,
   ])
 
-  // ─── Mobile Wizard ────────────────────────────────────────────
-  if (isMobile) {
+  // ─── Page Mode: Success View ─────────────────────────────────
+  if (mode === 'page' && pageSubmitted) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-6 py-10 px-6 text-center">
+          <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-4">
+            <CheckCircle2 className="h-10 w-10 text-green-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">{te('orderCreated')}</h2>
+            <p className="text-muted-foreground">{te('passwordSecuredDescription')}</p>
+            <p className="text-sm text-muted-foreground">{te('clickEditToChange')}</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href={`/${locale}`}>
+              <Button variant="outline">{locale === 'de' ? 'Zur Übersicht' : 'Back to overview'}</Button>
+            </Link>
+            <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
+              <Button>{locale === 'de' ? 'Meine Bestellung ansehen' : 'View my order'}</Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // ─── Page Mode: Form in Card ───────────────────────────────────
+  if (mode === 'page') {
+    const formHeader = (
+      <CardHeader>
+        <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+        <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
+      </CardHeader>
+    )
+
+    if (isMobile) {
+      return (
+        <Card>
+          {formHeader}
+          <CardContent>
+            <FormWizard
+              steps={wizardSteps}
+              currentStep={wizardStep}
+              onStepChange={setWizardStep}
+              onSubmit={() => handleSubmit()}
+              loading={loading}
+              isEdit={!!order}
+              error={error}
+              validateStep={validateWizardStep}
+            />
+          </CardContent>
+        </Card>
+      )
+    }
+
+    // Page mode desktop: render the form content directly in a Card (see below — reuses the desktop form JSX)
+  }
+
+  // ─── Mobile Wizard (modal mode) ────────────────────────────────
+  if (isMobile && mode !== 'page') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-[95vw] max-h-[90vh] flex flex-col overflow-hidden p-4">
@@ -661,19 +731,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     )
   }
 
-  // ─── Desktop Layout (unchanged) ───────────────────────────────
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {order ? t('editOrder') : t('newOrder')}
-          </DialogTitle>
-          <DialogDescription>
-            {order ? t('editOrderDescription') : t('newOrderDescription')}
-          </DialogDescription>
-        </DialogHeader>
-
+  // ─── Desktop Layout ────────────────────────────────────────────
+  const desktopFormContent = (
+    <>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md text-sm">
@@ -1213,14 +1273,54 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           )}
 
           <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              {tc('cancel')}
-            </Button>
+            {mode === 'modal' && (
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                {tc('cancel')}
+              </Button>
+            )}
+            {mode === 'page' && (
+              <Link href={`/${locale}`}>
+                <Button type="button" variant="outline">
+                  {tc('cancel')}
+                </Button>
+              </Link>
+            )}
             <Button type="submit" disabled={loading}>
               {loading ? tc('saving') : order ? tc('update') : tc('add')}
             </Button>
           </div>
         </form>
+    </>
+  )
+
+  // Page mode desktop: render in a Card
+  if (mode === 'page') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+          <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {desktopFormContent}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Modal mode desktop: render in Dialog
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {order ? t('editOrder') : t('newOrder')}
+          </DialogTitle>
+          <DialogDescription>
+            {order ? t('editOrderDescription') : t('newOrderDescription')}
+          </DialogDescription>
+        </DialogHeader>
+        {desktopFormContent}
       </DialogContent>
     </Dialog>
   )

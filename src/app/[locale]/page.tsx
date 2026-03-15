@@ -10,10 +10,10 @@ import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
-import { DonationBanner } from '@/components/DonationBanner'
-import { TrustSignals } from '@/components/TrustSignals'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { CommunityPulse } from '@/components/CommunityPulse'
+import { HeroSection } from '@/components/HeroSection'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
 
 const StatisticsDashboard = dynamic(
@@ -36,20 +36,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, LogIn, RefreshCw, Car, BarChart3, Coffee, Github, Code2, Copy, Check, KeyRound, MoreHorizontal, ChevronUp, Search } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
-import Image from 'next/image'
 
 export default function Home() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
-  const ts = useTranslations('search')
   const [orders, setOrders] = useState<Order[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -225,172 +217,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header
-        className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-lg shadow-sm"
-      >
-        <div className="h-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40" />
-        <div className="w-full max-w-[98vw] mx-auto px-3 py-3 sm:px-4 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="relative rounded-lg bg-primary p-1.5 w-[38px] h-[44px] transition-transform hover:scale-105 shadow-md shadow-primary/20"
-              >
-                <Image
-                  src="/logo.webp"
-                  alt="Tesla Tracker Logo"
-                  fill
-                  sizes="44px"
-                  className="object-contain p-0.5"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight md:text-2xl">
-                  <span className="sm:hidden">{t('titleShort')}</span>
-                  <span className="hidden sm:inline">{t('title')}</span>
-                </h1>
-                <p className="hidden text-sm text-muted-foreground/80 sm:block">
-                  {t('subtitle')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Desktop nav items */}
-              {settings?.showDonation && settings?.donationUrl && (
-                <a
-                  href={settings.donationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
-                >
-                  <Coffee className="h-3.5 w-3.5" />
-                  <span>{tc('support')}</span>
-                </a>
-              )}
-              <Link href="/docs" className="hidden sm:inline-flex">
-                <Button variant="ghost" size="icon" className="h-9 w-9" title="API Docs">
-                  <Code2 className="h-4 w-4" />
-                  <span className="sr-only">API Docs</span>
-                </Button>
-              </Link>
-              <a
-                href="https://github.com/svenger87/tesla_order_tracker"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex"
-              >
-                <Button variant="ghost" size="icon" className="h-9 w-9">
-                  <Github className="h-4 w-4" />
-                  <span className="sr-only">GitHub</span>
-                </Button>
-              </a>
-              {/* Separator between nav groups */}
-              <div className="hidden sm:block w-px h-5 bg-border mx-1" />
-              {/* Desktop search button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowSearch(true)}
-                className="hidden sm:inline-flex gap-2 text-muted-foreground border-input/60 bg-muted/30 hover:bg-muted/50"
-              >
-                <Search className="h-4 w-4" />
-                {ts('openSearch')}
-                <kbd className="pointer-events-none ml-1 hidden h-5 select-none items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </Button>
-              {/* Mobile search button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowSearch(true)}
-                className="sm:hidden h-9 w-9"
-              >
-                <Search className="h-4 w-4" />
-                <span className="sr-only">{ts('openSearch')}</span>
-              </Button>
-              <LanguageSwitcher />
-              <ThemeToggle />
-              {/* Mobile overflow menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild className="sm:hidden">
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">{tc('menu')}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href="/docs">
-                      <Code2 className="mr-2 h-4 w-4" />
-                      API Docs
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a
-                      href="https://github.com/svenger87/tesla_order_tracker"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Github className="mr-2 h-4 w-4" />
-                      GitHub
-                    </a>
-                  </DropdownMenuItem>
-                  {settings?.showDonation && settings?.donationUrl && (
-                    <DropdownMenuItem asChild>
-                      <a
-                        href={settings.donationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Coffee className="mr-2 h-4 w-4" />
-                        {tc('support')}
-                      </a>
-                    </DropdownMenuItem>
-                  )}
-                  {isAdmin ? (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Admin Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin/login">
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Admin
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {/* Desktop admin button */}
-              {isAdmin ? (
-                <Link href="/admin" className="hidden sm:inline-flex">
-                  <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5">
-                    Admin Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <Link href="/admin/login" className="hidden sm:inline-flex">
-                  <Button variant="ghost" size="sm">
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Admin
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header
+        isAdmin={isAdmin}
+        settings={settings}
+        onSearchOpen={() => setShowSearch(true)}
+      />
 
       <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-8">
-        {/* Statistics Toggle & Dashboard */}
-        {/* Trust Signals - always visible */}
-        {!loading && orders.length > 0 && (
-          <TrustSignals orders={orders} />
-        )}
+        {/* Hero Section */}
+        <HeroSection onSearchOpen={() => setShowSearch(true)} />
+
+        {/* Community Pulse */}
+        <CommunityPulse />
 
         <div className="flex items-center justify-between">
           <Button
@@ -449,9 +287,9 @@ export default function Home() {
           <CardContent>
             {loading ? (
               <div className="space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full animate-shimmer" />
+                <Skeleton className="h-16 w-full animate-shimmer" />
+                <Skeleton className="h-16 w-full animate-shimmer" />
               </div>
             ) : (
               <CollapsibleOrderSection
@@ -471,44 +309,11 @@ export default function Home() {
         </Card>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t mt-12 bg-muted/20">
-        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-        <div className="w-full max-w-[98vw] mx-auto px-4 py-8 sm:py-12">
-          <div className="flex flex-col items-center gap-5">
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
-              <a
-                href="https://github.com/svenger87/tesla_order_tracker"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors hover:underline underline-offset-4"
-              >
-                <Github className="h-4 w-4" />
-                <span>GitHub</span>
-              </a>
-              <Link
-                href="/docs"
-                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors hover:underline underline-offset-4"
-              >
-                <Code2 className="h-4 w-4" />
-                <span>API Docs</span>
-              </Link>
-              <Link
-                href="/impressum"
-                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors hover:underline underline-offset-4"
-              >
-                Impressum
-              </Link>
-              {settings?.showDonation && (
-                <DonationBanner settings={settings} />
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground/50">
-              {t('footer')}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer
+        settings={settings}
+        orderCount={orders.length}
+        deliveredCount={orders.filter(o => o.deliveryDate).length}
+      />
 
       {/* Order Search */}
       <OrderSearch

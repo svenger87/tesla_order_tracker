@@ -81,6 +81,14 @@ export function ConfigDeliveryInsights({ orders }: ConfigDeliveryInsightsProps) 
         )}
       </div>
 
+      {insight.values.length > 0 && (
+        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800">
+          <p className="text-sm font-medium text-green-700 dark:text-green-400">
+            {t('fastest')}: {insight.values[0].name} — Median {insight.values[0].medianDays} {tc('days')}
+          </p>
+        </div>
+      )}
+
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={insight.values} layout="vertical" margin={{ left: 10, right: 20 }}>

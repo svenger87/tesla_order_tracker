@@ -1,15 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
-import { Order } from '@/lib/types'
-import { parseGermanDate, calculateDaysBetween } from '@/lib/statistics'
-import { Car, CheckCircle2, Timer, Users } from 'lucide-react'
+import { Car, CheckCircle2, Timer, Zap } from 'lucide-react'
 
-interface TrustSignalsProps {
-  orders: Order[]
+interface PulseData {
+  totalOrders: number
+  deliveredOrders: number
+  deliveredPercent: number
+  avgDeliveryDays: number | null
+  vinsThisWeek: number
 }
 
 function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string }) {
@@ -23,74 +24,58 @@ function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string
       animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
       transition={{ type: 'spring', stiffness: 100, damping: 15 }}
       className="tabular-nums"
+      aria-live="polite"
     >
       {isInView ? value : 0}{suffix}
     </motion.span>
   )
 }
 
-export function TrustSignals({ orders }: TrustSignalsProps) {
+export function CommunityPulse() {
   const t = useTranslations('trust')
+  const [data, setData] = useState<PulseData | null>(null)
 
-  const metrics = useMemo(() => {
-    const total = orders.length
-    const delivered = orders.filter(o => o.deliveryDate).length
-    const deliveryPercent = total > 0 ? Math.round((delivered / total) * 100) : 0
+  useEffect(() => {
+    fetch('/api/pulse')
+      .then(res => res.json())
+      .then(setData)
+      .catch(() => {})
+  }, [])
 
-    // Average delivery time
-    const deliveryTimes = orders
-      .filter(o => o.deliveryDate)
-      .map(o => calculateDaysBetween(o.orderDate, o.deliveryDate))
-      .filter((d): d is number => d !== null)
-    const avgDeliveryDays = deliveryTimes.length > 0
-      ? Math.round(deliveryTimes.reduce((s, d) => s + d, 0) / deliveryTimes.length)
-      : null
-
-    // Earliest order
-    const orderDates = orders
-      .map(o => parseGermanDate(o.orderDate))
-      .filter((d): d is Date => d !== null)
-      .sort((a, b) => a.getTime() - b.getTime())
-    const earliestDate = orderDates.length > 0 ? orderDates[0] : null
-    const communityMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const communitySince = earliestDate
-      ? `${communityMonths[earliestDate.getMonth()]} ${earliestDate.getFullYear()}`
-      : null
-
-    return { total, delivered, deliveryPercent, avgDeliveryDays, communitySince }
-  }, [orders])
-
-  if (orders.length === 0) return null
+  if (!data || data.totalOrders === 0) return null
 
   const items = [
     {
       icon: Car,
-      value: metrics.total,
+      value: data.totalOrders,
       label: t('totalOrders'),
+      shortLabel: t('totalOrders'),
       color: 'text-primary',
       bgColor: 'bg-primary/10',
     },
     {
       icon: CheckCircle2,
-      value: metrics.delivered,
-      suffix: ` (${metrics.deliveryPercent}%)`,
+      value: data.deliveredOrders,
+      suffix: ` (${data.deliveredPercent}%)`,
       label: t('delivered'),
+      shortLabel: t('delivered'),
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-500/10',
     },
     {
       icon: Timer,
-      value: metrics.avgDeliveryDays,
+      value: data.avgDeliveryDays,
       suffix: ` ${t('days')}`,
       label: t('avgDeliveryTime'),
+      shortLabel: t('avgDeliveryTime'),
       color: 'text-blue-600 dark:text-blue-400',
       bgColor: 'bg-blue-500/10',
     },
     {
-      icon: Users,
-      value: null,
-      textValue: metrics.communitySince,
-      label: t('communitySince'),
+      icon: Zap,
+      value: data.vinsThisWeek,
+      label: 'VINs this week',
+      shortLabel: 'VINs',
       color: 'text-amber-600 dark:text-amber-400',
       bgColor: 'bg-amber-500/10',
     },
@@ -118,10 +103,13 @@ export function TrustSignals({ orders }: TrustSignalsProps) {
                     {item.suffix && <span className="text-sm sm:text-base font-medium text-muted-foreground">{item.suffix}</span>}
                   </>
                 ) : (
-                  <span>{item.textValue || '-'}</span>
+                  <span>-</span>
                 )}
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">{item.label}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                <span className="hidden sm:inline">{item.label}</span>
+                <span className="sm:hidden">{item.shortLabel}</span>
+              </p>
             </div>
           </motion.div>
         ))}

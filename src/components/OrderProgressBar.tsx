@@ -122,7 +122,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
             : 'bg-gradient-to-r from-gray-400 to-gray-300'
 
     return (
-      <div className="h-full w-full bg-muted/50 rounded-full overflow-hidden">
+      <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-[width] duration-500 ease-out', barColor)}
           style={{ width: `${progress}%` }}

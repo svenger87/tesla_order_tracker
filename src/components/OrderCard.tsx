@@ -65,7 +65,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
   }
 
   return (
-    <Card className="relative overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:border-primary/20">
+    <Card className={cn("relative overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:border-primary/20", order.deliveryDate && "bg-green-50/50 dark:bg-green-900/10")}>
         {/* Status bar at top */}
         <div className="h-2">
           <OrderProgressBar order={order} compact barOnly />
@@ -118,7 +118,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
             {isAdmin ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                  <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -154,7 +154,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0"
+                className="h-10 w-10 shrink-0"
                 onClick={() => onEditTostFields(order)}
                 title={t('editTostFields')}
               >
@@ -164,7 +164,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0"
+                className="h-10 w-10 shrink-0"
                 onClick={() => onEditByCode?.(order)}
                 title={tc('edit')}
               >

@@ -315,14 +315,15 @@ interface SortableHeaderProps {
   direction: SortDirection
   onSort: (field: SortField) => void
   children: React.ReactNode
+  className?: string
 }
 
-function SortableHeader({ field, currentField, direction, onSort, children }: SortableHeaderProps) {
+function SortableHeader({ field, currentField, direction, onSort, children, className }: SortableHeaderProps) {
   const isActive = currentField === field
 
   return (
     <TableHead
-      className="font-bold whitespace-nowrap cursor-pointer select-none hover:bg-muted/80 transition-colors bg-muted dark:bg-muted"
+      className={cn("font-bold whitespace-nowrap cursor-pointer select-none hover:bg-muted/80 transition-colors bg-muted dark:bg-muted", className)}
       onClick={() => onSort(field)}
     >
       <div className="flex items-center gap-1">
@@ -991,7 +992,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
         <table className="w-full min-w-max caption-bottom text-xs">
-        <TableHeader className="sticky top-0 z-20">
+        <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
@@ -1004,8 +1005,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('drive') && <SortableHeader field="drive" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('drive')}</SortableHeader>}
             {isColumnVisible('color') && <SortableHeader field="color" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('color')}</SortableHeader>}
             {isColumnVisible('interior') && <SortableHeader field="interior" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('interior')}</SortableHeader>}
-            {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('wheels')}</SortableHeader>}
-            {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('towHitch')}</SortableHeader>}
+            {isColumnVisible('wheels') && <SortableHeader field="wheels" currentField={sortField} direction={sortDirection} onSort={handleSort} className="min-w-[56px]">{t('wheels')}</SortableHeader>}
+            {isColumnVisible('towHitch') && <SortableHeader field="towHitch" currentField={sortField} direction={sortDirection} onSort={handleSort} className="min-w-[48px]">{t('towHitch')}</SortableHeader>}
             {isColumnVisible('seats') && <SortableHeader field="seats" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('seats')}</SortableHeader>}
             {isColumnVisible('autopilot') && <SortableHeader field="autopilot" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('autopilot')}</SortableHeader>}
             {isColumnVisible('deliveryWindow') && <SortableHeader field="deliveryWindow" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryWindow')}</SortableHeader>}
@@ -1044,7 +1045,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 key={order.id}
                 data-order-id={order.id}
                 className={cn(
-                  "border-b hover:bg-muted/50",
+                  "border-b hover:bg-muted/50 border-l-2 border-l-transparent",
+                  order.deliveryDate
+                    ? "hover:border-l-green-500"
+                    : "hover:border-l-amber-500",
                   isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25",
                   isSearchHighlighted && "bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
                 )}
