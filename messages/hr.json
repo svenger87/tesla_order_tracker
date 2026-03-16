@@ -243,7 +243,7 @@
       "monthsAgo": "prije {n}mj."
     },
     "deliveryScheduled": "Isporuka zakazana",
-    "editTostFields": "Dokumenti / COC",
+    "editTostFields": "Datum narudžbe, Dokumenti / COC",
     "editTostFieldsDescription": "Ova polja se mogu ručno uređivati, čak i za narudžbe kojima upravlja TOST.",
     "papersReceivedDate": "Dokumenti primljeni dana",
     "saveError": "Greška pri spremanju"

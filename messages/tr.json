@@ -243,7 +243,7 @@
       "monthsAgo": "{n}ay önce"
     },
     "deliveryScheduled": "Teslimat planlandı",
-    "editTostFields": "Belgeler / COC",
+    "editTostFields": "Sipariş tarihi, Belgeler / COC",
     "editTostFieldsDescription": "Bu alanlar, TOST tarafından yönetilen siparişler için bile manuel olarak düzenlenebilir.",
     "papersReceivedDate": "Belgeler alındığı tarih",
     "saveError": "Kaydetme hatası"

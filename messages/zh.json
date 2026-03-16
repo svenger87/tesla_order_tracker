@@ -243,7 +243,7 @@
       "monthsAgo": "{n} 个月前"
     },
     "deliveryScheduled": "交付已安排",
-    "editTostFields": "文件 / COC",
+    "editTostFields": "订单日期、文件 / COC",
     "editTostFieldsDescription": "即使是 TOST 管理的订单，这些字段也可以手动编辑。",
     "papersReceivedDate": "文件接收日期",
     "saveError": "保存出错"

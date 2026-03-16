@@ -243,7 +243,7 @@
       "monthsAgo": "{n}mnd geleden"
     },
     "deliveryScheduled": "Levering gepland",
-    "editTostFields": "Documenten / COC",
+    "editTostFields": "Besteldatum, Papieren / COC",
     "editTostFieldsDescription": "Deze velden kunnen handmatig worden bewerkt, ook voor door TOST beheerde bestellingen.",
     "papersReceivedDate": "Documenten ontvangen op",
     "saveError": "Fout bij opslaan"

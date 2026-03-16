@@ -243,7 +243,7 @@
       "monthsAgo": "há {n} meses"
     },
     "deliveryScheduled": "Entrega agendada",
-    "editTostFields": "Documentos / COC",
+    "editTostFields": "Data do pedido, Papéis / COC",
     "editTostFieldsDescription": "Estes campos podem ser editados manualmente, mesmo para encomendas geridas pelo TOST.",
     "papersReceivedDate": "Documentos recebidos em",
     "saveError": "Erro ao guardar"

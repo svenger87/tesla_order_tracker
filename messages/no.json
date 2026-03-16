@@ -243,7 +243,7 @@
       "monthsAgo": "{n}mnd siden"
     },
     "deliveryScheduled": "Levering planlagt",
-    "editTostFields": "Dokumenter / COC",
+    "editTostFields": "Bestillingsdato, Papirer / COC",
     "editTostFieldsDescription": "Disse feltene kan redigeres manuelt, selv for TOST-administrerte bestillinger.",
     "papersReceivedDate": "Dokumenter mottatt den",
     "saveError": "Feil ved lagring"

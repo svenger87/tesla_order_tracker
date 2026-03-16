@@ -243,7 +243,7 @@
       "monthsAgo": "pred {n}mes."
     },
     "deliveryScheduled": "Dodanie naplánované",
-    "editTostFields": "Dokumenty / COC",
+    "editTostFields": "Dátum objednávky, Dokumenty / COC",
     "editTostFieldsDescription": "Tieto polia je možné upraviť manuálne, aj pre objednávky spravované cez TOST.",
     "papersReceivedDate": "Dokumenty prijaté dňa",
     "saveError": "Chyba pri ukladaní"

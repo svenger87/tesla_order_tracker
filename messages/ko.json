@@ -243,7 +243,7 @@
       "monthsAgo": "{n}개월 전"
     },
     "deliveryScheduled": "인도 예정",
-    "editTostFields": "서류 / COC",
+    "editTostFields": "주문일, 서류 / COC",
     "editTostFieldsDescription": "TOST 관리 주문의 경우에도 이 필드는 수동으로 편집할 수 있습니다.",
     "papersReceivedDate": "서류 수신일",
     "saveError": "저장 오류"

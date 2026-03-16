@@ -243,7 +243,7 @@
       "monthsAgo": "{n}mån sedan"
     },
     "deliveryScheduled": "Leverans planerad",
-    "editTostFields": "Dokument / COC",
+    "editTostFields": "Beställningsdatum, Papper / COC",
     "editTostFieldsDescription": "Dessa fält kan redigeras manuellt, även för TOST-hanterade beställningar.",
     "papersReceivedDate": "Dokument mottagna den",
     "saveError": "Fel vid sparande"

@@ -243,7 +243,7 @@
       "monthsAgo": "преди {n}мес."
     },
     "deliveryScheduled": "Доставка насрочена",
-    "editTostFields": "Документи / COC",
+    "editTostFields": "Дата на поръчка, Документи / COC",
     "editTostFieldsDescription": "Тези полета могат да се редактират ръчно, дори за поръчки, управлявани от TOST.",
     "papersReceivedDate": "Документи получени на",
     "saveError": "Грешка при запазване"

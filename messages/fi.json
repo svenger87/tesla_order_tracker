@@ -243,7 +243,7 @@
       "monthsAgo": "{n} kk sitten"
     },
     "deliveryScheduled": "Toimitus sovittu",
-    "editTostFields": "Asiakirjat / COC",
+    "editTostFields": "Tilauspäivä, Paperit / COC",
     "editTostFieldsDescription": "Näitä kenttiä voi muokata manuaalisesti, myös TOST-hallinnoiduissa tilauksissa.",
     "papersReceivedDate": "Asiakirjat vastaanotettu",
     "saveError": "Virhe tallennettaessa"

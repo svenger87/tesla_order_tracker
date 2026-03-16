@@ -243,7 +243,7 @@
       "monthsAgo": "{n} hónapja"
     },
     "deliveryScheduled": "Szállítás ütemezve",
-    "editTostFields": "Dokumentumok / COC",
+    "editTostFields": "Rendelés dátuma, Papírok / COC",
     "editTostFieldsDescription": "Ezek a mezők manuálisan szerkeszthetők, még TOST által kezelt rendeléseknél is.",
     "papersReceivedDate": "Dokumentumok beérkezése",
     "saveError": "Mentési hiba"

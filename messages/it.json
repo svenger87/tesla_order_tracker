@@ -243,7 +243,7 @@
       "monthsAgo": "{n}m fa"
     },
     "deliveryScheduled": "Consegna programmata",
-    "editTostFields": "Documenti / COC",
+    "editTostFields": "Data dell'ordine, Documenti / COC",
     "editTostFieldsDescription": "Questi campi possono essere modificati manualmente, anche per gli ordini gestiti da TOST.",
     "papersReceivedDate": "Documenti ricevuti il",
     "saveError": "Errore nel salvataggio"

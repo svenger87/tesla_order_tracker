@@ -243,7 +243,7 @@
       "monthsAgo": "{n}ヶ月前"
     },
     "deliveryScheduled": "納車予定",
-    "editTostFields": "書類 / COC",
+    "editTostFields": "注文日、書類 / COC",
     "editTostFieldsDescription": "TOST 管理の注文でも、これらのフィールドは手動で編集できます。",
     "papersReceivedDate": "書類受信日",
     "saveError": "保存エラー"

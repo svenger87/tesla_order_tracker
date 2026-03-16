@@ -243,7 +243,7 @@
       "monthsAgo": "acum {n}luni"
     },
     "deliveryScheduled": "Livrare programată",
-    "editTostFields": "Documente / COC",
+    "editTostFields": "Data comenzii, Documente / COC",
     "editTostFieldsDescription": "Aceste câmpuri pot fi editate manual, chiar și pentru comenzile gestionate de TOST.",
     "papersReceivedDate": "Documente primite pe",
     "saveError": "Eroare la salvare"

@@ -243,7 +243,7 @@
       "monthsAgo": "vor {n} Mon."
     },
     "deliveryScheduled": "Lieferung geplant",
-    "editTostFields": "Papiere / COC",
+    "editTostFields": "Bestelldatum, Papiere / COC",
     "editTostFieldsDescription": "Diese Felder können manuell bearbeitet werden, auch bei TOST-verwalteten Bestellungen.",
     "papersReceivedDate": "Papiere erhalten am",
     "saveError": "Fehler beim Speichern"
