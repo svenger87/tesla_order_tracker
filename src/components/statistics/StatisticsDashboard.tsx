@@ -243,6 +243,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     semanticColor="pending"
                     minimal
                     delay={1.0}
+                    allowZero
                   />
                 </div>
               </div>

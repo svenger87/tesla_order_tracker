@@ -21,6 +21,7 @@ interface StatCardProps {
   minimal?: boolean
   delay?: number
   watermark?: boolean
+  allowZero?: boolean
 }
 
 const colorMap = {
@@ -30,11 +31,11 @@ const colorMap = {
   pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', bar: 'from-amber-500/60 to-amber-500/20', hoverBg: 'group-hover:bg-amber-500/15' },
 }
 
-export function StatCard({ label, value, icon: Icon, description, hint, variant = 'default', semanticColor = 'brand', minimal = false, delay = 0, watermark = false }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, description, hint, variant = 'default', semanticColor = 'brand', minimal = false, delay = 0, watermark = false, allowZero = false }: StatCardProps) {
   const isHero = variant === 'hero'
   const colors = colorMap[semanticColor]
-  const displayValue = (value === 0 || value === '0') ? '\u2014' : value
-  const isZeroValue = value === 0 || value === '0'
+  const displayValue = (!allowZero && (value === 0 || value === '0')) ? '\u2014' : value
+  const isZeroValue = !allowZero && (value === 0 || value === '0')
 
   return (
     <motion.div
