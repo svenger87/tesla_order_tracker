@@ -331,7 +331,8 @@
     "allColors": "Všetky farby",
     "allDrives": "Všetky pohony",
     "speed": "Rýchlosť",
-    "speedShort": "Rýchlosť"
+    "speedShort": "Rýchlosť",
+    "vinsThisWeek": "VINy tento týždeň"
   },
   "admin": {
     "dashboard": "Administrátorský panel",

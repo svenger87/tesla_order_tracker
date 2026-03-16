@@ -68,6 +68,7 @@ export interface OrderStatistics {
   countryDeliveryStats: { country: string; avgDays: number; medianDays: number; count: number }[]
   tostOrders: number
   manualOrders: number
+  vinsThisWeek: number
 }
 
 // Period filter types
@@ -585,6 +586,17 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   const tostOrders = filteredOrders.filter(o => o.source === 'tost').length
   const manualOrders = totalOrders - tostOrders
 
+  // VINs this week (ISO week)
+  const now = new Date()
+  const isoDay = now.getUTCDay() || 7 // Mon=1 … Sun=7
+  const weekStart = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - isoDay + 1))
+  const weekEnd = new Date(weekStart.getTime() + 7 * 86400000)
+  const vinsThisWeek = filteredOrders.filter(o => {
+    const d = parseGermanDate(o.vinReceivedDate)
+    if (!d) return false
+    return d >= weekStart && d < weekEnd
+  }).length
+
   return {
     totalOrders,
     deliveredOrders,
@@ -612,6 +624,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     countryDeliveryStats,
     tostOrders,
     manualOrders,
+    vinsThisWeek,
   }
 }
 

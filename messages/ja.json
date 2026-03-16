@@ -331,7 +331,8 @@
     "allColors": "すべてのカラー",
     "allDrives": "すべての駆動方式",
     "speed": "スピード",
-    "speedShort": "速度"
+    "speedShort": "速度",
+    "vinsThisWeek": "今週の VIN"
   },
   "admin": {
     "dashboard": "管理者ダッシュボード",

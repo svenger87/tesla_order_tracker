@@ -331,7 +331,8 @@
     "allColors": "所有颜色",
     "allDrives": "所有驱动",
     "speed": "速度",
-    "speedShort": "速度"
+    "speedShort": "速度",
+    "vinsThisWeek": "本周 VIN"
   },
   "admin": {
     "dashboard": "管理员仪表板",

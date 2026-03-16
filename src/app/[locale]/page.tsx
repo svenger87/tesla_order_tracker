@@ -12,7 +12,7 @@ import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
-import { CommunityPulse } from '@/components/CommunityPulse'
+// CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
@@ -292,8 +292,6 @@ export default function Home() {
         {/* Hero Section */}
         <HeroSection onSearchOpen={() => setShowSearch(true)} />
 
-        {/* Community Pulse */}
-        <CommunityPulse />
 
         {/* Global Filter Bar */}
         {!loading && (

@@ -331,7 +331,8 @@
     "allColors": "Tüm renkler",
     "allDrives": "Tüm tahrikler",
     "speed": "Hız",
-    "speedShort": "Hız"
+    "speedShort": "Hız",
+    "vinsThisWeek": "Bu hafta VINler"
   },
   "admin": {
     "dashboard": "Yönetici Paneli",

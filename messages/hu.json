@@ -331,7 +331,8 @@
     "allColors": "Összes szín",
     "allDrives": "Összes meghajtás",
     "speed": "Sebesség",
-    "speedShort": "Sebesség"
+    "speedShort": "Sebesség",
+    "vinsThisWeek": "VIN-ek ezen a héten"
   },
   "admin": {
     "dashboard": "Rendszergazdai kezelőpanel",

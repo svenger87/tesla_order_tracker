@@ -331,7 +331,8 @@
     "allColors": "Alle farger",
     "allDrives": "Alle drivlinjer",
     "speed": "Hastighet",
-    "speedShort": "Hastighet"
+    "speedShort": "Hastighet",
+    "vinsThisWeek": "VINs denne uken"
   },
   "admin": {
     "dashboard": "Administrasjonspanel",

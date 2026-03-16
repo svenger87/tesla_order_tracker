@@ -331,7 +331,8 @@
     "allColors": "Alle kleuren",
     "allDrives": "Alle aandrijvingen",
     "speed": "Snelheid",
-    "speedShort": "Snelheid"
+    "speedShort": "Snelheid",
+    "vinsThisWeek": "VINs deze week"
   },
   "admin": {
     "dashboard": "Beheerdersdashboard",

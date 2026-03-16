@@ -331,7 +331,8 @@
     "allColors": "Kaikki värit",
     "allDrives": "Kaikki vetotavat",
     "speed": "Nopeus",
-    "speedShort": "Nopeus"
+    "speedShort": "Nopeus",
+    "vinsThisWeek": "VINit tällä viikolla"
   },
   "admin": {
     "dashboard": "Ylläpidon hallintapaneeli",

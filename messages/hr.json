@@ -331,7 +331,8 @@
     "allColors": "Sve boje",
     "allDrives": "Svi pogoni",
     "speed": "Brzina",
-    "speedShort": "Brzina"
+    "speedShort": "Brzina",
+    "vinsThisWeek": "VINovi ovaj tjedan"
   },
   "admin": {
     "dashboard": "Administratorska ploča",

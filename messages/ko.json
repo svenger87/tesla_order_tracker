@@ -331,7 +331,8 @@
     "allColors": "모든 색상",
     "allDrives": "모든 구동 방식",
     "speed": "속도",
-    "speedShort": "속도"
+    "speedShort": "속도",
+    "vinsThisWeek": "이번 주 VIN"
   },
   "admin": {
     "dashboard": "관리자 대시보드",

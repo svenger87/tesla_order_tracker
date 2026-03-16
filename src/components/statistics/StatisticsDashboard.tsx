@@ -236,6 +236,14 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     minimal
                     delay={0.9}
                   />
+                  <StatCard
+                    label={t('vinsThisWeek')}
+                    value={stats.vinsThisWeek}
+                    icon={Zap}
+                    semanticColor="pending"
+                    minimal
+                    delay={1.0}
+                  />
                 </div>
               </div>
             )}

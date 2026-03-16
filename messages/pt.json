@@ -331,7 +331,8 @@
     "allColors": "Todas as cores",
     "allDrives": "Todas as trações",
     "speed": "Velocidade",
-    "speedShort": "Velocidade"
+    "speedShort": "Velocidade",
+    "vinsThisWeek": "VINs esta semana"
   },
   "admin": {
     "dashboard": "Painel de administração",

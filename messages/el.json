@@ -331,7 +331,8 @@
     "allColors": "Όλα τα χρώματα",
     "allDrives": "Όλες οι κινήσεις",
     "speed": "Ταχύτητα",
-    "speedShort": "Ταχύτ."
+    "speedShort": "Ταχύτ.",
+    "vinsThisWeek": "VINs αυτή την εβδομάδα"
   },
   "admin": {
     "dashboard": "Πίνακας Ελέγχου Διαχειριστή",

@@ -331,7 +331,8 @@
     "allColors": "Всички цветове",
     "allDrives": "Всички задвижвания",
     "speed": "Скорост",
-    "speedShort": "Скорост"
+    "speedShort": "Скорост",
+    "vinsThisWeek": "VIN номера тази седмица"
   },
   "admin": {
     "dashboard": "Административен панел",
