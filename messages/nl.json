@@ -151,7 +151,8 @@
       "passwordMinLength": "Wachtwoord moet minimaal 6 tekens bevatten",
       "passwordNeedsNumber": "Wachtwoord moet minimaal één cijfer bevatten",
       "passwordMismatch": "Wachtwoorden komen niet overeen",
-      "saveError": "Fout bij opslaan"
+      "saveError": "Fout bij opslaan",
+      "nameMinLength": "Gebruikersnaam moet minimaal 3 tekens bevatten"
     }
   },
   "editCodeModal": {

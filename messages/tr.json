@@ -151,7 +151,8 @@
       "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
       "passwordNeedsNumber": "Şifre en az bir rakam içermelidir",
       "passwordMismatch": "Şifreler eşleşmiyor",
-      "saveError": "Kaydetme hatası"
+      "saveError": "Kaydetme hatası",
+      "nameMinLength": "Kullanıcı adı en az 3 karakter olmalıdır"
     }
   },
   "editCodeModal": {

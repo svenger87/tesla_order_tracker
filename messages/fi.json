@@ -151,7 +151,8 @@
       "passwordMinLength": "Salasanan on oltava vähintään 6 merkkiä pitkä",
       "passwordNeedsNumber": "Salasanan on sisällettävä vähintään yksi numero",
       "passwordMismatch": "Salasanat eivät täsmää",
-      "saveError": "Virhe tallennettaessa"
+      "saveError": "Virhe tallennettaessa",
+      "nameMinLength": "Käyttäjänimen on oltava vähintään 3 merkkiä"
     }
   },
   "editCodeModal": {

@@ -151,7 +151,8 @@
       "passwordMinLength": "Password must be at least 6 characters long",
       "passwordNeedsNumber": "Password must contain at least one number",
       "passwordMismatch": "Passwords do not match",
-      "saveError": "Error saving"
+      "saveError": "Error saving",
+      "nameMinLength": "Username must be at least 3 characters"
     }
   },
   "editCodeModal": {

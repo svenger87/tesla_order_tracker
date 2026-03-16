@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, MODEL_Y_TRIMS, MODEL_3_TRIMS, COUNTRIES } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, MODEL_Y_TRIMS, MODEL_3_TRIMS, COUNTRIES } from '@/lib/types'
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { FilterCollapse } from '@/components/FilterCollapse'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -22,6 +22,8 @@ export interface GlobalFilters {
   model: string
   color: string
   drive: string
+  wheels: string
+  interior: string
   country: string
 }
 
@@ -31,6 +33,8 @@ export const defaultGlobalFilters: GlobalFilters = {
   model: '',
   color: '',
   drive: '',
+  wheels: '',
+  interior: '',
   country: '',
 }
 
@@ -78,11 +82,15 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
     const models = new Set<string>()
     const colors = new Set<string>()
     const drives = new Set<string>()
+    const wheels = new Set<string>()
+    const interiors = new Set<string>()
     const countryCodes = new Set<string>()
     orders.forEach(o => {
       if (o.model) models.add(o.model)
       if (o.color) colors.add(o.color)
       if (o.drive) drives.add(o.drive)
+      if (o.wheels) wheels.add(o.wheels)
+      if (o.interior) interiors.add(o.interior)
       if (o.country) countryCodes.add(o.country)
     })
 
@@ -102,16 +110,26 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
       return { value: v, label: d?.label || v }
     }).sort((a, b) => a.label.localeCompare(b.label))
 
+    const wheelsOptions = Array.from(wheels).map(v => {
+      const w = WHEELS.find(w => w.value === v)
+      return { value: v, label: w?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
+    const interiorOptions = Array.from(interiors).map(v => {
+      const i = INTERIORS.find(i => i.value === v)
+      return { value: v, label: i?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
     const countryOptions = Array.from(countryCodes).map(v => {
       const c = COUNTRIES.find(c => c.value === v)
       return { value: v, label: c?.label || v, flag: c?.flag }
     }).sort((a, b) => a.label.localeCompare(b.label))
 
-    return { modelOptions, colorOptions, driveOptions, countryOptions }
+    return { modelOptions, colorOptions, driveOptions, wheelsOptions, interiorOptions, countryOptions }
   }, [orders])
 
-  const hasActiveFilters = filters.model !== '' || filters.color !== '' || filters.drive !== '' || filters.country !== ''
-  const activeFilterCount = [filters.model, filters.color, filters.drive, filters.country].filter(v => v !== '').length
+  const hasActiveFilters = filters.model !== '' || filters.color !== '' || filters.drive !== '' || filters.wheels !== '' || filters.interior !== '' || filters.country !== ''
+  const activeFilterCount = [filters.model, filters.color, filters.drive, filters.wheels, filters.interior, filters.country].filter(v => v !== '').length
   // Count vehicle + period as active if not default
   const totalActiveCount = activeFilterCount
     + (filters.vehicle !== 'all' ? 1 : 0)
@@ -242,6 +260,42 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 <SelectContent>
                   <SelectItem value="_all">{t('driveDistribution')}: {tc('all')}</SelectItem>
                   {filterOptions.driveOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Wheels Filter */}
+            {filterOptions.wheelsOptions.length > 1 && (
+              <Select
+                value={filters.wheels || '_all'}
+                onValueChange={(v) => onChange({ ...filters, wheels: v === '_all' ? '' : v })}
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder={t('wheelsDistribution')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_all">{t('wheelsDistribution')}: {tc('all')}</SelectItem>
+                  {filterOptions.wheelsOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Interior Filter */}
+            {filterOptions.interiorOptions.length > 1 && (
+              <Select
+                value={filters.interior || '_all'}
+                onValueChange={(v) => onChange({ ...filters, interior: v === '_all' ? '' : v })}
+              >
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder={t('interiorDistribution')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_all">{t('interiorDistribution')}: {tc('all')}</SelectItem>
+                  {filterOptions.interiorOptions.map((o) => (
                     <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                   ))}
                 </SelectContent>

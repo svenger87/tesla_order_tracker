@@ -151,7 +151,8 @@
       "passwordMinLength": "Lozinka mora imati najmanje 6 znakova",
       "passwordNeedsNumber": "Lozinka mora sadržavati barem jedan broj",
       "passwordMismatch": "Lozinke se ne podudaraju",
-      "saveError": "Greška pri spremanju"
+      "saveError": "Greška pri spremanju",
+      "nameMinLength": "Korisničko ime mora imati najmanje 3 znaka"
     }
   },
   "editCodeModal": {

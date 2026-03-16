@@ -151,7 +151,8 @@
       "passwordMinLength": "Heslo musí mať aspoň 6 znakov",
       "passwordNeedsNumber": "Heslo musí obsahovať aspoň jedno číslo",
       "passwordMismatch": "Heslá sa nezhodujú",
-      "saveError": "Chyba pri ukladaní"
+      "saveError": "Chyba pri ukladaní",
+      "nameMinLength": "Používateľské meno musí mať aspoň 3 znaky"
     }
   },
   "editCodeModal": {

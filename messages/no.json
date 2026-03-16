@@ -151,7 +151,8 @@
       "passwordMinLength": "Passordet må være minst 6 tegn langt",
       "passwordNeedsNumber": "Passordet må inneholde minst ett tall",
       "passwordMismatch": "Passordene stemmer ikke overens",
-      "saveError": "Feil ved lagring"
+      "saveError": "Feil ved lagring",
+      "nameMinLength": "Brukernavnet må være minst 3 tegn"
     }
   },
   "editCodeModal": {

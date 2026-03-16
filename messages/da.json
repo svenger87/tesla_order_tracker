@@ -151,7 +151,8 @@
       "passwordMinLength": "Adgangskoden skal være mindst 6 tegn lang",
       "passwordNeedsNumber": "Adgangskoden skal indeholde mindst ét tal",
       "passwordMismatch": "Adgangskoderne stemmer ikke overens",
-      "saveError": "Fejl ved lagring"
+      "saveError": "Fejl ved lagring",
+      "nameMinLength": "Brugernavnet skal være mindst 3 tegn"
     }
   },
   "editCodeModal": {

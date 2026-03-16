@@ -151,7 +151,8 @@
       "passwordMinLength": "Passwort muss mindestens 6 Zeichen lang sein",
       "passwordNeedsNumber": "Passwort muss mindestens eine Zahl enthalten",
       "passwordMismatch": "Passwörter stimmen nicht überein",
-      "saveError": "Fehler beim Speichern"
+      "saveError": "Fehler beim Speichern",
+      "nameMinLength": "Benutzername muss mindestens 3 Zeichen lang sein"
     }
   },
   "editCodeModal": {

@@ -151,7 +151,8 @@
       "passwordMinLength": "Lösenordet måste vara minst 6 tecken långt",
       "passwordNeedsNumber": "Lösenordet måste innehålla minst en siffra",
       "passwordMismatch": "Lösenorden matchar inte",
-      "saveError": "Fel vid sparande"
+      "saveError": "Fel vid sparande",
+      "nameMinLength": "Användarnamnet måste vara minst 3 tecken"
     }
   },
   "editCodeModal": {

@@ -249,6 +249,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Validate username minimum length
+    if (typeof body.name === 'string' && body.name.trim().length < 3) {
+      return NextResponse.json(
+        { error: 'Benutzername muss mindestens 3 Zeichen lang sein' },
+        { status: 400 }
+      )
+    }
+
     // Validate password (required for all new orders)
     if (!body.customPassword) {
       return NextResponse.json(

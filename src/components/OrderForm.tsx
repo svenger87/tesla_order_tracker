@@ -351,6 +351,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setLoading(false)
       return
     }
+    if (formData.name.trim().length < 3) {
+      setError(tv('nameMinLength'))
+      setLoading(false)
+      return
+    }
 
     if (!formData.orderDate.trim()) {
       setError(tv('orderDateRequired'))
@@ -473,6 +478,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         if (!formData.name.trim()) {
           setError(tv('nameRequired'))
           return tv('nameRequired')
+        }
+        if (formData.name.trim().length < 3) {
+          setError(tv('nameMinLength'))
+          return tv('nameMinLength')
         }
         if (!formData.orderDate.trim()) {
           setError(tv('orderDateRequired'))

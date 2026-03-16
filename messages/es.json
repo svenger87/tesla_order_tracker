@@ -151,7 +151,8 @@
       "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
       "passwordNeedsNumber": "La contraseña debe contener al menos un número",
       "passwordMismatch": "Las contraseñas no coinciden",
-      "saveError": "Error al guardar"
+      "saveError": "Error al guardar",
+      "nameMinLength": "El nombre de usuario debe tener al menos 3 caracteres"
     }
   },
   "editCodeModal": {

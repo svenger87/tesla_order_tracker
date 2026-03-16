@@ -151,7 +151,8 @@
       "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
       "passwordNeedsNumber": "Hasło musi zawierać co najmniej jedną cyfrę",
       "passwordMismatch": "Hasła nie są zgodne",
-      "saveError": "Błąd zapisu"
+      "saveError": "Błąd zapisu",
+      "nameMinLength": "Nazwa użytkownika musi mieć co najmniej 3 znaki"
     }
   },
   "editCodeModal": {

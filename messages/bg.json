@@ -151,7 +151,8 @@
       "passwordMinLength": "Паролата трябва да е поне 6 символа",
       "passwordNeedsNumber": "Паролата трябва да съдържа поне една цифра",
       "passwordMismatch": "Паролите не съвпадат",
-      "saveError": "Грешка при запазване"
+      "saveError": "Грешка при запазване",
+      "nameMinLength": "Потребителското име трябва да е поне 3 символа"
     }
   },
   "editCodeModal": {

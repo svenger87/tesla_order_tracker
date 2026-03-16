@@ -151,7 +151,8 @@
       "passwordMinLength": "パスワードは6文字以上必要です",
       "passwordNeedsNumber": "パスワードには少なくとも1つの数字が必要です",
       "passwordMismatch": "パスワードが一致しません",
-      "saveError": "保存エラー"
+      "saveError": "保存エラー",
+      "nameMinLength": "ユーザー名は3文字以上である必要があります"
     }
   },
   "editCodeModal": {

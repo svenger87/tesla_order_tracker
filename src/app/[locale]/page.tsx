@@ -131,6 +131,14 @@ export default function Home() {
     if (globalFilters.drive) {
       result = result.filter(o => o.drive === globalFilters.drive)
     }
+    // Wheels
+    if (globalFilters.wheels) {
+      result = result.filter(o => o.wheels === globalFilters.wheels)
+    }
+    // Interior
+    if (globalFilters.interior) {
+      result = result.filter(o => o.interior === globalFilters.interior)
+    }
     // Country
     if (globalFilters.country) {
       result = result.filter(o => o.country === globalFilters.country)
@@ -139,7 +147,7 @@ export default function Home() {
   }, [orders, globalFilters])
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
-  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.country !== ''
+  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== ''
 
   const [refreshing, setRefreshing] = useState(false)
 

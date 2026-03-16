@@ -151,7 +151,8 @@
       "passwordMinLength": "密码长度至少为 6 个字符",
       "passwordNeedsNumber": "密码必须包含至少一个数字",
       "passwordMismatch": "密码不匹配",
-      "saveError": "保存出错"
+      "saveError": "保存出错",
+      "nameMinLength": "用户名至少需要3个字符"
     }
   },
   "editCodeModal": {

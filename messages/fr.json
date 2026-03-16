@@ -151,7 +151,8 @@
       "passwordMinLength": "Le mot de passe doit comporter au moins 6 caractères",
       "passwordNeedsNumber": "Le mot de passe doit contenir au moins un chiffre",
       "passwordMismatch": "Les mots de passe ne correspondent pas",
-      "saveError": "Erreur lors de l'enregistrement"
+      "saveError": "Erreur lors de l'enregistrement",
+      "nameMinLength": "Le nom d'utilisateur doit contenir au moins 3 caractères"
     }
   },
   "editCodeModal": {

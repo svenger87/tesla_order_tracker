@@ -50,6 +50,12 @@ export const POST = withTostAuth(async (request: NextRequest) => {
       })
     }
 
+    if (body.name.trim().length < 3) {
+      return ApiErrors.validationError('Validation failed', {
+        name: 'Name must be at least 3 characters',
+      })
+    }
+
     const timePeriods = calculateTimePeriods(body)
     const orderData = buildOrderData(body)
 

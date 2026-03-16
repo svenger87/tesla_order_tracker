@@ -151,7 +151,8 @@
       "passwordMinLength": "Parola trebuie să aibă cel puțin 6 caractere",
       "passwordNeedsNumber": "Parola trebuie să conțină cel puțin o cifră",
       "passwordMismatch": "Parolele nu se potrivesc",
-      "saveError": "Eroare la salvare"
+      "saveError": "Eroare la salvare",
+      "nameMinLength": "Numele de utilizator trebuie să aibă cel puțin 3 caractere"
     }
   },
   "editCodeModal": {

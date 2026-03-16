@@ -151,7 +151,8 @@
       "passwordMinLength": "A jelszónak legalább 6 karakter hosszúnak kell lennie",
       "passwordNeedsNumber": "A jelszónak legalább egy számot kell tartalmaznia",
       "passwordMismatch": "A jelszavak nem egyeznek",
-      "saveError": "Mentési hiba"
+      "saveError": "Mentési hiba",
+      "nameMinLength": "A felhasználónévnek legalább 3 karakter hosszúnak kell lennie"
     }
   },
   "editCodeModal": {

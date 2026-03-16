@@ -151,7 +151,8 @@
       "passwordMinLength": "La password deve contenere almeno 6 caratteri",
       "passwordNeedsNumber": "La password deve contenere almeno un numero",
       "passwordMismatch": "Le password non corrispondono",
-      "saveError": "Errore nel salvataggio"
+      "saveError": "Errore nel salvataggio",
+      "nameMinLength": "Il nome utente deve contenere almeno 3 caratteri"
     }
   },
   "editCodeModal": {
