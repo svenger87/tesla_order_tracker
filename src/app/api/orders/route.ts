@@ -69,7 +69,8 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
 // Helper to parse German date format (DD.MM.YYYY) and calculate days between dates
 function parseGermanDate(dateStr: string | null | undefined): Date | null {
   if (!dateStr) return null
-  const parsed = parse(dateStr, 'dd.MM.yyyy', new Date())
+  // Use fixed reference date to avoid timezone issues around midnight
+  const parsed = parse(dateStr, 'dd.MM.yyyy', new Date(2000, 0, 1))
   return isValid(parsed) ? parsed : null
 }
 

@@ -143,11 +143,15 @@ export default function Home() {
     if (globalFilters.country) {
       result = result.filter(o => o.country === globalFilters.country)
     }
+    // Delivery Location
+    if (globalFilters.deliveryLocation) {
+      result = result.filter(o => o.deliveryLocation === globalFilters.deliveryLocation)
+    }
     return result
   }, [orders, globalFilters])
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
-  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== ''
+  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)
 

@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Car, Calendar, Filter, X } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 
 export interface GlobalFilters {
   vehicle: VehicleType | 'all'
@@ -25,6 +25,7 @@ export interface GlobalFilters {
   wheels: string
   interior: string
   country: string
+  deliveryLocation: string
 }
 
 export const defaultGlobalFilters: GlobalFilters = {
@@ -36,6 +37,7 @@ export const defaultGlobalFilters: GlobalFilters = {
   wheels: '',
   interior: '',
   country: '',
+  deliveryLocation: '',
 }
 
 interface GlobalFilterBarProps {
@@ -74,6 +76,7 @@ function formatQuarter(year: number, quarter: number): string {
 export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarProps) {
   const t = useTranslations('statistics')
   const tc = useTranslations('common')
+  const tt = useTranslations('table')
 
   const availablePeriods = useMemo(() => getAvailablePeriods(orders), [orders])
 
@@ -85,6 +88,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
     const wheels = new Set<string>()
     const interiors = new Set<string>()
     const countryCodes = new Set<string>()
+    const deliveryLocations = new Set<string>()
     orders.forEach(o => {
       if (o.model) models.add(o.model)
       if (o.color) colors.add(o.color)
@@ -92,6 +96,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
       if (o.wheels) wheels.add(o.wheels)
       if (o.interior) interiors.add(o.interior)
       if (o.country) countryCodes.add(o.country)
+      if (o.deliveryLocation) deliveryLocations.add(o.deliveryLocation)
     })
 
     const allTrims = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]
@@ -125,11 +130,14 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
       return { value: v, label: c?.label || v, flag: c?.flag }
     }).sort((a, b) => a.label.localeCompare(b.label))
 
-    return { modelOptions, colorOptions, driveOptions, wheelsOptions, interiorOptions, countryOptions }
+    const deliveryLocationOptions = Array.from(deliveryLocations)
+      .sort((a, b) => a.localeCompare(b))
+      .map(v => ({ value: v, label: v }))
+
+    return { modelOptions, colorOptions, driveOptions, wheelsOptions, interiorOptions, countryOptions, deliveryLocationOptions }
   }, [orders])
 
-  const hasActiveFilters = filters.model !== '' || filters.color !== '' || filters.drive !== '' || filters.wheels !== '' || filters.interior !== '' || filters.country !== ''
-  const activeFilterCount = [filters.model, filters.color, filters.drive, filters.wheels, filters.interior, filters.country].filter(v => v !== '').length
+  const activeFilterCount = [filters.model, filters.color, filters.drive, filters.wheels, filters.interior, filters.country, filters.deliveryLocation].filter(v => v !== '').length
   // Count vehicle + period as active if not default
   const totalActiveCount = activeFilterCount
     + (filters.vehicle !== 'all' ? 1 : 0)
@@ -139,76 +147,68 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
 
   return (
     <div className="flex flex-col gap-2 bg-muted/30 rounded-xl p-3 sm:p-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4 w-full">
-          <FilterCollapse activeCount={totalActiveCount}>
-            {/* Vehicle Type Selector */}
-            <div className="flex items-center gap-2">
-              <Car className="h-5 w-5 text-muted-foreground hidden sm:block" />
-              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">{t('vehicle')}:</span>
-              <Select
-                value={filters.vehicle}
-                onValueChange={(value) => onChange({ ...filters, vehicle: value as VehicleType | 'all' })}
-              >
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder={t('vehicleSelect')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{tc('all')}</SelectItem>
-                  {VEHICLE_TYPES.map((vt) => (
-                    <SelectItem key={vt.value} value={vt.value}>
-                      {vt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      <div className="flex flex-wrap items-center gap-4 w-full">
+        <FilterCollapse activeCount={totalActiveCount}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 w-full">
+            {/* Vehicle Type */}
+            <Select
+              value={filters.vehicle}
+              onValueChange={(value) => onChange({ ...filters, vehicle: value as VehicleType | 'all' })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('vehicleSelect')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('vehicle')}: {tc('all')}</SelectItem>
+                {VEHICLE_TYPES.map((vt) => (
+                  <SelectItem key={vt.value} value={vt.value}>
+                    {vt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            {/* Period Selector */}
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-muted-foreground hidden sm:block" />
-              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">{t('period')}:</span>
-              <Select
-                value={periodToKey(filters.period)}
-                onValueChange={(key) => onChange({ ...filters, period: keyToPeriod(key) })}
-              >
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder={t('periodSelect')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('allTime')}</SelectItem>
-                  {availablePeriods.years.length > 0 && (
-                    <>
-                      {availablePeriods.years.map((year) => (
-                        <SelectItem key={`year-${year}`} value={`year-${year}`}>
-                          {t('year', { year })}
-                        </SelectItem>
-                      ))}
-                    </>
-                  )}
-                  {availablePeriods.quarters.length > 0 && (
-                    <>
-                      {availablePeriods.quarters.map(({ year, quarter }) => (
-                        <SelectItem
-                          key={`quarter-${year}-${quarter}`}
-                          value={`quarter-${year}-${quarter}`}
-                        >
-                          {formatQuarter(year, quarter)}
-                        </SelectItem>
-                      ))}
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Period */}
+            <Select
+              value={periodToKey(filters.period)}
+              onValueChange={(key) => onChange({ ...filters, period: keyToPeriod(key) })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('periodSelect')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('allTime')}</SelectItem>
+                {availablePeriods.years.length > 0 && (
+                  <>
+                    {availablePeriods.years.map((year) => (
+                      <SelectItem key={`year-${year}`} value={`year-${year}`}>
+                        {t('year', { year })}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {availablePeriods.quarters.length > 0 && (
+                  <>
+                    {availablePeriods.quarters.map(({ year, quarter }) => (
+                      <SelectItem
+                        key={`quarter-${year}-${quarter}`}
+                        value={`quarter-${year}-${quarter}`}
+                      >
+                        {formatQuarter(year, quarter)}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+              </SelectContent>
+            </Select>
 
-            {/* Model Filter */}
+            {/* Model */}
             {filterOptions.modelOptions.length > 1 && (
               <Select
                 value={filters.model || '_all'}
                 onValueChange={(v) => onChange({ ...filters, model: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('modelDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -220,13 +220,13 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Color Filter */}
+            {/* Color */}
             {filterOptions.colorOptions.length > 1 && (
               <Select
                 value={filters.color || '_all'}
                 onValueChange={(v) => onChange({ ...filters, color: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('colorDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,13 +248,13 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Drive Filter */}
+            {/* Drive */}
             {filterOptions.driveOptions.length > 1 && (
               <Select
                 value={filters.drive || '_all'}
                 onValueChange={(v) => onChange({ ...filters, drive: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('driveDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,13 +266,13 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Wheels Filter */}
+            {/* Wheels */}
             {filterOptions.wheelsOptions.length > 1 && (
               <Select
                 value={filters.wheels || '_all'}
                 onValueChange={(v) => onChange({ ...filters, wheels: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('wheelsDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -284,13 +284,13 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Interior Filter */}
+            {/* Interior */}
             {filterOptions.interiorOptions.length > 1 && (
               <Select
                 value={filters.interior || '_all'}
                 onValueChange={(v) => onChange({ ...filters, interior: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('interiorDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -302,13 +302,13 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Country Filter */}
+            {/* Country */}
             {filterOptions.countryOptions.length > 1 && (
               <Select
                 value={filters.country || '_all'}
                 onValueChange={(v) => onChange({ ...filters, country: v === '_all' ? '' : v })}
               >
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger>
                   <SelectValue placeholder={t('countryDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -325,26 +325,44 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               </Select>
             )}
 
-            {/* Clear Filters */}
-            {totalActiveCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            {/* Delivery Location */}
+            {filterOptions.deliveryLocationOptions.length > 1 && (
+              <Select
+                value={filters.deliveryLocation || '_all'}
+                onValueChange={(v) => onChange({ ...filters, deliveryLocation: v === '_all' ? '' : v })}
               >
-                <X className="h-3 w-3" />
-                {tc('reset')}
-              </button>
+                <SelectTrigger>
+                  <SelectValue placeholder={tt('deliveryLocation')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_all">{tt('deliveryLocation')}: {tc('all')}</SelectItem>
+                  {filterOptions.deliveryLocationOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
-          </FilterCollapse>
+          </div>
 
-          {/* Active filters indicator */}
+          {/* Clear Filters */}
           {totalActiveCount > 0 && (
-            <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
-              <Filter className="h-3 w-3 mr-1" />
-              {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
-            </Badge>
+            <button
+              onClick={clearFilters}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2"
+            >
+              <X className="h-3 w-3" />
+              {tc('reset')}
+            </button>
           )}
-        </div>
+        </FilterCollapse>
+
+        {/* Active filters indicator */}
+        {totalActiveCount > 0 && (
+          <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
+            <Filter className="h-3 w-3 mr-1" />
+            {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
+          </Badge>
+        )}
       </div>
     </div>
   )

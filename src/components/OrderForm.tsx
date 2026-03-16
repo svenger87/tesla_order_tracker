@@ -62,7 +62,8 @@ interface OrderFormProps {
 // Helper to parse German date format (DD.MM.YYYY) to Date object
 function parseGermanDate(dateStr: string): Date | undefined {
   if (!dateStr) return undefined
-  const parsed = parse(dateStr, 'dd.MM.yyyy', new Date())
+  // Use fixed reference date to avoid timezone issues around midnight
+  const parsed = parse(dateStr, 'dd.MM.yyyy', new Date(2000, 0, 1))
   return isValid(parsed) ? parsed : undefined
 }
 
