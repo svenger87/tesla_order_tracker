@@ -102,7 +102,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
       // Auto-claim webapp order with same name (name+orderDate unique conflict)
       if (bodyName) {
         const existing = await prisma.order.findFirst({
-          where: { name: bodyName.trim(), source: { not: 'tost' } },
+          where: { name: bodyName.trim(), OR: [{ source: null }, { source: { not: 'tost' } }] },
           select: { id: true },
         })
         if (existing) {
