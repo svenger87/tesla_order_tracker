@@ -61,16 +61,7 @@ export const PUT = withTostAuth(
         return ApiErrors.forbidden('Order is not managed by TOST. Claim it first.')
       }
 
-      // Optimistic locking
-      if (body.expectedUpdatedAt) {
-        const expectedTime = new Date(body.expectedUpdatedAt).getTime()
-        const actualTime = order.updatedAt.getTime()
-        if (actualTime > expectedTime) {
-          return ApiErrors.conflict(
-            'Order was modified since last read. Please refresh and try again.'
-          )
-        }
-      }
+      // Optimistic locking skipped — TOST is the source of truth for its own orders
 
       // Build update data from provided fields
       const updateData: Record<string, unknown> = {}
