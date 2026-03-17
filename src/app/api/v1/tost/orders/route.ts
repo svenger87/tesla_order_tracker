@@ -78,7 +78,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
     console.error('TOST orders POST error:', error)
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
     if (errorMsg.includes('Unique constraint')) {
-      // If the conflicting order is already TOST-owned, upsert it (idempotent retry)
+      // If the conflicting order is already TOST-owned by ID, upsert it (idempotent retry)
       if (body?.id) {
         const existing = await prisma.order.findUnique({
           where: { id: body.id },
@@ -99,20 +99,61 @@ export const POST = withTostAuth(async (request: NextRequest) => {
         }
       }
 
-      // Otherwise, check if there's a webapp order the user could claim
-      let existingOrderId: string | null = null
+      // Auto-claim webapp order with same name (name+orderDate unique conflict)
       if (bodyName) {
         const existing = await prisma.order.findFirst({
           where: { name: bodyName.trim(), source: { not: 'tost' } },
           select: { id: true },
         })
-        existingOrderId = existing?.id ?? null
+        if (existing) {
+          const timePeriods = calculateTimePeriods(body)
+          const orderData = buildOrderData(body)
+          const newId = body.id as string | undefined
+
+          if (newId && newId !== existing.id) {
+            // Re-key: delete old webapp order, create with TOST ID
+            const oldOrder = await prisma.order.findUnique({ where: { id: existing.id } })
+            if (oldOrder) {
+              const { id: _oldId, editCode: _editCode, createdAt, updatedAt: _updatedAt, ...oldData } = oldOrder
+              await prisma.$transaction([
+                prisma.order.delete({ where: { id: existing.id } }),
+                prisma.order.create({
+                  data: {
+                    ...oldData,
+                    ...orderData,
+                    id: newId,
+                    source: 'tost',
+                    ...timePeriods,
+                    createdAt,
+                  },
+                }),
+              ])
+              trackApiEvent({ name: 'tost-auto-claim-rekey', url: '/api/v1/tost/orders', data: { oldId: existing.id, newId, orderName: bodyName } })
+              return createApiSuccessResponse(
+                { id: newId, message: `Existing webapp order claimed and re-keyed successfully` },
+                { status: 200 }
+              )
+            }
+          } else {
+            // Claim in place
+            await prisma.order.update({
+              where: { id: existing.id },
+              data: {
+                ...orderData,
+                source: 'tost',
+                ...timePeriods,
+              },
+            })
+            trackApiEvent({ name: 'tost-auto-claim', url: '/api/v1/tost/orders', data: { orderId: existing.id, orderName: bodyName } })
+            return createApiSuccessResponse(
+              { id: existing.id, message: `Existing webapp order claimed successfully` },
+              { status: 200 }
+            )
+          }
+        }
       }
-      return ApiErrors.conflict(
-        existingOrderId
-          ? `An order with this ID already exists. Found unclaimed order "${bodyName}" with ID ${existingOrderId}. Use POST /api/v1/tost/claim/${existingOrderId} to claim it.`
-          : 'An order with this ID already exists.'
-      )
+
+      return ApiErrors.conflict('An order with this ID already exists.')
     }
     return ApiErrors.serverError('Failed to create order')
   }
