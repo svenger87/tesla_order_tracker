@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
+import { calculateDaysBetween } from '@/lib/date-utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions } from '@/hooks/useOptions'
 
@@ -168,7 +169,7 @@ import {
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 type SortDirection = 'asc' | 'desc'
-type SortField = keyof Order | null
+type SortField = keyof Order | 'vinToProduction' | 'productionToPapers' | null
 
 interface TableLocalFilters {
   nameSearch: string
@@ -211,12 +212,29 @@ function normalizeForSort(str: string): string {
     .replace(/ß/g, 'ss')
 }
 
+// Compute segment value for an order (VIN→Production, Production→Papers)
+function getSegmentValue(order: Order, field: string): number | null {
+  if (field === 'vinToProduction') return calculateDaysBetween(order.vinReceivedDate, order.productionDate)
+  if (field === 'productionToPapers') return calculateDaysBetween(order.productionDate, order.papersReceivedDate)
+  return null
+}
+
 // Compare function for sorting
 function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection, countryLabels?: Map<string, string>): number {
   if (!field) return 0
 
-  let aVal = a[field]
-  let bVal = b[field]
+  // Computed segment fields (not stored on Order)
+  if (field === 'vinToProduction' || field === 'productionToPapers') {
+    const aNum = getSegmentValue(a, field)
+    const bNum = getSegmentValue(b, field)
+    if (aNum === null && bNum === null) return 0
+    if (aNum === null) return direction === 'asc' ? 1 : -1
+    if (bNum === null) return direction === 'asc' ? -1 : 1
+    return direction === 'asc' ? aNum - bNum : bNum - aNum
+  }
+
+  let aVal = a[field as keyof Order]
+  let bVal = b[field as keyof Order]
 
   // Handle country field - look up translated label for proper alphabetical sorting
   if (field === 'country') {
@@ -249,8 +267,8 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     return direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
   }
 
-  // Handle numeric fields
-  const numericFields = ['orderToProduction', 'orderToVin', 'orderToDelivery', 'orderToPapers', 'papersToDelivery']
+  // Handle numeric fields (including computed segment fields)
+  const numericFields = ['orderToVin', 'vinToProduction', 'productionToPapers', 'papersToDelivery']
   if (numericFields.includes(field)) {
     const aNum = aVal as number | null
     const bNum = bVal as number | null
@@ -351,11 +369,10 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'typeApproval', label: 'typeApproval', group: 'configuration' },
   { key: 'typeVariant', label: 'typeVariant', group: 'configuration' },
   { key: 'deliveryDate', label: 'deliveryDate', group: 'configuration' },
-  // Detail (time periods & metadata)
-  { key: 'orderToProduction', label: 'orderToProduction', group: 'detail' },
+  // Detail (segment time periods matching timeline & metadata)
   { key: 'orderToVin', label: 'orderToVin', group: 'detail' },
-  { key: 'orderToDelivery', label: 'orderToDelivery', group: 'detail' },
-  { key: 'orderToPapers', label: 'orderToPapers', group: 'detail' },
+  { key: 'vinToProduction', label: 'vinToProduction', group: 'detail' },
+  { key: 'productionToPapers', label: 'productionToPapers', group: 'detail' },
   { key: 'papersToDelivery', label: 'papersToDelivery', group: 'detail' },
   { key: 'updatedAt', label: 'updatedAt', group: 'detail' },
 ]
@@ -730,10 +747,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('typeApproval') && <SortableHeader field="typeApproval" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('typeApproval')}</SortableHeader>}
             {isColumnVisible('typeVariant') && <SortableHeader field="typeVariant" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('typeVariant')}</SortableHeader>}
             {isColumnVisible('deliveryDate') && <SortableHeader field="deliveryDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('deliveryDate')}</SortableHeader>}
-            {isColumnVisible('orderToProduction') && <SortableHeader field="orderToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToProduction')}</SortableHeader>}
             {isColumnVisible('orderToVin') && <SortableHeader field="orderToVin" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToVin')}</SortableHeader>}
-            {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
-            {isColumnVisible('orderToPapers') && <SortableHeader field="orderToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToPapers')}</SortableHeader>}
+            {isColumnVisible('vinToProduction') && <SortableHeader field="vinToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vinToProduction')}</SortableHeader>}
+            {isColumnVisible('productionToPapers') && <SortableHeader field="productionToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('productionToPapers')}</SortableHeader>}
             {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
             <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
@@ -930,24 +946,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     })() : '-'}
                   </TableCell>
                 )}
-                {isColumnVisible('orderToProduction') && (
-                  <TableCell className="whitespace-nowrap text-center font-mono">
-                    {order.orderToProduction !== null ? order.orderToProduction : '-'}
-                  </TableCell>
-                )}
                 {isColumnVisible('orderToVin') && (
                   <TableCell className="whitespace-nowrap text-center font-mono">
                     {order.orderToVin !== null ? order.orderToVin : '-'}
                   </TableCell>
                 )}
-                {isColumnVisible('orderToDelivery') && (
+                {isColumnVisible('vinToProduction') && (
                   <TableCell className="whitespace-nowrap text-center font-mono">
-                    {order.orderToDelivery !== null ? order.orderToDelivery : '-'}
+                    {(() => { const v = calculateDaysBetween(order.vinReceivedDate, order.productionDate); return v !== null ? v : '-' })()}
                   </TableCell>
                 )}
-                {isColumnVisible('orderToPapers') && (
+                {isColumnVisible('productionToPapers') && (
                   <TableCell className="whitespace-nowrap text-center font-mono">
-                    {order.orderToPapers !== null ? order.orderToPapers : '-'}
+                    {(() => { const v = calculateDaysBetween(order.productionDate, order.papersReceivedDate); return v !== null ? v : '-' })()}
                   </TableCell>
                 )}
                 {isColumnVisible('papersToDelivery') && (
