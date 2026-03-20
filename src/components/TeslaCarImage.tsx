@@ -260,7 +260,11 @@ export const TeslaCarImage = memo(function TeslaCarImage({
   const [isLoading, setIsLoading] = useState(true)
   const uploadAttempted = useRef(false)
 
-  const modelSlug = vehicleType === 'Model Y' ? 'my' : 'm3'
+  const MODEL_SLUGS: Record<string, string> = {
+    'Model Y': 'my', 'Model 3': 'm3', 'Model S': 'ms',
+    'Model X': 'mx', 'Cybertruck': 'ct', 'Roadster': 'roadster',
+  }
+  const modelSlug = MODEL_SLUGS[vehicleType] || 'my'
   const apiSize = fetchSize || size
   const optionsStr = buildOptionsString(vehicleType, color, wheels, model, drive, interior, codes)
   const paramKey = buildParamKey(modelSlug, optionsStr, view, apiSize)
