@@ -54,11 +54,12 @@ export const GET = withApiAuth(
       const includeArchived = searchParams.get('archived') === 'true'
 
       // Find all orders matching the username
-      // Note: SQLite does case-insensitive comparison by default for LIKE
-      // For exact match, we use equals which is case-sensitive
       const orders = await prisma.order.findMany({
         where: {
-          name: decodedName,
+          name: {
+            equals: decodedName.trim(),
+            mode: 'insensitive',
+          },
           ...(!includeArchived && { archived: false }),
         },
         orderBy: { createdAt: 'desc' },
