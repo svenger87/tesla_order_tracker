@@ -24,7 +24,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Image, Plus, Pencil, Trash2, RefreshCw, Database, Eye } from 'lucide-react'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
 import { useTranslations } from 'next-intl'
-import { VEHICLE_TYPES as VEHICLE_TYPES_LIST, VehicleType } from '@/lib/types'
+import {
+  VEHICLE_TYPES as VEHICLE_TYPES_LIST,
+  VehicleType,
+  MODELS,
+  MODEL_3_TRIMS,
+  MODEL_S_TRIMS,
+  MODEL_X_TRIMS,
+  CYBERTRUCK_TRIMS,
+  ROADSTER_TRIMS,
+  WHEELS,
+  MODEL_3_WHEELS,
+  MODEL_S_WHEELS,
+  MODEL_X_WHEELS,
+  CYBERTRUCK_WHEELS,
+  ROADSTER_WHEELS,
+  COLORS,
+  INTERIORS,
+} from '@/lib/types'
 
 interface CompositorCode {
   id: string
@@ -45,6 +62,24 @@ const CATEGORIES = [
 ]
 
 const VEHICLE_TYPES = VEHICLE_TYPES_LIST.map(vt => vt.value)
+
+const TRIMS_BY_VEHICLE: Record<VehicleType, { value: string; label: string }[]> = {
+  'Model Y': MODELS,
+  'Model 3': MODEL_3_TRIMS,
+  'Model S': MODEL_S_TRIMS,
+  'Model X': MODEL_X_TRIMS,
+  'Cybertruck': CYBERTRUCK_TRIMS,
+  'Roadster': ROADSTER_TRIMS,
+}
+
+const WHEELS_BY_VEHICLE: Record<VehicleType, { value: string; label: string }[]> = {
+  'Model Y': WHEELS,
+  'Model 3': MODEL_3_WHEELS,
+  'Model S': MODEL_S_WHEELS,
+  'Model X': MODEL_X_WHEELS,
+  'Cybertruck': CYBERTRUCK_WHEELS,
+  'Roadster': ROADSTER_WHEELS,
+}
 
 export function CompositorTab() {
   const t = useTranslations('admin')
@@ -370,7 +405,7 @@ export function CompositorTab() {
                     <tr key={`${code.category}_${code.vehicleType}_${code.lookupKey}`} className="border-b last:border-0 hover:bg-muted/30">
                       <td className="p-3">
                         <Badge variant="outline" className="text-xs">
-                          {code.vehicleType === 'Model Y' ? 'MY' : 'M3'}
+                          {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[code.vehicleType] || code.vehicleType}
                         </Badge>
                       </td>
                       <td className="p-3 font-mono text-xs">{code.lookupKey}</td>
@@ -512,11 +547,20 @@ export function CompositorTab() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">{t('vehicleType')}</Label>
-                <Select value={previewVehicle} onValueChange={(v) => setPreviewVehicle(v as VehicleType)}>
+                <Select value={previewVehicle} onValueChange={(v) => {
+                  const vt = v as VehicleType
+                  setPreviewVehicle(vt)
+                  // Reset trim/wheels to first available option for the new vehicle
+                  const trims = TRIMS_BY_VEHICLE[vt]
+                  if (trims.length > 0) setPreviewModel(trims[0].value)
+                  const wheels = WHEELS_BY_VEHICLE[vt]
+                  if (wheels.length > 0) setPreviewWheels(wheels[0].value)
+                }}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Model Y">Model Y</SelectItem>
-                    <SelectItem value="Model 3">Model 3</SelectItem>
+                    {VEHICLE_TYPES_LIST.map(vt => (
+                      <SelectItem key={vt.value} value={vt.value}>{vt.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -525,9 +569,9 @@ export function CompositorTab() {
                 <Select value={previewModel} onValueChange={setPreviewModel}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="premium">Premium</SelectItem>
-                    <SelectItem value="performance">Performance</SelectItem>
+                    {TRIMS_BY_VEHICLE[previewVehicle].map(trim => (
+                      <SelectItem key={trim.value} value={trim.value}>{trim.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -546,10 +590,9 @@ export function CompositorTab() {
                 <Select value={previewWheels} onValueChange={setPreviewWheels}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="18">18&quot;</SelectItem>
-                    <SelectItem value="19">19&quot;</SelectItem>
-                    <SelectItem value="20">20&quot;</SelectItem>
-                    <SelectItem value="21">21&quot;</SelectItem>
+                    {WHEELS_BY_VEHICLE[previewVehicle].map(w => (
+                      <SelectItem key={w.value} value={w.value}>{w.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -558,14 +601,9 @@ export function CompositorTab() {
                 <Select value={previewColor} onValueChange={setPreviewColor}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pearl_white">Pearl White</SelectItem>
-                    <SelectItem value="solid_black">Solid Black</SelectItem>
-                    <SelectItem value="diamond_black">Diamond Black</SelectItem>
-                    <SelectItem value="stealth_grey">Stealth Grey</SelectItem>
-                    <SelectItem value="quicksilver">Quicksilver</SelectItem>
-                    <SelectItem value="ultra_red">Ultra Red</SelectItem>
-                    <SelectItem value="glacier_blue">Glacier Blue</SelectItem>
-                    <SelectItem value="marine_blue">Marine Blue</SelectItem>
+                    {COLORS.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -574,8 +612,9 @@ export function CompositorTab() {
                 <Select value={previewInterior} onValueChange={setPreviewInterior}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="black">Black</SelectItem>
-                    <SelectItem value="white">White</SelectItem>
+                    {INTERIORS.map(i => (
+                      <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
