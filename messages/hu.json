@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla rendelések és statisztikák",
-    "description": "Kövesse nyomon a Tesla Model Y és Model 3 rendeléseket a TFF közösségben. Szállítási határidők, konfigurációk, VIN-követés és statisztikák Németország, Ausztria és Svájc számára."
+    "description": "Kövesse nyomon a az összes Tesla modell rendeléseket a TFF közösségben. Szállítási határidők, konfigurációk, VIN-követés és statisztikák Németország, Ausztria és Svájc számára."
   },
   "common": {
     "save": "Mentés",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Fekete",
-      "white": "Fehér"
+      "white": "Fehér",
+      "cream": "Krém"
     },
     "range": {
       "maximale_reichweite": "Maximális hatótáv",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5 üléses",
+      "6": "6 üléses",
       "7": "7 üléses"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP átvitel",
       "fsd": "FSD",
       "fsd_transfer": "FSD átvitel"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

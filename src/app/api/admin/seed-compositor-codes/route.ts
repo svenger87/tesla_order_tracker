@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { validateApiKey } from '@/lib/api-auth'
 
+import { VehicleType } from '@/lib/types'
+
 interface CodeDefinition {
   category: 'body' | 'wheel' | 'interior' | 'color'
-  vehicleType: 'Model Y' | 'Model 3'
+  vehicleType: VehicleType
   lookupKey: string
   code: string
   label?: string
@@ -95,7 +97,23 @@ const COLOR_CODES: CodeDefinition[] = [
   { category: 'color', vehicleType: 'Model 3', lookupKey: 'silver_metallic', code: 'PMSS', label: 'Silver Metallic', sortOrder: 22 },
 ]
 
-const ALL_CODES = [...BODY_CODES, ...WHEEL_CODES, ...INTERIOR_CODES, ...COLOR_CODES]
+// Placeholder entries for new vehicle types (actual codes to be added by admin when available)
+const PLACEHOLDER_BODY_CODES: CodeDefinition[] = [
+  // Model S
+  { category: 'body', vehicleType: 'Model S', lookupKey: 'standard', code: 'MTS00', label: 'Standard' },
+  { category: 'body', vehicleType: 'Model S', lookupKey: 'plaid', code: 'MTS01', label: 'Plaid' },
+  // Model X
+  { category: 'body', vehicleType: 'Model X', lookupKey: 'standard', code: 'MTX00', label: 'Standard' },
+  { category: 'body', vehicleType: 'Model X', lookupKey: 'plaid', code: 'MTX01', label: 'Plaid' },
+  // Cybertruck
+  { category: 'body', vehicleType: 'Cybertruck', lookupKey: 'awd', code: 'MTCT0', label: 'AWD' },
+  { category: 'body', vehicleType: 'Cybertruck', lookupKey: 'cyberbeast', code: 'MTCT1', label: 'Cyberbeast' },
+  // Roadster
+  { category: 'body', vehicleType: 'Roadster', lookupKey: 'base', code: 'MTR00', label: 'Base' },
+  { category: 'body', vehicleType: 'Roadster', lookupKey: 'founders', code: 'MTR01', label: 'Founders Series' },
+]
+
+const ALL_CODES = [...BODY_CODES, ...WHEEL_CODES, ...INTERIOR_CODES, ...COLOR_CODES, ...PLACEHOLDER_BODY_CODES]
 
 // POST - Seed compositor codes from verified data
 export async function POST(request: NextRequest) {

@@ -66,25 +66,39 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
   return input === stored
 }
 
-// Apply Model 3 constraints - set unavailable options to "-"
-function applyModel3Constraints(data: Record<string, unknown>): Record<string, unknown> {
-  if (data.vehicleType !== 'Model 3') return data
-
+// Apply vehicle-specific constraints - set unavailable options appropriately
+function applyVehicleConstraints(data: Record<string, unknown>): Record<string, unknown> {
+  const vehicleType = data.vehicleType as string
   const model = (data.model as string)?.toLowerCase() || ''
   const result = { ...data }
 
-  // Performance models always have maximum range
-  if (model.includes('performance')) {
-    result.range = 'maximale_reichweite'
-  }
+  if (vehicleType === 'Model 3') {
+    // Performance models always have maximum range
+    if (model.includes('performance')) {
+      result.range = 'maximale_reichweite'
+    }
 
-  // Check tow hitch availability using ruleset
-  const trimKey = model.includes('performance') ? 'performance'
-    : model.includes('premium') ? 'premium'
-    : model.includes('standard') ? 'standard'
-    : null
+    // Check tow hitch availability using ruleset
+    const trimKey = model.includes('performance') ? 'performance'
+      : model.includes('premium') ? 'premium'
+      : model.includes('standard') ? 'standard'
+      : null
 
-  if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
+    if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
+      result.towHitch = 'nv'
+    }
+  } else if (vehicleType === 'Model S') {
+    result.drive = 'awd'
+    result.towHitch = 'nv'
+    result.seats = '5'
+  } else if (vehicleType === 'Model X') {
+    result.drive = 'awd'
+  } else if (vehicleType === 'Cybertruck') {
+    result.drive = 'awd'
+    result.towHitch = 'nv'
+    result.seats = '5'
+  } else if (vehicleType === 'Roadster') {
+    result.drive = 'awd'
     result.towHitch = 'nv'
   }
 
@@ -258,8 +272,8 @@ export async function POST(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(normalizedBody)
 
-    // Apply Model 3 constraints (set unavailable options to "nv")
-    const constrainedData = applyModel3Constraints(normalizedBody)
+    // Apply vehicle constraints (set unavailable options appropriately)
+    const constrainedData = applyVehicleConstraints(normalizedBody)
 
     const order = await prisma.order.create({
       data: {
@@ -399,8 +413,8 @@ export async function PUT(request: NextRequest) {
         // Calculate time periods from dates
         const timePeriods = calculateTimePeriods(data)
 
-        // Apply Model 3 constraints
-        const constrainedData = applyModel3Constraints(data)
+        // Apply vehicle constraints
+        const constrainedData = applyVehicleConstraints(data)
 
         // Update order with new hashed password
         const updated = await prisma.order.update({
@@ -466,8 +480,8 @@ export async function PUT(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(data)
 
-    // Apply Model 3 constraints
-    const constrainedData = applyModel3Constraints(data)
+    // Apply vehicle constraints
+    const constrainedData = applyVehicleConstraints(data)
 
     const updated = await prisma.order.update({
       where: { id },

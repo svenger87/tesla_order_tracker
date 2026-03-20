@@ -2,7 +2,7 @@
 
 import { memo, useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
-import { COLORS } from '@/lib/types'
+import { COLORS, VehicleType } from '@/lib/types'
 import { useCompositorCodes, lookupCode, type CompositorCodeMap } from '@/lib/CompositorCodesContext'
 
 // Hardcoded fallback color codes (used when DB codes not yet loaded)
@@ -139,7 +139,7 @@ function resolveInteriorCode(
 type ViewAngle = 'STUD_3QTR' | 'STUD_SIDE' | 'STUD_REAR' | 'STUD_FRONT'
 
 interface TeslaCarImageProps {
-  vehicleType: 'Model Y' | 'Model 3'
+  vehicleType: VehicleType
   color?: string | null
   wheels?: string | null
   model?: string | null
@@ -152,7 +152,7 @@ interface TeslaCarImageProps {
 }
 
 function buildOptionsString(
-  vehicleType: 'Model Y' | 'Model 3',
+  vehicleType: VehicleType,
   color: string | null | undefined,
   wheels: string | null | undefined,
   model: string | null | undefined,

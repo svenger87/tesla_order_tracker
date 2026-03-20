@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Objednávky a štatistiky Tesla",
-    "description": "Sledujte objednávky Tesla Model Y a Model 3 v komunite TFF. Termíny dodania, konfigurácie, sledovanie VIN a štatistiky pre Nemecko, Rakúsko a Švajčiarsko."
+    "description": "Sledujte objednávky všetky modely Tesla v komunite TFF. Termíny dodania, konfigurácie, sledovanie VIN a štatistiky pre Nemecko, Rakúsko a Švajčiarsko."
   },
   "common": {
     "save": "Uložiť",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Čierny",
-      "white": "Biely"
+      "white": "Biely",
+      "cream": "Krémová"
     },
     "range": {
       "maximale_reichweite": "Maximálny dojazd",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5-miestne",
+      "6": "6-miestny",
       "7": "7-miestne"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

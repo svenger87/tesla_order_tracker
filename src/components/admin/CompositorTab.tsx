@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Image, Plus, Pencil, Trash2, RefreshCw, Database, Eye } from 'lucide-react'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
 import { useTranslations } from 'next-intl'
+import { VEHICLE_TYPES as VEHICLE_TYPES_LIST, VehicleType } from '@/lib/types'
 
 interface CompositorCode {
   id: string
@@ -43,7 +44,7 @@ const CATEGORIES = [
   { value: 'color', label: 'Colors' },
 ]
 
-const VEHICLE_TYPES = ['Model Y', 'Model 3']
+const VEHICLE_TYPES = VEHICLE_TYPES_LIST.map(vt => vt.value)
 
 export function CompositorTab() {
   const t = useTranslations('admin')
@@ -74,7 +75,7 @@ export function CompositorTab() {
 
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewVehicle, setPreviewVehicle] = useState<'Model Y' | 'Model 3'>('Model Y')
+  const [previewVehicle, setPreviewVehicle] = useState<VehicleType>('Model Y')
   const [previewColor, setPreviewColor] = useState('pearl_white')
   const [previewWheels, setPreviewWheels] = useState('19')
   const [previewModel, setPreviewModel] = useState('premium')
@@ -511,7 +512,7 @@ export function CompositorTab() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">{t('vehicleType')}</Label>
-                <Select value={previewVehicle} onValueChange={(v) => setPreviewVehicle(v as 'Model Y' | 'Model 3')}>
+                <Select value={previewVehicle} onValueChange={(v) => setPreviewVehicle(v as VehicleType)}>
                   <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Model Y">Model Y</SelectItem>

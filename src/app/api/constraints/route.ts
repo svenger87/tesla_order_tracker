@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
+import { VEHICLE_TYPES } from '@/lib/types'
 
 // Valid constraint types
 const VALID_CONSTRAINT_TYPES = ['allow', 'fixed', 'disable'] as const
@@ -10,7 +11,7 @@ type ConstraintType = typeof VALID_CONSTRAINT_TYPES[number]
 const VALID_OPTION_TYPES = ['model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'seats'] as const
 
 // Valid vehicle types
-const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const
+const VALID_VEHICLE_TYPES = VEHICLE_TYPES.map(vt => vt.value)
 
 function isValidConstraintType(type: string): type is ConstraintType {
   return VALID_CONSTRAINT_TYPES.includes(type as ConstraintType)

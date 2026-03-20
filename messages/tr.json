@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla Siparişleri ve İstatistikleri",
-    "description": "TFF topluluğundaki Tesla Model Y ve Model 3 siparişlerini takip edin. Teslimat zaman çizelgeleri, yapılandırmalar, VIN takibi ve Almanya, Avusturya ve İsviçre için istatistikler."
+    "description": "TFF topluluğundaki tüm Tesla modelleri siparişlerini takip edin. Teslimat zaman çizelgeleri, yapılandırmalar, VIN takibi ve Almanya, Avusturya ve İsviçre için istatistikler."
   },
   "common": {
     "save": "Kaydet",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Siyah",
-      "white": "Beyaz"
+      "white": "Beyaz",
+      "cream": "Krem"
     },
     "range": {
       "maximale_reichweite": "Maksimum Menzil",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5 Koltuklu",
+      "6": "6 koltuklu",
       "7": "7 Koltuklu"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

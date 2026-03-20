@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla narudžbe i statistike",
-    "description": "Pratite narudžbe Tesla Model Y i Model 3 u TFF zajednici. Rokovi isporuke, konfiguracije, praćenje VIN-a i statistike za Njemačku, Austriju i Švicarsku."
+    "description": "Pratite narudžbe sve Tesla modele u TFF zajednici. Rokovi isporuke, konfiguracije, praćenje VIN-a i statistike za Njemačku, Austriju i Švicarsku."
   },
   "common": {
     "save": "Spremi",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Crna",
-      "white": "Bijela"
+      "white": "Bijela",
+      "cream": "Krem"
     },
     "range": {
       "maximale_reichweite": "Maksimalni domet",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5 sjedala",
+      "6": "6-sjedalo",
       "7": "7 sjedala"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

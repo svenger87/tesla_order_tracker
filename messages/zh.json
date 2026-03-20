@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla 订单与统计",
-    "description": "在 TFF 社区中跟踪 Tesla Model Y 和 Model 3 的订单。交付时间表、配置、VIN 跟踪以及德国、奥地利和瑞士的统计数据。"
+    "description": "在 TFF 社区中跟踪 所有 Tesla 车型 的订单。交付时间表、配置、VIN 跟踪以及德国、奥地利和瑞士的统计数据。"
   },
   "common": {
     "save": "保存",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "黑色",
-      "white": "白色"
+      "white": "白色",
+      "cream": "奶油色"
     },
     "range": {
       "maximale_reichweite": "最大续航",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5 座",
+      "6": "6座",
       "7": "7 座"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP 转移",
       "fsd": "FSD",
       "fsd_transfer": "FSD 转移"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

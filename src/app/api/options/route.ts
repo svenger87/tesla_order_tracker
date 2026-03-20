@@ -1,12 +1,13 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
+import { VEHICLE_TYPES } from '@/lib/types'
 
 // Valid option types
 const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'seats', 'deliveryLocation'] as const
 
 // Valid vehicle types
-const VALID_VEHICLE_TYPES = ['Model Y', 'Model 3'] as const
+const VALID_VEHICLE_TYPES = VEHICLE_TYPES.map(vt => vt.value)
 type OptionType = typeof VALID_TYPES[number]
 
 function isValidType(type: string): type is OptionType {

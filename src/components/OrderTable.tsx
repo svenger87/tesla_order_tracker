@@ -5,7 +5,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
-import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
+import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween } from '@/lib/date-utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions } from '@/hooks/useOptions'
@@ -805,7 +805,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   <TableCell className="whitespace-nowrap">
                     {order.vehicleType ? (
                       <Badge variant="outline" className="text-xs">
-                        {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                        {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[order.vehicleType] || order.vehicleType}
                       </Badge>
                     ) : '-'}
                   </TableCell>
@@ -819,7 +819,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                         onClick={() => setImageModalOrder(order)}
                       >
                         <TeslaCarImage
-                          vehicleType={order.vehicleType as 'Model Y' | 'Model 3'}
+                          vehicleType={order.vehicleType as VehicleType}
                           color={order.color}
                           wheels={order.wheels}
                           model={order.model}
@@ -1059,7 +1059,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             <div className="space-y-3">
               <div className="flex justify-center">
                 <TeslaCarImage
-                  vehicleType={imageModalOrder.vehicleType as 'Model Y' | 'Model 3'}
+                  vehicleType={imageModalOrder.vehicleType as VehicleType}
                   color={imageModalOrder.color}
                   wheels={imageModalOrder.wheels}
                   model={imageModalOrder.model}

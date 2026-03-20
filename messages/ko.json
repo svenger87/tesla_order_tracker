@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla 주문 및 통계",
-    "description": "TFF 커뮤니티에서 Tesla Model Y 및 Model 3 주문을 추적합니다. 배송 일정, 구성, VIN 추적 및 독일, 오스트리아, 스위스의 통계."
+    "description": "TFF 커뮤니티에서 모든 Tesla 모델 주문을 추적합니다. 배송 일정, 구성, VIN 추적 및 독일, 오스트리아, 스위스의 통계."
   },
   "common": {
     "save": "저장",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "블랙",
-      "white": "화이트"
+      "white": "화이트",
+      "cream": "크림"
     },
     "range": {
       "maximale_reichweite": "최대 주행거리",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5인승",
+      "6": "6인승",
       "7": "7인승"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP 이전",
       "fsd": "FSD",
       "fsd_transfer": "FSD 이전"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

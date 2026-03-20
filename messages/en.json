@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla Orders and Statistics",
-    "description": "Track Tesla Model Y and Model 3 orders in the TFF community. Delivery timelines, configurations, VIN tracking, and statistics for Germany, Austria, and Switzerland."
+    "description": "Track all Tesla model orders in the TFF community. Delivery timelines, configurations, VIN tracking, and statistics for Germany, Austria, and Switzerland."
   },
   "common": {
     "save": "Save",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Black",
-      "white": "White"
+      "white": "White",
+      "cream": "Cream"
     },
     "range": {
       "maximale_reichweite": "Maximum Range",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5-Seater",
+      "6": "6-Seater",
       "7": "7-Seater"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

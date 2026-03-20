@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { validateApiKey } from '@/lib/api-auth'
 
+import { VehicleType } from '@/lib/types'
+
 interface ConstraintDefinition {
   sourceType: 'model' | 'drive'
   sourceValue: string
-  vehicleType: 'Model Y' | 'Model 3'
+  vehicleType: VehicleType
   targetType: 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch' | 'seats'
   constraintType: 'allow' | 'fixed' | 'disable'
   values: string[] | string
@@ -57,13 +59,61 @@ const MODEL_Y_CONSTRAINTS: ConstraintDefinition[] = [
   { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'allow', values: ['5', '7'] },
 ]
 
+// Model S constraints
+const MODEL_S_CONSTRAINTS: ConstraintDefinition[] = [
+  // Standard
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'seats', constraintType: 'fixed', values: '5' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'wheels', constraintType: 'allow', values: ['19', '21'] },
+  // Plaid
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'seats', constraintType: 'fixed', values: '5' },
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'wheels', constraintType: 'allow', values: ['19', '21'] },
+]
+
+// Model X constraints
+const MODEL_X_CONSTRAINTS: ConstraintDefinition[] = [
+  // Standard
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'seats', constraintType: 'allow', values: ['5', '6', '7'] },
+  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'wheels', constraintType: 'allow', values: ['20', '22'] },
+  // Plaid
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'seats', constraintType: 'allow', values: ['5', '6', '7'] },
+  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'wheels', constraintType: 'allow', values: ['20', '22'] },
+]
+
+// Cybertruck constraints
+const CYBERTRUCK_CONSTRAINTS: ConstraintDefinition[] = [
+  // AWD
+  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'seats', constraintType: 'fixed', values: '5' },
+  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'wheels', constraintType: 'fixed', values: '20' },
+  // Cyberbeast
+  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'seats', constraintType: 'fixed', values: '5' },
+  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'wheels', constraintType: 'fixed', values: '20' },
+]
+
+// Roadster constraints (minimal)
+const ROADSTER_CONSTRAINTS: ConstraintDefinition[] = [
+  { sourceType: 'model', sourceValue: 'base', vehicleType: 'Roadster', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'base', vehicleType: 'Roadster', targetType: 'towHitch', constraintType: 'disable', values: [] },
+  { sourceType: 'model', sourceValue: 'founders', vehicleType: 'Roadster', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
+  { sourceType: 'model', sourceValue: 'founders', vehicleType: 'Roadster', targetType: 'towHitch', constraintType: 'disable', values: [] },
+]
+
 // Drive-based constraints (override model constraints when drive is selected)
 const DRIVE_CONSTRAINTS: ConstraintDefinition[] = [
   // RWD overrides Premium's seats allow [5,7] → fixed 5
   { sourceType: 'drive', sourceValue: 'rwd', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
 ]
 
-const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS, ...DRIVE_CONSTRAINTS]
+const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS, ...MODEL_S_CONSTRAINTS, ...MODEL_X_CONSTRAINTS, ...CYBERTRUCK_CONSTRAINTS, ...ROADSTER_CONSTRAINTS, ...DRIVE_CONSTRAINTS]
 
 // POST - Seed constraints from hardcoded rules (admin or API key auth)
 export async function POST(request: NextRequest) {
@@ -81,7 +131,7 @@ export async function POST(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const dryRun = searchParams.get('dryRun') === 'true'
-    const vehicleType = searchParams.get('vehicleType') as 'Model Y' | 'Model 3' | null
+    const vehicleType = searchParams.get('vehicleType') as VehicleType | null
 
     // Filter constraints if vehicleType specified
     let constraintsToSeed = ALL_CONSTRAINTS
@@ -169,6 +219,10 @@ export async function GET(request: NextRequest) {
     })),
     modelYCount: MODEL_Y_CONSTRAINTS.length,
     model3Count: MODEL_3_CONSTRAINTS.length,
+    modelSCount: MODEL_S_CONSTRAINTS.length,
+    modelXCount: MODEL_X_CONSTRAINTS.length,
+    cybertruckCount: CYBERTRUCK_CONSTRAINTS.length,
+    roadsterCount: ROADSTER_CONSTRAINTS.length,
     driveCount: DRIVE_CONSTRAINTS.length,
     totalCount: ALL_CONSTRAINTS.length,
   })

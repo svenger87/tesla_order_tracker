@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Order, COLORS, VehicleType } from '@/lib/types'
+import { Order, COLORS, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import type { FormOption } from '@/hooks/useOptions'
 import { OrderProgressBar } from './OrderProgressBar'
 import { TeslaCarThumbnail } from './TeslaCarImage'
@@ -73,7 +73,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
         </div>
 
         {/* Car image */}
-        {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') && (
+        {order.vehicleType && VEHICLE_TYPES.some(vt => vt.value === order.vehicleType) && (
           <button
             type="button"
             className="flex justify-center py-2 bg-gradient-to-b from-muted/30 to-transparent w-full cursor-pointer hover:opacity-80 transition-opacity"
@@ -183,7 +183,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
           <div className="flex flex-wrap gap-2 mb-3">
             {order.vehicleType && (
               <Badge variant="default" className="text-xs font-bold">
-                {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[order.vehicleType] || order.vehicleType}
               </Badge>
             )}
             {order.model && (

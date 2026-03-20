@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Comenzi și statistici Tesla",
-    "description": "Urmăriți comenzile Tesla Model Y și Model 3 în comunitatea TFF. Termene de livrare, configurații, urmărire VIN și statistici pentru Germania, Austria și Elveția."
+    "description": "Urmăriți comenzile toate modelele Tesla în comunitatea TFF. Termene de livrare, configurații, urmărire VIN și statistici pentru Germania, Austria și Elveția."
   },
   "common": {
     "save": "Salvează",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Negru",
-      "white": "Alb"
+      "white": "Alb",
+      "cream": "Crem"
     },
     "range": {
       "maximale_reichweite": "Autonomie maximă",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5 locuri",
+      "6": "6 locuri",
       "7": "7 locuri"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

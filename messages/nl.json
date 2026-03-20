@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla bestellingen en statistieken",
-    "description": "Volg Tesla Model Y en Model 3 bestellingen in de TFF community. Levertijden, configuraties, VIN-tracking en statistieken voor Duitsland, Oostenrijk en Zwitserland."
+    "description": "Volg alle Tesla-modellen bestellingen in de TFF community. Levertijden, configuraties, VIN-tracking en statistieken voor Duitsland, Oostenrijk en Zwitserland."
   },
   "common": {
     "save": "Opslaan",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Zwart",
-      "white": "Wit"
+      "white": "Wit",
+      "cream": "Crème"
     },
     "range": {
       "maximale_reichweite": "Maximaal bereik",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5-zitter",
+      "6": "6-zits",
       "7": "7-zitter"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Overdracht",
       "fsd": "FSD",
       "fsd_transfer": "FSD Overdracht"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

@@ -30,6 +30,7 @@ import { Settings2, Plus, Pencil, Trash2, GripVertical } from 'lucide-react'
 import { FlagEmojiPicker } from './FlagEmojiPicker'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useTranslations } from 'next-intl'
+import { VEHICLE_TYPES } from '@/lib/types'
 
 interface OptionMetadata {
   flag?: string
@@ -58,8 +59,7 @@ interface OptionFormData {
 
 const VEHICLE_TYPE_OPTIONS = [
   { value: 'all', label: 'Alle Fahrzeuge' },
-  { value: 'Model Y', label: 'Model Y' },
-  { value: 'Model 3', label: 'Model 3' },
+  ...VEHICLE_TYPES.map(vt => ({ value: vt.value, label: vt.label })),
 ]
 
 const OPTION_TYPES = [

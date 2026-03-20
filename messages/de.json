@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla Bestellungen und Statistiken",
-    "description": "Verfolge Tesla Model Y und Model 3 Bestellungen in der TFF Community. Lieferzeiten, Konfigurationen, VIN-Tracking und Statistiken für Deutschland, Österreich und die Schweiz."
+    "description": "Verfolge Bestellungen für alle Tesla-Modelle in der TFF Community. Lieferzeiten, Konfigurationen, VIN-Tracking und Statistiken für Deutschland, Österreich und die Schweiz."
   },
   "common": {
     "save": "Speichern",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Schwarz",
-      "white": "Weiß"
+      "white": "Weiß",
+      "cream": "Creme"
     },
     "range": {
       "maximale_reichweite": "Maximale Reichweite",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5-Sitzer",
+      "6": "6-Sitzer",
       "7": "7-Sitzer"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

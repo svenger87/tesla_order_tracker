@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla-beställningar och statistik",
-    "description": "Följ Tesla Model Y- och Model 3-beställningar i TFF-communityn. Leveranstider, konfigurationer, VIN-spårning och statistik för Tyskland, Österrike och Schweiz."
+    "description": "Följ beställningar av alla Tesla-modeller i TFF-communityn. Leveranstider, konfigurationer, VIN-spårning och statistik för Tyskland, Österrike och Schweiz."
   },
   "common": {
     "save": "Spara",
@@ -539,7 +539,8 @@
     },
     "interior": {
       "black": "Svart",
-      "white": "Vit"
+      "white": "Vit",
+      "cream": "Kräm"
     },
     "range": {
       "maximale_reichweite": "Maximal räckvidd",
@@ -553,6 +554,7 @@
     },
     "seats": {
       "5": "5-sitsig",
+      "6": "6-sitsig",
       "7": "7-sitsig"
     },
     "autopilot": {
@@ -562,6 +564,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {

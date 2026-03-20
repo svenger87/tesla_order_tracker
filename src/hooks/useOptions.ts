@@ -6,12 +6,20 @@ import {
   COUNTRIES,
   MODELS,
   MODEL_3_TRIMS,
+  MODEL_S_TRIMS,
+  MODEL_X_TRIMS,
+  CYBERTRUCK_TRIMS,
+  ROADSTER_TRIMS,
   RANGES,
   DRIVES,
   COLORS,
   INTERIORS,
   WHEELS,
   MODEL_3_WHEELS,
+  MODEL_S_WHEELS,
+  MODEL_X_WHEELS,
+  CYBERTRUCK_WHEELS,
+  ROADSTER_WHEELS,
   AUTOPILOT_OPTIONS,
   TOW_HITCH_OPTIONS,
   SEATS_OPTIONS,
@@ -90,6 +98,22 @@ const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormO
   'Model 3': {
     model: hardcodedToFormOptions(MODEL_3_TRIMS),
     wheels: hardcodedToFormOptions(MODEL_3_WHEELS),
+  },
+  'Model S': {
+    model: hardcodedToFormOptions(MODEL_S_TRIMS),
+    wheels: hardcodedToFormOptions(MODEL_S_WHEELS),
+  },
+  'Model X': {
+    model: hardcodedToFormOptions(MODEL_X_TRIMS),
+    wheels: hardcodedToFormOptions(MODEL_X_WHEELS),
+  },
+  'Cybertruck': {
+    model: hardcodedToFormOptions(CYBERTRUCK_TRIMS),
+    wheels: hardcodedToFormOptions(CYBERTRUCK_WHEELS),
+  },
+  'Roadster': {
+    model: hardcodedToFormOptions(ROADSTER_TRIMS),
+    wheels: hardcodedToFormOptions(ROADSTER_WHEELS),
   },
 }
 
