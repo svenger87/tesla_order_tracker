@@ -54,12 +54,10 @@ export const GET = withApiAuth(
       const includeArchived = searchParams.get('archived') === 'true'
 
       // Find all orders matching the username
+      const trimmedName = decodedName.trim()
       const orders = await prisma.order.findMany({
         where: {
-          name: {
-            equals: decodedName.trim(),
-            mode: 'insensitive',
-          },
+          name: trimmedName,
           ...(!includeArchived && { archived: false }),
         },
         orderBy: { createdAt: 'desc' },

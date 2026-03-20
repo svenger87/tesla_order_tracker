@@ -112,12 +112,7 @@ export const GET = withTostAuth(async (request: NextRequest) => {
 
     // Build where clause from provided filters
     const where: Record<string, unknown> = { archived: false }
-    if (name) {
-      where.name = {
-        equals: decodeURIComponent(name).trim(),
-        mode: 'insensitive',
-      }
-    }
+    if (name) where.name = decodeURIComponent(name).trim()
     if (tostUserId) where.tostUserId = decodeURIComponent(tostUserId)
 
     const orders = await prisma.order.findMany({
