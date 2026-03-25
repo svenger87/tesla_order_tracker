@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween } from '@/lib/date-utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
-import { useOptions } from '@/hooks/useOptions'
+import { useOptions, type FormOption } from '@/hooks/useOptions'
 
 // Format relative time using translation function
 function formatRelativeTime(dateString: string | undefined, t: (key: string, values?: Record<string, unknown>) => string): string {
@@ -286,6 +286,19 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     : bStr.localeCompare(aStr, 'de')
 }
 
+export interface OrderTableOptions {
+  countries: FormOption[]
+  models: FormOption[]
+  ranges: FormOption[]
+  drives: FormOption[]
+  interiors: FormOption[]
+  wheels: FormOption[]
+  autopilot: FormOption[]
+  towHitch: FormOption[]
+  seats: FormOption[]
+  deliveryLocations: FormOption[]
+}
+
 interface OrderTableProps {
   orders: Order[]
   isAdmin: boolean
@@ -295,6 +308,7 @@ interface OrderTableProps {
   onEditByCode?: (order: Order) => void
   onEditTostFields?: (order: Order) => void
   highlightOrderId?: string | null
+  options?: OrderTableOptions
 }
 
 interface SortableHeaderProps {
@@ -385,7 +399,7 @@ const DEFAULT_VISIBLE_COLUMNS = new Set(
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId }: OrderTableProps) {
+export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp }: OrderTableProps) {
   const isMobile = useIsMobile()
   const t = useTranslations('table')
   const tc = useTranslations('common')
@@ -395,14 +409,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const [sortField, setSortField] = useState<SortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [localFilters, setLocalFilters] = useState<TableLocalFilters>(emptyLocalFilters)
+  const [searchInput, setSearchInput] = useState('')
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(DEFAULT_VISIBLE_COLUMNS)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Car image modal
   const [imageModalOrder, setImageModalOrder] = useState<Order | null>(null)
 
-  // Get options from useOptions hook (includes labels for values)
-  const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions, seats: seatsOptions } = useOptions()
+  // Get options from prop (hoisted) or fallback to local useOptions hook
+  const fallbackOptions = useOptions()
+  const resolvedOptions = optionsProp ?? fallbackOptions.options
+  const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions, seats: seatsOptions } = resolvedOptions
 
   // Helper to lookup label from value (falls back to hardcoded trims for model)
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
@@ -512,16 +530,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     }
     updateScrollDimensions()
 
-    // Use MutationObserver to detect content changes (like filtered data)
-    const mutationObserver = new MutationObserver(updateScrollDimensions)
-    mutationObserver.observe(container, { childList: true, subtree: true })
-
     const resizeObserver = new ResizeObserver(updateScrollDimensions)
     resizeObserver.observe(container)
     window.addEventListener('resize', updateScrollDimensions)
 
     return () => {
-      mutationObserver.disconnect()
       resizeObserver.disconnect()
       window.removeEventListener('resize', updateScrollDimensions)
     }
@@ -589,6 +602,17 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     return result
   }, [orders, localFilters, sortField, sortDirection, countryLabelMap])
 
+  // Update scroll dimensions when data or visible columns change
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const container = tableContainerRef.current
+      if (container) {
+        setScrollWidth(container.scrollWidth)
+        setClientWidth(container.clientWidth)
+      }
+    })
+  }, [filteredAndSortedOrders.length, visibleColumns])
+
   return (
     <div className="space-y-2">
       {/* Toolbar: Search, VIN/Delivery toggles, Columns */}
@@ -599,13 +623,24 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <Input
             type="text"
             placeholder={tc('searchName')}
-            value={localFilters.nameSearch}
-            onChange={(e) => setLocalFilters(f => ({ ...f, nameSearch: e.target.value }))}
+            value={searchInput}
+            onChange={(e) => {
+              const val = e.target.value
+              setSearchInput(val)
+              if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+              searchDebounceRef.current = setTimeout(() => {
+                setLocalFilters(f => ({ ...f, nameSearch: val }))
+              }, 250)
+            }}
             className="h-8 w-[140px] sm:w-[180px] pl-8 pr-7 text-sm"
           />
-          {localFilters.nameSearch && (
+          {searchInput && (
             <button
-              onClick={() => setLocalFilters(f => ({ ...f, nameSearch: '' }))}
+              onClick={() => {
+                setSearchInput('')
+                if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+                setLocalFilters(f => ({ ...f, nameSearch: '' }))
+              }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />

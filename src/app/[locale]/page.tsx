@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { Order, Settings, VehicleType } from '@/lib/types'
 import { filterOrdersByPeriod } from '@/lib/statistics'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
+import { useOptions } from '@/hooks/useOptions'
 import { GlobalFilterBar, GlobalFilters, defaultGlobalFilters, keyToPeriod } from '@/components/GlobalFilterBar'
 import { CollapsibleOrderSection } from '@/components/CollapsibleOrderSection'
 import { TostFieldsModal } from '@/components/TostFieldsModal'
@@ -76,6 +77,9 @@ export default function Home() {
   const [resetCodeCopied, setResetCodeCopied] = useState(false)
   const [generatingResetCode, setGeneratingResetCode] = useState(false)
 
+  // Hoist options fetch — shared by all OrderTable instances
+  const { options: tableOptions } = useOptions()
+
   // Global filters
   const GLOBAL_FILTERS_KEY = 'tesla-tracker-filters'
   const [globalFilters, setGlobalFilters] = useState<GlobalFilters>(defaultGlobalFilters)
@@ -110,56 +114,53 @@ export default function Home() {
     }
   }, [globalFilters, filtersHydrated])
 
-  // Apply global filters to orders
+  // Apply global filters to orders in a single pass
   const filteredOrders = useMemo(() => {
-    let result = orders
-    // Vehicle type
-    if (globalFilters.vehicle !== 'all') {
-      result = result.filter(o => o.vehicleType === globalFilters.vehicle)
+    const { vehicle, model, color, drive, wheels, interior, country, deliveryLocation, period } = globalFilters
+    const hasVehicle = vehicle !== 'all'
+    const hasPeriod = period.type !== 'all'
+
+    // If no filters active, apply only period filter (which may need its own logic)
+    if (!hasVehicle && !hasPeriod && !model && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
+      return orders
     }
-    // Period
-    result = filterOrdersByPeriod(result, globalFilters.period)
-    // Model
-    if (globalFilters.model) {
-      result = result.filter(o => o.model === globalFilters.model)
+
+    // Apply period filter separately since it has complex logic, then single-pass the rest
+    const periodFiltered = hasPeriod ? filterOrdersByPeriod(orders, period) : orders
+
+    if (!hasVehicle && !model && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
+      return periodFiltered
     }
-    // Color
-    if (globalFilters.color) {
-      result = result.filter(o => o.color === globalFilters.color)
-    }
-    // Drive
-    if (globalFilters.drive) {
-      result = result.filter(o => o.drive === globalFilters.drive)
-    }
-    // Wheels
-    if (globalFilters.wheels) {
-      result = result.filter(o => o.wheels === globalFilters.wheels)
-    }
-    // Interior
-    if (globalFilters.interior) {
-      result = result.filter(o => o.interior === globalFilters.interior)
-    }
-    // Country
-    if (globalFilters.country) {
-      result = result.filter(o => o.country === globalFilters.country)
-    }
-    // Delivery Location
-    if (globalFilters.deliveryLocation) {
-      result = result.filter(o => o.deliveryLocation === globalFilters.deliveryLocation)
-    }
-    return result
+
+    return periodFiltered.filter(o =>
+      (!hasVehicle || o.vehicleType === vehicle) &&
+      (!model || o.model === model) &&
+      (!color || o.color === color) &&
+      (!drive || o.drive === drive) &&
+      (!wheels || o.wheels === wheels) &&
+      (!interior || o.interior === interior) &&
+      (!country || o.country === country) &&
+      (!deliveryLocation || o.deliveryLocation === deliveryLocation)
+    )
   }, [orders, globalFilters])
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
   const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)
+  const ordersFingerprint = useRef('')
 
   const fetchOrders = useCallback(async (showToast = false) => {
     if (showToast) setRefreshing(true)
     try {
       const res = await fetch('/api/orders')
       const data = await res.json()
+      // Build lightweight fingerprint to skip unnecessary re-renders
+      const fp = data.length + '-' + (data[0]?.updatedAt ?? '') + '-' + (data[data.length - 1]?.updatedAt ?? '')
+      if (!showToast && fp === ordersFingerprint.current) {
+        return // Data unchanged, skip state update
+      }
+      ordersFingerprint.current = fp
       setOrders(data)
       if (showToast) toast.success(tc('ordersRefreshed', { count: data.length }))
     } catch (error) {
@@ -409,6 +410,7 @@ export default function Home() {
                 expandedQuarters={expandedQuarters}
                 onExpandedChange={setExpandedQuarters}
                 highlightOrderId={highlightOrderId}
+                options={tableOptions}
               />
             )}
           </CardContent>

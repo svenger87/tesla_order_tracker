@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Order } from '@/lib/types'
 import { OrderGroup, getQuarterStats } from '@/lib/groupOrders'
-import { OrderTable } from './OrderTable'
+import { OrderTable, type OrderTableOptions } from './OrderTable'
 import { OrderGroupHeader } from './OrderGroupHeader'
 import {
   Accordion,
@@ -24,6 +24,7 @@ interface CollapsibleOrderSectionProps {
   expandedQuarters?: string[]
   onExpandedChange?: (vals: string[]) => void
   highlightOrderId?: string | null
+  options?: OrderTableOptions
 }
 
 export function CollapsibleOrderSection({
@@ -37,6 +38,7 @@ export function CollapsibleOrderSection({
   expandedQuarters,
   onExpandedChange,
   highlightOrderId,
+  options,
 }: CollapsibleOrderSectionProps) {
   const t = useTranslations('home')
 
@@ -82,18 +84,21 @@ export function CollapsibleOrderSection({
             />
           </AccordionTrigger>
           <AccordionContent className="px-0 pb-0 overflow-x-auto">
-            <div className="w-full">
-              <OrderTable
-                orders={group.orders}
-                isAdmin={isAdmin}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onGenerateResetCode={onGenerateResetCode}
-                onEditByCode={onEditByCode}
-                onEditTostFields={onEditTostFields}
-                highlightOrderId={highlightOrderId}
-              />
-            </div>
+            {value.includes(group.label) && (
+              <div className="w-full">
+                <OrderTable
+                  orders={group.orders}
+                  isAdmin={isAdmin}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onGenerateResetCode={onGenerateResetCode}
+                  onEditByCode={onEditByCode}
+                  onEditTostFields={onEditTostFields}
+                  highlightOrderId={highlightOrderId}
+                  options={options}
+                />
+              </div>
+            )}
           </AccordionContent>
         </AccordionItem>
       ))}
