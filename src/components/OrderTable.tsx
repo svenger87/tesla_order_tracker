@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, memo, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
@@ -613,6 +614,25 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     })
   }, [filteredAndSortedOrders.length, visibleColumns])
 
+  // Virtualizer for desktop table rows
+  const ROW_HEIGHT = 41
+  const tableVirtualizer = useVirtualizer({
+    count: filteredAndSortedOrders.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 15,
+  })
+
+  // Virtualizer for mobile cards
+  const mobileContainerRef = useRef<HTMLDivElement>(null)
+  const CARD_HEIGHT = 180
+  const mobileVirtualizer = useVirtualizer({
+    count: filteredAndSortedOrders.length,
+    getScrollElement: () => mobileContainerRef.current,
+    estimateSize: () => CARD_HEIGHT,
+    overscan: 5,
+  })
+
   return (
     <div className="space-y-2">
       {/* Toolbar: Search, VIN/Delivery toggles, Columns */}
@@ -717,36 +737,60 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
 
       {/* Mobile Card View - only rendered on small screens */}
       {isMobile ? (
-        <div className="space-y-3 px-1">
-          {filteredAndSortedOrders.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
+        filteredAndSortedOrders.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
+          </div>
+        ) : (
+          <div
+            ref={mobileContainerRef}
+            className="px-1 overflow-auto"
+            style={{ maxHeight: '70vh' }}
+          >
+            <div
+              style={{
+                height: mobileVirtualizer.getTotalSize(),
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {mobileVirtualizer.getVirtualItems().map((virtualItem) => {
+                const order = filteredAndSortedOrders[virtualItem.index]
+                return (
+                  <div
+                    key={order.id}
+                    data-order-id={order.id}
+                    ref={mobileVirtualizer.measureElement}
+                    data-index={virtualItem.index}
+                    className={cn(
+                      "rounded-lg transition-colors duration-500 pb-3",
+                      highlightOrderId === order.id && "ring-2 ring-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20 animate-pulse"
+                    )}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualItem.start}px)`,
+                    }}
+                  >
+                    <OrderCard
+                      order={order}
+                      isAdmin={isAdmin}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onGenerateResetCode={onGenerateResetCode}
+                      onEditByCode={onEditByCode}
+                      onEditTostFields={onEditTostFields}
+                      onImageClick={setImageModalOrder}
+                      options={{ models, ranges, drives, interiors, countries }}
+                    />
+                  </div>
+                )
+              })}
             </div>
-          ) : (
-            filteredAndSortedOrders.map((order) => (
-              <div
-                key={order.id}
-                data-order-id={order.id}
-                className={cn(
-                  "rounded-lg transition-colors duration-500",
-                  highlightOrderId === order.id && "ring-2 ring-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20 animate-pulse"
-                )}
-              >
-                <OrderCard
-                  order={order}
-                  isAdmin={isAdmin}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onGenerateResetCode={onGenerateResetCode}
-                  onEditByCode={onEditByCode}
-                  onEditTostFields={onEditTostFields}
-                  onImageClick={setImageModalOrder}
-                  options={{ models, ranges, drives, interiors, countries }}
-                />
-              </div>
-            ))
-          )}
-        </div>
+          </div>
+        )
       ) : null}
 
       {/* Desktop Table View - only rendered on medium+ screens */}
@@ -799,14 +843,20 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
               </TableCell>
             </TableRow>
-          ) : (
-            filteredAndSortedOrders.map((order) => {
+          ) : (<>
+            {tableVirtualizer.getVirtualItems()[0]?.start > 0 && (
+              <tr><td colSpan={visibleColumns.size + 1} style={{ height: tableVirtualizer.getVirtualItems()[0].start, padding: 0, border: 'none' }} /></tr>
+            )}
+            {tableVirtualizer.getVirtualItems().map((virtualRow) => {
+              const order = filteredAndSortedOrders[virtualRow.index]
               const isHighlighted = highlightUser && order.name.toLowerCase() === highlightUser
               const isSearchHighlighted = highlightOrderId === order.id
               return (
               <TableRow
                 key={order.id}
                 data-order-id={order.id}
+                data-index={virtualRow.index}
+                ref={tableVirtualizer.measureElement}
                 className={cn(
                   "border-b hover:bg-muted/50 border-l-2 border-l-transparent",
                   order.deliveryDate
@@ -1065,8 +1115,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   ) : null}
                 </TableCell>
               </TableRow>
-            )})
-          )}
+            )})}
+            {(() => {
+              const items = tableVirtualizer.getVirtualItems()
+              const lastItem = items[items.length - 1]
+              const bottomPad = lastItem ? tableVirtualizer.getTotalSize() - lastItem.end : 0
+              return bottomPad > 0 ? <tr><td colSpan={visibleColumns.size + 1} style={{ height: bottomPad, padding: 0, border: 'none' }} /></tr> : null
+            })()}
+          </>)}
         </TableBody>
       </table>
       </div>
