@@ -310,6 +310,7 @@ interface OrderTableProps {
   onEditTostFields?: (order: Order) => void
   highlightOrderId?: string | null
   options?: OrderTableOptions
+  scrollToOrderId?: string | null
 }
 
 interface SortableHeaderProps {
@@ -400,7 +401,7 @@ const DEFAULT_VISIBLE_COLUMNS = new Set(
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 
-export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp }: OrderTableProps) {
+export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp, scrollToOrderId }: OrderTableProps) {
   const isMobile = useIsMobile()
   const t = useTranslations('table')
   const tc = useTranslations('common')
@@ -632,6 +633,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     estimateSize: () => CARD_HEIGHT,
     overscan: 5,
   })
+
+  // Scroll virtualizer to a specific order when requested (e.g. from global search)
+  useEffect(() => {
+    if (!scrollToOrderId) return
+    const index = filteredAndSortedOrders.findIndex(o => o.id === scrollToOrderId)
+    if (index === -1) return
+
+    const virtualizer = isMobile ? mobileVirtualizer : tableVirtualizer
+    virtualizer.scrollToIndex(index, { align: 'center', behavior: 'smooth' })
+  }, [scrollToOrderId, filteredAndSortedOrders, isMobile, tableVirtualizer, mobileVirtualizer])
 
   return (
     <div className="space-y-2">

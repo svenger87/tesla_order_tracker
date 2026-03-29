@@ -25,6 +25,7 @@ interface CollapsibleOrderSectionProps {
   onExpandedChange?: (vals: string[]) => void
   highlightOrderId?: string | null
   options?: OrderTableOptions
+  scrollToOrderId?: string | null
 }
 
 export function CollapsibleOrderSection({
@@ -39,6 +40,7 @@ export function CollapsibleOrderSection({
   onExpandedChange,
   highlightOrderId,
   options,
+  scrollToOrderId,
 }: CollapsibleOrderSectionProps) {
   const t = useTranslations('home')
 
@@ -96,6 +98,7 @@ export function CollapsibleOrderSection({
                   onEditTostFields={onEditTostFields}
                   highlightOrderId={highlightOrderId}
                   options={options}
+                  scrollToOrderId={scrollToOrderId}
                 />
               </div>
             )}
