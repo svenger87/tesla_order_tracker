@@ -48,6 +48,7 @@ model Order {
 
   @@index([name, orderDate])
   @@index([archived])
+  @@index([archived, createdAt])
   @@index([vehicleType])
   @@index([source])
   @@index([tostUserId])

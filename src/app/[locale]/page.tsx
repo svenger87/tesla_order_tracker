@@ -116,25 +116,26 @@ export default function Home() {
 
   // Apply global filters to orders in a single pass
   const filteredOrders = useMemo(() => {
-    const { vehicle, model, color, drive, wheels, interior, country, deliveryLocation, period } = globalFilters
+    const { vehicle, model, range, color, drive, wheels, interior, country, deliveryLocation, period } = globalFilters
     const hasVehicle = vehicle !== 'all'
     const hasPeriod = period.type !== 'all'
 
     // If no filters active, apply only period filter (which may need its own logic)
-    if (!hasVehicle && !hasPeriod && !model && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
+    if (!hasVehicle && !hasPeriod && !model && !range && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
       return orders
     }
 
     // Apply period filter separately since it has complex logic, then single-pass the rest
     const periodFiltered = hasPeriod ? filterOrdersByPeriod(orders, period) : orders
 
-    if (!hasVehicle && !model && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
+    if (!hasVehicle && !model && !range && !color && !drive && !wheels && !interior && !country && !deliveryLocation) {
       return periodFiltered
     }
 
     return periodFiltered.filter(o =>
       (!hasVehicle || o.vehicleType === vehicle) &&
       (!model || o.model === model) &&
+      (!range || o.range === range) &&
       (!color || o.color === color) &&
       (!drive || o.drive === drive) &&
       (!wheels || o.wheels === wheels) &&
@@ -145,7 +146,7 @@ export default function Home() {
   }, [orders, globalFilters])
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
-  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
+  const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.range !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)
   const ordersFingerprint = useRef('')
