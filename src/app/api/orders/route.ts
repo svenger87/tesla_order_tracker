@@ -198,7 +198,9 @@ export async function GET(request: NextRequest) {
       // Add default archived fields to the response
       orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, updatedAt: o.createdAt }))
     }
-    return NextResponse.json(orders)
+    return NextResponse.json(orders, {
+      headers: { 'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=25' },
+    })
   } catch (error) {
     console.error('Failed to fetch orders:', error)
     // Return empty array to prevent frontend crash

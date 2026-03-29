@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_S_TRIMS, MODEL_X_TRIMS, CYBERTRUCK_TRIMS, ROADSTER_TRIMS, COUNTRIES } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, RANGES, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_S_TRIMS, MODEL_X_TRIMS, CYBERTRUCK_TRIMS, ROADSTER_TRIMS, COUNTRIES } from '@/lib/types'
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { FilterCollapse } from '@/components/FilterCollapse'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -20,6 +20,7 @@ export interface GlobalFilters {
   vehicle: VehicleType | 'all'
   period: StatsPeriod
   model: string
+  range: string
   color: string
   drive: string
   wheels: string
@@ -32,6 +33,7 @@ export const defaultGlobalFilters: GlobalFilters = {
   vehicle: 'all',
   period: { type: 'all' },
   model: '',
+  range: '',
   color: '',
   drive: '',
   wheels: '',
@@ -83,6 +85,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
   // Build available filter options from actual order data
   const filterOptions = useMemo(() => {
     const models = new Set<string>()
+    const ranges = new Set<string>()
     const colors = new Set<string>()
     const drives = new Set<string>()
     const wheels = new Set<string>()
@@ -91,6 +94,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
     const deliveryLocations = new Set<string>()
     orders.forEach(o => {
       if (o.model) models.add(o.model)
+      if (o.range) ranges.add(o.range)
       if (o.color) colors.add(o.color)
       if (o.drive) drives.add(o.drive)
       if (o.wheels) wheels.add(o.wheels)
@@ -103,6 +107,11 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
     const modelOptions = Array.from(models).map(v => {
       const trim = allTrims.find(t => t.value === v)
       return { value: v, label: trim?.label || v }
+    }).sort((a, b) => a.label.localeCompare(b.label))
+
+    const rangeOptions = Array.from(ranges).map(v => {
+      const r = RANGES.find(r => r.value === v)
+      return { value: v, label: r?.label || v }
     }).sort((a, b) => a.label.localeCompare(b.label))
 
     const colorOptions = Array.from(colors).map(v => {
@@ -134,10 +143,10 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
       .sort((a, b) => a.localeCompare(b))
       .map(v => ({ value: v, label: v }))
 
-    return { modelOptions, colorOptions, driveOptions, wheelsOptions, interiorOptions, countryOptions, deliveryLocationOptions }
+    return { modelOptions, rangeOptions, colorOptions, driveOptions, wheelsOptions, interiorOptions, countryOptions, deliveryLocationOptions }
   }, [orders])
 
-  const activeFilterCount = [filters.model, filters.color, filters.drive, filters.wheels, filters.interior, filters.country, filters.deliveryLocation].filter(v => v !== '').length
+  const activeFilterCount = [filters.model, filters.range, filters.color, filters.drive, filters.wheels, filters.interior, filters.country, filters.deliveryLocation].filter(v => v !== '').length
   // Count vehicle + period as active if not default
   const totalActiveCount = activeFilterCount
     + (filters.vehicle !== 'all' ? 1 : 0)
@@ -214,6 +223,24 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 <SelectContent>
                   <SelectItem value="_all">{t('modelDistribution')}: {tc('all')}</SelectItem>
                   {filterOptions.modelOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Range (Reichweite) */}
+            {filterOptions.rangeOptions.length > 1 && (
+              <Select
+                value={filters.range || '_all'}
+                onValueChange={(v) => onChange({ ...filters, range: v === '_all' ? '' : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('rangeDistribution')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_all">{t('rangeDistribution')}: {tc('all')}</SelectItem>
+                  {filterOptions.rangeOptions.map((o) => (
                     <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                   ))}
                 </SelectContent>
