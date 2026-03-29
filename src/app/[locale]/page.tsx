@@ -279,6 +279,8 @@ export default function Home() {
     }
   }, [t])
 
+  const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
+
   const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
     // Expand the target quarter, keeping already-open ones
     setExpandedQuarters(prev => {
@@ -286,22 +288,23 @@ export default function Home() {
     })
     setHighlightOrderId(orderId)
 
-    // Poll for the visible element (both mobile cards and desktop rows share the
-    // same data-order-id; querySelector returns the first DOM match which is the
-    // mobile card — hidden on desktop. Pick the one that's actually visible.)
-    let attempts = 0
-    const tryScroll = () => {
-      const els = document.querySelectorAll(`[data-order-id="${orderId}"]`)
-      const visible = Array.from(els).find(el => (el as HTMLElement).offsetParent !== null)
-      if (visible) {
-        visible.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        setTimeout(() => setHighlightOrderId(null), 3000)
-      } else if (attempts < 30) {
-        attempts++
-        requestAnimationFrame(tryScroll)
+    // Wait for accordion to expand, then scroll the section into view and trigger virtualizer scroll
+    requestAnimationFrame(() => {
+      // Find the accordion section by its trigger text
+      const triggers = document.querySelectorAll('[data-state="open"]')
+      const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
-    }
-    requestAnimationFrame(tryScroll)
+
+      // Trigger virtualizer scroll after section is visible
+      setTimeout(() => setScrollToOrderId(orderId), 300)
+    })
+
+    // Clear highlight after animation
+    setTimeout(() => setHighlightOrderId(null), 3000)
+    // Clear scroll target after virtualizer has scrolled
+    setTimeout(() => setScrollToOrderId(null), 1000)
   }, [])
 
   return (
@@ -412,6 +415,7 @@ export default function Home() {
                 onExpandedChange={setExpandedQuarters}
                 highlightOrderId={highlightOrderId}
                 options={tableOptions}
+                scrollToOrderId={scrollToOrderId}
               />
             )}
           </CardContent>
