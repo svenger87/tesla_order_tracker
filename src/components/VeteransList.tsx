@@ -8,6 +8,7 @@ import { differenceInDays } from 'date-fns'
 import { Link } from '@/i18n/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Medal, Shield } from 'lucide-react'
+import { useOptions } from '@/hooks/useOptions'
 
 const VETERAN_THRESHOLD = 150
 
@@ -19,6 +20,7 @@ interface VeteransListProps {
 export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
   const tc = useTranslations('common')
   const t = useTranslations('home')
+  const { models, colors, drives } = useOptions()
 
   const ranked = useMemo(() => {
     return orders
@@ -44,6 +46,11 @@ export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
     'text-gray-400',
     'text-amber-700',
   ]
+
+  const getLabel = (options: Array<{ value: string; label: string }>, value: string | null) => {
+    if (!value) return null
+    return options.find(o => o.value === value || o.label === value)?.label || value
+  }
 
   const vehicleShort: Record<string, string> = {
     'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS',
@@ -75,9 +82,9 @@ export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
           </Badge>
         </div>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-muted-foreground">
-          {order.model && <span>{order.model}</span>}
-          {order.color && <><span>·</span><span>{order.color}</span></>}
-          {order.drive && <><span>·</span><span>{order.drive}</span></>}
+          {order.model && <span>{getLabel(models, order.model)}</span>}
+          {order.color && <><span>·</span><span>{getLabel(colors, order.color)}</span></>}
+          {order.drive && <><span>·</span><span>{getLabel(drives, order.drive)}</span></>}
           <span>·</span>
           <span>{order.orderDate} &rarr; {order.deliveryDate}</span>
         </div>
