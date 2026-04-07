@@ -18,12 +18,12 @@ export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
   const tc = useTranslations('common')
 
   const veterans = useMemo(() => {
-    const today = new Date()
     return orders
-      .filter(o => !o.deliveryDate && o.orderDate)
+      .filter(o => o.orderDate && o.deliveryDate)
       .map(o => {
         const orderDate = parseGermanDate(o.orderDate)
-        const waitingDays = orderDate ? differenceInDays(today, orderDate) : 0
+        const deliveryDate = parseGermanDate(o.deliveryDate)
+        const waitingDays = orderDate && deliveryDate ? differenceInDays(deliveryDate, orderDate) : 0
         return { ...o, waitingDays }
       })
       .filter(o => o.waitingDays > 0)
