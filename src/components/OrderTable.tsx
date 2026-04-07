@@ -269,7 +269,7 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
   }
 
   // Handle numeric fields (including computed segment fields)
-  const numericFields = ['orderToVin', 'vinToProduction', 'productionToPapers', 'papersToDelivery']
+  const numericFields = ['orderToVin', 'vinToProduction', 'productionToPapers', 'papersToDelivery', 'orderToDelivery']
   if (numericFields.includes(field)) {
     const aNum = aVal as number | null
     const bNum = bVal as number | null
@@ -390,6 +390,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'vinToProduction', label: 'vinToProduction', group: 'detail' },
   { key: 'productionToPapers', label: 'productionToPapers', group: 'detail' },
   { key: 'papersToDelivery', label: 'papersToDelivery', group: 'detail' },
+  { key: 'orderToDelivery', label: 'orderToDelivery', group: 'detail' },
   { key: 'updatedAt', label: 'updatedAt', group: 'detail' },
 ]
 
@@ -841,6 +842,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('vinToProduction') && <SortableHeader field="vinToProduction" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vinToProduction')}</SortableHeader>}
             {isColumnVisible('productionToPapers') && <SortableHeader field="productionToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('productionToPapers')}</SortableHeader>}
             {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
+            {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
             <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
               {tc('actions')}
@@ -1060,6 +1062,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('papersToDelivery') && (
                   <TableCell className="whitespace-nowrap text-center font-mono">
                     {order.papersToDelivery !== null ? order.papersToDelivery : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('orderToDelivery') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {order.orderToDelivery !== null ? order.orderToDelivery : '-'}
                   </TableCell>
                 )}
                 {isColumnVisible('updatedAt') && (

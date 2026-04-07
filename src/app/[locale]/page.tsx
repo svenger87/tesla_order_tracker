@@ -15,6 +15,7 @@ import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
+import { VeteransList } from '@/components/VeteransList'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
@@ -39,7 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, Calculator } from 'lucide-react'
+import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, Calculator, Medal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 
@@ -357,6 +358,18 @@ export default function Home() {
               selectedPeriod={globalFilters.period}
               selectedVehicle={globalFilters.vehicle}
             />
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Medal className="h-4 w-4 text-yellow-500" />
+                  {t('veterans')}
+                </CardTitle>
+                <CardDescription>{t('veteransDescription')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <VeteransList orders={filteredOrders} />
+              </CardContent>
+            </Card>
           </>
         )}
 
