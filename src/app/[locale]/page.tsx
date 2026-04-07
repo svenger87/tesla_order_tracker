@@ -32,6 +32,7 @@ const OrderForm = dynamic(
   () => import('@/components/OrderForm').then(mod => mod.OrderForm)
 )
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Dialog,
@@ -358,18 +359,25 @@ export default function Home() {
               selectedPeriod={globalFilters.period}
               selectedVehicle={globalFilters.vehicle}
             />
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Medal className="h-4 w-4 text-yellow-500" />
-                  {t('veterans')}
-                </CardTitle>
-                <CardDescription>{t('veteransDescription')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <VeteransList orders={filteredOrders} />
-              </CardContent>
-            </Card>
+            <Collapsible>
+              <Card>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Medal className="h-4 w-4 text-yellow-500" />
+                      {t('veterans')}
+                      <ChevronUp className="h-4 w-4 ml-auto transition-transform duration-200 [[data-state=closed]_&]:rotate-180" />
+                    </CardTitle>
+                    <CardDescription>{t('veteransDescription')}</CardDescription>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <VeteransList orders={filteredOrders} />
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           </>
         )}
 

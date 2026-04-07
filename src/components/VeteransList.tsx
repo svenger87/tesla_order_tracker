@@ -15,7 +15,7 @@ interface VeteransListProps {
 }
 
 export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
-  const t = useTranslations('home')
+  const tc = useTranslations('common')
 
   const veterans = useMemo(() => {
     const today = new Date()
@@ -66,7 +66,7 @@ export function VeteransList({ orders, limit = 10 }: VeteransListProps) {
             {order.waitingDays}
           </span>
           <span className="text-xs text-muted-foreground shrink-0">
-            {t('days')}
+            {tc('days')}
           </span>
         </div>
       ))}
