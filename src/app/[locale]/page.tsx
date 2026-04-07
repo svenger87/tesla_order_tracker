@@ -373,7 +373,7 @@ export default function Home() {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <CardContent>
-                    <VeteransList orders={filteredOrders} />
+                    <VeteransList orders={orders} />
                   </CardContent>
                 </CollapsibleContent>
               </Card>
