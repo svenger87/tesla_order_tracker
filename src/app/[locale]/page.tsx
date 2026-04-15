@@ -153,14 +153,14 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false)
   const ordersFingerprint = useRef('')
 
-  const fetchOrders = useCallback(async (showToast = false) => {
+  const fetchOrders = useCallback(async (showToast = false, skipFingerprintCheck = false) => {
     if (showToast) setRefreshing(true)
     try {
       const res = await fetch('/api/orders')
       const data = await res.json()
-      // Build lightweight fingerprint to skip unnecessary re-renders
+      // Build lightweight fingerprint to skip unnecessary re-renders on auto-refresh
       const fp = data.length + '-' + (data[0]?.updatedAt ?? '') + '-' + (data[data.length - 1]?.updatedAt ?? '')
-      if (!showToast && fp === ordersFingerprint.current) {
+      if (!showToast && !skipFingerprintCheck && fp === ordersFingerprint.current) {
         return // Data unchanged, skip state update
       }
       ordersFingerprint.current = fp
@@ -220,7 +220,7 @@ export default function Home() {
     setIsCustomPassword(true)
     setNewEditCode('')
     setShowEditCodeModal(true)
-    fetchOrders()
+    fetchOrders(false, true)
   }
 
   const handleEditByCode = useCallback((order: Order) => {
@@ -242,7 +242,7 @@ export default function Home() {
     try {
       const res = await fetch(`/api/orders?id=${orderId}`, { method: 'DELETE' })
       if (res.ok) {
-        fetchOrders()
+        fetchOrders(false, true)
       }
     } catch (error) {
       console.error('Failed to delete order:', error)
@@ -492,7 +492,7 @@ export default function Home() {
           onOpenChange={(open) => !open && setEditByCodeOrder(null)}
           order={editByCodeOrder}
           onVerified={handleEditByCodeVerified}
-          onSuccess={fetchOrders}
+          onSuccess={() => fetchOrders(false, true)}
         />
       )}
 
@@ -509,7 +509,7 @@ export default function Home() {
             const err = await res.json()
             throw new Error(err.error || 'Fehler beim Speichern')
           }
-          fetchOrders()
+          fetchOrders(false, true)
         }}
       />
 
@@ -530,7 +530,7 @@ export default function Home() {
             setEditingOrder(null)
             setEditByCodePassword('')
             setEditByCodeIsLegacy(false)
-            fetchOrders()
+            fetchOrders(false, true)
           }}
         />
       )}
