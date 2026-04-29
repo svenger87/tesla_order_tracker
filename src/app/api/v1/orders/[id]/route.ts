@@ -4,6 +4,7 @@ import { withApiAuth, RouteContext } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { ApiOrder, UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
+import { recordOrderChanges } from '@/lib/order-history'
 
 // Fields to select (excludes editCode for security)
 const orderSelectFields = {
@@ -167,10 +168,14 @@ export const PUT = withApiAuth(
       }
 
       // Update the order
-      const updated = await prisma.order.update({
-        where: { id },
-        data: updateData,
-        select: { id: true, updatedAt: true },
+      const updated = await prisma.$transaction(async (tx) => {
+        const before = await tx.order.findUnique({ where: { id } })
+        const u = await tx.order.update({
+          where: { id },
+          data: updateData,
+        })
+        await recordOrderChanges(id, before, u, { tx })
+        return u
       })
 
       const response: UpdateOrderResponse = {

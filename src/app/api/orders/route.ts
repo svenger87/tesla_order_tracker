@@ -383,7 +383,12 @@ export async function PUT(request: NextRequest) {
             if (value !== null) updateData[key] = value
           }
         }
-        const updated = await prisma.order.update({ where: { id }, data: updateData })
+        const updated = await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id } })
+          const u = await tx.order.update({ where: { id }, data: updateData })
+          await recordOrderChanges(id, before, u, { tx, source: 'tost' })
+          return u
+        })
         return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated' })
       }
       return NextResponse.json({ message: 'No changes' })
@@ -422,33 +427,38 @@ export async function PUT(request: NextRequest) {
         const constrainedData = applyVehicleConstraints(data)
 
         // Update order with new hashed password
-        const updated = await prisma.order.update({
-          where: { id },
-          data: {
-            editCode: hashedPassword, // Set the new hashed password
-            name: constrainedData.name as string,
-            vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
-            orderDate: (constrainedData.orderDate as string) || null,
-            country: (constrainedData.country as string) || null,
-            model: (constrainedData.model as string) || null,
-            range: (constrainedData.range as string) || null,
-            drive: (constrainedData.drive as string) || null,
-            color: (constrainedData.color as string) || null,
-            interior: (constrainedData.interior as string) || null,
-            wheels: (constrainedData.wheels as string) || null,
-            towHitch: (constrainedData.towHitch as string) || null,
-            autopilot: (constrainedData.autopilot as string) || null,
-            deliveryWindow: (constrainedData.deliveryWindow as string) || null,
-            deliveryLocation: (constrainedData.deliveryLocation as string) || null,
-            vin: (constrainedData.vin as string) || null,
-            vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
-            papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
-            productionDate: (constrainedData.productionDate as string) || null,
-            typeApproval: (constrainedData.typeApproval as string) || null,
-            typeVariant: (constrainedData.typeVariant as string) || null,
-            deliveryDate: (constrainedData.deliveryDate as string) || null,
-            ...timePeriods,
-          },
+        const updated = await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id } })
+          const u = await tx.order.update({
+            where: { id },
+            data: {
+              editCode: hashedPassword, // Set the new hashed password
+              name: constrainedData.name as string,
+              vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+              orderDate: (constrainedData.orderDate as string) || null,
+              country: (constrainedData.country as string) || null,
+              model: (constrainedData.model as string) || null,
+              range: (constrainedData.range as string) || null,
+              drive: (constrainedData.drive as string) || null,
+              color: (constrainedData.color as string) || null,
+              interior: (constrainedData.interior as string) || null,
+              wheels: (constrainedData.wheels as string) || null,
+              towHitch: (constrainedData.towHitch as string) || null,
+              autopilot: (constrainedData.autopilot as string) || null,
+              deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+              deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+              vin: (constrainedData.vin as string) || null,
+              vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+              papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+              productionDate: (constrainedData.productionDate as string) || null,
+              typeApproval: (constrainedData.typeApproval as string) || null,
+              typeVariant: (constrainedData.typeVariant as string) || null,
+              deliveryDate: (constrainedData.deliveryDate as string) || null,
+              ...timePeriods,
+            },
+          })
+          await recordOrderChanges(id, before, u, { tx })
+          return u
         })
 
         return NextResponse.json({
@@ -488,33 +498,38 @@ export async function PUT(request: NextRequest) {
     // Apply vehicle constraints
     const constrainedData = applyVehicleConstraints(data)
 
-    const updated = await prisma.order.update({
-      where: { id },
-      data: {
-        name: constrainedData.name as string,
-        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
-        orderDate: (constrainedData.orderDate as string) || null,
-        country: (constrainedData.country as string) || null,
-        model: (constrainedData.model as string) || null,
-        range: (constrainedData.range as string) || null,
-        drive: (constrainedData.drive as string) || null,
-        color: (constrainedData.color as string) || null,
-        interior: (constrainedData.interior as string) || null,
-        wheels: (constrainedData.wheels as string) || null,
-        towHitch: (constrainedData.towHitch as string) || null,
-        autopilot: (constrainedData.autopilot as string) || null,
-        seats: (constrainedData.seats as string) || null,
-        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
-        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
-        vin: (constrainedData.vin as string) || null,
-        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
-        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
-        productionDate: (constrainedData.productionDate as string) || null,
-        typeApproval: (constrainedData.typeApproval as string) || null,
-        typeVariant: (constrainedData.typeVariant as string) || null,
-        deliveryDate: (constrainedData.deliveryDate as string) || null,
-        ...timePeriods,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const before = await tx.order.findUnique({ where: { id } })
+      const u = await tx.order.update({
+        where: { id },
+        data: {
+          name: constrainedData.name as string,
+          vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+          orderDate: (constrainedData.orderDate as string) || null,
+          country: (constrainedData.country as string) || null,
+          model: (constrainedData.model as string) || null,
+          range: (constrainedData.range as string) || null,
+          drive: (constrainedData.drive as string) || null,
+          color: (constrainedData.color as string) || null,
+          interior: (constrainedData.interior as string) || null,
+          wheels: (constrainedData.wheels as string) || null,
+          towHitch: (constrainedData.towHitch as string) || null,
+          autopilot: (constrainedData.autopilot as string) || null,
+          seats: (constrainedData.seats as string) || null,
+          deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+          deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+          vin: (constrainedData.vin as string) || null,
+          vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+          papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+          productionDate: (constrainedData.productionDate as string) || null,
+          typeApproval: (constrainedData.typeApproval as string) || null,
+          typeVariant: (constrainedData.typeVariant as string) || null,
+          deliveryDate: (constrainedData.deliveryDate as string) || null,
+          ...timePeriods,
+        },
+      })
+      await recordOrderChanges(id, before, u, { tx })
+      return u
     })
 
     return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated successfully' })
