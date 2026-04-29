@@ -399,8 +399,9 @@ const DEFAULT_VISIBLE_COLUMNS = new Set(
   COLUMN_DEFS.map(c => c.key)
 )
 
-const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
+const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
+const COLUMNS_SCHEMA = COLUMN_DEFS.map(c => c.key).sort().join(',')
 
 export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp, scrollToOrderId }: OrderTableProps) {
   const isMobile = useIsMobile()
@@ -472,19 +473,23 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       }
     }
 
-    // Load column visibility, auto-including any new columns not in saved set
+    // Load column visibility, respecting user-hidden columns and auto-showing truly new ones
     const savedColumns = localStorage.getItem(COLUMNS_STORAGE_KEY)
     if (savedColumns) {
       try {
-        const parsed = JSON.parse(savedColumns)
-        if (Array.isArray(parsed)) {
-          const saved = new Set(parsed)
-          // Add any columns that exist in COLUMN_DEFS but weren't in saved prefs (newly added)
-          const allKeys = new Set(COLUMN_DEFS.map(c => c.key))
-          for (const key of allKeys) {
-            if (!saved.has(key)) saved.add(key)
+        const parsed = JSON.parse(savedColumns) as { visible?: string[]; schema?: string }
+        if (parsed && Array.isArray(parsed.visible) && typeof parsed.schema === 'string') {
+          const visible = new Set(parsed.visible)
+          if (parsed.schema === COLUMNS_SCHEMA) {
+            setVisibleColumns(visible)
+          } else {
+            // Schema changed: add ONLY columns that didn't exist when prefs were saved
+            const previousKeys = new Set(parsed.schema.split(',').filter(Boolean))
+            for (const c of COLUMN_DEFS) {
+              if (!previousKeys.has(c.key)) visible.add(c.key)
+            }
+            setVisibleColumns(visible)
           }
-          setVisibleColumns(saved)
         }
       } catch (e) {
         console.error('Failed to parse saved columns:', e)
@@ -504,7 +509,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   // Save column visibility to localStorage whenever it changes
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify([...visibleColumns]))
+      localStorage.setItem(
+        COLUMNS_STORAGE_KEY,
+        JSON.stringify({ visible: [...visibleColumns], schema: COLUMNS_SCHEMA }),
+      )
     }
   }, [visibleColumns, isHydrated])
 
