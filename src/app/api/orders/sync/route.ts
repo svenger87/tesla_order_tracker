@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult } from '@/lib/types'
 import { normalizeDate } from '@/lib/date-utils'
+import { recordOrderChanges } from '@/lib/order-history'
 
 const SPREADSHEET_ID = '1--3lNLMSUDwxgcpqrYh4Fbz8LONLBfbJwOIftKgzaSA'
 
@@ -329,10 +330,15 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
 
       if (existing) {
         // Update existing order - preserve editCode and range!
-        await prisma.order.update({
-          where: { id: existing.id },
-          data: orderData,
-          // Note: range field is NOT in orderData, so existing range is preserved
+        await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id: existing.id } })
+          const u = await tx.order.update({
+            where: { id: existing.id },
+            data: orderData,
+            // Note: range field is NOT in orderData, so existing range is preserved
+          })
+          await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
+          return u
         })
         result.updated++
       } else {
@@ -341,11 +347,15 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
         const isStandard = model === 'standard'
         // Use internal codes: 'maximale_reichweite' or 'standard'
         const defaultRange = isStandard ? 'standard' : 'maximale_reichweite'
-        await prisma.order.create({
-          data: {
-            ...orderData,
-            range: defaultRange,
-          },
+        await prisma.$transaction(async (tx) => {
+          const created = await tx.order.create({
+            data: {
+              ...orderData,
+              range: defaultRange,
+            },
+          })
+          await recordOrderChanges(created.id, null, created, { source: 'tost', tx })
+          return created
         })
         result.created++
       }

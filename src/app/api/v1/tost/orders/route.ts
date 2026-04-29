@@ -6,6 +6,7 @@ import { calculateTimePeriods, orderSelectFields } from '@/lib/tost-helpers'
 import { normalizeDateFields } from '@/lib/date-utils'
 import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
+import { recordOrderChanges } from '@/lib/order-history'
 
 // Build the data fields from a TOST request body
 function buildOrderData(body: Record<string, unknown>) {
@@ -61,13 +62,17 @@ export const POST = withTostAuth(async (request: NextRequest) => {
     const timePeriods = calculateTimePeriods(body)
     const orderData = buildOrderData(body)
 
-    const order = await prisma.order.create({
-      data: {
-        ...(body.id && { id: body.id }),
-        ...orderData,
-        source: 'tost',
-        ...timePeriods,
-      },
+    const order = await prisma.$transaction(async (tx) => {
+      const created = await tx.order.create({
+        data: {
+          ...(body.id && { id: body.id }),
+          ...orderData,
+          source: 'tost',
+          ...timePeriods,
+        },
+      })
+      await recordOrderChanges(created.id, null, created, { source: 'tost', tx })
+      return created
     })
 
     trackApiEvent({ name: 'tost-create-order', url: '/api/v1/tost/orders', data: { orderId: order.id, vehicleType: body.vehicleType || 'Model Y', customId: !!body.id } })
@@ -89,9 +94,14 @@ export const POST = withTostAuth(async (request: NextRequest) => {
         if (existing?.source === 'tost') {
           const timePeriods = calculateTimePeriods(body)
           const orderData = buildOrderData(body)
-          await prisma.order.update({
-            where: { id: body.id },
-            data: { ...orderData, ...timePeriods },
+          await prisma.$transaction(async (tx) => {
+            const before = await tx.order.findUnique({ where: { id: body.id } })
+            const u = await tx.order.update({
+              where: { id: body.id },
+              data: { ...orderData, ...timePeriods },
+            })
+            await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
+            return u
           })
           trackApiEvent({ name: 'tost-create-order-upsert', url: '/api/v1/tost/orders', data: { orderId: body.id } })
           return createApiSuccessResponse(
@@ -117,9 +127,9 @@ export const POST = withTostAuth(async (request: NextRequest) => {
             const oldOrder = await prisma.order.findUnique({ where: { id: existing.id } })
             if (oldOrder) {
               const { id: _oldId, editCode: _editCode, createdAt, updatedAt: _updatedAt, ...oldData } = oldOrder
-              await prisma.$transaction([
-                prisma.order.delete({ where: { id: existing.id } }),
-                prisma.order.create({
+              await prisma.$transaction(async (tx) => {
+                await tx.order.delete({ where: { id: existing.id } })
+                const created = await tx.order.create({
                   data: {
                     ...oldData,
                     ...orderData,
@@ -128,8 +138,10 @@ export const POST = withTostAuth(async (request: NextRequest) => {
                     ...timePeriods,
                     createdAt,
                   },
-                }),
-              ])
+                })
+                await recordOrderChanges(created.id, null, created, { source: 'tost', tx })
+                return created
+              })
               trackApiEvent({ name: 'tost-auto-claim-rekey', url: '/api/v1/tost/orders', data: { oldId: existing.id, newId, orderName: bodyName } })
               return createApiSuccessResponse(
                 { id: newId, message: `Existing webapp order claimed and re-keyed successfully` },
@@ -138,13 +150,18 @@ export const POST = withTostAuth(async (request: NextRequest) => {
             }
           } else {
             // Claim in place
-            await prisma.order.update({
-              where: { id: existing.id },
-              data: {
-                ...orderData,
-                source: 'tost',
-                ...timePeriods,
-              },
+            await prisma.$transaction(async (tx) => {
+              const before = await tx.order.findUnique({ where: { id: existing.id } })
+              const u = await tx.order.update({
+                where: { id: existing.id },
+                data: {
+                  ...orderData,
+                  source: 'tost',
+                  ...timePeriods,
+                },
+              })
+              await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
+              return u
             })
             trackApiEvent({ name: 'tost-auto-claim', url: '/api/v1/tost/orders', data: { orderId: existing.id, orderName: bodyName } })
             return createApiSuccessResponse(

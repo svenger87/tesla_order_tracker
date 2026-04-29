@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
+import { recordOrderChanges } from '@/lib/order-history'
 
 // Model 3 Spreadsheet
 const MODEL_3_SPREADSHEET_ID = '10fQS1HdBFnvSEVDyP8ofgXerxT1RVoVYUJfagyn95DA'
@@ -378,15 +379,24 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
 
       if (existing) {
         // Update existing order - preserve editCode
-        await prisma.order.update({
-          where: { id: existing.id },
-          data: orderData,
+        await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id: existing.id } })
+          const u = await tx.order.update({
+            where: { id: existing.id },
+            data: orderData,
+          })
+          await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
+          return u
         })
         result.updated++
       } else {
         // Create new order
-        await prisma.order.create({
-          data: orderData,
+        await prisma.$transaction(async (tx) => {
+          const created = await tx.order.create({
+            data: orderData,
+          })
+          await recordOrderChanges(created.id, null, created, { source: 'tost', tx })
+          return created
         })
         result.created++
       }
