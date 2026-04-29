@@ -179,7 +179,22 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
         </button>
         {expanded && (
           <div className="border-t px-4 py-3 space-y-4">
-            {/* event filter chips — Task 9 */}
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_EVENT_TYPES.map((ev) => {
+                const on = enabledEvents.has(ev)
+                return (
+                  <button
+                    key={ev}
+                    type="button"
+                    onClick={() => toggleEvent(ev)}
+                    aria-pressed={on}
+                    className={`rounded-full border px-2.5 py-0.5 text-xs ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                  >
+                    {t(`event.${ev}`)}
+                  </button>
+                )
+              })}
+            </div>
             {entries.length === 0 && !loading && (
               <p className="text-sm text-muted-foreground">{t('empty')}</p>
             )}
