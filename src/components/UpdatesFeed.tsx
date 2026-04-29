@@ -26,6 +26,42 @@ interface UpdatesFeedProps {
   onOrderClick: (orderId: string) => void
 }
 
+function formatRelativeTime(iso: string, t: (k: string, v?: Record<string, string | number | Date>) => string): string {
+  const d = new Date(iso)
+  const diffMin = Math.max(1, Math.floor((Date.now() - d.getTime()) / 60000))
+  if (diffMin < 60) return t('time.minutesAgo', { n: diffMin })
+  const diffHour = Math.floor(diffMin / 60)
+  if (diffHour < 24) return t('time.hoursAgo', { n: diffHour })
+  const diffDay = Math.floor(diffHour / 24)
+  if (diffDay === 1) return t('time.yesterday')
+  if (diffDay < 7) return t('time.daysAgo', { n: diffDay })
+  return t('time.weeksAgo', { n: Math.floor(diffDay / 7) })
+}
+
+function bucketOf(iso: string): 'today' | 'yesterday' | 'week' | 'older' {
+  const d = new Date(iso)
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const startOfYesterday = startOfToday - 86_400_000
+  const sevenAgo = startOfToday - 7 * 86_400_000
+  const t = d.getTime()
+  if (t >= startOfToday) return 'today'
+  if (t >= startOfYesterday) return 'yesterday'
+  if (t >= sevenAgo) return 'week'
+  return 'older'
+}
+
+function eventColorHex(e: EventType): string {
+  switch (e) {
+    case 'vin': return '#3b82f6'        // blue-500
+    case 'production': return '#f59e0b' // amber-500
+    case 'papers': return '#a855f7'     // purple-500
+    case 'delivery': return '#10b981'   // emerald-500
+    case 'window': return '#0ea5e9'     // sky-500
+    case 'created': return '#64748b'    // slate-500
+  }
+}
+
 const POLL_MS = 60_000
 
 export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
@@ -124,11 +160,66 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
     })
   }, [])
 
-  // Render is added in Task 8.
+  const grouped = entries.reduce<Record<'today'|'yesterday'|'week'|'older', FeedEntry[]>>(
+    (acc, e) => { acc[bucketOf(e.changedAt)].push(e); return acc },
+    { today: [], yesterday: [], week: [], older: [] },
+  )
+
   return (
-    <section aria-label={t('title')} className="container mx-auto px-4 py-2">
-      {/* placeholder — Task 8 fills this in */}
-      <div>{loading ? t('loading') : `${entries.length} ${t('entries')}`}</div>
+    <section aria-label={t('title')} className="container mx-auto px-4 py-4">
+      <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          className="flex w-full items-center justify-between px-4 py-3 font-semibold"
+          aria-expanded={expanded}
+        >
+          <span>{t('title')} {entries.length > 0 && <span className="ml-2 rounded-full bg-muted px-2 text-xs">{entries.length}</span>}</span>
+          <span aria-hidden>{expanded ? '−' : '+'}</span>
+        </button>
+        {expanded && (
+          <div className="border-t px-4 py-3 space-y-4">
+            {/* event filter chips — Task 9 */}
+            {entries.length === 0 && !loading && (
+              <p className="text-sm text-muted-foreground">{t('empty')}</p>
+            )}
+            {(['today','yesterday','week','older'] as const).map((bucket) => {
+              const items = grouped[bucket]
+              if (items.length === 0) return null
+              return (
+                <div key={bucket}>
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-muted-foreground">{t(`bucket.${bucket}`)}</h3>
+                  <ul className="space-y-1">
+                    {items.map(e => (
+                      <li key={e.id}>
+                        <button
+                          type="button"
+                          onClick={() => onOrderClick(e.orderId)}
+                          className="flex w-full items-center gap-3 rounded px-2 py-1.5 text-left hover:bg-muted/60"
+                          aria-label={`${e.orderName}: ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
+                        >
+                          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
+                          <span className="font-medium">{e.orderName}</span>
+                          <span className="text-sm text-muted-foreground">{t(`event.${e.eventType}`)}</span>
+                          {e.eventType === 'window' && e.newValue && (
+                            <span className="text-xs text-muted-foreground">→ {e.newValue}</span>
+                          )}
+                          <span className="ml-auto text-xs text-muted-foreground">{formatRelativeTime(e.changedAt, t)}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            })}
+            {nextCursor && (
+              <button type="button" onClick={loadMore} disabled={loading} className="text-sm text-primary underline">
+                {loading ? t('loading') : t('loadMore')}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </section>
   )
 }
