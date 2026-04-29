@@ -42,7 +42,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, Calculator, Medal } from 'lucide-react'
+import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, ChevronDown, Calculator, Medal, Filter } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 
@@ -64,7 +64,12 @@ export default function Home() {
   const [editByCodeIsLegacy, setEditByCodeIsLegacy] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [tostFieldsOrder, setTostFieldsOrder] = useState<Order | null>(null)
-  const [showStats, setShowStats] = useState(true)
+  const STATS_OPEN_KEY = 'tesla-tracker-stats-open'
+  const [showStats, setShowStats] = useState<boolean>(true)
+  const [statsHydrated, setStatsHydrated] = useState(false)
+  const FILTER_OPEN_KEY = 'tesla-tracker-filter-open'
+  const [filterOpen, setFilterOpen] = useState<boolean>(true)
+  const [filterHydrated, setFilterHydrated] = useState(false)
   const [showPrediction, setShowPrediction] = useState(false)
   // Search state
   const [showSearch, setShowSearch] = useState(false)
@@ -116,6 +121,36 @@ export default function Home() {
       localStorage.setItem(GLOBAL_FILTERS_KEY, JSON.stringify(toSave))
     }
   }, [globalFilters, filtersHydrated])
+
+  // Load stats panel open state from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STATS_OPEN_KEY)
+      if (raw !== null) setShowStats(raw === 'true')
+    } catch {}
+    setStatsHydrated(true)
+  }, [])
+
+  // Save stats panel open state to localStorage
+  useEffect(() => {
+    if (!statsHydrated) return
+    try { localStorage.setItem(STATS_OPEN_KEY, String(showStats)) } catch {}
+  }, [showStats, statsHydrated])
+
+  // Load filter bar open state from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(FILTER_OPEN_KEY)
+      if (raw !== null) setFilterOpen(raw === 'true')
+    } catch {}
+    setFilterHydrated(true)
+  }, [])
+
+  // Save filter bar open state to localStorage
+  useEffect(() => {
+    if (!filterHydrated) return
+    try { localStorage.setItem(FILTER_OPEN_KEY, String(filterOpen)) } catch {}
+  }, [filterOpen, filterHydrated])
 
   // Apply global filters to orders in a single pass
   const filteredOrders = useMemo(() => {
@@ -347,11 +382,23 @@ export default function Home() {
 
         {/* Global Filter Bar */}
         {!loading && (
-          <GlobalFilterBar
-            orders={orders}
-            filters={globalFilters}
-            onChange={setGlobalFilters}
-          />
+          <Collapsible open={filterOpen} onOpenChange={setFilterOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Filter className="h-4 w-4" />
+                {tc('filter')}
+                {hasActiveGlobalFilters && <span className="rounded-full bg-primary text-primary-foreground px-1.5 py-0.5 text-xs leading-none">{[globalFilters.vehicle !== 'all', globalFilters.period.type !== 'all', globalFilters.model, globalFilters.range, globalFilters.color, globalFilters.drive, globalFilters.wheels, globalFilters.interior, globalFilters.country, globalFilters.deliveryLocation].filter(Boolean).length}</span>}
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filterOpen ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <GlobalFilterBar
+                orders={orders}
+                filters={globalFilters}
+                onChange={setGlobalFilters}
+              />
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         <div className="flex items-center gap-2">

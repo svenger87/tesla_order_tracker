@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 const ALL_EVENT_TYPES = ['vin', 'production', 'papers', 'delivery', 'window', 'created'] as const
 type EventType = (typeof ALL_EVENT_TYPES)[number]
@@ -178,18 +179,20 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
 
   return (
     <section aria-label={t('title')} className="container mx-auto px-4 py-4">
-      <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-        <button
-          type="button"
-          onClick={() => setExpanded(v => !v)}
-          className="flex w-full items-center justify-between px-4 py-3 font-semibold"
-          aria-expanded={expanded}
-        >
-          <span>{t('title')} {entries.length > 0 && <span className="ml-2 rounded-full bg-muted px-2 text-xs">{entries.length}</span>}</span>
-          <span aria-hidden>{expanded ? '−' : '+'}</span>
-        </button>
+      <Card>
+        <CardHeader className="cursor-pointer p-0">
+          <button
+            type="button"
+            onClick={() => setExpanded(v => !v)}
+            className="flex w-full items-center justify-between px-6 py-4 font-semibold"
+            aria-expanded={expanded}
+          >
+            <span>{t('title')} {entries.length > 0 && <span className="ml-2 rounded-full bg-muted px-2 text-xs">{entries.length}</span>}</span>
+            <span aria-hidden>{expanded ? '−' : '+'}</span>
+          </button>
+        </CardHeader>
         {expanded && (
-          <div className="border-t px-4 py-3 space-y-4">
+          <CardContent className="border-t pt-3 space-y-4">
             <div className="flex flex-wrap gap-1.5">
               {ALL_EVENT_TYPES.map((ev) => {
                 const on = enabledEvents.has(ev)
@@ -243,9 +246,9 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
                 {loading ? t('loading') : t('loadMore')}
               </button>
             )}
-          </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </section>
   )
 }

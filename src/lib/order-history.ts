@@ -56,14 +56,29 @@ export async function recordOrderChanges(
     return
   }
 
-  const rows: Prisma.OrderHistoryCreateManyInput[] = []
+  const FLAP_WINDOW_MS = 5 * 60 * 1000
+
   for (const f of TRACKED_FIELDS) {
     const oldV = normalize((before as Record<string, unknown>)[f])
     const newV = normalize((after as Record<string, unknown>)[f])
     if (oldV === newV) continue
-    rows.push({ orderId, field: f, oldValue: oldV, newValue: newV, source })
-  }
-  if (rows.length > 0) {
-    await client.orderHistory.createMany({ data: rows })
+
+    const recent = await client.orderHistory.findFirst({
+      where: { orderId, field: f, source },
+      orderBy: { changedAt: 'desc' },
+    })
+
+    const isRevert = !!recent
+      && recent.newValue === oldV
+      && recent.oldValue === newV
+      && (Date.now() - recent.changedAt.getTime()) < FLAP_WINDOW_MS
+
+    if (isRevert) {
+      await client.orderHistory.delete({ where: { id: recent.id } })
+    } else {
+      await client.orderHistory.create({
+        data: { orderId, field: f, oldValue: oldV, newValue: newV, source },
+      })
+    }
   }
 }

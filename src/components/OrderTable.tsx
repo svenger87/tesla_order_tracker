@@ -860,7 +860,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
             {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
-            <TableHead className="font-bold whitespace-nowrap sticky right-0 bg-muted dark:bg-muted shadow-[-2px_0_4px_rgba(0,0,0,0.15)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-30">
+            <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">
               {tc('actions')}
             </TableHead>
           </TableRow>
@@ -901,20 +901,21 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   </TableCell>
                 )}
                 {isColumnVisible('name') && (
-                  <TableCell className="font-medium whitespace-nowrap">
-                    <span className="block truncate" title={order.name}>
+                  <TableCell className="font-medium overflow-hidden">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       <Link
                         href={`/track/${encodeURIComponent(order.name)}`}
-                        className="hover:text-primary transition-colors hover:underline underline-offset-2"
+                        className="hover:text-primary transition-colors hover:underline underline-offset-2 truncate"
+                        title={order.name}
                       >
                         {order.name}
                       </Link>
                       {order.source === 'tost' && (
-                        <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
+                        <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="shrink-0 inline-block align-middle hover:opacity-70 transition-opacity">
                           <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
                         </a>
                       )}
-                    </span>
+                    </div>
                   </TableCell>
                 )}
                 {isColumnVisible('vehicleType') && (
@@ -1104,7 +1105,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     {formatRelativeTime(order.updatedAt, t as any)}
                   </TableCell>
                 )}
-                <TableCell className="sticky right-0 bg-card dark:bg-card shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.4)] z-10">
+                <TableCell className="bg-card dark:bg-card">
                   {isAdmin ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
