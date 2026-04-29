@@ -319,35 +319,6 @@ export default function Home() {
 
   const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
 
-  const scrollToOrder = useCallback((orderId: string) => {
-    // Find which quarter group contains this order, then expand it and scroll
-    const group = orderGroups.find(g => g.orders.some(o => o.id === orderId))
-    if (!group) return
-    const quarterLabel = group.label
-    setExpandedQuarters(prev => {
-      return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
-    })
-    setHighlightOrderId(orderId)
-
-    // Wait for accordion to expand, then scroll the section into view and trigger virtualizer scroll
-    requestAnimationFrame(() => {
-      // Find the accordion section by its trigger text
-      const triggers = document.querySelectorAll('[data-state="open"]')
-      const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-
-      // Trigger virtualizer scroll after section is visible
-      setTimeout(() => setScrollToOrderId(orderId), 300)
-    })
-
-    // Clear highlight after animation
-    setTimeout(() => setHighlightOrderId(null), 3000)
-    // Clear scroll target after virtualizer has scrolled
-    setTimeout(() => setScrollToOrderId(null), 1000)
-  }, [orderGroups])
-
   const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
     // Expand the target quarter, keeping already-open ones (quarter label already known from search result)
     setExpandedQuarters(prev => {
@@ -465,7 +436,6 @@ export default function Home() {
             countries: globalFilters.country ? [globalFilters.country] : [],
             vehicleType: globalFilters.vehicle ?? 'all',
           }}
-          onOrderClick={scrollToOrder}
         />
 
         {/* Orders Section */}

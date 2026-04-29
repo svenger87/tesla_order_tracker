@@ -4,6 +4,17 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Link } from '@/i18n/navigation'
+
+const VEHICLE_SHORT: Record<string, string> = {
+  'Model Y': 'MY',
+  'Model 3': 'M3',
+  'Model S': 'MS',
+  'Model X': 'MX',
+  'Cybertruck': 'CT',
+  'Roadster': 'R',
+}
 
 const ALL_EVENT_TYPES = ['vin', 'production', 'papers', 'delivery', 'window', 'created'] as const
 type EventType = (typeof ALL_EVENT_TYPES)[number]
@@ -24,7 +35,6 @@ export interface FeedEntry {
 
 interface UpdatesFeedProps {
   globalFilters: { countries: string[]; vehicleType: string | 'all' }
-  onOrderClick: (orderId: string) => void
 }
 
 function formatRelativeTime(iso: string, t: (k: string, v?: Record<string, string | number | Date>) => string): string {
@@ -65,7 +75,7 @@ function eventColorHex(e: EventType): string {
 
 const POLL_MS = 60_000
 
-export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
+export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   const t = useTranslations('updatesFeed')
   const isMobile = useIsMobile()
   const [expanded, setExpanded] = useState(true)
@@ -220,20 +230,20 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
                   <ul className="space-y-1">
                     {items.map(e => (
                       <li key={e.id}>
-                        <button
-                          type="button"
-                          onClick={() => onOrderClick(e.orderId)}
-                          className="flex w-full items-center gap-3 rounded px-2 py-1.5 text-left hover:bg-muted/60"
-                          aria-label={`${e.orderName}: ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
+                        <Link
+                          href={`/track/${encodeURIComponent(e.orderName)}`}
+                          className="flex w-full items-center gap-3 rounded px-2 py-1.5 hover:bg-muted/60"
+                          aria-label={`${e.orderName} (${e.vehicleType}): ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
                         >
-                          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
-                          <span className="font-medium">{e.orderName}</span>
-                          <span className="text-sm text-muted-foreground">{t(`event.${e.eventType}`)}</span>
+                          <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
+                          <Badge variant="outline" className="shrink-0 text-xs font-mono">{VEHICLE_SHORT[e.vehicleType] ?? e.vehicleType}</Badge>
+                          <span className="font-medium truncate">{e.orderName}</span>
+                          <span className="text-sm text-muted-foreground truncate">{t(`event.${e.eventType}`)}</span>
                           {e.eventType === 'window' && e.newValue && (
-                            <span className="text-xs text-muted-foreground">→ {e.newValue}</span>
+                            <span className="text-xs text-muted-foreground truncate">→ {e.newValue}</span>
                           )}
-                          <span className="ml-auto text-xs text-muted-foreground">{formatRelativeTime(e.changedAt, t)}</span>
-                        </button>
+                          <span className="ml-auto shrink-0 text-xs text-muted-foreground">{formatRelativeTime(e.changedAt, t)}</span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
