@@ -178,8 +178,7 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
   )
 
   return (
-    <section aria-label={t('title')} className="container mx-auto px-4 py-4">
-      <Card>
+    <Card aria-label={t('title')}>
         <CardHeader className="cursor-pointer p-0">
           <button
             type="button"
@@ -248,7 +247,6 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
             )}
           </CardContent>
         )}
-      </Card>
-    </section>
+    </Card>
   )
 }
