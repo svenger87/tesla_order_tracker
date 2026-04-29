@@ -79,6 +79,12 @@ export async function POST(request: NextRequest) {
       }
 
       if (Object.keys(updates).length > 0) {
+        // NOTE: This admin endpoint normalises display-label values and intentionally
+        // does not write to OrderHistory. The fields it touches must NEVER include any
+        // of the audit-tracked fields (TRACKED_FIELDS in src/lib/order-history.ts) —
+        // `vinReceivedDate`, `productionDate`, `papersReceivedDate`, `deliveryDate`,
+        // `deliveryWindow`. Adding any of those to FIXES would silently bypass the
+        // updates feed audit trail.
         await prisma.order.update({
           where: { id: order.id },
           data: updates,

@@ -31,6 +31,11 @@ export async function GET(request: NextRequest) {
 
   const where: import('@/generated/prisma/client').Prisma.OrderHistoryWhereInput = {
     field: { in: eventToFields },
+    // Cursor is the previous page's tail `changedAt`. We use strict `<` here, so
+    // rows sharing the exact same millisecond timestamp as the cursor will be
+    // dropped from the next page. Acceptable trade-off for current data volume;
+    // if TOST sync ever produces many same-ms history rows, switch to a composite
+    // (changedAt, id) cursor.
     ...(cursor ? { changedAt: { lt: new Date(cursor) } } : {}),
     ...(includeTost ? {} : { OR: [{ source: null }, { source: { not: 'tost' } }] }),
     order: {

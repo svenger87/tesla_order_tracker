@@ -73,7 +73,12 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
   const [loading, setLoading] = useState(false)
   const [enabledEvents, setEnabledEvents] = useState<Set<EventType>>(new Set(ALL_EVENT_TYPES))
   const [hydrated, setHydrated] = useState(false)
+  const [paginated, setPaginated] = useState(false)
+  const paginatedRef = useRef(paginated)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Keep ref in sync so the polling setInterval callback reads the latest value without stale closure
+  useEffect(() => { paginatedRef.current = paginated }, [paginated])
 
   // Set initial collapsed state from isMobile, once
   useEffect(() => { setExpanded(!isMobile) }, [isMobile])
@@ -116,6 +121,7 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
       const data = (await res.json()) as { entries: FeedEntry[]; nextCursor: string | null }
       setEntries(data.entries)
       setNextCursor(data.nextCursor)
+      setPaginated(false)
     } finally {
       setLoading(false)
     }
@@ -129,10 +135,14 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [refresh, hydrated])
 
-  // Poll
+  // Poll — paused while the user has loaded extra pages to avoid wiping their paginated view.
+  // paginatedRef (kept in sync via its own effect) avoids a stale closure inside setInterval.
   useEffect(() => {
     if (!hydrated) return
-    const id = setInterval(() => { void refresh() }, POLL_MS)
+    const id = setInterval(() => {
+      if (paginatedRef.current) return
+      void refresh()
+    }, POLL_MS)
     return () => clearInterval(id)
   }, [refresh, hydrated])
 
@@ -145,6 +155,7 @@ export function UpdatesFeed({ globalFilters, onOrderClick }: UpdatesFeedProps) {
       const data = (await res.json()) as { entries: FeedEntry[]; nextCursor: string | null }
       setEntries((prev) => [...prev, ...data.entries])
       setNextCursor(data.nextCursor)
+      setPaginated(true)
     } finally {
       setLoading(false)
     }

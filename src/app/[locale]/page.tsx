@@ -284,8 +284,11 @@ export default function Home() {
 
   const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
 
-  const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
-    // Expand the target quarter, keeping already-open ones
+  const scrollToOrder = useCallback((orderId: string) => {
+    // Find which quarter group contains this order, then expand it and scroll
+    const group = orderGroups.find(g => g.orders.some(o => o.id === orderId))
+    if (!group) return
+    const quarterLabel = group.label
     setExpandedQuarters(prev => {
       return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
     })
@@ -307,6 +310,26 @@ export default function Home() {
     // Clear highlight after animation
     setTimeout(() => setHighlightOrderId(null), 3000)
     // Clear scroll target after virtualizer has scrolled
+    setTimeout(() => setScrollToOrderId(null), 1000)
+  }, [orderGroups])
+
+  const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
+    // Expand the target quarter, keeping already-open ones (quarter label already known from search result)
+    setExpandedQuarters(prev => {
+      return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
+    })
+    setHighlightOrderId(orderId)
+
+    requestAnimationFrame(() => {
+      const triggers = document.querySelectorAll('[data-state="open"]')
+      const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      setTimeout(() => setScrollToOrderId(orderId), 300)
+    })
+
+    setTimeout(() => setHighlightOrderId(null), 3000)
     setTimeout(() => setScrollToOrderId(null), 1000)
   }, [])
 
@@ -395,7 +418,7 @@ export default function Home() {
             countries: globalFilters.country ? [globalFilters.country] : [],
             vehicleType: globalFilters.vehicle ?? 'all',
           }}
-          onOrderClick={(id) => setScrollToOrderId(id)}
+          onOrderClick={scrollToOrder}
         />
 
         {/* Orders Section */}
