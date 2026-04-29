@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
+import { recordOrderChanges } from '@/lib/order-history'
 import {
   MODEL_3_TOW_HITCH_AVAILABLE,
   COLORS,
@@ -305,6 +306,8 @@ export async function POST(request: NextRequest) {
         editCode,
       },
     })
+
+    await recordOrderChanges(order.id, null, order)
 
     return NextResponse.json({
       id: order.id,
