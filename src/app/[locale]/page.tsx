@@ -16,6 +16,7 @@ import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
+import { UpdatesFeed } from '@/components/UpdatesFeed'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
@@ -387,6 +388,15 @@ export default function Home() {
           <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('orders')}</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         </div>
+
+        {/* Updates Feed */}
+        <UpdatesFeed
+          globalFilters={{
+            countries: globalFilters.country ? [globalFilters.country] : [],
+            vehicleType: globalFilters.vehicle ?? 'all',
+          }}
+          onOrderClick={(id) => setScrollToOrderId(id)}
+        />
 
         {/* Orders Section */}
         <Card>
