@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Objednávky a štatistiky Tesla",
-    "description": "Sledujte objednávky Tesla Model Y a Model 3 v komunite TFF. Termíny dodania, konfigurácie, sledovanie VIN a štatistiky pre Nemecko, Rakúsko a Švajčiarsko."
+    "description": "Sledujte objednávky všetky modely Tesla v komunite TFF. Termíny dodania, konfigurácie, sledovanie VIN a štatistiky pre Nemecko, Rakúsko a Švajčiarsko."
   },
   "common": {
     "save": "Uložiť",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Čierny",
-      "white": "Biely"
+      "white": "Biely",
+      "cream": "Krémová"
     },
     "range": {
       "maximale_reichweite": "Maximálny dojazd",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-miestne",
+      "6": "6-miestny",
       "7": "7-miestne"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Prevádzkuje Sven",
     "supportDevelopment": "Podporte hosting a vývoj",
     "stats": "{orders} objednávok · {delivered} dodaných"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

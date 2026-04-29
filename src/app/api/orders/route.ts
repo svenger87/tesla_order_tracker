@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
+import { recordOrderChanges } from '@/lib/order-history'
 import {
   MODEL_3_TOW_HITCH_AVAILABLE,
   COLORS,
@@ -66,25 +67,39 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
   return input === stored
 }
 
-// Apply Model 3 constraints - set unavailable options to "-"
-function applyModel3Constraints(data: Record<string, unknown>): Record<string, unknown> {
-  if (data.vehicleType !== 'Model 3') return data
-
+// Apply vehicle-specific constraints - set unavailable options appropriately
+function applyVehicleConstraints(data: Record<string, unknown>): Record<string, unknown> {
+  const vehicleType = data.vehicleType as string
   const model = (data.model as string)?.toLowerCase() || ''
   const result = { ...data }
 
-  // Performance models always have maximum range
-  if (model.includes('performance')) {
-    result.range = 'maximale_reichweite'
-  }
+  if (vehicleType === 'Model 3') {
+    // Performance models always have maximum range
+    if (model.includes('performance')) {
+      result.range = 'maximale_reichweite'
+    }
 
-  // Check tow hitch availability using ruleset
-  const trimKey = model.includes('performance') ? 'performance'
-    : model.includes('premium') ? 'premium'
-    : model.includes('standard') ? 'standard'
-    : null
+    // Check tow hitch availability using ruleset
+    const trimKey = model.includes('performance') ? 'performance'
+      : model.includes('premium') ? 'premium'
+      : model.includes('standard') ? 'standard'
+      : null
 
-  if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
+    if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
+      result.towHitch = 'nv'
+    }
+  } else if (vehicleType === 'Model S') {
+    result.drive = 'awd'
+    result.towHitch = 'nv'
+    result.seats = '5'
+  } else if (vehicleType === 'Model X') {
+    result.drive = 'awd'
+  } else if (vehicleType === 'Cybertruck') {
+    result.drive = 'awd'
+    result.towHitch = 'nv'
+    result.seats = '5'
+  } else if (vehicleType === 'Roadster') {
+    result.drive = 'awd'
     result.towHitch = 'nv'
   }
 
@@ -260,8 +275,8 @@ export async function POST(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(normalizedBody)
 
-    // Apply Model 3 constraints (set unavailable options to "nv")
-    const constrainedData = applyModel3Constraints(normalizedBody)
+    // Apply vehicle constraints (set unavailable options appropriately)
+    const constrainedData = applyVehicleConstraints(normalizedBody)
 
     const order = await prisma.order.create({
       data: {
@@ -291,6 +306,8 @@ export async function POST(request: NextRequest) {
         editCode,
       },
     })
+
+    await recordOrderChanges(order.id, null, order)
 
     return NextResponse.json({
       id: order.id,
@@ -366,7 +383,12 @@ export async function PUT(request: NextRequest) {
             if (value !== null) updateData[key] = value
           }
         }
-        const updated = await prisma.order.update({ where: { id }, data: updateData })
+        const updated = await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id } })
+          const u = await tx.order.update({ where: { id }, data: updateData })
+          await recordOrderChanges(id, before, u, { tx, source: 'tost' })
+          return u
+        })
         return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated' })
       }
       return NextResponse.json({ message: 'No changes' })
@@ -401,37 +423,42 @@ export async function PUT(request: NextRequest) {
         // Calculate time periods from dates
         const timePeriods = calculateTimePeriods(data)
 
-        // Apply Model 3 constraints
-        const constrainedData = applyModel3Constraints(data)
+        // Apply vehicle constraints
+        const constrainedData = applyVehicleConstraints(data)
 
         // Update order with new hashed password
-        const updated = await prisma.order.update({
-          where: { id },
-          data: {
-            editCode: hashedPassword, // Set the new hashed password
-            name: constrainedData.name as string,
-            vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
-            orderDate: (constrainedData.orderDate as string) || null,
-            country: (constrainedData.country as string) || null,
-            model: (constrainedData.model as string) || null,
-            range: (constrainedData.range as string) || null,
-            drive: (constrainedData.drive as string) || null,
-            color: (constrainedData.color as string) || null,
-            interior: (constrainedData.interior as string) || null,
-            wheels: (constrainedData.wheels as string) || null,
-            towHitch: (constrainedData.towHitch as string) || null,
-            autopilot: (constrainedData.autopilot as string) || null,
-            deliveryWindow: (constrainedData.deliveryWindow as string) || null,
-            deliveryLocation: (constrainedData.deliveryLocation as string) || null,
-            vin: (constrainedData.vin as string) || null,
-            vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
-            papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
-            productionDate: (constrainedData.productionDate as string) || null,
-            typeApproval: (constrainedData.typeApproval as string) || null,
-            typeVariant: (constrainedData.typeVariant as string) || null,
-            deliveryDate: (constrainedData.deliveryDate as string) || null,
-            ...timePeriods,
-          },
+        const updated = await prisma.$transaction(async (tx) => {
+          const before = await tx.order.findUnique({ where: { id } })
+          const u = await tx.order.update({
+            where: { id },
+            data: {
+              editCode: hashedPassword, // Set the new hashed password
+              name: constrainedData.name as string,
+              vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+              orderDate: (constrainedData.orderDate as string) || null,
+              country: (constrainedData.country as string) || null,
+              model: (constrainedData.model as string) || null,
+              range: (constrainedData.range as string) || null,
+              drive: (constrainedData.drive as string) || null,
+              color: (constrainedData.color as string) || null,
+              interior: (constrainedData.interior as string) || null,
+              wheels: (constrainedData.wheels as string) || null,
+              towHitch: (constrainedData.towHitch as string) || null,
+              autopilot: (constrainedData.autopilot as string) || null,
+              deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+              deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+              vin: (constrainedData.vin as string) || null,
+              vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+              papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+              productionDate: (constrainedData.productionDate as string) || null,
+              typeApproval: (constrainedData.typeApproval as string) || null,
+              typeVariant: (constrainedData.typeVariant as string) || null,
+              deliveryDate: (constrainedData.deliveryDate as string) || null,
+              ...timePeriods,
+            },
+          })
+          await recordOrderChanges(id, before, u, { tx })
+          return u
         })
 
         return NextResponse.json({
@@ -468,36 +495,41 @@ export async function PUT(request: NextRequest) {
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(data)
 
-    // Apply Model 3 constraints
-    const constrainedData = applyModel3Constraints(data)
+    // Apply vehicle constraints
+    const constrainedData = applyVehicleConstraints(data)
 
-    const updated = await prisma.order.update({
-      where: { id },
-      data: {
-        name: constrainedData.name as string,
-        vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
-        orderDate: (constrainedData.orderDate as string) || null,
-        country: (constrainedData.country as string) || null,
-        model: (constrainedData.model as string) || null,
-        range: (constrainedData.range as string) || null,
-        drive: (constrainedData.drive as string) || null,
-        color: (constrainedData.color as string) || null,
-        interior: (constrainedData.interior as string) || null,
-        wheels: (constrainedData.wheels as string) || null,
-        towHitch: (constrainedData.towHitch as string) || null,
-        autopilot: (constrainedData.autopilot as string) || null,
-        seats: (constrainedData.seats as string) || null,
-        deliveryWindow: (constrainedData.deliveryWindow as string) || null,
-        deliveryLocation: (constrainedData.deliveryLocation as string) || null,
-        vin: (constrainedData.vin as string) || null,
-        vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
-        papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
-        productionDate: (constrainedData.productionDate as string) || null,
-        typeApproval: (constrainedData.typeApproval as string) || null,
-        typeVariant: (constrainedData.typeVariant as string) || null,
-        deliveryDate: (constrainedData.deliveryDate as string) || null,
-        ...timePeriods,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const before = await tx.order.findUnique({ where: { id } })
+      const u = await tx.order.update({
+        where: { id },
+        data: {
+          name: constrainedData.name as string,
+          vehicleType: (constrainedData.vehicleType as string) || 'Model Y',
+          orderDate: (constrainedData.orderDate as string) || null,
+          country: (constrainedData.country as string) || null,
+          model: (constrainedData.model as string) || null,
+          range: (constrainedData.range as string) || null,
+          drive: (constrainedData.drive as string) || null,
+          color: (constrainedData.color as string) || null,
+          interior: (constrainedData.interior as string) || null,
+          wheels: (constrainedData.wheels as string) || null,
+          towHitch: (constrainedData.towHitch as string) || null,
+          autopilot: (constrainedData.autopilot as string) || null,
+          seats: (constrainedData.seats as string) || null,
+          deliveryWindow: (constrainedData.deliveryWindow as string) || null,
+          deliveryLocation: (constrainedData.deliveryLocation as string) || null,
+          vin: (constrainedData.vin as string) || null,
+          vinReceivedDate: (constrainedData.vinReceivedDate as string) || null,
+          papersReceivedDate: (constrainedData.papersReceivedDate as string) || null,
+          productionDate: (constrainedData.productionDate as string) || null,
+          typeApproval: (constrainedData.typeApproval as string) || null,
+          typeVariant: (constrainedData.typeVariant as string) || null,
+          deliveryDate: (constrainedData.deliveryDate as string) || null,
+          ...timePeriods,
+        },
+      })
+      await recordOrderChanges(id, before, u, { tx })
+      return u
     })
 
     return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated successfully' })

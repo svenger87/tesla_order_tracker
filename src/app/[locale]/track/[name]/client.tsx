@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order, VehicleType } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES } from '@/lib/types'
 import { Link } from '@/i18n/navigation'
 import { ProgressTimeline } from '@/components/ProgressTimeline'
 import { SimilarOrders } from '@/components/SimilarOrders'
@@ -98,7 +98,7 @@ export function TrackingPageClient({
     }
   }
 
-  const isModelYOrM3 = order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3'
+  const isKnownVehicle = VEHICLE_TYPES.some(vt => vt.value === order.vehicleType)
 
   const confidenceColor = prediction?.confidence === 'high'
     ? 'text-green-600 dark:text-green-400'
@@ -136,7 +136,7 @@ export function TrackingPageClient({
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 {/* Car image */}
-                {isModelYOrM3 && (
+                {isKnownVehicle && (
                   <div className="shrink-0">
                     <TeslaCarImage
                       vehicleType={order.vehicleType as VehicleType}
@@ -176,7 +176,7 @@ export function TrackingPageClient({
                   <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                     {order.vehicleType && (
                       <Badge variant="default" className="font-bold">
-                        {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                        {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[order.vehicleType] || order.vehicleType}
                       </Badge>
                     )}
                     {resolvedLabels.model && (

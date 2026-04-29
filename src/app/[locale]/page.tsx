@@ -16,6 +16,7 @@ import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
+import { UpdatesFeed } from '@/components/UpdatesFeed'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
@@ -283,8 +284,11 @@ export default function Home() {
 
   const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
 
-  const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
-    // Expand the target quarter, keeping already-open ones
+  const scrollToOrder = useCallback((orderId: string) => {
+    // Find which quarter group contains this order, then expand it and scroll
+    const group = orderGroups.find(g => g.orders.some(o => o.id === orderId))
+    if (!group) return
+    const quarterLabel = group.label
     setExpandedQuarters(prev => {
       return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
     })
@@ -306,6 +310,26 @@ export default function Home() {
     // Clear highlight after animation
     setTimeout(() => setHighlightOrderId(null), 3000)
     // Clear scroll target after virtualizer has scrolled
+    setTimeout(() => setScrollToOrderId(null), 1000)
+  }, [orderGroups])
+
+  const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
+    // Expand the target quarter, keeping already-open ones (quarter label already known from search result)
+    setExpandedQuarters(prev => {
+      return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
+    })
+    setHighlightOrderId(orderId)
+
+    requestAnimationFrame(() => {
+      const triggers = document.querySelectorAll('[data-state="open"]')
+      const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      setTimeout(() => setScrollToOrderId(orderId), 300)
+    })
+
+    setTimeout(() => setHighlightOrderId(null), 3000)
     setTimeout(() => setScrollToOrderId(null), 1000)
   }, [])
 
@@ -387,6 +411,15 @@ export default function Home() {
           <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('orders')}</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         </div>
+
+        {/* Updates Feed */}
+        <UpdatesFeed
+          globalFilters={{
+            countries: globalFilters.country ? [globalFilters.country] : [],
+            vehicleType: globalFilters.vehicle ?? 'all',
+          }}
+          onOrderClick={scrollToOrder}
+        />
 
         {/* Orders Section */}
         <Card>

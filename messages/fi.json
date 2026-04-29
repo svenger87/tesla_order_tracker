@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla-tilaukset ja tilastot",
-    "description": "Seuraa Tesla Model Y- ja Model 3 -tilauksia TFF-yhteisössä. Toimitusaikataulut, kokoonpanot, VIN-seuranta ja tilastot Saksassa, Itävallassa ja Sveitsissä."
+    "description": "Seuraa kaikkien Tesla-mallien tilauksia TFF-yhteisössä. Toimitusaikataulut, kokoonpanot, VIN-seuranta ja tilastot Saksassa, Itävallassa ja Sveitsissä."
   },
   "common": {
     "save": "Tallenna",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Musta",
-      "white": "Valkoinen"
+      "white": "Valkoinen",
+      "cream": "Kerma"
     },
     "range": {
       "maximale_reichweite": "Maksimitoimintamatka",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-paikkainen",
+      "6": "6-paikkainen",
       "7": "7-paikkainen"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP-siirto",
       "fsd": "FSD",
       "fsd_transfer": "FSD-siirto"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Ylläpitäjä Sven",
     "supportDevelopment": "Tue ylläpitoa ja kehitystä",
     "stats": "{orders} tilausta · {delivered} toimitettu"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

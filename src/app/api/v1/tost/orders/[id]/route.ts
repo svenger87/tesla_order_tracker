@@ -6,6 +6,7 @@ import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { calculateTimePeriods } from '@/lib/tost-helpers'
 import { normalizeDateFields } from '@/lib/date-utils'
 import { trackApiEvent } from '@/lib/umami'
+import { recordOrderChanges } from '@/lib/order-history'
 
 // DELETE /api/v1/tost/orders/[id] - Delete a TOST-owned order
 export const DELETE = withTostAuth(
@@ -100,10 +101,14 @@ export const PUT = withTostAuth(
         }
       }
 
-      const updated = await prisma.order.update({
-        where: { id },
-        data: updateData,
-        select: { id: true, updatedAt: true },
+      const updated = await prisma.$transaction(async (tx) => {
+        const before = await tx.order.findUnique({ where: { id } })
+        const u = await tx.order.update({
+          where: { id },
+          data: updateData,
+        })
+        await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
+        return u
       })
 
       trackApiEvent({ name: 'tost-update-order', url: `/api/v1/tost/orders/${id}`, data: { fieldsUpdated: Object.keys(updateData).length } })

@@ -4,6 +4,7 @@ import { withApiAuth } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { ApiOrder, CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
+import { recordOrderChanges } from '@/lib/order-history'
 
 // Fields to select (excludes editCode for security)
 const orderSelectFields = {
@@ -173,6 +174,8 @@ export const POST = withApiAuth(async (request: NextRequest) => {
         ...(editCode && { editCode }),
       },
     })
+
+    await recordOrderChanges(order.id, null, order)
 
     const response: CreateOrderResponse = {
       id: order.id,

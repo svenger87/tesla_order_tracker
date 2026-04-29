@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, RANGES, MODEL_Y_TRIMS, MODEL_3_TRIMS, COUNTRIES } from '@/lib/types'
+import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, RANGES, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_S_TRIMS, MODEL_X_TRIMS, CYBERTRUCK_TRIMS, ROADSTER_TRIMS, COUNTRIES } from '@/lib/types'
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { FilterCollapse } from '@/components/FilterCollapse'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -103,7 +103,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
       if (o.deliveryLocation) deliveryLocations.add(o.deliveryLocation)
     })
 
-    const allTrims = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]
+    const allTrims = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS, ...MODEL_S_TRIMS, ...MODEL_X_TRIMS, ...CYBERTRUCK_TRIMS, ...ROADSTER_TRIMS]
     const modelOptions = Array.from(models).map(v => {
       const trim = allTrims.find(t => t.value === v)
       return { value: v, label: trim?.label || v }

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Παραγγελίες και Στατιστικά Tesla",
-    "description": "Παρακολουθήστε παραγγελίες Tesla Model Y και Model 3 στην κοινότητα TFF. Χρονοδιαγράμματα παράδοσης, διαμορφώσεις, παρακολούθηση VIN και στατιστικά για Γερμανία, Αυστρία και Ελβετία."
+    "description": "Παρακολουθήστε παραγγελίες όλα τα μοντέλα Tesla στην κοινότητα TFF. Χρονοδιαγράμματα παράδοσης, διαμορφώσεις, παρακολούθηση VIN και στατιστικά για Γερμανία, Αυστρία και Ελβετία."
   },
   "common": {
     "save": "Αποθήκευση",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Μαύρο",
-      "white": "Λευκό"
+      "white": "Λευκό",
+      "cream": "Κρεμ"
     },
     "range": {
       "maximale_reichweite": "Μέγιστη Αυτονομία",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5θέσιο",
+      "6": "6-θέσιο",
       "7": "7θέσιο"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "Μεταφορά EAP",
       "fsd": "FSD",
       "fsd_transfer": "Μεταφορά FSD"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Λειτουργεί από τον Sven",
     "supportDevelopment": "Υποστήριξη φιλοξενίας & ανάπτυξης",
     "stats": "{orders} παραγγελίες · {delivered} παραδοθείσες"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

@@ -46,6 +46,8 @@ model Order {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  history               OrderHistory[]
+
   @@index([name, orderDate])
   @@index([archived])
   @@index([archived, createdAt])
@@ -129,4 +131,19 @@ model CompositorCode {
 
   @@unique([category, vehicleType, lookupKey])
   @@index([category, vehicleType, isActive])
+}
+
+model OrderHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  field     String
+  oldValue  String?
+  newValue  String?
+  source    String?
+  changedAt DateTime @default(now())
+
+  @@index([changedAt])
+  @@index([orderId, changedAt])
+  @@index([field, changedAt])
 }

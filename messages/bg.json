@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Поръчки и статистики на Tesla",
-    "description": "Проследявайте поръчки за Tesla Model Y и Model 3 в общността TFF. Срокове на доставка, конфигурации, проследяване на VIN и статистики за Германия, Австрия и Швейцария."
+    "description": "Проследявайте поръчки за всички модели Tesla в общността TFF. Срокове на доставка, конфигурации, проследяване на VIN и статистики за Германия, Австрия и Швейцария."
   },
   "common": {
     "save": "Запази",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Черен",
-      "white": "Бял"
+      "white": "Бял",
+      "cream": "Кремав"
     },
     "range": {
       "maximale_reichweite": "Максимален пробег",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5 места",
+      "6": "6-местен",
       "7": "7 места"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Поддържан от Sven",
     "supportDevelopment": "Подкрепете хостинга и разработката",
     "stats": "{orders} поръчки · {delivered} доставени"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

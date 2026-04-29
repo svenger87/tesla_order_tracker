@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla 注文と統計",
-    "description": "TFF コミュニティで Tesla Model Y と Model 3 の注文を追跡します。納車スケジュール、構成、VIN 追跡、ドイツ・オーストリア・スイスの統計データ。"
+    "description": "TFF コミュニティで すべての Tesla モデル の注文を追跡します。納車スケジュール、構成、VIN 追跡、ドイツ・オーストリア・スイスの統計データ。"
   },
   "common": {
     "save": "保存",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "ブラック",
-      "white": "ホワイト"
+      "white": "ホワイト",
+      "cream": "クリーム"
     },
     "range": {
       "maximale_reichweite": "最大航続距離",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5人乗り",
+      "6": "6人乗り",
       "7": "7人乗り"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP 移行",
       "fsd": "FSD",
       "fsd_transfer": "FSD 移行"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Sven が運営",
     "supportDevelopment": "ホスティングと開発を支援",
     "stats": "{orders} 件の注文 · {delivered} 件納車済み"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

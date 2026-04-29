@@ -1,9 +1,13 @@
 // Vehicle types supported by the application
-export type VehicleType = 'Model Y' | 'Model 3'
+export type VehicleType = 'Model Y' | 'Model 3' | 'Model S' | 'Model X' | 'Cybertruck' | 'Roadster'
 
 export const VEHICLE_TYPES: { value: VehicleType; label: string }[] = [
   { value: 'Model Y', label: 'Model Y' },
   { value: 'Model 3', label: 'Model 3' },
+  { value: 'Model S', label: 'Model S' },
+  { value: 'Model X', label: 'Model X' },
+  { value: 'Cybertruck', label: 'Cybertruck' },
+  { value: 'Roadster', label: 'Roadster' },
 ]
 
 export interface Order {
@@ -153,6 +157,30 @@ export const MODEL_3_TRIMS = [
   { value: 'performance', label: 'Performance' },
 ]
 
+// Model S trims
+export const MODEL_S_TRIMS = [
+  { value: 'standard', label: 'Standard' },
+  { value: 'plaid', label: 'Plaid' },
+]
+
+// Model X trims
+export const MODEL_X_TRIMS = [
+  { value: 'standard', label: 'Standard' },
+  { value: 'plaid', label: 'Plaid' },
+]
+
+// Cybertruck trims
+export const CYBERTRUCK_TRIMS = [
+  { value: 'awd', label: 'AWD' },
+  { value: 'cyberbeast', label: 'Cyberbeast' },
+]
+
+// Roadster trims (placeholder)
+export const ROADSTER_TRIMS = [
+  { value: 'base', label: 'Base' },
+  { value: 'founders', label: 'Founders Series' },
+]
+
 export const RANGES = [
   { value: 'maximale_reichweite', label: 'Maximale Reichweite' },
   { value: 'standard', label: 'Standard' },
@@ -175,6 +203,8 @@ export const COLORS = [
   { value: 'marine_blue', label: 'Marine Blue', hex: '#1E3A5F', border: false },    // New Juniper
   { value: 'deep_blue', label: 'Deep Blue Metallic', hex: '#1C3A5F', border: false },
   { value: 'midnight_cherry', label: 'Midnight Cherry Red', hex: '#5C0029', border: false },
+  // Cybertruck
+  { value: 'stainless_steel', label: 'Stainless Steel', hex: '#C8C8C8', border: true },
   // Legacy colors (discontinued but appear in historical orders)
   { value: 'midnight_silver', label: 'Midnight Silver Metallic', hex: '#71797E', border: false },
   { value: 'red_multi', label: 'Red Multi-Coat', hex: '#A52125', border: false },
@@ -184,6 +214,7 @@ export const COLORS = [
 export const INTERIORS = [
   { value: 'black', label: 'Schwarz' },
   { value: 'white', label: 'Weiß' },
+  { value: 'cream', label: 'Creme' },
 ]
 
 // Model Y wheels (all sizes)
@@ -203,6 +234,26 @@ export const MODEL_3_WHEELS = [
   { value: '19', label: '19"' },
   { value: '20', label: '20"' },
 ]
+
+// Model S wheels
+export const MODEL_S_WHEELS = [
+  { value: '19', label: '19"' },
+  { value: '21', label: '21"' },
+]
+
+// Model X wheels
+export const MODEL_X_WHEELS = [
+  { value: '20', label: '20"' },
+  { value: '22', label: '22"' },
+]
+
+// Cybertruck wheels
+export const CYBERTRUCK_WHEELS = [
+  { value: '20', label: '20"' },
+]
+
+// Roadster wheels (TBD)
+export const ROADSTER_WHEELS: { value: string; label: string }[] = []
 
 // Model 3 wheel constraints per trim
 export const MODEL_3_WHEEL_CONSTRAINTS: Record<string, string[]> = {
@@ -249,5 +300,6 @@ export const TOW_HITCH_OPTIONS = [
 
 export const SEATS_OPTIONS = [
   { value: '5', label: '5-Sitzer' },
+  { value: '6', label: '6-Sitzer' },
   { value: '7', label: '7-Sitzer' },
 ]

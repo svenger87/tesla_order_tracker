@@ -6,7 +6,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
-import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS } from '@/lib/types'
+import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween } from '@/lib/date-utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
@@ -80,7 +80,7 @@ const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
             style={{ backgroundColor: colorInfo.hex }}
           />
         )}
-        <span>{displayLabel}</span>
+        <span className="truncate" title={displayLabel}>{displayLabel}</span>
       </div>
     </TableCell>
   )
@@ -132,8 +132,8 @@ const CountryCell = memo(function CountryCell({
   return (
     <TableCell className="whitespace-nowrap">
       <div className="flex items-center gap-1.5">
-        {flag && <TwemojiEmoji emoji={flag} size={16} />}
-        <span>{displayName}</span>
+        {flag && <TwemojiEmoji emoji={flag} size={16} className="shrink-0" />}
+        <span className="truncate" title={displayName}>{displayName}</span>
       </div>
     </TableCell>
   )
@@ -331,8 +331,8 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
       onClick={() => onSort(field)}
     >
       <div className="flex items-center gap-1">
-        {children}
-        <span className="ml-1">
+        <span className="truncate">{children}</span>
+        <span className="ml-1 shrink-0">
           {isActive ? (
             direction === 'asc' ? (
               <ArrowUp className="h-3 w-3" />
@@ -355,43 +355,44 @@ interface ColumnDef {
   key: string
   label: string
   group: ColumnGroup
+  width: number
 }
 
 const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
-  { key: 'status', label: 'status', group: 'essential' },
-  { key: 'name', label: 'name', group: 'essential' },
-  { key: 'vehicleType', label: 'vehicle', group: 'essential' },
-  { key: 'carImage', label: 'image', group: 'configuration' },
-  { key: 'orderDate', label: 'orderDate', group: 'essential' },
+  { key: 'status',             label: 'status',             group: 'essential',     width: 120 },
+  { key: 'name',               label: 'name',               group: 'essential',     width: 180 },
+  { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 110 },
+  { key: 'carImage',           label: 'image',              group: 'configuration', width: 80  },
+  { key: 'orderDate',          label: 'orderDate',          group: 'essential',     width: 120 },
   // Configuration
-  { key: 'country', label: 'country', group: 'configuration' },
-  { key: 'model', label: 'model', group: 'configuration' },
-  { key: 'range', label: 'range', group: 'configuration' },
-  { key: 'drive', label: 'drive', group: 'configuration' },
-  { key: 'color', label: 'color', group: 'configuration' },
-  { key: 'interior', label: 'interior', group: 'configuration' },
-  { key: 'wheels', label: 'wheels', group: 'configuration' },
-  { key: 'towHitch', label: 'towHitch', group: 'configuration' },
-  { key: 'seats', label: 'seats', group: 'configuration' },
-  { key: 'autopilot', label: 'autopilot', group: 'configuration' },
+  { key: 'country',            label: 'country',            group: 'configuration', width: 130 },
+  { key: 'model',              label: 'model',              group: 'configuration', width: 120 },
+  { key: 'range',              label: 'range',              group: 'configuration', width: 130 },
+  { key: 'drive',              label: 'drive',              group: 'configuration', width: 130 },
+  { key: 'color',              label: 'color',              group: 'configuration', width: 150 },
+  { key: 'interior',           label: 'interior',           group: 'configuration', width: 130 },
+  { key: 'wheels',             label: 'wheels',             group: 'configuration', width: 100 },
+  { key: 'towHitch',           label: 'towHitch',           group: 'configuration', width: 90  },
+  { key: 'seats',              label: 'seats',              group: 'configuration', width: 80  },
+  { key: 'autopilot',          label: 'autopilot',          group: 'configuration', width: 130 },
   // Status & Delivery
-  { key: 'deliveryWindow', label: 'deliveryWindow', group: 'configuration' },
-  { key: 'deliveryLocation', label: 'deliveryLocation', group: 'configuration' },
-  { key: 'vin', label: 'vin', group: 'configuration' },
-  { key: 'vinReceivedDate', label: 'vinDate', group: 'configuration' },
-  { key: 'papersReceivedDate', label: 'papersDate', group: 'configuration' },
-  { key: 'productionDate', label: 'production', group: 'configuration' },
-  { key: 'typeApproval', label: 'typeApproval', group: 'configuration' },
-  { key: 'typeVariant', label: 'typeVariant', group: 'configuration' },
-  { key: 'deliveryDate', label: 'deliveryDate', group: 'configuration' },
+  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 150 },
+  { key: 'deliveryLocation',   label: 'deliveryLocation',   group: 'configuration', width: 150 },
+  { key: 'vin',                label: 'vin',                group: 'configuration', width: 170 },
+  { key: 'vinReceivedDate',    label: 'vinDate',            group: 'configuration', width: 120 },
+  { key: 'papersReceivedDate', label: 'papersDate',         group: 'configuration', width: 120 },
+  { key: 'productionDate',     label: 'production',         group: 'configuration', width: 120 },
+  { key: 'typeApproval',       label: 'typeApproval',       group: 'configuration', width: 120 },
+  { key: 'typeVariant',        label: 'typeVariant',        group: 'configuration', width: 120 },
+  { key: 'deliveryDate',       label: 'deliveryDate',       group: 'configuration', width: 120 },
   // Detail (segment time periods matching timeline & metadata)
-  { key: 'orderToVin', label: 'orderToVin', group: 'detail' },
-  { key: 'vinToProduction', label: 'vinToProduction', group: 'detail' },
-  { key: 'productionToPapers', label: 'productionToPapers', group: 'detail' },
-  { key: 'papersToDelivery', label: 'papersToDelivery', group: 'detail' },
-  { key: 'orderToDelivery', label: 'orderToDelivery', group: 'detail' },
-  { key: 'updatedAt', label: 'updatedAt', group: 'detail' },
+  { key: 'orderToVin',         label: 'orderToVin',         group: 'detail',        width: 110 },
+  { key: 'vinToProduction',    label: 'vinToProduction',    group: 'detail',        width: 110 },
+  { key: 'productionToPapers', label: 'productionToPapers', group: 'detail',        width: 110 },
+  { key: 'papersToDelivery',   label: 'papersToDelivery',   group: 'detail',        width: 110 },
+  { key: 'orderToDelivery',    label: 'orderToDelivery',    group: 'detail',        width: 110 },
+  { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
 // All columns visible by default
@@ -399,8 +400,9 @@ const DEFAULT_VISIBLE_COLUMNS = new Set(
   COLUMN_DEFS.map(c => c.key)
 )
 
-const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns'
+const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
+const COLUMNS_SCHEMA = COLUMN_DEFS.map(c => c.key).sort().join(',')
 
 export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp, scrollToOrderId }: OrderTableProps) {
   const isMobile = useIsMobile()
@@ -472,19 +474,23 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       }
     }
 
-    // Load column visibility, auto-including any new columns not in saved set
+    // Load column visibility, respecting user-hidden columns and auto-showing truly new ones
     const savedColumns = localStorage.getItem(COLUMNS_STORAGE_KEY)
     if (savedColumns) {
       try {
-        const parsed = JSON.parse(savedColumns)
-        if (Array.isArray(parsed)) {
-          const saved = new Set(parsed)
-          // Add any columns that exist in COLUMN_DEFS but weren't in saved prefs (newly added)
-          const allKeys = new Set(COLUMN_DEFS.map(c => c.key))
-          for (const key of allKeys) {
-            if (!saved.has(key)) saved.add(key)
+        const parsed = JSON.parse(savedColumns) as { visible?: string[]; schema?: string }
+        if (parsed && Array.isArray(parsed.visible) && typeof parsed.schema === 'string') {
+          const visible = new Set(parsed.visible)
+          if (parsed.schema === COLUMNS_SCHEMA) {
+            setVisibleColumns(visible)
+          } else {
+            // Schema changed: add ONLY columns that didn't exist when prefs were saved
+            const previousKeys = new Set(parsed.schema.split(',').filter(Boolean))
+            for (const c of COLUMN_DEFS) {
+              if (!previousKeys.has(c.key)) visible.add(c.key)
+            }
+            setVisibleColumns(visible)
           }
-          setVisibleColumns(saved)
         }
       } catch (e) {
         console.error('Failed to parse saved columns:', e)
@@ -504,7 +510,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   // Save column visibility to localStorage whenever it changes
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify([...visibleColumns]))
+      localStorage.setItem(
+        COLUMNS_STORAGE_KEY,
+        JSON.stringify({ visible: [...visibleColumns], schema: COLUMNS_SCHEMA }),
+      )
     }
   }, [visibleColumns, isHydrated])
 
@@ -811,7 +820,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="w-full min-w-max caption-bottom text-xs">
+        <table className="table-fixed w-max caption-bottom text-xs">
+          <colgroup>
+            {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
+              <col key={c.key} style={{ width: c.width }} />
+            ))}
+            {/* Actions column — always rendered at end */}
+            <col style={{ width: 60 }} />
+          </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
@@ -886,24 +902,26 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('name') && (
                   <TableCell className="font-medium whitespace-nowrap">
-                    <Link
-                      href={`/track/${encodeURIComponent(order.name)}`}
-                      className="hover:text-primary transition-colors hover:underline underline-offset-2"
-                    >
-                      {order.name}
-                    </Link>
-                    {order.source === 'tost' && (
-                      <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
-                        <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
-                      </a>
-                    )}
+                    <span className="block truncate" title={order.name}>
+                      <Link
+                        href={`/track/${encodeURIComponent(order.name)}`}
+                        className="hover:text-primary transition-colors hover:underline underline-offset-2"
+                      >
+                        {order.name}
+                      </Link>
+                      {order.source === 'tost' && (
+                        <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
+                          <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
+                        </a>
+                      )}
+                    </span>
                   </TableCell>
                 )}
                 {isColumnVisible('vehicleType') && (
                   <TableCell className="whitespace-nowrap">
                     {order.vehicleType ? (
                       <Badge variant="outline" className="text-xs">
-                        {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                        {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[order.vehicleType] || order.vehicleType}
                       </Badge>
                     ) : '-'}
                   </TableCell>
@@ -917,7 +935,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                         onClick={() => setImageModalOrder(order)}
                       >
                         <TeslaCarImage
-                          vehicleType={order.vehicleType as 'Model Y' | 'Model 3'}
+                          vehicleType={order.vehicleType as VehicleType}
                           color={order.color}
                           wheels={order.wheels}
                           model={order.model}
@@ -973,10 +991,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('color') && <ColorCell color={order.color} />}
                 {isColumnVisible('interior') && (
-                  <TableCell className="whitespace-nowrap">{getLabel(interiors, order.interior)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={getLabel(interiors, order.interior)}>{getLabel(interiors, order.interior)}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('wheels') && (
-                  <TableCell className="whitespace-nowrap">{getLabel(wheels, order.wheels)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={getLabel(wheels, order.wheels)}>{getLabel(wheels, order.wheels)}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('towHitch') && (
                   <TableCell className="whitespace-nowrap">
@@ -1000,14 +1022,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   </TableCell>
                 )}
                 {isColumnVisible('deliveryWindow') && (
-                  <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.deliveryWindow || ''}>{order.deliveryWindow || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('deliveryLocation') && (
-                  <TableCell className="whitespace-nowrap">{order.deliveryLocation || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.deliveryLocation || ''}>{order.deliveryLocation || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('vin') && (
                   <TableCell className="whitespace-nowrap font-mono text-xs">
-                    {order.vin ? order.vin.substring(0, 17) : '-'}
+                    <span className="block truncate" title={order.vin || ''}>{order.vin ? order.vin.substring(0, 17) : '-'}</span>
                   </TableCell>
                 )}
                 {isColumnVisible('vinReceivedDate') && (
@@ -1020,10 +1046,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   <TableCell className="whitespace-nowrap">{order.productionDate || '-'}</TableCell>
                 )}
                 {isColumnVisible('typeApproval') && (
-                  <TableCell className="whitespace-nowrap">{order.typeApproval || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.typeApproval || ''}>{order.typeApproval || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('typeVariant') && (
-                  <TableCell className="whitespace-nowrap">{order.typeVariant || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.typeVariant || ''}>{order.typeVariant || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('deliveryDate') && (
                   <TableCell className="whitespace-nowrap">
@@ -1168,7 +1198,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             <div className="space-y-3">
               <div className="flex justify-center">
                 <TeslaCarImage
-                  vehicleType={imageModalOrder.vehicleType as 'Model Y' | 'Model 3'}
+                  vehicleType={imageModalOrder.vehicleType as VehicleType}
                   color={imageModalOrder.color}
                   wheels={imageModalOrder.wheels}
                   model={imageModalOrder.model}

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Pedidos y estadísticas de Tesla",
-    "description": "Realice el seguimiento de pedidos de Tesla Model Y y Model 3 en la comunidad TFF. Plazos de entrega, configuraciones, seguimiento de VIN y estadísticas para Alemania, Austria y Suiza."
+    "description": "Realice el seguimiento de pedidos de todos los modelos Tesla en la comunidad TFF. Plazos de entrega, configuraciones, seguimiento de VIN y estadísticas para Alemania, Austria y Suiza."
   },
   "common": {
     "save": "Guardar",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Negro",
-      "white": "Blanco"
+      "white": "Blanco",
+      "cream": "Crema"
     },
     "range": {
       "maximale_reichweite": "Autonomía máxima",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5 plazas",
+      "6": "6 plazas",
       "7": "7 plazas"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transferencia",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transferencia"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Operado por Sven",
     "supportDevelopment": "Apoyar el alojamiento y desarrollo",
     "stats": "{orders} pedidos · {delivered} entregados"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

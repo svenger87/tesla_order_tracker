@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Zamówienia i statystyki Tesla",
-    "description": "Śledź zamówienia Tesla Model Y i Model 3 w społeczności TFF. Terminy dostaw, konfiguracje, śledzenie VIN i statystyki dla Niemiec, Austrii i Szwajcarii."
+    "description": "Śledź zamówienia wszystkie modele Tesla w społeczności TFF. Terminy dostaw, konfiguracje, śledzenie VIN i statystyki dla Niemiec, Austrii i Szwajcarii."
   },
   "common": {
     "save": "Zapisz",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Czarny",
-      "white": "Biały"
+      "white": "Biały",
+      "cream": "Kremowy"
     },
     "range": {
       "maximale_reichweite": "Maksymalny zasięg",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-miejscowy",
+      "6": "6-osobowy",
       "7": "7-miejscowy"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Prowadzony przez Svena",
     "supportDevelopment": "Wesprzyj hosting i rozwój",
     "stats": "{orders} zamówień · {delivered} dostarczonych"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

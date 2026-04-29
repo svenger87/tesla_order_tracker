@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla narudžbe i statistike",
-    "description": "Pratite narudžbe Tesla Model Y i Model 3 u TFF zajednici. Rokovi isporuke, konfiguracije, praćenje VIN-a i statistike za Njemačku, Austriju i Švicarsku."
+    "description": "Pratite narudžbe sve Tesla modele u TFF zajednici. Rokovi isporuke, konfiguracije, praćenje VIN-a i statistike za Njemačku, Austriju i Švicarsku."
   },
   "common": {
     "save": "Spremi",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Crna",
-      "white": "Bijela"
+      "white": "Bijela",
+      "cream": "Krem"
     },
     "range": {
       "maximale_reichweite": "Maksimalni domet",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5 sjedala",
+      "6": "6-sjedalo",
       "7": "7 sjedala"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Vodi Sven",
     "supportDevelopment": "Podržite hosting i razvoj",
     "stats": "{orders} narudžbi · {delivered} isporučeno"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

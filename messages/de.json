@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla Bestellungen und Statistiken",
-    "description": "Verfolge Tesla Model Y und Model 3 Bestellungen in der TFF Community. Lieferzeiten, Konfigurationen, VIN-Tracking und Statistiken für Deutschland, Österreich und die Schweiz."
+    "description": "Verfolge Bestellungen für alle Tesla-Modelle in der TFF Community. Lieferzeiten, Konfigurationen, VIN-Tracking und Statistiken für Deutschland, Österreich und die Schweiz."
   },
   "common": {
     "save": "Speichern",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Schwarz",
-      "white": "Weiß"
+      "white": "Weiß",
+      "cream": "Creme"
     },
     "range": {
       "maximale_reichweite": "Maximale Reichweite",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-Sitzer",
+      "6": "6-Sitzer",
       "7": "7-Sitzer"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -696,6 +701,34 @@
     "orderToDelivery": "Bestellung → Lieferung",
     "orderToPapers": "Bestellung → Papiere",
     "papersToDelivery": "Papiere → Lieferung"
+  },
+  "updatesFeed": {
+    "title": "Letzte Updates",
+    "entries": "Einträge",
+    "loading": "Laden…",
+    "loadMore": "Mehr laden",
+    "empty": "Noch keine Updates.",
+    "bucket": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "week": "Diese Woche",
+      "older": "Älter"
+    },
+    "event": {
+      "vin": "VIN zugewiesen",
+      "production": "In Produktion",
+      "papers": "Papiere erhalten",
+      "delivery": "Geliefert",
+      "window": "Lieferfenster geändert",
+      "created": "Neue Bestellung"
+    },
+    "time": {
+      "minutesAgo": "vor {n} Min",
+      "hoursAgo": "vor {n} Std",
+      "yesterday": "gestern",
+      "daysAgo": "vor {n} Tagen",
+      "weeksAgo": "vor {n} Wo"
+    }
   },
   "support": {
     "communityMessage": "Diese Daten werden von der Community für die Community gepflegt. Wenn dir die Seite hilft, kannst du die Serverkosten unterstützen.",

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla-bestillinger og statistik",
-    "description": "Følg Tesla Model Y- og Model 3-bestillinger i TFF-fællesskabet. Leveringstider, konfigurationer, VIN-sporing og statistik for Tyskland, Østrig og Schweiz."
+    "description": "Følg bestillinger af alle Tesla-modeller i TFF-fællesskabet. Leveringstider, konfigurationer, VIN-sporing og statistik for Tyskland, Østrig og Schweiz."
   },
   "common": {
     "save": "Gem",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Sort",
-      "white": "Hvid"
+      "white": "Hvid",
+      "cream": "Creme"
     },
     "range": {
       "maximale_reichweite": "Maksimal rækkevidde",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-personers",
+      "6": "6-personers",
       "7": "7-personers"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "Drevet af Sven",
     "supportDevelopment": "Støt hosting og udvikling",
     "stats": "{orders} bestillinger · {delivered} leveret"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }

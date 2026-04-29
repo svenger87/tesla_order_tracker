@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { validateApiKey } from '@/lib/api-auth'
 
+import { VehicleType } from '@/lib/types'
+
 interface CodeDefinition {
   category: 'body' | 'wheel' | 'interior' | 'color'
-  vehicleType: 'Model Y' | 'Model 3'
+  vehicleType: VehicleType
   lookupKey: string
   code: string
   label?: string
@@ -95,7 +97,102 @@ const COLOR_CODES: CodeDefinition[] = [
   { category: 'color', vehicleType: 'Model 3', lookupKey: 'silver_metallic', code: 'PMSS', label: 'Silver Metallic', sortOrder: 22 },
 ]
 
-const ALL_CODES = [...BODY_CODES, ...WHEEL_CODES, ...INTERIOR_CODES, ...COLOR_CODES]
+// Model S codes (verified from TeslaHunt, timdorr/tesla-api, compositor URLs)
+const MODEL_S_BODY_CODES: CodeDefinition[] = [
+  { category: 'body', vehicleType: 'Model S', lookupKey: 'standard', code: 'MTS13', label: 'Dual Motor AWD' },
+  { category: 'body', vehicleType: 'Model S', lookupKey: 'plaid', code: 'MTS14', label: 'Plaid Tri Motor AWD' },
+]
+
+const MODEL_S_WHEEL_CODES: CodeDefinition[] = [
+  { category: 'wheel', vehicleType: 'Model S', lookupKey: '19', code: 'WS90', label: '19" Tempest', sortOrder: 0 },
+  { category: 'wheel', vehicleType: 'Model S', lookupKey: '21', code: 'WS10', label: '21" Arachnid', sortOrder: 1 },
+]
+
+const MODEL_S_INTERIOR_CODES: CodeDefinition[] = [
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'standard_black', code: 'IBC00', label: 'Carbon & Schwarz' },
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'standard_white', code: 'IWC00', label: 'Carbon & Weiß' },
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'standard_cream', code: 'ICC00', label: 'Carbon & Creme' },
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'plaid_black', code: 'IBC00', label: 'Carbon & Schwarz' },
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'plaid_white', code: 'IWC00', label: 'Carbon & Weiß' },
+  { category: 'interior', vehicleType: 'Model S', lookupKey: 'plaid_cream', code: 'ICC00', label: 'Carbon & Creme' },
+]
+
+const MODEL_S_COLOR_CODES: CodeDefinition[] = [
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'pearl_white', code: 'PPSW', label: 'Pearl White', sortOrder: 0 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'solid_black', code: 'PBSB', label: 'Solid Black', sortOrder: 1 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'diamond_black', code: 'PX02', label: 'Diamond Black', sortOrder: 2 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'stealth_grey', code: 'PN01', label: 'Stealth Grey', sortOrder: 3 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'quicksilver', code: 'PN00', label: 'Quicksilver', sortOrder: 4 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'ultra_red', code: 'PR01', label: 'Ultra Red', sortOrder: 5 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'deep_blue', code: 'PPSB', label: 'Deep Blue Metallic', sortOrder: 6 },
+  { category: 'color', vehicleType: 'Model S', lookupKey: 'midnight_cherry', code: 'PR00', label: 'Midnight Cherry Red', sortOrder: 7 },
+]
+
+// Model X codes (verified from TeslaHunt, timdorr/tesla-api)
+const MODEL_X_BODY_CODES: CodeDefinition[] = [
+  { category: 'body', vehicleType: 'Model X', lookupKey: 'standard', code: 'MTX13', label: 'Dual Motor AWD' },
+  { category: 'body', vehicleType: 'Model X', lookupKey: 'plaid', code: 'MTX14', label: 'Plaid Tri Motor AWD' },
+]
+
+const MODEL_X_WHEEL_CODES: CodeDefinition[] = [
+  { category: 'wheel', vehicleType: 'Model X', lookupKey: '20', code: 'WX00', label: '20" Cyberstream', sortOrder: 0 },
+  { category: 'wheel', vehicleType: 'Model X', lookupKey: '22', code: 'WX20', label: '22" Turbine', sortOrder: 1 },
+]
+
+const MODEL_X_INTERIOR_CODES: CodeDefinition[] = [
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'standard_black', code: 'IBC00', label: 'Carbon & Schwarz' },
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'standard_white', code: 'IWC00', label: 'Carbon & Weiß' },
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'standard_cream', code: 'ICC00', label: 'Carbon & Creme' },
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'plaid_black', code: 'IBC00', label: 'Carbon & Schwarz' },
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'plaid_white', code: 'IWC00', label: 'Carbon & Weiß' },
+  { category: 'interior', vehicleType: 'Model X', lookupKey: 'plaid_cream', code: 'ICC00', label: 'Carbon & Creme' },
+]
+
+const MODEL_X_COLOR_CODES: CodeDefinition[] = [
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'pearl_white', code: 'PPSW', label: 'Pearl White', sortOrder: 0 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'solid_black', code: 'PBSB', label: 'Solid Black', sortOrder: 1 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'diamond_black', code: 'PX02', label: 'Diamond Black', sortOrder: 2 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'stealth_grey', code: 'PN01', label: 'Stealth Grey', sortOrder: 3 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'quicksilver', code: 'PN00', label: 'Quicksilver', sortOrder: 4 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'ultra_red', code: 'PR01', label: 'Ultra Red', sortOrder: 5 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'deep_blue', code: 'PPSB', label: 'Deep Blue Metallic', sortOrder: 6 },
+  { category: 'color', vehicleType: 'Model X', lookupKey: 'midnight_cherry', code: 'PR00', label: 'Midnight Cherry Red', sortOrder: 7 },
+]
+
+// Cybertruck codes (verified from cybertruckownersclub.com, compositor URLs)
+const CYBERTRUCK_BODY_CODES: CodeDefinition[] = [
+  { category: 'body', vehicleType: 'Cybertruck', lookupKey: 'awd', code: 'MTC03', label: 'Dual Motor AWD' },
+  { category: 'body', vehicleType: 'Cybertruck', lookupKey: 'cyberbeast', code: 'MTC04', label: 'Tri Motor Cyberbeast' },
+]
+
+const CYBERTRUCK_WHEEL_CODES: CodeDefinition[] = [
+  { category: 'wheel', vehicleType: 'Cybertruck', lookupKey: '20', code: 'WH0B', label: '20" Cyber Wheels', sortOrder: 0 },
+]
+
+const CYBERTRUCK_INTERIOR_CODES: CodeDefinition[] = [
+  { category: 'interior', vehicleType: 'Cybertruck', lookupKey: 'awd_black', code: 'IG01', label: 'Schwarz' },
+  { category: 'interior', vehicleType: 'Cybertruck', lookupKey: 'awd_white', code: 'IW01', label: 'Weiß' },
+  { category: 'interior', vehicleType: 'Cybertruck', lookupKey: 'cyberbeast_black', code: 'IG01', label: 'Schwarz' },
+  { category: 'interior', vehicleType: 'Cybertruck', lookupKey: 'cyberbeast_white', code: 'IW01', label: 'Weiß' },
+]
+
+const CYBERTRUCK_COLOR_CODES: CodeDefinition[] = [
+  { category: 'color', vehicleType: 'Cybertruck', lookupKey: 'stainless_steel', code: 'PDD', label: 'Stainless Steel', sortOrder: 0 },
+]
+
+// Roadster - no verified compositor codes yet (not in production)
+const ROADSTER_BODY_CODES: CodeDefinition[] = [
+  { category: 'body', vehicleType: 'Roadster', lookupKey: 'base', code: 'MTR00', label: 'Base (unverified)' },
+  { category: 'body', vehicleType: 'Roadster', lookupKey: 'founders', code: 'MTR01', label: 'Founders Series (unverified)' },
+]
+
+const ALL_CODES = [
+  ...BODY_CODES, ...WHEEL_CODES, ...INTERIOR_CODES, ...COLOR_CODES,
+  ...MODEL_S_BODY_CODES, ...MODEL_S_WHEEL_CODES, ...MODEL_S_INTERIOR_CODES, ...MODEL_S_COLOR_CODES,
+  ...MODEL_X_BODY_CODES, ...MODEL_X_WHEEL_CODES, ...MODEL_X_INTERIOR_CODES, ...MODEL_X_COLOR_CODES,
+  ...CYBERTRUCK_BODY_CODES, ...CYBERTRUCK_WHEEL_CODES, ...CYBERTRUCK_INTERIOR_CODES, ...CYBERTRUCK_COLOR_CODES,
+  ...ROADSTER_BODY_CODES,
+]
 
 // POST - Seed compositor codes from verified data
 export async function POST(request: NextRequest) {

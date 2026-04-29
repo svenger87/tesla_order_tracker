@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla Orders and Statistics",
-    "description": "Track Tesla Model Y and Model 3 orders in the TFF community. Delivery timelines, configurations, VIN tracking, and statistics for Germany, Austria, and Switzerland."
+    "description": "Track all Tesla model orders in the TFF community. Delivery timelines, configurations, VIN tracking, and statistics for Germany, Austria, and Switzerland."
   },
   "common": {
     "save": "Save",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "Black",
-      "white": "White"
+      "white": "White",
+      "cream": "Cream"
     },
     "range": {
       "maximale_reichweite": "Maximum Range",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5-Seater",
+      "6": "6-Seater",
       "7": "7-Seater"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP Transfer",
       "fsd": "FSD",
       "fsd_transfer": "FSD Transfer"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -696,6 +701,34 @@
     "orderToDelivery": "Order → Delivery",
     "orderToPapers": "Order → Documents",
     "papersToDelivery": "Documents → Delivery"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   },
   "support": {
     "communityMessage": "This data is maintained by the community for the community. If this site helps you, you can support the server costs.",

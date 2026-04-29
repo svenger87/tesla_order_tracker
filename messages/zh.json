@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Tesla 订单与统计",
-    "description": "在 TFF 社区中跟踪 Tesla Model Y 和 Model 3 的订单。交付时间表、配置、VIN 跟踪以及德国、奥地利和瑞士的统计数据。"
+    "description": "在 TFF 社区中跟踪 所有 Tesla 车型 的订单。交付时间表、配置、VIN 跟踪以及德国、奥地利和瑞士的统计数据。"
   },
   "common": {
     "save": "保存",
@@ -543,7 +543,8 @@
     },
     "interior": {
       "black": "黑色",
-      "white": "白色"
+      "white": "白色",
+      "cream": "奶油色"
     },
     "range": {
       "maximale_reichweite": "最大续航",
@@ -557,6 +558,7 @@
     },
     "seats": {
       "5": "5 座",
+      "6": "6座",
       "7": "7 座"
     },
     "autopilot": {
@@ -566,6 +568,9 @@
       "eap_transfer": "EAP 转移",
       "fsd": "FSD",
       "fsd_transfer": "FSD 转移"
+    },
+    "color": {
+      "stainless_steel": "Stainless Steel"
     }
   },
   "impressum": {
@@ -712,5 +717,33 @@
     "operatedBy": "由 Sven 运营",
     "supportDevelopment": "支持托管与开发",
     "stats": "{orders} 个订单 · {delivered} 已交付"
+  },
+  "updatesFeed": {
+    "title": "Recent updates",
+    "entries": "entries",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "empty": "No recent updates yet.",
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "This week",
+      "older": "Older"
+    },
+    "event": {
+      "vin": "VIN assigned",
+      "production": "In production",
+      "papers": "Papers received",
+      "delivery": "Delivered",
+      "window": "Delivery window changed",
+      "created": "New order"
+    },
+    "time": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{n} d ago",
+      "weeksAgo": "{n} wk ago"
+    }
   }
 }
