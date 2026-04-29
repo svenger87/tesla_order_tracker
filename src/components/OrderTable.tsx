@@ -820,7 +820,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="table-fixed w-max caption-bottom text-xs">
+        <table className="table-fixed w-max caption-bottom text-xs [&_td:not(:last-child)]:overflow-hidden [&_th:not(:last-child)]:overflow-hidden">
           <colgroup>
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
               <col key={c.key} style={{ width: c.width }} />
