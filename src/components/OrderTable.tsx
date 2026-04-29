@@ -80,7 +80,7 @@ const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
             style={{ backgroundColor: colorInfo.hex }}
           />
         )}
-        <span>{displayLabel}</span>
+        <span className="truncate" title={displayLabel}>{displayLabel}</span>
       </div>
     </TableCell>
   )
@@ -132,8 +132,8 @@ const CountryCell = memo(function CountryCell({
   return (
     <TableCell className="whitespace-nowrap">
       <div className="flex items-center gap-1.5">
-        {flag && <TwemojiEmoji emoji={flag} size={16} />}
-        <span>{displayName}</span>
+        {flag && <TwemojiEmoji emoji={flag} size={16} className="shrink-0" />}
+        <span className="truncate" title={displayName}>{displayName}</span>
       </div>
     </TableCell>
   )
@@ -331,8 +331,8 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
       onClick={() => onSort(field)}
     >
       <div className="flex items-center gap-1">
-        {children}
-        <span className="ml-1">
+        <span className="truncate">{children}</span>
+        <span className="ml-1 shrink-0">
           {isActive ? (
             direction === 'asc' ? (
               <ArrowUp className="h-3 w-3" />
@@ -355,43 +355,44 @@ interface ColumnDef {
   key: string
   label: string
   group: ColumnGroup
+  width: number
 }
 
 const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
-  { key: 'status', label: 'status', group: 'essential' },
-  { key: 'name', label: 'name', group: 'essential' },
-  { key: 'vehicleType', label: 'vehicle', group: 'essential' },
-  { key: 'carImage', label: 'image', group: 'configuration' },
-  { key: 'orderDate', label: 'orderDate', group: 'essential' },
+  { key: 'status',             label: 'status',             group: 'essential',     width: 120 },
+  { key: 'name',               label: 'name',               group: 'essential',     width: 180 },
+  { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 110 },
+  { key: 'carImage',           label: 'image',              group: 'configuration', width: 80  },
+  { key: 'orderDate',          label: 'orderDate',          group: 'essential',     width: 120 },
   // Configuration
-  { key: 'country', label: 'country', group: 'configuration' },
-  { key: 'model', label: 'model', group: 'configuration' },
-  { key: 'range', label: 'range', group: 'configuration' },
-  { key: 'drive', label: 'drive', group: 'configuration' },
-  { key: 'color', label: 'color', group: 'configuration' },
-  { key: 'interior', label: 'interior', group: 'configuration' },
-  { key: 'wheels', label: 'wheels', group: 'configuration' },
-  { key: 'towHitch', label: 'towHitch', group: 'configuration' },
-  { key: 'seats', label: 'seats', group: 'configuration' },
-  { key: 'autopilot', label: 'autopilot', group: 'configuration' },
+  { key: 'country',            label: 'country',            group: 'configuration', width: 130 },
+  { key: 'model',              label: 'model',              group: 'configuration', width: 120 },
+  { key: 'range',              label: 'range',              group: 'configuration', width: 130 },
+  { key: 'drive',              label: 'drive',              group: 'configuration', width: 130 },
+  { key: 'color',              label: 'color',              group: 'configuration', width: 150 },
+  { key: 'interior',           label: 'interior',           group: 'configuration', width: 130 },
+  { key: 'wheels',             label: 'wheels',             group: 'configuration', width: 100 },
+  { key: 'towHitch',           label: 'towHitch',           group: 'configuration', width: 90  },
+  { key: 'seats',              label: 'seats',              group: 'configuration', width: 80  },
+  { key: 'autopilot',          label: 'autopilot',          group: 'configuration', width: 130 },
   // Status & Delivery
-  { key: 'deliveryWindow', label: 'deliveryWindow', group: 'configuration' },
-  { key: 'deliveryLocation', label: 'deliveryLocation', group: 'configuration' },
-  { key: 'vin', label: 'vin', group: 'configuration' },
-  { key: 'vinReceivedDate', label: 'vinDate', group: 'configuration' },
-  { key: 'papersReceivedDate', label: 'papersDate', group: 'configuration' },
-  { key: 'productionDate', label: 'production', group: 'configuration' },
-  { key: 'typeApproval', label: 'typeApproval', group: 'configuration' },
-  { key: 'typeVariant', label: 'typeVariant', group: 'configuration' },
-  { key: 'deliveryDate', label: 'deliveryDate', group: 'configuration' },
+  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 150 },
+  { key: 'deliveryLocation',   label: 'deliveryLocation',   group: 'configuration', width: 150 },
+  { key: 'vin',                label: 'vin',                group: 'configuration', width: 170 },
+  { key: 'vinReceivedDate',    label: 'vinDate',            group: 'configuration', width: 120 },
+  { key: 'papersReceivedDate', label: 'papersDate',         group: 'configuration', width: 120 },
+  { key: 'productionDate',     label: 'production',         group: 'configuration', width: 120 },
+  { key: 'typeApproval',       label: 'typeApproval',       group: 'configuration', width: 120 },
+  { key: 'typeVariant',        label: 'typeVariant',        group: 'configuration', width: 120 },
+  { key: 'deliveryDate',       label: 'deliveryDate',       group: 'configuration', width: 120 },
   // Detail (segment time periods matching timeline & metadata)
-  { key: 'orderToVin', label: 'orderToVin', group: 'detail' },
-  { key: 'vinToProduction', label: 'vinToProduction', group: 'detail' },
-  { key: 'productionToPapers', label: 'productionToPapers', group: 'detail' },
-  { key: 'papersToDelivery', label: 'papersToDelivery', group: 'detail' },
-  { key: 'orderToDelivery', label: 'orderToDelivery', group: 'detail' },
-  { key: 'updatedAt', label: 'updatedAt', group: 'detail' },
+  { key: 'orderToVin',         label: 'orderToVin',         group: 'detail',        width: 110 },
+  { key: 'vinToProduction',    label: 'vinToProduction',    group: 'detail',        width: 110 },
+  { key: 'productionToPapers', label: 'productionToPapers', group: 'detail',        width: 110 },
+  { key: 'papersToDelivery',   label: 'papersToDelivery',   group: 'detail',        width: 110 },
+  { key: 'orderToDelivery',    label: 'orderToDelivery',    group: 'detail',        width: 110 },
+  { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
 // All columns visible by default
@@ -819,7 +820,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="w-full min-w-max caption-bottom text-xs">
+        <table className="table-fixed w-max caption-bottom text-xs">
+          <colgroup>
+            {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
+              <col key={c.key} style={{ width: c.width }} />
+            ))}
+            {/* Actions column — always rendered at end */}
+            <col style={{ width: 60 }} />
+          </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
@@ -894,17 +902,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('name') && (
                   <TableCell className="font-medium whitespace-nowrap">
-                    <Link
-                      href={`/track/${encodeURIComponent(order.name)}`}
-                      className="hover:text-primary transition-colors hover:underline underline-offset-2"
-                    >
-                      {order.name}
-                    </Link>
-                    {order.source === 'tost' && (
-                      <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
-                        <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
-                      </a>
-                    )}
+                    <span className="block truncate" title={order.name}>
+                      <Link
+                        href={`/track/${encodeURIComponent(order.name)}`}
+                        className="hover:text-primary transition-colors hover:underline underline-offset-2"
+                      >
+                        {order.name}
+                      </Link>
+                      {order.source === 'tost' && (
+                        <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
+                          <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
+                        </a>
+                      )}
+                    </span>
                   </TableCell>
                 )}
                 {isColumnVisible('vehicleType') && (
@@ -981,10 +991,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('color') && <ColorCell color={order.color} />}
                 {isColumnVisible('interior') && (
-                  <TableCell className="whitespace-nowrap">{getLabel(interiors, order.interior)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={getLabel(interiors, order.interior)}>{getLabel(interiors, order.interior)}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('wheels') && (
-                  <TableCell className="whitespace-nowrap">{getLabel(wheels, order.wheels)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={getLabel(wheels, order.wheels)}>{getLabel(wheels, order.wheels)}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('towHitch') && (
                   <TableCell className="whitespace-nowrap">
@@ -1008,14 +1022,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   </TableCell>
                 )}
                 {isColumnVisible('deliveryWindow') && (
-                  <TableCell className="whitespace-nowrap">{order.deliveryWindow || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.deliveryWindow || ''}>{order.deliveryWindow || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('deliveryLocation') && (
-                  <TableCell className="whitespace-nowrap">{order.deliveryLocation || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.deliveryLocation || ''}>{order.deliveryLocation || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('vin') && (
                   <TableCell className="whitespace-nowrap font-mono text-xs">
-                    {order.vin ? order.vin.substring(0, 17) : '-'}
+                    <span className="block truncate" title={order.vin || ''}>{order.vin ? order.vin.substring(0, 17) : '-'}</span>
                   </TableCell>
                 )}
                 {isColumnVisible('vinReceivedDate') && (
@@ -1028,10 +1046,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   <TableCell className="whitespace-nowrap">{order.productionDate || '-'}</TableCell>
                 )}
                 {isColumnVisible('typeApproval') && (
-                  <TableCell className="whitespace-nowrap">{order.typeApproval || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.typeApproval || ''}>{order.typeApproval || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('typeVariant') && (
-                  <TableCell className="whitespace-nowrap">{order.typeVariant || '-'}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <span className="block truncate" title={order.typeVariant || ''}>{order.typeVariant || '-'}</span>
+                  </TableCell>
                 )}
                 {isColumnVisible('deliveryDate') && (
                   <TableCell className="whitespace-nowrap">
