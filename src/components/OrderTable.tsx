@@ -360,7 +360,7 @@ interface ColumnDef {
 
 const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
-  { key: 'status',             label: 'status',             group: 'essential',     width: 120 },
+  { key: 'status',             label: 'status',             group: 'essential',     width: 180 },
   { key: 'name',               label: 'name',               group: 'essential',     width: 180 },
   { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 110 },
   { key: 'carImage',           label: 'image',              group: 'configuration', width: 80  },
@@ -820,7 +820,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="table-fixed min-w-max w-full caption-bottom text-xs [&_td:not(:last-child)]:overflow-hidden [&_th:not(:last-child)]:overflow-hidden">
+        <table className="table-fixed min-w-max w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
               <col key={c.key} style={{ width: c.width }} />
@@ -830,7 +830,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
-            {isColumnVisible('status') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
+            {isColumnVisible('status') && <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
             {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('image')}</TableHead>}
@@ -896,7 +896,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
               >
                 {isColumnVisible('status') && (
-                  <TableCell className="whitespace-nowrap">
+                  <TableCell data-noclip className="whitespace-nowrap">
                     <OrderProgressBar order={order} compact />
                   </TableCell>
                 )}

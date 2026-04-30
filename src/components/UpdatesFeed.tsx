@@ -6,14 +6,37 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Link } from '@/i18n/navigation'
+import {
+  COUNTRIES,
+  MODEL_Y_TRIMS,
+  MODEL_3_TRIMS,
+  MODEL_S_TRIMS,
+  MODEL_X_TRIMS,
+  CYBERTRUCK_TRIMS,
+  ROADSTER_TRIMS,
+} from '@/lib/types'
 
-const VEHICLE_SHORT: Record<string, string> = {
-  'Model Y': 'MY',
-  'Model 3': 'M3',
-  'Model S': 'MS',
-  'Model X': 'MX',
-  'Cybertruck': 'CT',
-  'Roadster': 'R',
+const TRIMS_BY_VEHICLE: Record<string, ReadonlyArray<{ value: string; label: string }>> = {
+  'Model Y': MODEL_Y_TRIMS,
+  'Model 3': MODEL_3_TRIMS,
+  'Model S': MODEL_S_TRIMS,
+  'Model X': MODEL_X_TRIMS,
+  'Cybertruck': CYBERTRUCK_TRIMS,
+  'Roadster': ROADSTER_TRIMS,
+}
+
+const FLAG_BY_COUNTRY = new Map(COUNTRIES.map(c => [c.value, c.flag] as const))
+
+function trimLabel(vehicleType: string, model: string | null): string | null {
+  if (!model) return null
+  const trims = TRIMS_BY_VEHICLE[vehicleType]
+  const match = trims?.find(t => t.value === model || t.label === model)
+  return match?.label ?? model
+}
+
+function vehicleAndTrim(vehicleType: string, model: string | null): string {
+  const trim = trimLabel(vehicleType, model)
+  return trim ? `${vehicleType} ${trim}` : vehicleType
 }
 
 const ALL_EVENT_TYPES = ['vin', 'production', 'papers', 'delivery', 'window', 'created'] as const
@@ -27,6 +50,7 @@ export interface FeedEntry {
   orderName: string
   country: string | null
   vehicleType: string
+  model: string | null
   eventType: EventType
   oldValue: string | null
   newValue: string | null
@@ -233,11 +257,14 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                         <Link
                           href={`/track/${encodeURIComponent(e.orderName)}`}
                           className="flex w-full items-center gap-3 rounded px-2 py-1.5 hover:bg-muted/60"
-                          aria-label={`${e.orderName} (${e.vehicleType}): ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
+                          aria-label={`${e.orderName} (${vehicleAndTrim(e.vehicleType, e.model)}): ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
                         >
                           <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
-                          <Badge variant="outline" className="shrink-0 text-xs font-mono">{VEHICLE_SHORT[e.vehicleType] ?? e.vehicleType}</Badge>
+                          {e.country && FLAG_BY_COUNTRY.get(e.country) && (
+                            <span className="shrink-0 text-base leading-none" aria-hidden>{FLAG_BY_COUNTRY.get(e.country)}</span>
+                          )}
                           <span className="font-medium truncate">{e.orderName}</span>
+                          <Badge variant="outline" className="shrink-0 text-xs">{vehicleAndTrim(e.vehicleType, e.model)}</Badge>
                           <span className="text-sm text-muted-foreground truncate">{t(`event.${e.eventType}`)}</span>
                           {e.eventType === 'window' && e.newValue && (
                             <span className="text-xs text-muted-foreground truncate">→ {e.newValue}</span>

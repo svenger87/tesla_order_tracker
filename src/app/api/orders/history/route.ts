@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     take: limit + 1,
     include: {
       order: {
-        select: { id: true, name: true, country: true, vehicleType: true },
+        select: { id: true, name: true, country: true, vehicleType: true, model: true },
       },
     },
   })
@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
     orderName: r.order.name,
     country: r.order.country,
     vehicleType: r.order.vehicleType,
+    model: r.order.model,
     field: r.field,
     eventType: FIELD_TO_EVENT[r.field] ?? r.field,
     oldValue: r.oldValue,
