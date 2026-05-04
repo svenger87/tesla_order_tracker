@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "書類→納",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "更新日",
     "country": "国",
     "allVehicles": "すべての車両",

@@ -223,6 +223,7 @@
     "productionToPapers": "P→Pap",
     "papersToDelivery": "Pap→L",
     "orderToDelivery": "B→L",
+    "waitingDays": "Wartezeit",
     "updatedAt": "Änderung",
     "country": "Land",
     "allVehicles": "Alle Fahrzeuge",

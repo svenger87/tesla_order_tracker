@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Belge→T",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Güncellendi",
     "country": "Ülke",
     "allVehicles": "Tüm araçlar",

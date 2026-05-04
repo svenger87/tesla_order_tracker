@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "As→To",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Päivitetty",
     "country": "Maa",
     "allVehicles": "Kaikki ajoneuvot",

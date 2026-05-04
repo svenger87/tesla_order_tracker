@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Έγγρ→Πρ",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Ενημερώθηκε",
     "country": "Χώρα",
     "allVehicles": "Όλα τα οχήματα",

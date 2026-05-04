@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→C",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Aggiornato",
     "country": "Paese",
     "allVehicles": "Tutti i veicoli",

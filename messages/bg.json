@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Док→Д",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Актуализирано",
     "country": "Държава",
     "allVehicles": "Всички превозни средства",

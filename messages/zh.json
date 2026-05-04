@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "文件→交",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "更新于",
     "country": "国家",
     "allVehicles": "所有车辆",

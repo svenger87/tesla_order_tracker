@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Dok→D",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Aktualizované",
     "country": "Krajina",
     "allVehicles": "Všetky vozidlá",

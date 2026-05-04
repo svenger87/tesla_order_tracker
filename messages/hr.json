@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Dok→I",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Ažurirano",
     "country": "Država",
     "allVehicles": "Sva vozila",

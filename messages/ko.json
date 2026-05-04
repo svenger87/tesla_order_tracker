@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "서류→인",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "업데이트",
     "country": "국가",
     "allVehicles": "모든 차량",

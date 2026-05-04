@@ -223,6 +223,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Dok→Sz",
     "orderToDelivery": "O→D",
+    "waitingDays": "Waiting",
     "updatedAt": "Frissítve",
     "country": "Ország",
     "allVehicles": "Összes jármű",

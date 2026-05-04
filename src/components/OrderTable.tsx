@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
-import { calculateDaysBetween } from '@/lib/date-utils'
+import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
 
@@ -170,7 +170,7 @@ import {
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 type SortDirection = 'asc' | 'desc'
-type SortField = keyof Order | 'vinToProduction' | 'productionToPapers' | null
+type SortField = keyof Order | 'vinToProduction' | 'productionToPapers' | 'waitingDays' | null
 
 interface TableLocalFilters {
   nameSearch: string
@@ -220,6 +220,14 @@ function getSegmentValue(order: Order, field: string): number | null {
   return null
 }
 
+// Days waited so far: orderDate → deliveryDate (if delivered) or today (if pending).
+function getWaitingDays(order: Order): number | null {
+  const start = parseGermanDate(order.orderDate)
+  if (!start) return null
+  const end = parseGermanDate(order.deliveryDate) ?? new Date()
+  return Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86_400_000))
+}
+
 // Compare function for sorting
 function compareValues(a: Order, b: Order, field: SortField, direction: SortDirection, countryLabels?: Map<string, string>): number {
   if (!field) return 0
@@ -228,6 +236,16 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
   if (field === 'vinToProduction' || field === 'productionToPapers') {
     const aNum = getSegmentValue(a, field)
     const bNum = getSegmentValue(b, field)
+    if (aNum === null && bNum === null) return 0
+    if (aNum === null) return direction === 'asc' ? 1 : -1
+    if (bNum === null) return direction === 'asc' ? -1 : 1
+    return direction === 'asc' ? aNum - bNum : bNum - aNum
+  }
+
+  // Computed waiting-days field (orderDate → delivery|today)
+  if (field === 'waitingDays') {
+    const aNum = getWaitingDays(a)
+    const bNum = getWaitingDays(b)
     if (aNum === null && bNum === null) return 0
     if (aNum === null) return direction === 'asc' ? 1 : -1
     if (bNum === null) return direction === 'asc' ? -1 : 1
@@ -392,6 +410,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'productionToPapers', label: 'productionToPapers', group: 'detail',        width: 110 },
   { key: 'papersToDelivery',   label: 'papersToDelivery',   group: 'detail',        width: 110 },
   { key: 'orderToDelivery',    label: 'orderToDelivery',    group: 'detail',        width: 110 },
+  { key: 'waitingDays',        label: 'waitingDays',        group: 'detail',        width: 110 },
   { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
@@ -859,6 +878,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('productionToPapers') && <SortableHeader field="productionToPapers" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('productionToPapers')}</SortableHeader>}
             {isColumnVisible('papersToDelivery') && <SortableHeader field="papersToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('papersToDelivery')}</SortableHeader>}
             {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
+            {isColumnVisible('waitingDays') && <SortableHeader field="waitingDays" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('waitingDays')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
             <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">
               {tc('actions')}
@@ -1098,6 +1118,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('orderToDelivery') && (
                   <TableCell className="whitespace-nowrap text-center font-mono">
                     {order.orderToDelivery !== null ? order.orderToDelivery : '-'}
+                  </TableCell>
+                )}
+                {isColumnVisible('waitingDays') && (
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {(() => { const v = getWaitingDays(order); return v !== null ? v : '-' })()}
                   </TableCell>
                 )}
                 {isColumnVisible('updatedAt') && (
