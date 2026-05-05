@@ -45,18 +45,20 @@ export function Header({ isAdmin, settings }: HeaderProps) {
       <div className="h-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40" />
       <div className="w-full max-w-[98vw] mx-auto px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center justify-between">
-          {/* Logo + title */}
-          <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <div className="relative rounded-lg bg-primary p-1.5 w-[34px] h-[40px] transition-transform hover:scale-105 shadow-md shadow-primary/20">
-              <Image
-                src="/logo.webp"
-                alt="Tesla Tracker Logo"
-                fill
-                sizes="40px"
-                className="object-contain p-0.5"
-              />
-            </div>
-            <span className="text-lg font-bold tracking-tight">TFF Order Stats</span>
+          {/* Brand banner (icon + wordmark in one image) */}
+          <Link
+            href="/"
+            className="flex items-center hover:opacity-90 transition-opacity shrink-0"
+            aria-label="TFF Order Stats"
+          >
+            <Image
+              src="/banner-logo.png"
+              alt="TFF Order Stats"
+              width={144}
+              height={36}
+              priority
+              className="h-7 sm:h-9 w-auto rounded-md"
+            />
           </Link>
 
           {/* Desktop nav (>=1024px) */}

@@ -58,6 +58,7 @@ next-env.d.ts
 turso-schema.sql
 .playwright-mcp/
 *.png
+!/public/*.png
 .env*.local
 backups/
 

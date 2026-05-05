@@ -62,8 +62,8 @@ export async function generateMetadata({
     title: t('title'),
     description: t('description'),
     icons: {
-      icon: "/favicon.webp",
-      apple: "/favicon.webp",
+      icon: "/favicon.png",
+      apple: "/favicon.png",
     },
     metadataBase: new URL(baseUrl),
     openGraph: {
