@@ -644,6 +644,15 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     })
   }, [filteredAndSortedOrders.length, visibleColumns])
 
+  // Sum of visible column widths (+ actions column). Used as explicit min-width on the
+  // table because Tailwind's `min-w-max` (= min-width: max-content) on a table-fixed
+  // table miscomputes catastrophically in Firefox (table inflates to millions of px),
+  // pushing all cell content far off-screen.
+  const tableMinWidth = useMemo(
+    () => COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0) + 60,
+    [visibleColumns],
+  )
+
   // Virtualizer for desktop table rows
   const ROW_HEIGHT = 41
   const tableVirtualizer = useVirtualizer({
@@ -839,7 +848,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table className="table-fixed min-w-max w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
+        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
               <col key={c.key} style={{ width: c.width }} />
