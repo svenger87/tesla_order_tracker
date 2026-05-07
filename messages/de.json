@@ -696,6 +696,8 @@
     "pessimistic": "Pessimistisch",
     "predictionConfidence": "Konfidenz: {level}",
     "predictionSample": "Basierend auf {count} Bestellungen",
+    "predictionSampleRecent": "Basierend auf {count} Lieferungen aus den letzten {days} Tagen",
+    "exceedsPessimisticHint": "Deine bisherige Wartezeit ({days} Tage) liegt bereits über dem pessimistischen Wert. Die Prognose basiert auf historischen Lieferzeiten und ist in dieser Situation nicht mehr verlässlich — orientiere dich am offiziellen Tesla-Lieferfenster.",
     "noPrediction": "Nicht genügend Daten für eine Prognose",
     "confidence_high": "Hoch",
     "confidence_medium": "Mittel",

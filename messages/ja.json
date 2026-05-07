@@ -703,7 +703,9 @@
     "orderToVin": "注文 → VIN",
     "orderToDelivery": "注文 → 納車",
     "orderToPapers": "注文 → 書類",
-    "papersToDelivery": "書類 → 納車"
+    "papersToDelivery": "書類 → 納車",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "このデータはコミュニティによってコミュニティのために管理されています。このサイトがお役に立てば、サーバー費用のご支援をお願いいたします。",

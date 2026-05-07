@@ -15,6 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Zap, Clock, AlertTriangle, Sparkles } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+// True when the days-from-reference value lies in the past relative to today.
+function isPast(daysFromRef: number, elapsedDays: number): boolean {
+  return daysFromRef < elapsedDays
+}
 
 interface DeliveryPredictionProps {
   orders: Order[]
@@ -157,22 +163,40 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-lg border bg-green-50 dark:bg-green-900/10 p-3 text-center">
+              <div className={cn(
+                "rounded-lg border bg-green-50 dark:bg-green-900/10 p-3 text-center",
+                isPast(prediction.optimisticDays, prediction.daysElapsedFromReference) && "opacity-50",
+              )}>
                 <Zap className="h-4 w-4 text-green-600 dark:text-green-400 mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
-                <p className="text-lg font-bold tabular-nums">{prediction.optimisticDays} {tc('days')}</p>
+                <p className={cn(
+                  "text-lg font-bold tabular-nums",
+                  isPast(prediction.optimisticDays, prediction.daysElapsedFromReference) && "line-through",
+                )}>{prediction.optimisticDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.optimisticDate}</p>
               </div>
-              <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center">
+              <div className={cn(
+                "rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center",
+                isPast(prediction.expectedDays, prediction.daysElapsedFromReference) && "opacity-50",
+              )}>
                 <Clock className="h-4 w-4 text-primary mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('expected')}</p>
-                <p className="text-xl font-bold tabular-nums text-primary">{prediction.expectedDays} {tc('days')}</p>
+                <p className={cn(
+                  "text-xl font-bold tabular-nums text-primary",
+                  isPast(prediction.expectedDays, prediction.daysElapsedFromReference) && "line-through",
+                )}>{prediction.expectedDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.expectedDate}</p>
               </div>
-              <div className="rounded-lg border bg-amber-50 dark:bg-amber-900/10 p-3 text-center">
+              <div className={cn(
+                "rounded-lg border bg-amber-50 dark:bg-amber-900/10 p-3 text-center",
+                isPast(prediction.pessimisticDays, prediction.daysElapsedFromReference) && "opacity-50",
+              )}>
                 <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('pessimistic')}</p>
-                <p className="text-lg font-bold tabular-nums">{prediction.pessimisticDays} {tc('days')}</p>
+                <p className={cn(
+                  "text-lg font-bold tabular-nums",
+                  isPast(prediction.pessimisticDays, prediction.daysElapsedFromReference) && "line-through",
+                )}>{prediction.pessimisticDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.pessimisticDate}</p>
               </div>
             </div>

@@ -703,7 +703,9 @@
     "orderToVin": "Поръчка → VIN",
     "orderToDelivery": "Поръчка → Доставка",
     "orderToPapers": "Поръчка → Документи",
-    "papersToDelivery": "Документи → Доставка"
+    "papersToDelivery": "Документи → Доставка",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Тези данни се поддържат от общността за общността. Ако този сайт Ви помага, можете да подкрепите разходите за сървъра.",

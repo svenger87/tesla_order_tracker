@@ -703,7 +703,9 @@
     "orderToVin": "订单 → VIN",
     "orderToDelivery": "订单 → 交付",
     "orderToPapers": "订单 → 文件",
-    "papersToDelivery": "文件 → 交付"
+    "papersToDelivery": "文件 → 交付",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "这些数据由社区为社区维护。如果本站对您有帮助，您可以支持服务器费用。",

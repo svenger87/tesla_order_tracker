@@ -703,7 +703,9 @@
     "orderToVin": "Rendelés → VIN",
     "orderToDelivery": "Rendelés → szállítás",
     "orderToPapers": "Rendelés → dokumentumok",
-    "papersToDelivery": "Dokumentumok → szállítás"
+    "papersToDelivery": "Dokumentumok → szállítás",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Ezeket az adatokat a közösség tartja karban a közösség számára. Ha ez az oldal segít Önnek, támogathatja a szerver költségeit.",

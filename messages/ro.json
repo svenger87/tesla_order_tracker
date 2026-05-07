@@ -703,7 +703,9 @@
     "orderToVin": "Comandă → VIN",
     "orderToDelivery": "Comandă → Livrare",
     "orderToPapers": "Comandă → Documente",
-    "papersToDelivery": "Documente → Livrare"
+    "papersToDelivery": "Documente → Livrare",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Aceste date sunt întreținute de comunitate pentru comunitate. Dacă acest site vă ajută, puteți sprijini costurile serverului.",

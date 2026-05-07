@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, Share2, Check, Calendar, MapPin, TrendingUp, Clock } from 'lucide-react'
+import { ArrowLeft, Share2, Check, Calendar, MapPin, TrendingUp, Clock, AlertTriangle } from 'lucide-react'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { motion } from 'framer-motion'
 
@@ -29,6 +29,8 @@ interface TrackingPageClientProps {
     confidence: 'high' | 'medium' | 'low'
     sampleSize: number
     filtersUsed: string[]
+    recencyWindowDays: number | null
+    daysElapsedFromReference: number
   } | null
   fasterPercent: number | null
   detailFields: { label: string; value: string | null }[]
@@ -243,7 +245,11 @@ export function TrackingPageClient({
         </motion.div>
 
         {/* Delivery prediction (only for non-delivered orders) */}
-        {prediction && !order.deliveryDate && (
+        {prediction && !order.deliveryDate && (() => {
+          const elapsed = prediction.daysElapsedFromReference
+          const past = (n: number) => n < elapsed
+          const exceedsPessimistic = elapsed > prediction.pessimisticDays
+          return (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -257,20 +263,37 @@ export function TrackingPageClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {exceedsPessimistic && (
+                  <div className="mb-4 rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20 p-2.5">
+                    <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                      <span>{t('exceedsPessimisticHint', { days: elapsed })}</span>
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800",
+                    past(prediction.optimisticDays) && "opacity-50",
+                  )}>
                     <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
-                    <p className="font-bold text-green-700 dark:text-green-400">{prediction.optimisticDate}</p>
+                    <p className={cn("font-bold text-green-700 dark:text-green-400", past(prediction.optimisticDays) && "line-through")}>{prediction.optimisticDate}</p>
                     <p className="text-xs text-muted-foreground">{prediction.optimisticDays}d</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-primary/5 border border-primary/20",
+                    past(prediction.expectedDays) && "opacity-50",
+                  )}>
                     <p className="text-xs text-muted-foreground mb-1">{t('expected')}</p>
-                    <p className="font-bold text-primary">{prediction.expectedDate}</p>
+                    <p className={cn("font-bold text-primary", past(prediction.expectedDays) && "line-through")}>{prediction.expectedDate}</p>
                     <p className="text-xs text-muted-foreground">{prediction.expectedDays}d</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800",
+                    past(prediction.pessimisticDays) && "opacity-50",
+                  )}>
                     <p className="text-xs text-muted-foreground mb-1">{t('pessimistic')}</p>
-                    <p className="font-bold text-amber-700 dark:text-amber-400">{prediction.pessimisticDate}</p>
+                    <p className={cn("font-bold text-amber-700 dark:text-amber-400", past(prediction.pessimisticDays) && "line-through")}>{prediction.pessimisticDate}</p>
                     <p className="text-xs text-muted-foreground">{prediction.pessimisticDays}d</p>
                   </div>
                 </div>
@@ -278,12 +301,17 @@ export function TrackingPageClient({
                   <span className={confidenceColor}>
                     {t('predictionConfidence', { level: t(`confidence_${prediction.confidence}`) })}
                   </span>
-                  <span>{t('predictionSample', { count: prediction.sampleSize })}</span>
+                  <span>
+                    {prediction.recencyWindowDays
+                      ? t('predictionSampleRecent', { count: prediction.sampleSize, days: prediction.recencyWindowDays })
+                      : t('predictionSample', { count: prediction.sampleSize })}
+                  </span>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
-        )}
+          )
+        })()}
 
         {/* Duration stats (for delivered orders) */}
         {durationFields.some(f => f.value != null) && (

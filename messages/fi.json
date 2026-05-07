@@ -703,7 +703,9 @@
     "orderToVin": "Tilaus → VIN",
     "orderToDelivery": "Tilaus → toimitus",
     "orderToPapers": "Tilaus → asiakirjat",
-    "papersToDelivery": "Asiakirjat → toimitus"
+    "papersToDelivery": "Asiakirjat → toimitus",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Tätä dataa ylläpitää yhteisö yhteisölle. Jos tämä sivusto auttaa sinua, voit tukea palvelinkustannuksia.",

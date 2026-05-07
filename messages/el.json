@@ -703,7 +703,9 @@
     "orderToVin": "Παραγγελία → VIN",
     "orderToDelivery": "Παραγγελία → Παράδοση",
     "orderToPapers": "Παραγγελία → Έγγραφα",
-    "papersToDelivery": "Έγγραφα → Παράδοση"
+    "papersToDelivery": "Έγγραφα → Παράδοση",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Αυτά τα δεδομένα διατηρούνται από την κοινότητα για την κοινότητα. Εάν αυτός ο ιστότοπος σας βοηθά, μπορείτε να υποστηρίξετε τα έξοδα του διακομιστή.",

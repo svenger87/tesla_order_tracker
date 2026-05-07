@@ -703,7 +703,9 @@
     "orderToVin": "Narudžba → VIN",
     "orderToDelivery": "Narudžba → Isporuka",
     "orderToPapers": "Narudžba → Dokumenti",
-    "papersToDelivery": "Dokumenti → Isporuka"
+    "papersToDelivery": "Dokumenti → Isporuka",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Ove podatke održava zajednica za zajednicu. Ako vam ova stranica pomaže, možete podržati troškove poslužitelja.",

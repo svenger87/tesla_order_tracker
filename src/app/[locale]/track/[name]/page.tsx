@@ -278,6 +278,8 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     confidence: prediction.confidence,
     sampleSize: prediction.sampleSize,
     filtersUsed: prediction.filtersUsed,
+    recencyWindowDays: prediction.recencyWindowDays,
+    daysElapsedFromReference: prediction.daysElapsedFromReference,
   } : null
 
   return (

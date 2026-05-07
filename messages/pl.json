@@ -703,7 +703,9 @@
     "orderToVin": "Zamówienie → VIN",
     "orderToDelivery": "Zamówienie → dostawa",
     "orderToPapers": "Zamówienie → dokumenty",
-    "papersToDelivery": "Dokumenty → dostawa"
+    "papersToDelivery": "Dokumenty → dostawa",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "Te dane są utrzymywane przez społeczność dla społeczności. Jeśli ta strona Ci pomaga, możesz wesprzeć koszty serwera.",

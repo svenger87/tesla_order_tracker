@@ -27,6 +27,9 @@ export interface DeliveryPrediction {
   filtersUsed: string[]
   /** Width of the recency window applied to the sample (in days). Null = no recency filter (full history). */
   recencyWindowDays: number | null
+  /** Days already elapsed since the reference milestone (orderDate or the latest segment milestone).
+   * When this exceeds expectedDays/pessimisticDays the historical prediction is unreliable. */
+  daysElapsedFromReference: number
 }
 
 export interface DeliveryTrend {
@@ -192,6 +195,11 @@ export function predictDelivery(
   const confidence: DeliveryPrediction['confidence'] =
     deliveryDays.length >= 30 ? 'high' : deliveryDays.length >= 10 ? 'medium' : 'low'
 
+  const daysElapsedFromReference = Math.max(
+    0,
+    Math.floor((Date.now() - refDate.getTime()) / 86_400_000),
+  )
+
   return {
     optimisticDays: p25,
     expectedDays: p50,
@@ -203,6 +211,7 @@ export function predictDelivery(
     sampleSize: deliveryDays.length,
     filtersUsed,
     recencyWindowDays,
+    daysElapsedFromReference,
   }
 }
 

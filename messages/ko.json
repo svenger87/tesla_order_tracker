@@ -703,7 +703,9 @@
     "orderToVin": "주문 → VIN",
     "orderToDelivery": "주문 → 인도",
     "orderToPapers": "주문 → 서류",
-    "papersToDelivery": "서류 → 인도"
+    "papersToDelivery": "서류 → 인도",
+    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
   },
   "support": {
     "communityMessage": "이 데이터는 커뮤니티에 의해 커뮤니티를 위해 유지됩니다. 이 사이트가 도움이 되셨다면 서버 비용을 지원해 주실 수 있습니다.",
