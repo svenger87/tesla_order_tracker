@@ -611,7 +611,9 @@
     },
     "basedOn": "Na podstawie {count} zamówień",
     "notEnoughData": "Niewystarczająca ilość danych do prognozy. Wybierz typ pojazdu.",
-    "lowDataHint": "Mało danych — prognoza może być niedokładna. Więcej zamówień poprawi dokładność."
+    "lowDataHint": "Mało danych — prognoza może być niedokładna. Więcej zamówień poprawi dokładność.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Trend dostaw",

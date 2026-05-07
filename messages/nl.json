@@ -611,7 +611,9 @@
     },
     "basedOn": "Gebaseerd op {count} bestellingen",
     "notEnoughData": "Onvoldoende gegevens voor voorspelling. Selecteer een voertuigtype.",
-    "lowDataHint": "Weinig gegevens — de voorspelling kan onnauwkeurig zijn. Meer bestellingen verbeteren de nauwkeurigheid."
+    "lowDataHint": "Weinig gegevens — de voorspelling kan onnauwkeurig zijn. Meer bestellingen verbeteren de nauwkeurigheid.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Leveringstrend",

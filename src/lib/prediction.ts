@@ -25,6 +25,8 @@ export interface DeliveryPrediction {
   confidence: 'high' | 'medium' | 'low'
   sampleSize: number
   filtersUsed: string[]
+  /** Width of the recency window applied to the sample (in days). Null = no recency filter (full history). */
+  recencyWindowDays: number | null
 }
 
 export interface DeliveryTrend {
@@ -127,6 +129,28 @@ export function predictDelivery(
     filtersUsed.push(drive)
   }
 
+  // Recency filter: prefer recently delivered orders so the prediction reflects
+  // current market conditions rather than older Tesla delivery dynamics. Try a
+  // tight window first; widen progressively if the sample becomes too small.
+  // `null` means "fall back to full history" — communicated to the UI.
+  const RECENCY_WINDOWS = [120, 180, 365] as const
+  const MIN_SAMPLE = 10
+  const today = new Date()
+  let recencyWindowDays: number | null = null
+  for (const win of RECENCY_WINDOWS) {
+    const cutoff = new Date(today)
+    cutoff.setDate(cutoff.getDate() - win)
+    const recent = candidates.filter(o => {
+      const dd = parseGermanDate(o.deliveryDate)
+      return dd !== null && dd >= cutoff && dd <= today
+    })
+    if (recent.length >= MIN_SAMPLE) {
+      candidates = recent
+      recencyWindowDays = win
+      break
+    }
+  }
+
   // Dynamic segment: if a current order is provided and has progressed past "ordered",
   // predict remaining time from the latest milestone instead of from order date.
   const segment = currentOrder ? getSegment(currentOrder) : null
@@ -178,6 +202,7 @@ export function predictDelivery(
     confidence,
     sampleSize: deliveryDays.length,
     filtersUsed,
+    recencyWindowDays,
   }
 }
 

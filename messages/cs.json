@@ -611,7 +611,9 @@
     },
     "basedOn": "Na základě {count} objednávek",
     "notEnoughData": "Nedostatek dat pro predikci. Vyberte typ vozidla.",
-    "lowDataHint": "Málo dat — předpověď může být nepřesná. Více objednávek zlepší přesnost."
+    "lowDataHint": "Málo dat — předpověď může být nepřesná. Více objednávek zlepší přesnost.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Trend dodání",

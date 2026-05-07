@@ -611,7 +611,9 @@
     },
     "basedOn": "{count} 件の注文に基づく",
     "notEnoughData": "予測に十分なデータがありません。車両タイプを選択してください。",
-    "lowDataHint": "データが少ないため、予測が不正確な場合があります。注文が増えると精度が向上します。"
+    "lowDataHint": "データが少ないため、予測が不正確な場合があります。注文が増えると精度が向上します。",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "納車トレンド",

@@ -611,7 +611,9 @@
     },
     "basedOn": "基于 {count} 个订单",
     "notEnoughData": "数据不足，无法进行预测。请选择车辆类型。",
-    "lowDataHint": "数据点较少——预测可能不准确。更多订单将提高准确性。"
+    "lowDataHint": "数据点较少——预测可能不准确。更多订单将提高准确性。",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "交付趋势",

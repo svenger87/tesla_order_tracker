@@ -611,7 +611,9 @@
     },
     "basedOn": "Basado en {count} pedidos",
     "notEnoughData": "Datos insuficientes para la predicción. Seleccione un tipo de vehículo.",
-    "lowDataHint": "Pocos datos — la predicción puede ser imprecisa. Más pedidos mejorarán la precisión."
+    "lowDataHint": "Pocos datos — la predicción puede ser imprecisa. Más pedidos mejorarán la precisión.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Tendencia de entrega",

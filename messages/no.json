@@ -611,7 +611,9 @@
     },
     "basedOn": "Basert på {count} bestillinger",
     "notEnoughData": "Ikke nok data for prediksjon. Velg en kjøretøytype.",
-    "lowDataHint": "Få datapunkter — prognosen kan være unøyaktig. Flere bestillinger vil forbedre nøyaktigheten."
+    "lowDataHint": "Få datapunkter — prognosen kan være unøyaktig. Flere bestillinger vil forbedre nøyaktigheten.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Leveringstrend",

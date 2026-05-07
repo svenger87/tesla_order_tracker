@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Order, VEHICLE_TYPES, MODEL_Y_TRIMS, MODEL_3_TRIMS, DRIVES, COUNTRIES } from '@/lib/types'
 import { predictDelivery, DeliveryPrediction as PredictionType } from '@/lib/prediction'
+import { parseGermanDate } from '@/lib/date-utils'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -45,6 +46,18 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
     const opt = (v: string) => v && v !== '_any' ? v : undefined
     return predictDelivery(orders, vehicleType, opt(model), opt(country), opt(drive), orderDate || undefined)
   }, [orders, vehicleType, model, country, drive, orderDate])
+
+  // Days the user has been waiting since their orderDate (only when they entered one)
+  const currentWaitingDays = useMemo(() => {
+    const parsed = orderDate ? parseGermanDate(orderDate) : null
+    if (!parsed) return null
+    return Math.max(0, Math.floor((Date.now() - parsed.getTime()) / 86_400_000))
+  }, [orderDate])
+
+  const exceedsPessimistic =
+    prediction !== null &&
+    currentWaitingDays !== null &&
+    currentWaitingDays > prediction.pessimisticDays
 
   return (
     <div className="space-y-4">
@@ -123,13 +136,23 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
                   {t(`confidence.${prediction.confidence}`)}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  {t('basedOn', { count: prediction.sampleSize })}
+                  {prediction.recencyWindowDays
+                    ? t('basedOnRecent', { count: prediction.sampleSize, days: prediction.recencyWindowDays })
+                    : t('basedOn', { count: prediction.sampleSize })}
                 </span>
               </div>
               {prediction.confidence === 'low' && (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
                   {t('lowDataHint')}
                 </p>
+              )}
+              {exceedsPessimistic && (
+                <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20 p-2.5">
+                  <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                    <span>{t('exceedsPessimisticHint', { days: currentWaitingDays! })}</span>
+                  </p>
+                </div>
               )}
             </div>
 

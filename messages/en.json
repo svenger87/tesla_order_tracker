@@ -610,8 +610,10 @@
       "low": "Low confidence"
     },
     "basedOn": "Based on {count} orders",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
     "notEnoughData": "Not enough data for prediction. Select a vehicle type.",
-    "lowDataHint": "Few data points — the prediction may be inaccurate. More orders will improve accuracy."
+    "lowDataHint": "Few data points — the prediction may be inaccurate. More orders will improve accuracy.",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Delivery Trend",

@@ -610,8 +610,10 @@
       "low": "Niedrige Konfidenz"
     },
     "basedOn": "Basierend auf {count} Bestellungen",
+    "basedOnRecent": "Basierend auf {count} Lieferungen aus den letzten {days} Tagen",
     "notEnoughData": "Nicht genügend Daten für eine Prognose. Wähle ein Fahrzeug aus.",
-    "lowDataHint": "Wenige Datenpunkte — die Prognose kann ungenau sein. Mehr Bestellungen verbessern die Genauigkeit."
+    "lowDataHint": "Wenige Datenpunkte — die Prognose kann ungenau sein. Mehr Bestellungen verbessern die Genauigkeit.",
+    "exceedsPessimisticHint": "Deine bisherige Wartezeit ({days} Tage) liegt bereits über dem pessimistischen Wert (75% vergleichbarer Lieferungen). Aktuelle Wartezeiten sind länger als die historische Verteilung — diese Prognose ist mit Vorsicht zu genießen."
   },
   "trend": {
     "title": "Lieferzeit-Trend",

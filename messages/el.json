@@ -611,7 +611,9 @@
     },
     "basedOn": "Βάσει {count} παραγγελιών",
     "notEnoughData": "Δεν υπάρχουν αρκετά δεδομένα για πρόβλεψη. Επιλέξτε τύπο οχήματος.",
-    "lowDataHint": "Λίγα δεδομένα — η πρόβλεψη μπορεί να είναι ανακριβής. Περισσότερες παραγγελίες θα βελτιώσουν την ακρίβεια."
+    "lowDataHint": "Λίγα δεδομένα — η πρόβλεψη μπορεί να είναι ανακριβής. Περισσότερες παραγγελίες θα βελτιώσουν την ακρίβεια.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Τάση Παράδοσης",

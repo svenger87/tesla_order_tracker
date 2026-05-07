@@ -611,7 +611,9 @@
     },
     "basedOn": "Baserad på {count} beställningar",
     "notEnoughData": "Inte tillräckligt med data för prognos. Välj en fordonstyp.",
-    "lowDataHint": "Få datapunkter — prognosen kan vara felaktig. Fler beställningar förbättrar noggrannheten."
+    "lowDataHint": "Få datapunkter — prognosen kan vara felaktig. Fler beställningar förbättrar noggrannheten.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Leveranstrend",

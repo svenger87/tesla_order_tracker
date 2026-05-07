@@ -611,7 +611,9 @@
     },
     "basedOn": "На базата на {count} поръчки",
     "notEnoughData": "Недостатъчно данни за прогноза. Изберете тип превозно средство.",
-    "lowDataHint": "Малко данни — прогнозата може да е неточна. Повече поръчки ще подобрят точността."
+    "lowDataHint": "Малко данни — прогнозата може да е неточна. Повече поръчки ще подобрят точността.",
+    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
   },
   "trend": {
     "title": "Тенденция на доставките",
