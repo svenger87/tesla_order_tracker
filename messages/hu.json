@@ -250,7 +250,8 @@
     "editTostFields": "Rendelés dátuma, Papírok / COC",
     "editTostFieldsDescription": "Ezek a mezők manuálisan szerkeszthetők, még TOST által kezelt rendeléseknél is.",
     "papersReceivedDate": "Dokumentumok beérkezése",
-    "saveError": "Mentési hiba"
+    "saveError": "Mentési hiba",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Megrendelve",

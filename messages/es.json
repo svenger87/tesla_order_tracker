@@ -250,7 +250,8 @@
     "editTostFields": "Fecha de pedido, Papeles / COC",
     "editTostFieldsDescription": "Estos campos pueden editarse manualmente, incluso para pedidos gestionados por TOST.",
     "papersReceivedDate": "Documentos recibidos el",
-    "saveError": "Error al guardar"
+    "saveError": "Error al guardar",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Pedido realizado",

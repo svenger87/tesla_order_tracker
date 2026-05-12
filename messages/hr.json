@@ -250,7 +250,8 @@
     "editTostFields": "Datum narudžbe, Dokumenti / COC",
     "editTostFieldsDescription": "Ova polja se mogu ručno uređivati, čak i za narudžbe kojima upravlja TOST.",
     "papersReceivedDate": "Dokumenti primljeni dana",
-    "saveError": "Greška pri spremanju"
+    "saveError": "Greška pri spremanju",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Naručeno",

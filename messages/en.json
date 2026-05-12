@@ -247,9 +247,10 @@
       "monthsAgo": "{n}mo ago"
     },
     "deliveryScheduled": "Delivery scheduled",
-    "editTostFields": "Order Date, Papers / COC",
+    "editTostFields": "Order Date, Production, Papers / COC",
     "editTostFieldsDescription": "These fields can be edited manually, even for TOST-managed orders.",
     "papersReceivedDate": "Papers received on",
+    "productionDate": "Production date",
     "saveError": "Error saving"
   },
   "progress": {

@@ -250,7 +250,8 @@
     "editTostFields": "Sipariş tarihi, Belgeler / COC",
     "editTostFieldsDescription": "Bu alanlar, TOST tarafından yönetilen siparişler için bile manuel olarak düzenlenebilir.",
     "papersReceivedDate": "Belgeler alındığı tarih",
-    "saveError": "Kaydetme hatası"
+    "saveError": "Kaydetme hatası",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Sipariş verildi",

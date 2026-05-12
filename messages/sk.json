@@ -250,7 +250,8 @@
     "editTostFields": "Dátum objednávky, Dokumenty / COC",
     "editTostFieldsDescription": "Tieto polia je možné upraviť manuálne, aj pre objednávky spravované cez TOST.",
     "papersReceivedDate": "Dokumenty prijaté dňa",
-    "saveError": "Chyba pri ukladaní"
+    "saveError": "Chyba pri ukladaní",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Objednané",

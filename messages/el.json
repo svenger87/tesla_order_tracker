@@ -250,7 +250,8 @@
     "editTostFields": "Ημερομηνία παραγγελίας, Έγγραφα / COC",
     "editTostFieldsDescription": "Αυτά τα πεδία μπορούν να επεξεργαστούν χειροκίνητα, ακόμα και για παραγγελίες που διαχειρίζεται το TOST.",
     "papersReceivedDate": "Έγγραφα λήφθηκαν στις",
-    "saveError": "Σφάλμα αποθήκευσης"
+    "saveError": "Σφάλμα αποθήκευσης",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Παραγγέλθηκε",

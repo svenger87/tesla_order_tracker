@@ -247,9 +247,10 @@
       "monthsAgo": "vor {n} Mon."
     },
     "deliveryScheduled": "Lieferung geplant",
-    "editTostFields": "Bestelldatum, Papiere / COC",
+    "editTostFields": "Bestelldatum, Produktion, Papiere / COC",
     "editTostFieldsDescription": "Diese Felder können manuell bearbeitet werden, auch bei TOST-verwalteten Bestellungen.",
     "papersReceivedDate": "Papiere erhalten am",
+    "productionDate": "Produktionsdatum",
     "saveError": "Fehler beim Speichern"
   },
   "progress": {

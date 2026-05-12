@@ -38,6 +38,18 @@ function buildOrderData(body: Record<string, unknown>) {
   }
 }
 
+// Drop null/empty fields so an auto-claim doesn't wipe values the user already
+// entered manually on the webapp (e.g. a productionDate read from the COC).
+// Used only on the claim paths — for regular TOST upserts the unfiltered data
+// is correct because TOST is the source of truth there.
+function nonEmpty(data: ReturnType<typeof buildOrderData>): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(data)) {
+    if (v !== null && v !== undefined && v !== '') out[k] = v
+  }
+  return out
+}
+
 // POST /api/v1/tost/orders - Create a new TOST-managed order
 export const POST = withTostAuth(async (request: NextRequest) => {
   let bodyName: string | undefined
@@ -122,6 +134,10 @@ export const POST = withTostAuth(async (request: NextRequest) => {
           const orderData = buildOrderData(body)
           const newId = body.id as string | undefined
 
+          // On auto-claim, only apply TOST fields that have an actual value —
+          // never wipe a value the user already entered manually on the webapp.
+          const claimData = nonEmpty(orderData)
+
           if (newId && newId !== existing.id) {
             // Re-key: delete old webapp order, create with TOST ID
             const oldOrder = await prisma.order.findUnique({ where: { id: existing.id } })
@@ -132,7 +148,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
                 const created = await tx.order.create({
                   data: {
                     ...oldData,
-                    ...orderData,
+                    ...claimData,
                     id: newId,
                     source: 'tost',
                     ...timePeriods,
@@ -155,7 +171,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
               const u = await tx.order.update({
                 where: { id: existing.id },
                 data: {
-                  ...orderData,
+                  ...claimData,
                   source: 'tost',
                   ...timePeriods,
                 },

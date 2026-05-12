@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 interface TostFieldsModalProps {
   order: Order | null
   onClose: () => void
-  onSave: (orderId: string, data: { orderDate?: string; papersReceivedDate?: string; typeApproval?: string; typeVariant?: string }) => Promise<void>
+  onSave: (orderId: string, data: { orderDate?: string; papersReceivedDate?: string; productionDate?: string; typeApproval?: string; typeVariant?: string }) => Promise<void>
 }
 
 export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps) {
@@ -20,6 +20,7 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
 
   const [orderDate, setOrderDate] = useState(order?.orderDate || '')
   const [papersReceivedDate, setPapersReceivedDate] = useState(order?.papersReceivedDate || '')
+  const [productionDate, setProductionDate] = useState(order?.productionDate || '')
   const [typeApproval, setTypeApproval] = useState(order?.typeApproval || '')
   const [typeVariant, setTypeVariant] = useState(order?.typeVariant || '')
   const [saving, setSaving] = useState(false)
@@ -30,6 +31,7 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
     if (order) {
       setOrderDate(order.orderDate || '')
       setPapersReceivedDate(order.papersReceivedDate || '')
+      setProductionDate(order.productionDate || '')
       setTypeApproval(order.typeApproval || '')
       setTypeVariant(order.typeVariant || '')
       setError(null)
@@ -45,6 +47,7 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
       const data: Record<string, string> = {}
       if (orderDate !== (order.orderDate || '')) data.orderDate = orderDate
       if (papersReceivedDate !== (order.papersReceivedDate || '')) data.papersReceivedDate = papersReceivedDate
+      if (productionDate !== (order.productionDate || '')) data.productionDate = productionDate
       if (typeApproval !== (order.typeApproval || '')) data.typeApproval = typeApproval
       if (typeVariant !== (order.typeVariant || '')) data.typeVariant = typeVariant
 
@@ -88,6 +91,16 @@ export function TostFieldsModal({ order, onClose, onSave }: TostFieldsModalProps
               placeholder="TT.MM.JJJJ"
               value={papersReceivedDate}
               onChange={(e) => setPapersReceivedDate(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="productionDate">{t('productionDate')}</Label>
+            <Input
+              id="productionDate"
+              placeholder="TT.MM.JJJJ"
+              value={productionDate}
+              onChange={(e) => setProductionDate(e.target.value)}
             />
           </div>
 

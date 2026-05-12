@@ -250,7 +250,8 @@
     "editTostFields": "Tilauspäivä, Paperit / COC",
     "editTostFieldsDescription": "Näitä kenttiä voi muokata manuaalisesti, myös TOST-hallinnoiduissa tilauksissa.",
     "papersReceivedDate": "Asiakirjat vastaanotettu",
-    "saveError": "Virhe tallennettaessa"
+    "saveError": "Virhe tallennettaessa",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Tilattu",

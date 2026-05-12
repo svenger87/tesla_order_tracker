@@ -250,7 +250,8 @@
     "editTostFields": "Beställningsdatum, Papper / COC",
     "editTostFieldsDescription": "Dessa fält kan redigeras manuellt, även för TOST-hanterade beställningar.",
     "papersReceivedDate": "Dokument mottagna den",
-    "saveError": "Fel vid sparande"
+    "saveError": "Fel vid sparande",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Beställd",

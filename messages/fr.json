@@ -250,7 +250,8 @@
     "editTostFields": "Date de commande, Papiers / COC",
     "editTostFieldsDescription": "Ces champs peuvent être modifiés manuellement, même pour les commandes gérées par TOST.",
     "papersReceivedDate": "Documents reçus le",
-    "saveError": "Erreur lors de l'enregistrement"
+    "saveError": "Erreur lors de l'enregistrement",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Commandé",

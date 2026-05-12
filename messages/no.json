@@ -250,7 +250,8 @@
     "editTostFields": "Bestillingsdato, Papirer / COC",
     "editTostFieldsDescription": "Disse feltene kan redigeres manuelt, selv for TOST-administrerte bestillinger.",
     "papersReceivedDate": "Dokumenter mottatt den",
-    "saveError": "Feil ved lagring"
+    "saveError": "Feil ved lagring",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "Bestilt",

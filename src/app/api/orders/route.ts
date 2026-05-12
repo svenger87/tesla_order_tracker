@@ -336,7 +336,7 @@ export async function PUT(request: NextRequest) {
     // TOST-managed orders: only papersReceivedDate, typeApproval, typeVariant can be edited via webapp
     const tostCheck = await prisma.order.findUnique({ where: { id }, select: { source: true } })
     if (tostCheck?.source === 'tost') {
-      const tostUserEditableFields = ['orderDate', 'papersReceivedDate', 'typeApproval', 'typeVariant']
+      const tostUserEditableFields = ['orderDate', 'papersReceivedDate', 'productionDate', 'typeApproval', 'typeVariant']
       const attemptedFields = Object.keys(rawData).filter(k => k !== 'id')
       const disallowedFields = attemptedFields.filter(f => !tostUserEditableFields.includes(f))
       if (disallowedFields.length > 0) {
@@ -369,15 +369,14 @@ export async function PUT(request: NextRequest) {
           }
         }
 
-        // Recalculate all order-based time periods if orderDate changed
-        if (updateData.orderDate && existingOrder) {
-          const od = updateData.orderDate as string
+        // Recalculate all order-based time periods if orderDate or productionDate changed
+        if ((updateData.orderDate || updateData.productionDate) && existingOrder) {
           const timePeriods = calculateTimePeriods({
-            orderDate: od,
-            productionDate: existingOrder.productionDate,
-            vinReceivedDate: existingOrder.vinReceivedDate,
-            deliveryDate: existingOrder.deliveryDate,
-            papersReceivedDate: (updateData.papersReceivedDate as string) ?? existingOrder.papersReceivedDate,
+            orderDate: (updateData.orderDate as string) ?? existingOrder.orderDate ?? undefined,
+            productionDate: (updateData.productionDate as string) ?? existingOrder.productionDate ?? undefined,
+            vinReceivedDate: existingOrder.vinReceivedDate ?? undefined,
+            deliveryDate: existingOrder.deliveryDate ?? undefined,
+            papersReceivedDate: (updateData.papersReceivedDate as string) ?? existingOrder.papersReceivedDate ?? undefined,
           })
           for (const [key, value] of Object.entries(timePeriods)) {
             if (value !== null) updateData[key] = value

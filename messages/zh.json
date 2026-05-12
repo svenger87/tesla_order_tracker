@@ -250,7 +250,8 @@
     "editTostFields": "订单日期、文件 / COC",
     "editTostFieldsDescription": "即使是 TOST 管理的订单，这些字段也可以手动编辑。",
     "papersReceivedDate": "文件接收日期",
-    "saveError": "保存出错"
+    "saveError": "保存出错",
+    "productionDate": "Production date"
   },
   "progress": {
     "ordered": "已下单",
