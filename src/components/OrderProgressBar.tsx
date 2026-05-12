@@ -82,7 +82,7 @@ const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: 
                   {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
                 </p>
                 {dateValue && (
-                  <p className="text-xs text-white/80">{dateValue}</p>
+                  <p className="text-xs opacity-80">{dateValue}</p>
                 )}
               </TooltipContent>
             </Tooltip>
@@ -198,7 +198,7 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
                   {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
                 </p>
                 {dateValue && (
-                  <p className="text-xs text-white/80">{dateValue}</p>
+                  <p className="text-xs opacity-80">{dateValue}</p>
                 )}
               </TooltipContent>
             </Tooltip>
