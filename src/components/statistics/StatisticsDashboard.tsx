@@ -76,7 +76,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
           tabsRef.current?.querySelector('[role="tabpanel"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
         }, 50)
       }}>
-        <TabsList className="sticky-tabs flex w-full overflow-x-auto flex-nowrap gap-1 sm:grid sm:grid-cols-5">
+        <TabsList className="sticky-tabs flex h-auto w-full overflow-x-auto overflow-y-hidden flex-nowrap gap-1 sm:grid sm:grid-cols-5">
           <TabsTrigger value="overview" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
             <BarChart3 className="h-4 w-4 shrink-0" />
             <span className="sm:hidden">{t('overviewShort')}</span>
