@@ -70,7 +70,9 @@
     "generateResetCode": "Δημιουργία κωδικού μίας χρήσης",
     "vehicleImage": "Εικόνα οχήματος",
     "delivered": "Παραδόθηκε: {date}",
-    "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού"
+    "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Αναζήτηση παραγγελιών κατά όνομα, VIN, χώρα...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Αυτά τα πεδία μπορούν να επεξεργαστούν χειροκίνητα, ακόμα και για παραγγελίες που διαχειρίζεται το TOST.",
     "papersReceivedDate": "Έγγραφα λήφθηκαν στις",
     "saveError": "Σφάλμα αποθήκευσης",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Παραγγέλθηκε",
@@ -706,7 +710,8 @@
     "orderToPapers": "Παραγγελία → Έγγραφα",
     "papersToDelivery": "Έγγραφα → Παράδοση",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Αυτά τα δεδομένα διατηρούνται από την κοινότητα για την κοινότητα. Εάν αυτός ο ιστότοπος σας βοηθά, μπορείτε να υποστηρίξετε τα έξοδα του διακομιστή.",

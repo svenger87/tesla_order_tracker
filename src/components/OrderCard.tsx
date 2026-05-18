@@ -6,6 +6,7 @@ import type { FormOption } from '@/hooks/useOptions'
 import { OrderProgressBar } from './OrderProgressBar'
 import { TeslaCarThumbnail } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
+import { isStaleOrder } from '@/lib/statistics'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -65,8 +66,14 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
     return option?.label || value
   }
 
+  const isStale = isStaleOrder(order)
+
   return (
-    <Card className={cn("relative overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:border-primary/20", order.deliveryDate && "bg-green-50/50 dark:bg-green-900/10")}>
+    <Card className={cn(
+      "relative overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:border-primary/20",
+      order.deliveryDate && "bg-green-50/50 dark:bg-green-900/10",
+      isStale && "opacity-60 hover:opacity-100 transition-opacity",
+    )}>
         {/* Status bar at top */}
         <div className="h-2">
           <OrderProgressBar order={order} compact barOnly />

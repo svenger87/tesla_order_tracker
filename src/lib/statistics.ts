@@ -687,6 +687,35 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   }
 }
 
+/**
+ * An order is "stale" when it is still pending (no past delivery date) AND its
+ * last update is older than {@link thresholdDays} days. Useful for fading rows
+ * the user is no longer maintaining — stops them from posing as fresh data
+ * without dropping them from the global statistics, which already only count
+ * delivered orders.
+ */
+export function isStaleOrder(
+  order: Pick<Order, 'deliveryDate' | 'updatedAt'>,
+  thresholdDays: number = 60,
+): boolean {
+  if (!order.updatedAt) return false
+  // Treat orders with a past delivery date as completed → never stale.
+  if (order.deliveryDate) {
+    const parts = order.deliveryDate.split('.')
+    if (parts.length === 3) {
+      const [day, month, year] = parts.map(Number)
+      const d = new Date(year, month - 1, day)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      if (d <= today) return false
+    }
+  }
+  const updated = new Date(order.updatedAt)
+  if (isNaN(updated.getTime())) return false
+  const elapsedDays = (Date.now() - updated.getTime()) / 86_400_000
+  return elapsedDays > thresholdDays
+}
+
 export function getOrderStatus(order: Order): 'ordered' | 'vin_received' | 'production' | 'papers_received' | 'delivery_scheduled' | 'delivered' {
   if (order.deliveryDate) {
     // Check if delivery date is in the future

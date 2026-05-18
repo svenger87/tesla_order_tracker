@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
+import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
 
@@ -176,12 +177,14 @@ interface TableLocalFilters {
   nameSearch: string
   hasVin: '' | 'yes' | 'no'
   hasDelivery: '' | 'yes' | 'no'
+  staleness: '' | 'hide' | 'only'
 }
 
 const emptyLocalFilters: TableLocalFilters = {
   nameSearch: '',
   hasVin: '',
   hasDelivery: '',
+  staleness: '',
 }
 
 // Parse date string (DD.MM.YYYY format) to Date for sorting
@@ -625,6 +628,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       result = result.filter(o => !o.deliveryDate)
     }
 
+    // Apply staleness filter (>60 days without update on still-pending orders)
+    if (localFilters.staleness === 'hide') {
+      result = result.filter(o => !isStaleOrder(o))
+    } else if (localFilters.staleness === 'only') {
+      result = result.filter(o => isStaleOrder(o))
+    }
+
     // Apply sort
     if (sortField) {
       result = [...result].sort((a, b) => compareValues(a, b, sortField, sortDirection, countryLabelMap))
@@ -739,6 +749,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           }))}
         >
           {t('deliveredFilter')} {localFilters.hasDelivery === 'yes' ? '\u2713' : localFilters.hasDelivery === 'no' ? '\u2717' : ''}
+        </Button>
+        {/* Stale pill toggle: '' (all) \u2192 'hide' (hide stale) \u2192 'only' (only stale) \u2192 '' */}
+        <Button
+          variant={localFilters.staleness === 'hide' ? 'secondary' : localFilters.staleness === 'only' ? 'default' : 'outline'}
+          size="sm"
+          className="h-8 text-xs"
+          title={t('staleTooltip')}
+          onClick={() => setLocalFilters(f => ({
+            ...f,
+            staleness: f.staleness === '' ? 'hide' : f.staleness === 'hide' ? 'only' : ''
+          }))}
+        >
+          {t('staleFilter')} {localFilters.staleness === 'hide' ? '\u2717' : localFilters.staleness === 'only' ? '\u2713' : ''}
         </Button>
         <Popover>
           <PopoverTrigger asChild>
@@ -909,6 +932,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
               const order = filteredAndSortedOrders[virtualRow.index]
               const isHighlighted = highlightUser && order.name.toLowerCase() === highlightUser
               const isSearchHighlighted = highlightOrderId === order.id
+              const isStale = isStaleOrder(order)
               return (
               <TableRow
                 key={order.id}
@@ -920,9 +944,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   order.deliveryDate
                     ? "hover:border-l-green-500"
                     : "hover:border-l-amber-500",
+                  isStale && "opacity-60 hover:opacity-100 transition-opacity",
                   isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25",
                   isSearchHighlighted && "bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
                 )}
+                title={isStale ? th('staleHint') : undefined}
               >
                 {isColumnVisible('status') && (
                   <TableCell data-noclip className="whitespace-nowrap">
@@ -1136,7 +1162,17 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('updatedAt') && (
                   <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                    {formatRelativeTime(order.updatedAt, t as any)}
+                    <span className="inline-flex items-center gap-1">
+                      {isStale && (
+                        <span
+                          className="inline-flex items-center rounded-sm border border-amber-300/60 bg-amber-100/60 px-1 py-px text-[10px] font-medium text-amber-700 dark:border-amber-700/60 dark:bg-amber-900/30 dark:text-amber-300"
+                          title={th('staleHint')}
+                        >
+                          {th('staleBadge')}
+                        </span>
+                      )}
+                      {formatRelativeTime(order.updatedAt, t as any)}
+                    </span>
                   </TableCell>
                 )}
                 <TableCell className="bg-card dark:bg-card">

@@ -70,7 +70,9 @@
     "generateResetCode": "Generar código de un solo uso",
     "vehicleImage": "Imagen del vehículo",
     "delivered": "Entregado: {date}",
-    "errorGeneratingCode": "Error al generar el código"
+    "errorGeneratingCode": "Error al generar el código",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Buscar pedidos por nombre, VIN, país...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Estos campos pueden editarse manualmente, incluso para pedidos gestionados por TOST.",
     "papersReceivedDate": "Documentos recibidos el",
     "saveError": "Error al guardar",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Pedido realizado",
@@ -706,7 +710,8 @@
     "orderToPapers": "Pedido → Documentos",
     "papersToDelivery": "Documentos → Entrega",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Estos datos son mantenidos por la comunidad para la comunidad. Si este sitio le ayuda, puede apoyar los costes del servidor.",

@@ -70,7 +70,9 @@
     "generateResetCode": "Tek kullanımlık kod oluştur",
     "vehicleImage": "Araç resmi",
     "delivered": "Teslim edildi: {date}",
-    "errorGeneratingCode": "Kod oluşturma hatası"
+    "errorGeneratingCode": "Kod oluşturma hatası",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Siparişlerde isim, VIN, ülke ile ara...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Bu alanlar, TOST tarafından yönetilen siparişler için bile manuel olarak düzenlenebilir.",
     "papersReceivedDate": "Belgeler alındığı tarih",
     "saveError": "Kaydetme hatası",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Sipariş verildi",
@@ -706,7 +710,8 @@
     "orderToPapers": "Sipariş → Belgeler",
     "papersToDelivery": "Belgeler → Teslimat",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Bu veriler topluluk tarafından topluluk için korunmaktadır. Bu site size yardımcı oluyorsa, sunucu maliyetlerini destekleyebilirsiniz.",

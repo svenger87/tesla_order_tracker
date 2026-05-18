@@ -70,7 +70,9 @@
     "generateResetCode": "일회용 코드 생성",
     "vehicleImage": "차량 이미지",
     "delivered": "인도 완료: {date}",
-    "errorGeneratingCode": "코드 생성 오류"
+    "errorGeneratingCode": "코드 생성 오류",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "이름, VIN, 국가로 주문 검색...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "TOST 관리 주문의 경우에도 이 필드는 수동으로 편집할 수 있습니다.",
     "papersReceivedDate": "서류 수신일",
     "saveError": "저장 오류",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "주문 완료",
@@ -706,7 +710,8 @@
     "orderToPapers": "주문 → 서류",
     "papersToDelivery": "서류 → 인도",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "이 데이터는 커뮤니티에 의해 커뮤니티를 위해 유지됩니다. 이 사이트가 도움이 되셨다면 서버 비용을 지원해 주실 수 있습니다.",

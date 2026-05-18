@@ -70,7 +70,9 @@
     "generateResetCode": "Vygenerovat jednorázový kód",
     "vehicleImage": "Obrázek vozidla",
     "delivered": "Dodáno: {date}",
-    "errorGeneratingCode": "Chyba při generování kódu"
+    "errorGeneratingCode": "Chyba při generování kódu",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Hledat objednávky podle jména, VIN, země...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Tato pole lze upravovat ručně, i u objednávek spravovaných přes TOST.",
     "papersReceivedDate": "Dokumenty přijaty dne",
     "saveError": "Chyba při ukládání",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Objednáno",
@@ -706,7 +710,8 @@
     "orderToPapers": "Objednávka → dokumenty",
     "papersToDelivery": "Dokumenty → dodání",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Tato data spravuje komunita pro komunitu. Pokud Vám tento web pomáhá, můžete podpořit náklady na server.",

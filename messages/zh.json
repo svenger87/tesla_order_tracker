@@ -70,7 +70,9 @@
     "generateResetCode": "生成一次性代码",
     "vehicleImage": "车辆图片",
     "delivered": "已交付：{date}",
-    "errorGeneratingCode": "生成代码时出错"
+    "errorGeneratingCode": "生成代码时出错",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "按名称、VIN、国家搜索订单...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "即使是 TOST 管理的订单，这些字段也可以手动编辑。",
     "papersReceivedDate": "文件接收日期",
     "saveError": "保存出错",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "已下单",
@@ -706,7 +710,8 @@
     "orderToPapers": "订单 → 文件",
     "papersToDelivery": "文件 → 交付",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "这些数据由社区为社区维护。如果本站对您有帮助，您可以支持服务器费用。",

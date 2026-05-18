@@ -70,7 +70,9 @@
     "generateResetCode": "Luo kertakoodi",
     "vehicleImage": "Ajoneuvon kuva",
     "delivered": "Toimitettu: {date}",
-    "errorGeneratingCode": "Virhe koodin luomisessa"
+    "errorGeneratingCode": "Virhe koodin luomisessa",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Hae tilauksia nimellä, VIN-numerolla, maalla...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Näitä kenttiä voi muokata manuaalisesti, myös TOST-hallinnoiduissa tilauksissa.",
     "papersReceivedDate": "Asiakirjat vastaanotettu",
     "saveError": "Virhe tallennettaessa",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Tilattu",
@@ -706,7 +710,8 @@
     "orderToPapers": "Tilaus → asiakirjat",
     "papersToDelivery": "Asiakirjat → toimitus",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Tätä dataa ylläpitää yhteisö yhteisölle. Jos tämä sivusto auttaa sinua, voit tukea palvelinkustannuksia.",

@@ -70,7 +70,9 @@
     "generateResetCode": "Generer engangskode",
     "vehicleImage": "Køretøjsbillede",
     "delivered": "Leveret: {date}",
-    "errorGeneratingCode": "Fejl ved generering af kode"
+    "errorGeneratingCode": "Fejl ved generering af kode",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Søg bestillinger efter navn, VIN, land...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Disse felter kan redigeres manuelt, selv for TOST-administrerede bestillinger.",
     "papersReceivedDate": "Dokumenter modtaget den",
     "saveError": "Fejl ved lagring",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Bestilt",
@@ -706,7 +710,8 @@
     "orderToPapers": "Bestilling → Dokumenter",
     "papersToDelivery": "Dokumenter → Levering",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Disse data vedligeholdes af fællesskabet for fællesskabet. Hvis dette websted hjælper dig, kan du støtte serveromkostningerne.",

@@ -70,7 +70,9 @@
     "generateResetCode": "Generiraj jednokratni kôd",
     "vehicleImage": "Slika vozila",
     "delivered": "Isporučeno: {date}",
-    "errorGeneratingCode": "Greška pri generiranju koda"
+    "errorGeneratingCode": "Greška pri generiranju koda",
+    "staleBadge": "stale",
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
   },
   "search": {
     "placeholder": "Pretražite narudžbe po imenu, VIN-u, državi...",
@@ -251,7 +253,9 @@
     "editTostFieldsDescription": "Ova polja se mogu ručno uređivati, čak i za narudžbe kojima upravlja TOST.",
     "papersReceivedDate": "Dokumenti primljeni dana",
     "saveError": "Greška pri spremanju",
-    "productionDate": "Production date"
+    "productionDate": "Production date",
+    "staleFilter": "Stale",
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
   },
   "progress": {
     "ordered": "Naručeno",
@@ -706,7 +710,8 @@
     "orderToPapers": "Narudžba → Dokumenti",
     "papersToDelivery": "Dokumenti → Isporuka",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window."
+    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
   },
   "support": {
     "communityMessage": "Ove podatke održava zajednica za zajednicu. Ako vam ova stranica pomaže, možete podržati troškove poslužitelja.",

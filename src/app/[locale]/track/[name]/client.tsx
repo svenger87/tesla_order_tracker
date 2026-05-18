@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, Share2, Check, Calendar, MapPin, TrendingUp, Clock, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Share2, Check, Calendar, MapPin, TrendingUp, Clock, AlertTriangle, AlarmClock } from 'lucide-react'
+import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { motion } from 'framer-motion'
 
@@ -230,6 +231,22 @@ export function TrackingPageClient({
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Stale-data notice — surfaces when a pending order hasn't been updated in 60+ days */}
+        {isStaleOrder(order) && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
+            <div className="rounded-md border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-900/20 p-3">
+              <p className="text-xs text-amber-700 dark:text-amber-300 flex items-start gap-1.5">
+                <AlarmClock className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                <span>{t('staleHint')}</span>
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Progress timeline */}
         <motion.div
