@@ -589,6 +589,38 @@
     "backToHome": "Späť na hlavnú stránku",
     "revealEmail": "[Kliknutím zobrazíte]"
   },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {date}",
+    "lastUpdatedDate": "May 2026",
+    "backToHome": "Back to homepage",
+    "controller": "1. Data Controller",
+    "controllerBody": "The controller responsible for the data processing on this website under the GDPR is:\n\nSven Rosema\nRhede (Ems), Germany\n\nContact details are listed at the bottom of this page.",
+    "scope": "2. Scope and notes",
+    "scopeBody": "This privacy policy applies to https://tff-order-stats.de. tff-order-stats.de is a private, non-commercial community project around Tesla orders. It is operated without intent to generate profit. Personal data is collected only to the extent technically necessary.",
+    "serverLogs": "3. Server logs",
+    "serverLogsBody": "When the website is accessed, the hosting provider (Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Germany) collects technical data in so-called server logs: IP address, time of the request, requested URL, HTTP status, transferred byte size, referrer and user-agent. These data are technically required for the secure operation of the website. Legal basis: Art. 6(1)(f) GDPR (legitimate interest in operating and securing the site). Retention period: a maximum of 14 days, after which logs are automatically deleted.",
+    "cookies": "4. Cookies",
+    "cookiesBody": "The website uses one strictly necessary cookie only:\n\n• admin_token — set exclusively after a successful admin login and used for authentication. HttpOnly, Secure, SameSite=Strict. Lifetime: 7 days.\n\nNo cookies are set for regular visitors without admin access. Consent under § 25(2) TTDSG is not required, as the cookie is strictly necessary for the service the user expressly requested (admin login). Legal basis: Art. 6(1)(b) GDPR.",
+    "localStorage": "5. Browser local storage",
+    "localStorageBody": "The website stores the following technical preferences exclusively in your browser's local storage (never transmitted to the server):\n\n• selected language\n• selected filters, sorting and visible table columns\n• visibility of filter/statistics sections\n• filters in the updates feed\n• selected theme (light/dark)\n\nThese data never leave your browser and are used solely to improve usability. You can clear them at any time via your browser settings.",
+    "analytics": "6. Web analytics (Umami)",
+    "analyticsBody": "Reach measurement uses the self-hosted open-source software Umami, running on the same server as the website. No cookies are set and no personal data is transferred to any third party. Umami collects only anonymised information: pages visited, referrer source (e.g. search engine), coarse geolocation (country), browser/device type and screen resolution. IP addresses are hashed before storage and not retained in identifiable form. Legal basis: Art. 6(1)(f) GDPR (legitimate interest in statistical evaluation to improve the website).",
+    "orderData": "7. Order entries",
+    "orderDataBody": "When you submit an order through the form, the data you provide (a self-chosen display name, vehicle configuration, order date, delivery window, country, etc.) is stored in the database and shown publicly. No email address or real name is required. If you set a password for your entry, it is stored exclusively as a bcrypt hash and never in plaintext. You can edit or delete your entry at any time via the edit button or by contacting the address below.\n\nIf you use the third-party app TOST (https://www.tesla-order-status-tracker.de), data entered there is forwarded to this website through their API. The TOST app's own privacy policy applies to data processed within TOST. Legal basis for storage on this website: Art. 6(1)(a) GDPR (consent through active submission).",
+    "externalResources": "8. Embedded external resources",
+    "externalResourcesBody": "Loading the site fetches the following external resources, which transmits your IP address to the respective providers:\n\n• Twemoji icons via cdn.jsdelivr.net (Fastly/Cloudflare) — display of country flags.\n• Google Fonts — fonts are bundled at build time and served from the same domain, so no direct calls to Google occur during normal use.\n\nVehicle preview images are generated server-side via the official Tesla compositor endpoint and served exclusively from the website's own domain. No direct request to tesla.com is made from your browser.\n\nLegal basis for external resources: Art. 6(1)(f) GDPR (legitimate interest in up-to-date presentation and CDN-based performance).",
+    "donationLinks": "9. Donation links",
+    "donationLinksBody": "The footer and menu contain optional links to Buy Me a Coffee and PayPal. They are loaded only when actively clicked; nothing is transmitted to these providers beforehand.",
+    "rights": "10. Your rights",
+    "rightsBody": "Under the GDPR you have the right to:\n\n• access (Art. 15)\n• rectification (Art. 16)\n• erasure (Art. 17)\n• restriction of processing (Art. 18)\n• data portability (Art. 20)\n• object to processing based on legitimate interests (Art. 21)\n• withdraw consent at any time with future effect (Art. 7(3))\n\nAn informal message to the contact address below is sufficient to exercise these rights.",
+    "complaints": "11. Right to lodge a complaint",
+    "complaintsBody": "Without prejudice to other remedies, you may lodge a complaint with a data protection supervisory authority, in particular the one responsible for your place of residence or the alleged infringement. The authority responsible for the controller is the Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hannover.",
+    "changes": "12. Changes to this notice",
+    "changesBody": "This privacy notice may be adjusted when data processing changes or legal requirements demand it. The current version is always available on this page.",
+    "contact": "Contact for privacy enquiries",
+    "contactBody": "Please direct enquiries about your rights and data protection to:"
+  },
   "trust": {
     "totalOrders": "Sledované objednávky",
     "delivered": "Dodané",
@@ -722,7 +754,8 @@
     "apiDocs": "API dokumentácia",
     "adminDashboard": "Administrátorský panel",
     "navigationMenu": "Navigačné menu",
-    "impressum": "Právne informácie"
+    "impressum": "Právne informácie",
+    "privacy": "Privacy"
   },
   "footer": {
     "operatedBy": "Prevádzkuje Sven",

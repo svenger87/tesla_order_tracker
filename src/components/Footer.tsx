@@ -46,6 +46,13 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
             >
               {tn('impressum')}
             </Link>
+            <span className="text-muted-foreground/40">·</span>
+            <Link
+              href="/datenschutz"
+              className="hover:text-foreground transition-colors hover:underline underline-offset-4"
+            >
+              {tn('privacy')}
+            </Link>
           </div>
 
           {/* Operated by + donation */}
