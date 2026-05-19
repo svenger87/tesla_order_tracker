@@ -25,7 +25,9 @@ export default async function ImpressumPage({ params }: { params: Promise<{ loca
               {t('legalInfo')}
             </h2>
             <p>Sven Rosema</p>
-            <p>Rhede (Ems)</p>
+            <p>An der Wallhacke 5</p>
+            <p>26899 Rhede (Ems)</p>
+            <p>Deutschland</p>
           </section>
 
           <section className="space-y-1">
