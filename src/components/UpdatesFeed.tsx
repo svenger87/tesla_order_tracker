@@ -46,6 +46,7 @@ const ALL_EVENT_TYPES = ['vin', 'production', 'papers', 'delivery', 'window', 'c
 type EventType = (typeof ALL_EVENT_TYPES)[number]
 
 const EVENT_FILTER_KEY = 'tesla-tracker-feed-events'
+const EXPANDED_KEY = 'tesla-tracker-feed-expanded'
 
 export interface FeedEntry {
   id: string
@@ -115,12 +116,39 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   const [paginated, setPaginated] = useState(false)
   const paginatedRef = useRef(paginated)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // True once the user (or a saved preference) has explicitly chosen a state —
+  // prevents the isMobile default from overriding the remembered choice.
+  const hasExplicitState = useRef(false)
 
   // Keep ref in sync so the polling setInterval callback reads the latest value without stale closure
   useEffect(() => { paginatedRef.current = paginated }, [paginated])
 
-  // Set initial collapsed state from isMobile, once
-  useEffect(() => { setExpanded(!isMobile) }, [isMobile])
+  // Restore the saved collapsed/expanded preference once on mount.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(EXPANDED_KEY)
+      if (raw === 'true' || raw === 'false') {
+        hasExplicitState.current = true
+        setExpanded(raw === 'true')
+      }
+    } catch {}
+  }, [])
+
+  // Default to collapsed on mobile / expanded on desktop — but only until the
+  // user has a remembered preference, which then takes precedence.
+  useEffect(() => {
+    if (hasExplicitState.current) return
+    setExpanded(!isMobile)
+  }, [isMobile])
+
+  const toggleExpanded = useCallback(() => {
+    hasExplicitState.current = true
+    setExpanded(v => {
+      const next = !v
+      try { localStorage.setItem(EXPANDED_KEY, String(next)) } catch {}
+      return next
+    })
+  }, [])
 
   // Hydrate event filter from localStorage
   useEffect(() => {
@@ -220,7 +248,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
         <CardHeader className="cursor-pointer p-0">
           <button
             type="button"
-            onClick={() => setExpanded(v => !v)}
+            onClick={toggleExpanded}
             className="flex w-full items-center justify-between px-6 py-4 font-semibold"
             aria-expanded={expanded}
           >

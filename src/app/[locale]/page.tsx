@@ -42,7 +42,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, ChevronDown, Calculator, Medal, Filter } from 'lucide-react'
+import { RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, ChevronDown, Calculator, Medal, Filter } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 
@@ -348,7 +348,7 @@ export default function Home() {
 
       <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-8">
         {/* Hero Section */}
-        <HeroSection onSearchOpen={() => setShowSearch(true)} />
+        <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
 
         {/* Global Filter Bar */}
@@ -458,10 +458,6 @@ export default function Home() {
                 <Button variant="ghost" size="sm" onClick={() => fetchOrders(true)} disabled={refreshing} className="text-muted-foreground">
                   <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                   <span className="hidden sm:inline">{tc('refresh')}</span>
-                </Button>
-                <Button size="sm" onClick={() => setShowAddForm(true)} className="shadow-sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">{t('newOrder')}</span>
                 </Button>
               </div>
             </div>
