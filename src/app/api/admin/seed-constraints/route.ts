@@ -2,118 +2,17 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { validateApiKey } from '@/lib/api-auth'
-
 import { VehicleType } from '@/lib/types'
-
-interface ConstraintDefinition {
-  sourceType: 'model' | 'drive'
-  sourceValue: string
-  vehicleType: VehicleType
-  targetType: 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch' | 'seats'
-  constraintType: 'allow' | 'fixed' | 'disable'
-  values: string[] | string
-}
-
-// All Model 3 constraints based on German market 2025
-// NOTE: Values must match exactly with types.ts (RANGES, DRIVES, INTERIORS, WHEELS)
-const MODEL_3_CONSTRAINTS: ConstraintDefinition[] = [
-  // Standard (base model)
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '18' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'standard' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'interior', constraintType: 'fixed', values: 'black' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'color', constraintType: 'allow', values: ['pearl_white', 'diamond_black', 'stealth_grey'] },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
-
-  // Premium
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'allow', values: ['18', '19'] },
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
-
-  // Performance
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'wheels', constraintType: 'fixed', values: '20' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model 3', targetType: 'seats', constraintType: 'fixed', values: '5' },
-]
-
-// All Model Y constraints
-// NOTE: Values must match exactly with types.ts (RANGES, DRIVES, INTERIORS, WHEELS)
-const MODEL_Y_CONSTRAINTS: ConstraintDefinition[] = [
-  // Standard
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'range', constraintType: 'fixed', values: 'standard' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'fixed', values: '18' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'drive', constraintType: 'fixed', values: 'rwd' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
-
-  // Performance
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'range', constraintType: 'fixed', values: 'maximale_reichweite' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'fixed', values: '21' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'performance', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
-
-  // Premium - wheels constrained but user can choose, seats allow 5 or 7
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'wheels', constraintType: 'allow', values: ['19', '20'] },
-  { sourceType: 'model', sourceValue: 'premium', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'allow', values: ['5', '7'] },
-]
-
-// Model S constraints
-const MODEL_S_CONSTRAINTS: ConstraintDefinition[] = [
-  // Standard
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'seats', constraintType: 'fixed', values: '5' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model S', targetType: 'wheels', constraintType: 'allow', values: ['19', '21'] },
-  // Plaid
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'seats', constraintType: 'fixed', values: '5' },
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model S', targetType: 'wheels', constraintType: 'allow', values: ['19', '21'] },
-]
-
-// Model X constraints
-const MODEL_X_CONSTRAINTS: ConstraintDefinition[] = [
-  // Standard
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'seats', constraintType: 'allow', values: ['5', '6', '7'] },
-  { sourceType: 'model', sourceValue: 'standard', vehicleType: 'Model X', targetType: 'wheels', constraintType: 'allow', values: ['20', '22'] },
-  // Plaid
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'seats', constraintType: 'allow', values: ['5', '6', '7'] },
-  { sourceType: 'model', sourceValue: 'plaid', vehicleType: 'Model X', targetType: 'wheels', constraintType: 'allow', values: ['20', '22'] },
-]
-
-// Cybertruck constraints
-const CYBERTRUCK_CONSTRAINTS: ConstraintDefinition[] = [
-  // AWD
-  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'seats', constraintType: 'fixed', values: '5' },
-  { sourceType: 'model', sourceValue: 'awd', vehicleType: 'Cybertruck', targetType: 'wheels', constraintType: 'fixed', values: '20' },
-  // Cyberbeast
-  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'seats', constraintType: 'fixed', values: '5' },
-  { sourceType: 'model', sourceValue: 'cyberbeast', vehicleType: 'Cybertruck', targetType: 'wheels', constraintType: 'fixed', values: '20' },
-]
-
-// Roadster constraints (minimal)
-const ROADSTER_CONSTRAINTS: ConstraintDefinition[] = [
-  { sourceType: 'model', sourceValue: 'base', vehicleType: 'Roadster', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'base', vehicleType: 'Roadster', targetType: 'towHitch', constraintType: 'disable', values: [] },
-  { sourceType: 'model', sourceValue: 'founders', vehicleType: 'Roadster', targetType: 'drive', constraintType: 'fixed', values: 'awd' },
-  { sourceType: 'model', sourceValue: 'founders', vehicleType: 'Roadster', targetType: 'towHitch', constraintType: 'disable', values: [] },
-]
-
-// Drive-based constraints (override model constraints when drive is selected)
-const DRIVE_CONSTRAINTS: ConstraintDefinition[] = [
-  // RWD overrides Premium's seats allow [5,7] → fixed 5
-  { sourceType: 'drive', sourceValue: 'rwd', vehicleType: 'Model Y', targetType: 'seats', constraintType: 'fixed', values: '5' },
-]
-
-const ALL_CONSTRAINTS = [...MODEL_3_CONSTRAINTS, ...MODEL_Y_CONSTRAINTS, ...MODEL_S_CONSTRAINTS, ...MODEL_X_CONSTRAINTS, ...CYBERTRUCK_CONSTRAINTS, ...ROADSTER_CONSTRAINTS, ...DRIVE_CONSTRAINTS]
+import {
+  ALL_CONSTRAINTS,
+  MODEL_3_CONSTRAINTS,
+  MODEL_Y_CONSTRAINTS,
+  MODEL_S_CONSTRAINTS,
+  MODEL_X_CONSTRAINTS,
+  CYBERTRUCK_CONSTRAINTS,
+  ROADSTER_CONSTRAINTS,
+  DRIVE_CONSTRAINTS,
+} from '@/lib/vehicle-constraints'
 
 // POST - Seed constraints from hardcoded rules (admin or API key auth)
 export async function POST(request: NextRequest) {
@@ -142,6 +41,7 @@ export async function POST(request: NextRequest) {
     const results = {
       total: constraintsToSeed.length,
       created: 0,
+      updated: 0,
       skipped: 0,
       errors: [] as string[],
       details: [] as { constraint: string; action: string }[],
@@ -161,8 +61,33 @@ export async function POST(request: NextRequest) {
       })
 
       if (existing) {
-        results.skipped++
-        results.details.push({ constraint: constraintKey, action: 'skipped (exists)' })
+        const serializedValues = JSON.stringify(constraint.values)
+        const valuesChanged = existing.values !== serializedValues
+        const typeChanged = existing.constraintType !== constraint.constraintType
+        const activeChanged = existing.isActive !== true
+
+        if (!valuesChanged && !typeChanged && !activeChanged) {
+          results.skipped++
+          results.details.push({ constraint: constraintKey, action: 'skipped (unchanged)' })
+          continue
+        }
+
+        if (dryRun) {
+          results.updated++
+          results.details.push({ constraint: constraintKey, action: 'would update' })
+          continue
+        }
+
+        await prisma.optionConstraint.update({
+          where: { id: existing.id },
+          data: {
+            constraintType: constraint.constraintType,
+            values: serializedValues,
+            isActive: true,
+          },
+        })
+        results.updated++
+        results.details.push({ constraint: constraintKey, action: 'updated' })
         continue
       }
 

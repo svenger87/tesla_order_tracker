@@ -94,26 +94,35 @@ const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormO
   'Model Y': {
     model: hardcodedToFormOptions(MODELS),
     wheels: hardcodedToFormOptions(WHEELS),
+    color: hardcodedToFormOptions(COLORS.filter(c => ['pearl_white', 'diamond_black', 'stealth_grey', 'glacier_blue', 'ultra_red', 'quicksilver'].includes(c.value))),
+    interior: hardcodedToFormOptions(INTERIORS.filter(i => ['black', 'white'].includes(i.value))),
   },
   'Model 3': {
     model: hardcodedToFormOptions(MODEL_3_TRIMS),
     wheels: hardcodedToFormOptions(MODEL_3_WHEELS),
+    color: hardcodedToFormOptions(COLORS.filter(c => ['pearl_white', 'diamond_black', 'stealth_grey', 'marine_blue', 'ultra_red', 'quicksilver'].includes(c.value))),
+    interior: hardcodedToFormOptions(INTERIORS.filter(i => ['black', 'white'].includes(i.value))),
   },
   'Model S': {
     model: hardcodedToFormOptions(MODEL_S_TRIMS),
     wheels: hardcodedToFormOptions(MODEL_S_WHEELS),
+    color: hardcodedToFormOptions(COLORS.filter(c => ['pearl_white', 'solid_black', 'deep_blue', 'stealth_grey', 'ultra_red'].includes(c.value))),
   },
   'Model X': {
     model: hardcodedToFormOptions(MODEL_X_TRIMS),
     wheels: hardcodedToFormOptions(MODEL_X_WHEELS),
+    color: hardcodedToFormOptions(COLORS.filter(c => ['pearl_white', 'solid_black', 'deep_blue', 'stealth_grey', 'ultra_red'].includes(c.value))),
   },
   'Cybertruck': {
     model: hardcodedToFormOptions(CYBERTRUCK_TRIMS),
     wheels: hardcodedToFormOptions(CYBERTRUCK_WHEELS),
+    color: hardcodedToFormOptions(COLORS.filter(c => c.value === 'stainless_steel')),
+    interior: hardcodedToFormOptions(INTERIORS.filter(i => ['black', 'white'].includes(i.value))),
   },
   'Roadster': {
     model: hardcodedToFormOptions(ROADSTER_TRIMS),
     wheels: hardcodedToFormOptions(ROADSTER_WHEELS),
+    seats: hardcodedToFormOptions(SEATS_OPTIONS.filter(s => s.value === '4')),
   },
 }
 
@@ -162,6 +171,14 @@ export function useOptions(vehicleType?: VehicleType) {
         (o.vehicleType === null || o.vehicleType === vehicleType)
       )
       if (typeOptions.length > 0) {
+        const vehicleFallback = vehicleType ? VEHICLE_FALLBACK_OPTIONS[vehicleType]?.[type] : undefined
+        if (vehicleType && vehicleFallback) {
+          const fallbackValues = new Set(vehicleFallback.map(o => o.value))
+          const scopedOptions = typeOptions.filter(o =>
+            o.vehicleType === vehicleType || (o.vehicleType === null && fallbackValues.has(o.value))
+          )
+          return apiToFormOptions(scopedOptions.length > 0 ? scopedOptions : typeOptions)
+        }
         return apiToFormOptions(typeOptions)
       }
       // Use vehicle-specific fallback if available, otherwise use global fallback

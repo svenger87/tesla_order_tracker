@@ -5,13 +5,13 @@ import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 import {
-  MODEL_3_TOW_HITCH_AVAILABLE,
   COLORS,
   INTERIORS,
   AUTOPILOT_OPTIONS,
   TOW_HITCH_OPTIONS,
   COUNTRIES,
 } from '@/lib/types'
+import { applyVehicleConstraints } from '@/lib/vehicle-constraints'
 
 // Build reverse lookup maps: display label → internal value
 function buildLabelToValueMap(options: { value: string; label: string }[]): Map<string, string> {
@@ -65,45 +65,6 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
     return bcrypt.compare(input, stored)
   }
   return input === stored
-}
-
-// Apply vehicle-specific constraints - set unavailable options appropriately
-function applyVehicleConstraints(data: Record<string, unknown>): Record<string, unknown> {
-  const vehicleType = data.vehicleType as string
-  const model = (data.model as string)?.toLowerCase() || ''
-  const result = { ...data }
-
-  if (vehicleType === 'Model 3') {
-    // Performance models always have maximum range
-    if (model.includes('performance')) {
-      result.range = 'maximale_reichweite'
-    }
-
-    // Check tow hitch availability using ruleset
-    const trimKey = model.includes('performance') ? 'performance'
-      : model.includes('premium') ? 'premium'
-      : model.includes('standard') ? 'standard'
-      : null
-
-    if (trimKey && MODEL_3_TOW_HITCH_AVAILABLE[trimKey] === false) {
-      result.towHitch = 'nv'
-    }
-  } else if (vehicleType === 'Model S') {
-    result.drive = 'awd'
-    result.towHitch = 'nv'
-    result.seats = '5'
-  } else if (vehicleType === 'Model X') {
-    result.drive = 'awd'
-  } else if (vehicleType === 'Cybertruck') {
-    result.drive = 'awd'
-    result.towHitch = 'nv'
-    result.seats = '5'
-  } else if (vehicleType === 'Roadster') {
-    result.drive = 'awd'
-    result.towHitch = 'nv'
-  }
-
-  return result
 }
 
 export async function GET(request: NextRequest) {

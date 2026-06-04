@@ -252,8 +252,10 @@ export const CYBERTRUCK_WHEELS = [
   { value: '20', label: '20"' },
 ]
 
-// Roadster wheels (TBD)
-export const ROADSTER_WHEELS: { value: string; label: string }[] = []
+// Roadster wheels are not configurable in the current reservation flow
+export const ROADSTER_WHEELS: { value: string; label: string }[] = [
+  { value: 'nv', label: 'n.v.' },
+]
 
 // Model 3 wheel constraints per trim
 export const MODEL_3_WHEEL_CONSTRAINTS: Record<string, string[]> = {
@@ -299,6 +301,7 @@ export const TOW_HITCH_OPTIONS = [
 ]
 
 export const SEATS_OPTIONS = [
+  { value: '4', label: '4-Sitzer' },
   { value: '5', label: '5-Sitzer' },
   { value: '6', label: '6-Sitzer' },
   { value: '7', label: '7-Sitzer' },
