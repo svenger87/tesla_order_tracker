@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
@@ -35,7 +35,6 @@ interface HeaderProps {
 }
 
 export function Header({ isAdmin, settings }: HeaderProps) {
-  const t = useTranslations('home')
   const tc = useTranslations('common')
   const tn = useTranslations('nav')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -251,24 +250,30 @@ export function HeaderWithData() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [settings, setSettings] = useState<{ showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null>(null)
 
-  const fetchData = useCallback(async () => {
-    try {
-      const [authRes, settingsRes] = await Promise.all([
-        fetch('/api/auth/check'),
-        fetch('/api/settings'),
-      ])
-      const authData = await authRes.json()
-      setIsAdmin(authData.authenticated)
-      const settingsData = await settingsRes.json()
-      setSettings(settingsData)
-    } catch {
-      // Silently handle — header renders fine without admin/settings
+  useEffect(() => {
+    let cancelled = false
+
+    void Promise.all([
+      fetch('/api/auth/check'),
+      fetch('/api/settings'),
+    ])
+      .then(async ([authRes, settingsRes]) => {
+        const [authData, settingsData] = await Promise.all([
+          authRes.json(),
+          settingsRes.json(),
+        ])
+        if (cancelled) return
+        setIsAdmin(authData.authenticated)
+        setSettings(settingsData)
+      })
+      .catch(() => {
+        // Silently handle; header renders fine without admin/settings.
+      })
+
+    return () => {
+      cancelled = true
     }
   }, [])
-
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
 
   return (
     <Header

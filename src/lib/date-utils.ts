@@ -47,11 +47,11 @@ const DATE_FIELDS = [
 /**
  * Normalize all date fields on an object in-place and return it.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function normalizeDateFields<T extends Record<string, any>>(data: T): T {
+export function normalizeDateFields<T extends object>(data: T): T {
+  const record = data as Record<string, unknown>
   for (const field of DATE_FIELDS) {
-    if (field in data && typeof data[field] === 'string') {
-      (data as Record<string, unknown>)[field] = normalizeDate(data[field] as string)
+    if (field in record && typeof record[field] === 'string') {
+      record[field] = normalizeDate(record[field])
     }
   }
   return data

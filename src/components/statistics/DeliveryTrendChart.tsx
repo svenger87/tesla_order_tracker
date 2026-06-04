@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { motion } from 'framer-motion'
 import { Order } from '@/lib/types'
 import { calculateDeliveryTrend } from '@/lib/prediction'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'

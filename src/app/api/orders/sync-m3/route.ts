@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult, MODEL_3_TOW_HITCH_AVAILABLE } from '@/lib/types'
 import { recordOrderChanges } from '@/lib/order-history'
@@ -410,7 +410,7 @@ async function syncModel3Sheet(gid: string, label: string): Promise<SyncResult &
   return result
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const admin = await getAdminFromCookie()
     if (!admin) {

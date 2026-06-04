@@ -1,14 +1,13 @@
 import { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
-import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
+import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
 import { Link } from '@/i18n/navigation'
-import { ArrowLeft, Search, PlusCircle, MapPin, Calendar, Hash } from 'lucide-react'
+import { ArrowLeft, Search, PlusCircle, Calendar } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+import { Card, CardContent } from '@/components/ui/card'
 import { TrackingPageClient } from './client'
 
 // Helpers
@@ -182,8 +181,6 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   const order = matches[0]
   const colorInfo = findColorInfo(order.color)
   const countryInfo = findCountryInfo(order.country)
-  const status = getOrderStatus(order)
-
   // Delivery prediction — status-aware: predicts remaining time from current milestone
   const prediction = predictDelivery(
     orders,

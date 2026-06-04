@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
-import { Order, Settings, VehicleType } from '@/lib/types'
+import { Order, Settings } from '@/lib/types'
 import { filterOrdersByPeriod } from '@/lib/statistics'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
 import { useOptions } from '@/hooks/useOptions'
@@ -15,6 +15,7 @@ import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
+import { InsightsStrip } from '@/components/statistics/InsightsStrip'
 import { VeteransList } from '@/components/VeteransList'
 import { UpdatesFeed } from '@/components/UpdatesFeed'
 import { Header } from '@/components/Header'
@@ -44,7 +45,6 @@ import {
 } from '@/components/ui/dialog'
 import { RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, ChevronDown, Calculator, Medal, Filter } from 'lucide-react'
 import { toast } from 'sonner'
-import { Link } from '@/i18n/navigation'
 
 export default function Home() {
   const t = useTranslations('home')
@@ -64,10 +64,12 @@ export default function Home() {
   const [editByCodeIsLegacy, setEditByCodeIsLegacy] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [tostFieldsOrder, setTostFieldsOrder] = useState<Order | null>(null)
-  const STATS_OPEN_KEY = 'tesla-tracker-stats-open'
+  const STATS_OPEN_KEY_DESKTOP = 'tesla-tracker-stats-open-v3-desktop'
+  const STATS_OPEN_KEY_MOBILE = 'tesla-tracker-stats-open-v3-mobile'
   const [showStats, setShowStats] = useState<boolean>(true)
   const [statsHydrated, setStatsHydrated] = useState(false)
-  const FILTER_OPEN_KEY = 'tesla-tracker-filter-open'
+  const FILTER_OPEN_KEY_DESKTOP = 'tesla-tracker-filter-open-v3-desktop'
+  const FILTER_OPEN_KEY_MOBILE = 'tesla-tracker-filter-open-v3-mobile'
   const [filterOpen, setFilterOpen] = useState<boolean>(true)
   const [filterHydrated, setFilterHydrated] = useState(false)
   const [showPrediction, setShowPrediction] = useState(false)
@@ -83,7 +85,6 @@ export default function Home() {
     orderName: string
   }>({ open: false, code: '', orderName: '' })
   const [resetCodeCopied, setResetCodeCopied] = useState(false)
-  const [generatingResetCode, setGeneratingResetCode] = useState(false)
 
   // Hoist options fetch — shared by all OrderTable instances
   const { options: tableOptions } = useOptions()
@@ -124,32 +125,44 @@ export default function Home() {
 
   // Load stats panel open state from localStorage
   useEffect(() => {
+    let raw: string | null = null
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const key = isMobile ? STATS_OPEN_KEY_MOBILE : STATS_OPEN_KEY_DESKTOP
     try {
-      const raw = localStorage.getItem(STATS_OPEN_KEY)
-      if (raw !== null) setShowStats(raw === 'true')
+      raw = localStorage.getItem(key)
     } catch {}
+    if (raw !== null) setShowStats(raw === 'true')
+    else setShowStats(!isMobile)
     setStatsHydrated(true)
   }, [])
 
   // Save stats panel open state to localStorage
   useEffect(() => {
     if (!statsHydrated) return
-    try { localStorage.setItem(STATS_OPEN_KEY, String(showStats)) } catch {}
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const key = isMobile ? STATS_OPEN_KEY_MOBILE : STATS_OPEN_KEY_DESKTOP
+    try { localStorage.setItem(key, String(showStats)) } catch {}
   }, [showStats, statsHydrated])
 
   // Load filter bar open state from localStorage
   useEffect(() => {
+    let raw: string | null = null
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const key = isMobile ? FILTER_OPEN_KEY_MOBILE : FILTER_OPEN_KEY_DESKTOP
     try {
-      const raw = localStorage.getItem(FILTER_OPEN_KEY)
-      if (raw !== null) setFilterOpen(raw === 'true')
+      raw = localStorage.getItem(key)
     } catch {}
+    if (raw !== null) setFilterOpen(raw === 'true')
+    else setFilterOpen(!isMobile)
     setFilterHydrated(true)
   }, [])
 
   // Save filter bar open state to localStorage
   useEffect(() => {
     if (!filterHydrated) return
-    try { localStorage.setItem(FILTER_OPEN_KEY, String(filterOpen)) } catch {}
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const key = isMobile ? FILTER_OPEN_KEY_MOBILE : FILTER_OPEN_KEY_DESKTOP
+    try { localStorage.setItem(key, String(filterOpen)) } catch {}
   }, [filterOpen, filterHydrated])
 
   // Apply global filters to orders in a single pass
@@ -286,14 +299,7 @@ export default function Home() {
     setDeleteConfirm(null)
   }
 
-  const handleDeliveryUpdate = useCallback((hadDeliveryBefore: boolean, hasDeliveryNow: boolean) => {
-    if (!hadDeliveryBefore && hasDeliveryNow) {
-      import('@/components/DeliveryCelebration').then(mod => mod.triggerCelebration())
-    }
-  }, [])
-
   const handleGenerateResetCode = useCallback(async (orderId: string, orderName: string) => {
-    setGeneratingResetCode(true)
     try {
       const res = await fetch('/api/orders/reset-code', {
         method: 'POST',
@@ -312,8 +318,6 @@ export default function Home() {
     } catch (error) {
       console.error('Failed to generate reset code:', error)
       alert(error instanceof Error ? error.message : t('errorGeneratingCode'))
-    } finally {
-      setGeneratingResetCode(false)
     }
   }, [t])
 
@@ -346,18 +350,21 @@ export default function Home() {
         settings={settings}
       />
 
-      <main className="w-full max-w-[98vw] mx-auto px-4 py-6 space-y-8">
+      <main className="w-full max-w-[1440px] mx-auto px-3 py-3 space-y-3 sm:px-5 sm:py-6 sm:space-y-5 lg:px-6">
         {/* Hero Section */}
         <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
+        {!loading && (
+          <InsightsStrip orders={filteredOrders} compact />
+        )}
 
         {/* Global Filter Bar */}
         {!loading && (
           <Collapsible open={filterOpen} onOpenChange={setFilterOpen}>
             <CollapsibleTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="h-10 w-full justify-between gap-2 px-4 text-base sm:h-8 sm:w-auto sm:justify-center sm:px-3 sm:text-sm">
                 <Filter className="h-4 w-4" />
-                {tc('filter')}
+                <span className="mr-auto sm:mr-0">{tc('filter')}</span>
                 {hasActiveGlobalFilters && <span className="rounded-full bg-primary text-primary-foreground px-1.5 py-0.5 text-xs leading-none">{[globalFilters.vehicle !== 'all', globalFilters.period.type !== 'all', globalFilters.model, globalFilters.range, globalFilters.color, globalFilters.drive, globalFilters.wheels, globalFilters.interior, globalFilters.country, globalFilters.deliveryLocation].filter(Boolean).length}</span>}
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filterOpen ? 'rotate-180' : ''}`} />
               </Button>
@@ -372,82 +379,58 @@ export default function Home() {
           </Collapsible>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:rounded-xl sm:border sm:bg-card/90 sm:p-2 sm:shadow-[var(--shadow-card)] sm:backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowStats(!showStats)}
-            className="gap-2"
+            className="h-10 justify-between gap-2 px-4 text-base sm:h-8 sm:justify-center sm:px-3 sm:text-sm"
           >
             <BarChart3 className="h-4 w-4" />
-            {showStats ? t('hideStats') : t('showStats')}
+            <span className="mr-auto sm:mr-0">{showStats ? t('hideStats') : t('showStats')}</span>
             <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPrediction(true)}
-            className="gap-2"
-          >
-            <Calculator className="h-4 w-4" />
-            {tp('title')}
           </Button>
         </div>
 
         {showStats && !loading && (
-          <>
-            <StatisticsDashboard
-              orders={filteredOrders}
-              selectedPeriod={globalFilters.period}
-              selectedVehicle={globalFilters.vehicle}
-            />
-            <Collapsible>
-              <Card>
-                <CollapsibleTrigger asChild>
-                  <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Medal className="h-4 w-4 text-yellow-500" />
-                      {t('veterans')}
-                      <ChevronUp className="h-4 w-4 ml-auto transition-transform duration-200 [[data-state=closed]_&]:rotate-180" />
-                    </CardTitle>
-                    <CardDescription>{t('veteransDescription')}</CardDescription>
-                  </CardHeader>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CardContent>
-                    <VeteransList orders={orders} />
-                  </CardContent>
-                </CollapsibleContent>
-              </Card>
-            </Collapsible>
-          </>
+          <section className="overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)]">
+            <div className="border-b bg-card">
+              <div className="flex items-center justify-between border-b px-4 py-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Statistiken</p>
+                  <h3 className="text-base font-semibold tracking-tight">Lieferzeiten, Konfigurationen und Trends</h3>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPrediction(true)}
+                  className="hidden gap-2 sm:inline-flex"
+                >
+                  <Calculator className="h-4 w-4" />
+                  {tp('title')}
+                </Button>
+              </div>
+              <div className="px-3 py-3 sm:px-4">
+                <StatisticsDashboard
+                  orders={filteredOrders}
+                  selectedPeriod={globalFilters.period}
+                  selectedVehicle={globalFilters.vehicle}
+                />
+              </div>
+            </div>
+          </section>
         )}
 
-        {/* Section Divider */}
-        <div className="relative flex items-center py-2">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-          <span className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('orders')}</span>
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        </div>
-
-        {/* Updates Feed */}
-        <UpdatesFeed
-          globalFilters={{
-            countries: globalFilters.country ? [globalFilters.country] : [],
-            vehicleType: globalFilters.vehicle ?? 'all',
-          }}
-        />
-
         {/* Orders Section */}
-        <Card>
-          <CardHeader>
+        <Card className="overflow-hidden border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
+          <CardHeader className="border-b bg-transparent px-0 pb-2 pt-0 sm:bg-card sm:px-6 sm:py-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-[22px] sm:text-xl">
                   <Car className="h-5 w-5 text-primary" />
                   {t('orders')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   {hasActiveGlobalFilters
                     ? `${filteredOrders.length} von ${orders.length} ${t('orders')}`
                     : t('ordersCount', { count: orders.length })}
@@ -462,7 +445,7 @@ export default function Home() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 sm:px-6">
             {loading ? (
               <div className="space-y-4">
                 <Skeleton className="h-16 w-full animate-shimmer" />
@@ -487,6 +470,36 @@ export default function Home() {
             )}
           </CardContent>
         </Card>
+
+        {showStats && !loading && (
+          <Collapsible>
+            <Card className="overflow-hidden shadow-[var(--shadow-card)]">
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Medal className="h-4 w-4 text-yellow-500" />
+                      {t('veterans')}
+                      <ChevronUp className="h-4 w-4 ml-auto transition-transform duration-200 [[data-state=closed]_&]:rotate-180" />
+                    </CardTitle>
+                    <CardDescription>{t('veteransDescription')}</CardDescription>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <VeteransList orders={orders} />
+                  </CardContent>
+                </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        )}
+
+        {/* Updates Feed */}
+        <UpdatesFeed
+          globalFilters={{
+            countries: globalFilters.country ? [globalFilters.country] : [],
+            vehicleType: globalFilters.vehicle ?? 'all',
+          }}
+        />
       </main>
 
       <Footer
@@ -513,7 +526,6 @@ export default function Home() {
       <OrderSearch
         open={showSearch}
         onOpenChange={setShowSearch}
-        orders={orders}
         orderGroups={orderGroups}
         onSelectOrder={handleSearchSelect}
       />

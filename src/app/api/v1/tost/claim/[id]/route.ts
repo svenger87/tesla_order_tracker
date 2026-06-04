@@ -37,7 +37,10 @@ export const POST = withTostAuth(
         }
 
         // Replace: delete old, create new with TOST ID + all existing data
-        const { id: _oldId, editCode: _editCode, createdAt, updatedAt, ...orderData } = order
+        const { id: oldId, editCode, createdAt, updatedAt, ...orderData } = order
+        void oldId
+        void editCode
+        void updatedAt
         await prisma.$transaction([
           prisma.order.delete({ where: { id } }),
           prisma.order.create({

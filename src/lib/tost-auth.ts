@@ -71,7 +71,7 @@ export function withTostAuth<T extends unknown[]>(
 
     // Parse response for logging (summarized — no full order data)
     let responseBody: Record<string, unknown> | undefined
-    let responseStatus = response.status
+    const responseStatus = response.status
     try {
       const cloned = response.clone()
       const json = await cloned.json()

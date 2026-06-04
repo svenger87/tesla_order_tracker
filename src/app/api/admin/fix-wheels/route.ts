@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/db'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 // POST - Fix wheel labels in database
-export async function POST(request: NextRequest) {
+export async function POST() {
   const admin = await getAdminFromCookie()
   if (!admin) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 401 })

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, memo, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
+import { useState, useMemo, memo, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { useSearchParams } from 'next/navigation'
@@ -13,7 +14,10 @@ import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
 
 // Format relative time using translation function
-function formatRelativeTime(dateString: string | undefined, t: (key: string, values?: Record<string, unknown>) => string): string {
+function formatRelativeTime(
+  dateString: string | undefined,
+  t: (key: string, values?: Record<string, string | number | Date>) => string
+): string {
   if (!dateString) return '-'
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return '-'
@@ -198,12 +202,6 @@ function parseDate(dateStr: string | null): Date | null {
   return null
 }
 
-// Strip flag emoji from string for proper sorting
-function stripFlagEmoji(str: string): string {
-  // Remove regional indicator symbols (flag emojis) from start of string
-  return str.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '')
-}
-
 // Normalize German umlauts for sorting (Ö→O, Ä→A, Ü→U)
 function normalizeForSort(str: string): string {
   return str
@@ -255,8 +253,8 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     return direction === 'asc' ? aNum - bNum : bNum - aNum
   }
 
-  let aVal = a[field as keyof Order]
-  let bVal = b[field as keyof Order]
+  const aVal = a[field as keyof Order]
+  const bVal = b[field as keyof Order]
 
   // Handle country field - look up translated label for proper alphabetical sorting
   if (field === 'country') {
@@ -654,17 +652,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     })
   }, [filteredAndSortedOrders.length, visibleColumns])
 
-  // Sum of visible column widths (+ actions column). Used as explicit min-width on the
+  // Sum of visible column widths. Used as explicit min-width on the
   // table because Tailwind's `min-w-max` (= min-width: max-content) on a table-fixed
   // table miscomputes catastrophically in Firefox (table inflates to millions of px),
   // pushing all cell content far off-screen.
   const tableMinWidth = useMemo(
-    () => COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0) + 60,
+    () => COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0),
     [visibleColumns],
   )
 
   // Virtualizer for desktop table rows
   const ROW_HEIGHT = 41
+  // TanStack Virtual intentionally returns imperative functions; keep this hook outside compiler memoization.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const tableVirtualizer = useVirtualizer({
     count: filteredAndSortedOrders.length,
     getScrollElement: () => tableContainerRef.current,
@@ -674,7 +674,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
 
   // Virtualizer for mobile cards
   const mobileContainerRef = useRef<HTMLDivElement>(null)
-  const CARD_HEIGHT = 180
+  const CARD_HEIGHT = 78
   const mobileVirtualizer = useVirtualizer({
     count: filteredAndSortedOrders.length,
     getScrollElement: () => mobileContainerRef.current,
@@ -692,10 +692,83 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     virtualizer.scrollToIndex(index, { align: 'center', behavior: 'smooth' })
   }, [scrollToOrderId, filteredAndSortedOrders, isMobile, tableVirtualizer, mobileVirtualizer])
 
+  const renderRowAction = (order: Order, compact = false) => {
+    const buttonClassName = compact ? 'h-7 w-7 shrink-0' : 'h-8 w-8 shrink-0'
+
+    if (isAdmin) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className={buttonClassName} title={tc('actions')}>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {order.source !== 'tost' && (
+              <DropdownMenuItem onClick={() => onEdit(order)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                {tc('edit')}
+              </DropdownMenuItem>
+            )}
+            {order.source === 'tost' && onEditTostFields && (
+              <DropdownMenuItem onClick={() => onEditTostFields(order)}>
+                <FileText className="mr-2 h-4 w-4" />
+                {t('editTostFields')}
+              </DropdownMenuItem>
+            )}
+            {onGenerateResetCode && order.source !== 'tost' && (
+              <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                {th('generateResetCode')}
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              onClick={() => onDelete(order.id)}
+              className="text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {tc('delete')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+
+    if (order.source === 'tost' && onEditTostFields) {
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={buttonClassName}
+          onClick={() => onEditTostFields(order)}
+          title={t('editTostFields')}
+        >
+          <FileText className="h-4 w-4" />
+        </Button>
+      )
+    }
+
+    if (order.source !== 'tost') {
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={buttonClassName}
+          onClick={() => onEditByCode?.(order)}
+          title={tc('edit')}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )
+    }
+
+    return <span className={compact ? 'h-7 w-7 shrink-0' : 'h-8 w-8 shrink-0'} />
+  }
+
   return (
     <div className="space-y-2">
       {/* Toolbar: Search, VIN/Delivery toggles, Columns */}
-      <div className="flex flex-wrap items-center gap-2 px-2">
+      <div className="hidden flex-wrap items-center gap-2 border-b bg-muted/20 px-3 py-2 sm:flex">
         {/* Name Search */}
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -814,52 +887,67 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
           </div>
         ) : (
-          <div
-            ref={mobileContainerRef}
-            className="px-1 overflow-auto"
-            style={{ maxHeight: '70vh' }}
-          >
+          <div className="overflow-hidden rounded-xl border bg-card">
+            <div className="grid grid-cols-[34px_minmax(0,1fr)_90px_64px] gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground">
+              <span>Status</span>
+              <span>Modell</span>
+              <button
+                type="button"
+                className="flex items-center gap-1 text-left"
+                onClick={() => setSortField('orderDate')}
+              >
+                Bestelldatum
+                <ArrowUpDown className="h-3 w-3" />
+              </button>
+              <span>Wartezeit</span>
+            </div>
             <div
-              style={{
-                height: mobileVirtualizer.getTotalSize(),
-                width: '100%',
-                position: 'relative',
-              }}
+              ref={mobileContainerRef}
+              className="overflow-auto"
+              style={{ maxHeight: '70vh' }}
             >
-              {mobileVirtualizer.getVirtualItems().map((virtualItem) => {
-                const order = filteredAndSortedOrders[virtualItem.index]
-                return (
-                  <div
-                    key={order.id}
-                    data-order-id={order.id}
-                    ref={mobileVirtualizer.measureElement}
-                    data-index={virtualItem.index}
-                    className={cn(
-                      "rounded-lg transition-colors duration-500 pb-3",
-                      highlightOrderId === order.id && "ring-2 ring-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20 animate-pulse"
-                    )}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      transform: `translateY(${virtualItem.start}px)`,
-                    }}
-                  >
-                    <OrderCard
-                      order={order}
-                      isAdmin={isAdmin}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                      onGenerateResetCode={onGenerateResetCode}
-                      onEditByCode={onEditByCode}
-                      onEditTostFields={onEditTostFields}
-                      onImageClick={setImageModalOrder}
-                      options={{ models, ranges, drives, interiors, countries }}
-                    />
-                  </div>
-                )
-              })}
+              <div
+                style={{
+                  height: mobileVirtualizer.getTotalSize(),
+                  width: '100%',
+                  position: 'relative',
+                }}
+              >
+                {mobileVirtualizer.getVirtualItems().map((virtualItem) => {
+                  const order = filteredAndSortedOrders[virtualItem.index]
+                  return (
+                    <div
+                      key={order.id}
+                      data-order-id={order.id}
+                      ref={mobileVirtualizer.measureElement}
+                      data-index={virtualItem.index}
+                      className={cn(
+                        "transition-colors duration-500",
+                        highlightOrderId === order.id && "ring-2 ring-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20 animate-pulse"
+                      )}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        transform: `translateY(${virtualItem.start}px)`,
+                      }}
+                    >
+                      <OrderCard
+                        order={order}
+                        isAdmin={isAdmin}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onGenerateResetCode={onGenerateResetCode}
+                        onEditByCode={onEditByCode}
+                        onEditTostFields={onEditTostFields}
+                        onImageClick={setImageModalOrder}
+                        options={{ models, ranges, drives, interiors, countries }}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )
@@ -869,7 +957,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       {!isMobile ? (<><div
         ref={tableContainerRef}
         onScroll={handleTableScroll}
-        className="rounded-md border bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
+        className="bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
       >
         <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
@@ -880,7 +968,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             <col style={{ width: 60 }} />
           </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
-          <TableRow className="bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-muted">
+          <TableRow className="bg-muted/70 dark:bg-muted hover:bg-muted dark:hover:bg-muted">
             {isColumnVisible('status') && <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
@@ -912,21 +1000,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {isColumnVisible('orderToDelivery') && <SortableHeader field="orderToDelivery" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderToDelivery')}</SortableHeader>}
             {isColumnVisible('waitingDays') && <SortableHeader field="waitingDays" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('waitingDays')}</SortableHeader>}
             {isColumnVisible('updatedAt') && <SortableHeader field="updatedAt" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('updatedAt')}</SortableHeader>}
-            <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">
-              {tc('actions')}
-            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={visibleColumns.size + 1} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={visibleColumns.size} className="text-center py-8 text-muted-foreground">
                 {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
               </TableCell>
             </TableRow>
           ) : (<>
             {tableVirtualizer.getVirtualItems()[0]?.start > 0 && (
-              <tr><td colSpan={visibleColumns.size + 1} style={{ height: tableVirtualizer.getVirtualItems()[0].start, padding: 0, border: 'none' }} /></tr>
+              <tr><td colSpan={visibleColumns.size} style={{ height: tableVirtualizer.getVirtualItems()[0].start, padding: 0, border: 'none' }} /></tr>
             )}
             {tableVirtualizer.getVirtualItems().map((virtualRow) => {
               const order = filteredAndSortedOrders[virtualRow.index]
@@ -958,6 +1043,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('name') && (
                   <TableCell className="font-medium overflow-hidden">
                     <div className="flex items-center gap-1.5 min-w-0">
+                      {renderRowAction(order, true)}
                       <Link
                         href={`/track/${encodeURIComponent(order.name)}`}
                         className="hover:text-primary transition-colors hover:underline underline-offset-2 truncate"
@@ -967,7 +1053,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       </Link>
                       {order.source === 'tost' && (
                         <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="shrink-0 inline-block align-middle hover:opacity-70 transition-opacity">
-                          <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
+                          <Image src="/tost-badge.svg" alt="TOST" width={64} height={32} className="h-8 w-auto" />
                         </a>
                       )}
                     </div>
@@ -1171,75 +1257,17 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                           {th('staleBadge')}
                         </span>
                       )}
-                      {formatRelativeTime(order.updatedAt, t as any)}
+                      {formatRelativeTime(order.updatedAt, t)}
                     </span>
                   </TableCell>
                 )}
-                <TableCell className="bg-card dark:bg-card">
-                  {isAdmin ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {order.source !== 'tost' && (
-                          <DropdownMenuItem onClick={() => onEdit(order)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            {tc('edit')}
-                          </DropdownMenuItem>
-                        )}
-                        {order.source === 'tost' && onEditTostFields && (
-                          <DropdownMenuItem onClick={() => onEditTostFields(order)}>
-                            <FileText className="mr-2 h-4 w-4" />
-                            {t('editTostFields')}
-                          </DropdownMenuItem>
-                        )}
-                        {onGenerateResetCode && order.source !== 'tost' && (
-                          <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
-                            <KeyRound className="mr-2 h-4 w-4" />
-                            {th('generateResetCode')}
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onClick={() => onDelete(order.id)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          {tc('delete')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : order.source === 'tost' && onEditTostFields ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => onEditTostFields(order)}
-                      title={t('editTostFields')}
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  ) : order.source !== 'tost' ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => onEditByCode?.(order)}
-                      title={tc('edit')}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                </TableCell>
               </TableRow>
             )})}
             {(() => {
               const items = tableVirtualizer.getVirtualItems()
               const lastItem = items[items.length - 1]
               const bottomPad = lastItem ? tableVirtualizer.getTotalSize() - lastItem.end : 0
-              return bottomPad > 0 ? <tr><td colSpan={visibleColumns.size + 1} style={{ height: bottomPad, padding: 0, border: 'none' }} /></tr> : null
+              return bottomPad > 0 ? <tr><td colSpan={visibleColumns.size} style={{ height: bottomPad, padding: 0, border: 'none' }} /></tr> : null
             })()}
           </>)}
         </TableBody>

@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Github, Code2, ExternalLink } from 'lucide-react'
-import { TransparencyBar } from '@/components/TransparencyBar'
 
 interface FooterProps {
   settings: { showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null

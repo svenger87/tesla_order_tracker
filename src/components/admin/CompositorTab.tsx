@@ -20,8 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Image, Plus, Pencil, Trash2, RefreshCw, Database, Eye } from 'lucide-react'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Image as ImageIcon, Plus, Pencil, Trash2, RefreshCw, Database, Eye } from 'lucide-react'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
 import { useTranslations } from 'next-intl'
 import {
@@ -304,7 +304,7 @@ export function CompositorTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Image className="h-5 w-5" />
+            <ImageIcon className="h-5 w-5" />
             {t('compositorCodes')}
           </CardTitle>
           <CardDescription>

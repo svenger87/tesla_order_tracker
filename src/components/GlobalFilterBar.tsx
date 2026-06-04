@@ -155,16 +155,16 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
   const clearFilters = () => onChange(defaultGlobalFilters)
 
   return (
-    <div className="flex flex-col gap-2 bg-muted/30 rounded-xl p-3 sm:p-4">
+    <div className="flex flex-col gap-2 bg-muted/20 rounded-xl p-3 sm:bg-transparent sm:p-0">
       <div className="flex flex-wrap items-center gap-4 w-full">
         <FilterCollapse activeCount={totalActiveCount}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:items-center lg:flex-nowrap">
             {/* Vehicle Type */}
             <Select
               value={filters.vehicle}
               onValueChange={(value) => onChange({ ...filters, vehicle: value as VehicleType | 'all' })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="sm:w-[128px]">
                 <SelectValue placeholder={t('vehicleSelect')} />
               </SelectTrigger>
               <SelectContent>
@@ -182,7 +182,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
               value={periodToKey(filters.period)}
               onValueChange={(key) => onChange({ ...filters, period: keyToPeriod(key) })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="sm:w-[150px]">
                 <SelectValue placeholder={t('periodSelect')} />
               </SelectTrigger>
               <SelectContent>
@@ -217,7 +217,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.model || '_all'}
                 onValueChange={(v) => onChange({ ...filters, model: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[150px]">
                   <SelectValue placeholder={t('modelDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -235,7 +235,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.range || '_all'}
                 onValueChange={(v) => onChange({ ...filters, range: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[154px]">
                   <SelectValue placeholder={t('rangeDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -253,7 +253,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.color || '_all'}
                 onValueChange={(v) => onChange({ ...filters, color: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[150px]">
                   <SelectValue placeholder={t('colorDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -281,7 +281,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.drive || '_all'}
                 onValueChange={(v) => onChange({ ...filters, drive: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[140px]">
                   <SelectValue placeholder={t('driveDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,7 +299,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.wheels || '_all'}
                 onValueChange={(v) => onChange({ ...filters, wheels: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[126px]">
                   <SelectValue placeholder={t('wheelsDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -317,7 +317,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.interior || '_all'}
                 onValueChange={(v) => onChange({ ...filters, interior: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[150px]">
                   <SelectValue placeholder={t('interiorDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -335,7 +335,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.country || '_all'}
                 onValueChange={(v) => onChange({ ...filters, country: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[176px]">
                   <SelectValue placeholder={t('countryDistribution')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -358,7 +358,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 value={filters.deliveryLocation || '_all'}
                 onValueChange={(v) => onChange({ ...filters, deliveryLocation: v === '_all' ? '' : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="sm:w-[128px]">
                   <SelectValue placeholder={tt('deliveryLocation')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -375,7 +375,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
           {totalActiveCount > 0 && (
             <button
               onClick={clearFilters}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2"
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2 sm:mt-0"
             >
               <X className="h-3 w-3" />
               {tc('reset')}

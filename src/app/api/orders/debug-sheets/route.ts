@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 const SPREADSHEET_ID = '1--3lNLMSUDwxgcpqrYh4Fbz8LONLBfbJwOIftKgzaSA'
@@ -75,7 +75,7 @@ async function fetchCSV(gid: string): Promise<string> {
   return response.text()
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const admin = await getAdminFromCookie()
     if (!admin) {

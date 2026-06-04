@@ -1,6 +1,7 @@
 'use client'
 
 import React, { memo } from 'react'
+import Image from 'next/image'
 import { parse, EmojiEntity } from 'twemoji-parser'
 
 // Use jsDelivr CDN which has proper CORS support (maxcdn has CORS issues)
@@ -50,10 +51,13 @@ export const TwemojiText = memo(function TwemojiText({
 
     // Add the emoji as an image
     elements.push(
-      <img
+      <Image
         key={i}
         src={fixTwemojiUrl(entity.url)}
         alt={entity.text}
+        width={size}
+        height={size}
+        unoptimized
         className="inline-block align-text-bottom"
         style={{
           width: size,
@@ -94,9 +98,12 @@ export const TwemojiEmoji = memo(function TwemojiEmoji({
   }
 
   return (
-    <img
+    <Image
       src={fixTwemojiUrl(entities[0].url)}
       alt={emoji}
+      width={size}
+      height={size}
+      unoptimized
       className={`inline-block ${className}`}
       style={{
         width: size,

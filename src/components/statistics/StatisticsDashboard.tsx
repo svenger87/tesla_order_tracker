@@ -43,7 +43,6 @@ interface StatisticsDashboardProps {
 
 export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }: StatisticsDashboardProps) {
   const t = useTranslations('statistics')
-  const tc = useTranslations('common')
   const tcd = useTranslations('countryDelivery')
 
   const tabsRef = useRef<HTMLDivElement>(null)

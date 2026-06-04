@@ -40,6 +40,7 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
   const [country, setCountry] = useState('')
   const [drive, setDrive] = useState('')
   const [orderDate, setOrderDate] = useState('')
+  const [today] = useState(() => Date.now())
 
   const modelOptions = useMemo(() => {
     if (vehicleType === 'Model Y') return MODEL_Y_TRIMS
@@ -57,8 +58,8 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
   const currentWaitingDays = useMemo(() => {
     const parsed = orderDate ? parseGermanDate(orderDate) : null
     if (!parsed) return null
-    return Math.max(0, Math.floor((Date.now() - parsed.getTime()) / 86_400_000))
-  }, [orderDate])
+    return Math.max(0, Math.floor((today - parsed.getTime()) / 86_400_000))
+  }, [orderDate, today])
 
   const exceedsPessimistic =
     prediction !== null &&

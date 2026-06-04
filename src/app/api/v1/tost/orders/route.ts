@@ -8,33 +8,43 @@ import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 import { recordOrderChanges } from '@/lib/order-history'
 
+type TostOrderBody = Record<string, unknown> & {
+  id?: unknown
+  name?: unknown
+  vehicleType?: unknown
+}
+
+function asOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value : null
+}
+
 // Build the data fields from a TOST request body
-function buildOrderData(body: Record<string, unknown>) {
+function buildOrderData(body: TostOrderBody) {
   normalizeDateFields(body)
   return {
-    name: (body.name as string).trim(),
-    vehicleType: (body.vehicleType as string) || 'Model Y',
-    orderDate: (body.orderDate as string) || null,
-    country: (body.country as string) || null,
-    model: (body.model as string) || null,
-    range: (body.range as string) || null,
-    drive: (body.drive as string) || null,
-    color: (body.color as string) || null,
-    interior: (body.interior as string) || null,
-    wheels: (body.wheels as string) || null,
-    towHitch: (body.towHitch as string) || null,
-    autopilot: (body.autopilot as string) || null,
-    seats: (body.seats as string) || null,
-    deliveryWindow: (body.deliveryWindow as string) || null,
-    deliveryLocation: (body.deliveryLocation as string) || null,
-    vin: (body.vin as string) || null,
-    vinReceivedDate: (body.vinReceivedDate as string) || null,
-    papersReceivedDate: (body.papersReceivedDate as string) || null,
-    productionDate: (body.productionDate as string) || null,
-    typeApproval: (body.typeApproval as string) || null,
-    typeVariant: (body.typeVariant as string) || null,
-    deliveryDate: (body.deliveryDate as string) || null,
-    tostUserId: (body.tostUserId as string) || null,
+    name: asOptionalString(body.name)?.trim() ?? '',
+    vehicleType: asOptionalString(body.vehicleType) ?? 'Model Y',
+    orderDate: asOptionalString(body.orderDate),
+    country: asOptionalString(body.country),
+    model: asOptionalString(body.model),
+    range: asOptionalString(body.range),
+    drive: asOptionalString(body.drive),
+    color: asOptionalString(body.color),
+    interior: asOptionalString(body.interior),
+    wheels: asOptionalString(body.wheels),
+    towHitch: asOptionalString(body.towHitch),
+    autopilot: asOptionalString(body.autopilot),
+    seats: asOptionalString(body.seats),
+    deliveryWindow: asOptionalString(body.deliveryWindow),
+    deliveryLocation: asOptionalString(body.deliveryLocation),
+    vin: asOptionalString(body.vin),
+    vinReceivedDate: asOptionalString(body.vinReceivedDate),
+    papersReceivedDate: asOptionalString(body.papersReceivedDate),
+    productionDate: asOptionalString(body.productionDate),
+    typeApproval: asOptionalString(body.typeApproval),
+    typeVariant: asOptionalString(body.typeVariant),
+    deliveryDate: asOptionalString(body.deliveryDate),
+    tostUserId: asOptionalString(body.tostUserId),
   }
 }
 
@@ -53,31 +63,37 @@ function nonEmpty(data: ReturnType<typeof buildOrderData>): Record<string, unkno
 // POST /api/v1/tost/orders - Create a new TOST-managed order
 export const POST = withTostAuth(async (request: NextRequest) => {
   let bodyName: string | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any = {}
+  let body: TostOrderBody = {}
   try {
-    body = await request.json()
-    bodyName = body?.name as string | undefined
+    const parsedBody: unknown = await request.json()
+    if (!parsedBody || typeof parsedBody !== 'object' || Array.isArray(parsedBody)) {
+      return ApiErrors.validationError('Validation failed', {
+        body: 'Request body must be an object',
+      })
+    }
 
-    if (!body.name?.trim()) {
+    body = parsedBody as TostOrderBody
+    bodyName = asOptionalString(body.name) ?? undefined
+
+    if (!bodyName) {
       return ApiErrors.validationError('Validation failed', {
         name: 'Name is required',
       })
     }
 
-    if (body.name.trim().length < 3) {
+    if (bodyName.trim().length < 3) {
       return ApiErrors.validationError('Validation failed', {
         name: 'Name must be at least 3 characters',
       })
     }
 
-    const timePeriods = calculateTimePeriods(body)
     const orderData = buildOrderData(body)
+    const timePeriods = calculateTimePeriods(orderData)
 
     const order = await prisma.$transaction(async (tx) => {
       const created = await tx.order.create({
         data: {
-          ...(body.id && { id: body.id }),
+          ...(typeof body.id === 'string' && body.id ? { id: body.id } : {}),
           ...orderData,
           source: 'tost',
           ...timePeriods,
@@ -87,7 +103,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
       return created
     })
 
-    trackApiEvent({ name: 'tost-create-order', url: '/api/v1/tost/orders', data: { orderId: order.id, vehicleType: body.vehicleType || 'Model Y', customId: !!body.id } })
+    trackApiEvent({ name: 'tost-create-order', url: '/api/v1/tost/orders', data: { orderId: order.id, vehicleType: asOptionalString(body.vehicleType) ?? 'Model Y', customId: typeof body.id === 'string' && Boolean(body.id) } })
 
     return createApiSuccessResponse(
       { id: order.id, message: 'Order created successfully' },
@@ -98,41 +114,42 @@ export const POST = withTostAuth(async (request: NextRequest) => {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
     if (errorMsg.includes('Unique constraint')) {
       // If the conflicting order is already TOST-owned by ID, upsert it (idempotent retry)
-      if (body?.id) {
+      if (typeof body.id === 'string' && body.id) {
+        const bodyId = body.id
         const existing = await prisma.order.findUnique({
-          where: { id: body.id },
+          where: { id: bodyId },
           select: { id: true, source: true },
         })
         if (existing?.source === 'tost') {
-          const timePeriods = calculateTimePeriods(body)
           const orderData = buildOrderData(body)
+          const timePeriods = calculateTimePeriods(orderData)
           await prisma.$transaction(async (tx) => {
-            const before = await tx.order.findUnique({ where: { id: body.id } })
+            const before = await tx.order.findUnique({ where: { id: bodyId } })
             const u = await tx.order.update({
-              where: { id: body.id },
+              where: { id: bodyId },
               data: { ...orderData, ...timePeriods },
             })
             await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
             return u
           })
-          trackApiEvent({ name: 'tost-create-order-upsert', url: '/api/v1/tost/orders', data: { orderId: body.id } })
+          trackApiEvent({ name: 'tost-create-order-upsert', url: '/api/v1/tost/orders', data: { orderId: bodyId } })
           return createApiSuccessResponse(
-            { id: body.id, message: 'Order already existed (TOST-owned), updated successfully' },
+            { id: bodyId, message: 'Order already existed (TOST-owned), updated successfully' },
             { status: 200 }
           )
         }
       }
 
-      // Auto-claim webapp order with same name (name+orderDate unique conflict)
+          // Auto-claim webapp order with same name (name+orderDate unique conflict)
       if (bodyName) {
         const existing = await prisma.order.findFirst({
           where: { name: bodyName.trim(), OR: [{ source: null }, { source: { not: 'tost' } }] },
           select: { id: true },
         })
         if (existing) {
-          const timePeriods = calculateTimePeriods(body)
           const orderData = buildOrderData(body)
-          const newId = body.id as string | undefined
+          const timePeriods = calculateTimePeriods(orderData)
+          const newId = typeof body.id === 'string' && body.id ? body.id : undefined
 
           // On auto-claim, only apply TOST fields that have an actual value —
           // never wipe a value the user already entered manually on the webapp.
@@ -142,7 +159,10 @@ export const POST = withTostAuth(async (request: NextRequest) => {
             // Re-key: delete old webapp order, create with TOST ID
             const oldOrder = await prisma.order.findUnique({ where: { id: existing.id } })
             if (oldOrder) {
-              const { id: _oldId, editCode: _editCode, createdAt, updatedAt: _updatedAt, ...oldData } = oldOrder
+              const { id: oldId, editCode, createdAt, updatedAt, ...oldData } = oldOrder
+              void oldId
+              void editCode
+              void updatedAt
               await prisma.$transaction(async (tx) => {
                 await tx.order.delete({ where: { id: existing.id } })
                 const created = await tx.order.create({

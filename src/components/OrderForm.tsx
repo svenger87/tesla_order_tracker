@@ -49,6 +49,12 @@ import {
   PasswordStep,
 } from '@/components/form-steps'
 
+type ValidationMessageKey = Parameters<ReturnType<typeof useTranslations<'form.validation'>>>[0]
+
+function getPasswordValidationMessageKey(errorKey: string | undefined): ValidationMessageKey {
+  return (errorKey || 'invalidPassword') as ValidationMessageKey
+}
+
 interface OrderFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -165,8 +171,8 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   // For legacy orders: new password fields
   const [newEditCode, setNewEditCode] = useState('')
   const [confirmNewEditCode, setConfirmNewEditCode] = useState('')
-  // Tracking section: expanded by default
-  const [trackingOpen, setTrackingOpen] = useState(true)
+  // Tracking is optional for new orders, but useful to show immediately while editing.
+  const [trackingOpen, setTrackingOpen] = useState(Boolean(order))
   // Wizard step index (mobile only)
   const [wizardStep, setWizardStep] = useState(0)
 
@@ -174,7 +180,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, seats, deliveryLocations } = useOptions(formData.vehicleType)
 
   // Load constraints from database
-  const { getConstraintsForModel, getMergedConstraints, getFixedValue, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
+  const { getConstraintsForModel, getMergedConstraints, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
 
   // Get the model value for constraint lookups (formData.model is already a value)
   const selectedModelValue = useMemo(() => {
@@ -287,7 +293,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       setNewEditCode('')
       setConfirmNewEditCode('')
       setError('')
-      setTrackingOpen(true)
+      setTrackingOpen(Boolean(order))
       setWizardStep(0)
     }
   }, [open, order])
@@ -391,7 +397,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (!order) {
       const validation = validateCustomPassword(formData.customPassword)
       if (!validation.valid) {
-        setError(tv(validation.errorKey as any || 'invalidPassword'))
+        setError(tv(getPasswordValidationMessageKey(validation.errorKey)))
         setLoading(false)
         return
       }
@@ -406,7 +412,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     if (order && isLegacy) {
       const validation = validateCustomPassword(newEditCode)
       if (!validation.valid) {
-        setError(tv(validation.errorKey as any || 'invalidPassword'))
+        setError(tv(getPasswordValidationMessageKey(validation.errorKey)))
         setLoading(false)
         return
       }
@@ -421,7 +427,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const url = '/api/orders'
       const method = order ? 'PUT' : 'POST'
 
-      const { useCustomPassword, customPassword, confirmPassword, ...orderData } = formData
+      const orderData = Object.fromEntries(
+        Object.entries(formData).filter(([key]) => !['useCustomPassword', 'customPassword', 'confirmPassword'].includes(key))
+      ) as Omit<OrderFormData, 'useCustomPassword' | 'customPassword' | 'confirmPassword'>
       let requestBody
       if (order) {
         if (isLegacy) {
@@ -432,7 +440,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       } else {
         requestBody = {
           ...orderData,
-          customPassword,
+          customPassword: formData.customPassword,
         }
       }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, VehicleType, VEHICLE_TYPES } from '@/lib/types'
 import { Link } from '@/i18n/navigation'
@@ -8,11 +9,13 @@ import { ProgressTimeline } from '@/components/ProgressTimeline'
 import { SimilarOrders } from '@/components/SimilarOrders'
 import { SupportCard } from '@/components/SupportCard'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
+import { OrderForm } from '@/components/OrderForm'
+import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, Share2, Check, Calendar, MapPin, TrendingUp, Clock, AlertTriangle, AlarmClock } from 'lucide-react'
+import { ArrowLeft, Share2, Check, Calendar, TrendingUp, Clock, AlertTriangle, AlarmClock, Pencil } from 'lucide-react'
 import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { motion } from 'framer-motion'
@@ -61,9 +64,14 @@ export function TrackingPageClient({
   paypalUrl,
   resolvedLabels,
 }: TrackingPageClientProps) {
+  const router = useRouter()
   const t = useTranslations('tracking')
   const tc = useTranslations('common')
   const [copied, setCopied] = useState(false)
+  const [editPromptOpen, setEditPromptOpen] = useState(false)
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null)
+  const [editPassword, setEditPassword] = useState('')
+  const [editIsLegacy, setEditIsLegacy] = useState(false)
 
   // Confetti for delivered orders
   useEffect(() => {
@@ -101,6 +109,19 @@ export function TrackingPageClient({
     }
   }
 
+  const handleEditVerified = (verifiedOrder: Order, password: string, isLegacy: boolean) => {
+    setEditPassword(password)
+    setEditIsLegacy(isLegacy)
+    setEditingOrder(verifiedOrder)
+  }
+
+  const handleEditSuccess = () => {
+    setEditingOrder(null)
+    setEditPassword('')
+    setEditIsLegacy(false)
+    router.refresh()
+  }
+
   const isKnownVehicle = VEHICLE_TYPES.some(vt => vt.value === order.vehicleType)
 
   const confidenceColor = prediction?.confidence === 'high'
@@ -112,21 +133,34 @@ export function TrackingPageClient({
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-        {/* Back link + share */}
+        {/* Back link + actions */}
         <div className="flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
             {t('backToOverview')}
           </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-            className="gap-2"
-          >
-            {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
-            {copied ? t('linkCopied') : t('shareOrder')}
-          </Button>
+          <div className="flex items-center gap-2">
+            {order.source !== 'tost' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditPromptOpen(true)}
+                className="gap-2"
+              >
+                <Pencil className="h-4 w-4" />
+                {tc('edit')}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="gap-2"
+            >
+              {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+              {copied ? t('linkCopied') : t('shareOrder')}
+            </Button>
+          </div>
         </div>
 
         {/* Order hero */}
@@ -398,6 +432,33 @@ export function TrackingPageClient({
           </Card>
         </motion.div>
       </div>
+
+      {order.source !== 'tost' && (
+        <PasswordPromptModal
+          open={editPromptOpen}
+          onOpenChange={setEditPromptOpen}
+          order={order}
+          onVerified={handleEditVerified}
+          onSuccess={() => router.refresh()}
+        />
+      )}
+
+      {editingOrder && (
+        <OrderForm
+          open={!!editingOrder}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingOrder(null)
+              setEditPassword('')
+              setEditIsLegacy(false)
+            }
+          }}
+          order={editingOrder}
+          editCode={editPassword || undefined}
+          isLegacy={editIsLegacy || undefined}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </div>
   )
 }

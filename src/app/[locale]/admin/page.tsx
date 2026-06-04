@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image } from 'lucide-react'
+import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image as ImageIcon } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { SettingsTab } from '@/components/admin/SettingsTab'
@@ -21,7 +21,8 @@ export default function AdminDashboard() {
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/check')
-      if (!res.ok) {
+      const data = await res.json()
+      if (!res.ok || !data.authenticated) {
         router.push('/admin/login')
         return false
       }
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
               {t('options')}
             </TabsTrigger>
             <TabsTrigger value="compositor">
-              <Image className="h-4 w-4 mr-2" />
+              <ImageIcon className="h-4 w-4 mr-2" />
               {t('compositor')}
             </TabsTrigger>
           </TabsList>

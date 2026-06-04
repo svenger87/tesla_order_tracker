@@ -1,34 +1,24 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order, COLORS, VEHICLE_TYPES, VehicleType } from '@/lib/types'
+import Image from 'next/image'
+import { Order, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import type { FormOption } from '@/hooks/useOptions'
-import { OrderProgressBar } from './OrderProgressBar'
 import { TeslaCarThumbnail } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
-import { isStaleOrder } from '@/lib/statistics'
+import { calculateDaysBetween, getOrderStatus, isStaleOrder, parseGermanDate } from '@/lib/statistics'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreVertical, Pencil, Trash2, MapPin, Calendar, Car, Hash, KeyRound, FileText, ExternalLink } from 'lucide-react'
+import { ChevronRight, FileText, KeyRound, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { Link } from '@/i18n/navigation'
-
-// Helper to find color info by label
-function findColorInfo(colorLabel: string | null) {
-  if (!colorLabel) return null
-  const normalizedLabel = colorLabel.toLowerCase().trim()
-  return COLORS.find(c =>
-    normalizedLabel.includes(c.label.toLowerCase()) ||
-    c.label.toLowerCase().includes(normalizedLabel)
-  )
-}
 
 export interface OrderCardOptions {
   models: FormOption[]
@@ -51,13 +41,12 @@ interface OrderCardProps {
 }
 
 export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, onImageClick, options }: OrderCardProps) {
-  const t = useTranslations('table')
+  const [nowMs] = useState(() => Date.now())
   const tc = useTranslations('common')
   const th = useTranslations('home')
   const to = useTranslations('options')
 
-  const colorInfo = findColorInfo(order.color)
-  const { models, ranges, drives, interiors, countries } = options
+  const { models, ranges, drives, countries } = options
 
   // Helper to lookup label from value
   const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
@@ -67,225 +56,138 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
   }
 
   const isStale = isStaleOrder(order)
+  const status = getOrderStatus(order)
+  const orderDate = parseGermanDate(order.orderDate)
+  const currentWaitingDays = orderDate
+    ? Math.max(0, Math.floor((nowMs - orderDate.getTime()) / 86_400_000))
+    : null
+  const waitingDays = order.orderToDelivery ?? calculateDaysBetween(order.orderDate, order.deliveryDate) ?? currentWaitingDays
+  const modelLabel = getLabel(models, order.model)
+  const rangeLabel = order.range === 'maximale_reichweite'
+    ? to('range.maxRangeShort')
+    : getLabel(ranges, order.range)
+  const driveLabel = getLabel(drives, order.drive)
+  const countryOpt = countries.find(c => c.value === order.country)
+
+  const statusClass = {
+    ordered: 'bg-neutral-400',
+    vin_received: 'bg-blue-500',
+    production: 'bg-amber-500',
+    papers_received: 'bg-cyan-500',
+    delivery_scheduled: 'bg-amber-500',
+    delivered: 'bg-green-500',
+  }[status]
+
+  const actionButton = isAdmin ? (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {order.source !== 'tost' && (
+          <DropdownMenuItem onClick={() => onEdit(order)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {tc('edit')}
+          </DropdownMenuItem>
+        )}
+        {order.source === 'tost' && onEditTostFields && (
+          <DropdownMenuItem onClick={() => onEditTostFields(order)}>
+            <FileText className="mr-2 h-4 w-4" />
+            TOST Felder
+          </DropdownMenuItem>
+        )}
+        {onGenerateResetCode && order.source !== 'tost' && (
+          <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
+            <KeyRound className="mr-2 h-4 w-4" />
+            {th('generateResetCode')}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          onClick={() => onDelete(order.id)}
+          className="text-destructive"
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          {tc('delete')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : order.source === 'tost' && onEditTostFields ? (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-8 w-8 shrink-0"
+      onClick={() => onEditTostFields(order)}
+      title="TOST Felder"
+    >
+      <FileText className="h-4 w-4" />
+    </Button>
+  ) : order.source !== 'tost' ? (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-8 w-8 shrink-0"
+      onClick={() => onEditByCode?.(order)}
+      title={tc('edit')}
+    >
+      <Pencil className="h-4 w-4" />
+    </Button>
+  ) : null
 
   return (
     <Card className={cn(
-      "relative overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:border-primary/20",
-      order.deliveryDate && "bg-green-50/50 dark:bg-green-900/10",
+      "relative overflow-hidden rounded-none border-0 border-b bg-card shadow-none transition-colors hover:bg-muted/20",
       isStale && "opacity-60 hover:opacity-100 transition-opacity",
     )}>
-        {/* Status bar at top */}
-        <div className="h-2">
-          <OrderProgressBar order={order} compact barOnly />
-        </div>
+        <CardContent className="grid grid-cols-[16px_minmax(0,1fr)_82px_72px_12px] items-center gap-2 px-3 py-2.5">
+          <span className={cn('h-3.5 w-3.5 rounded-full shadow-sm', statusClass)} title={status} />
 
-        {/* Car image */}
-        {order.vehicleType && VEHICLE_TYPES.some(vt => vt.value === order.vehicleType) && (
-          <button
-            type="button"
-            className="flex justify-center py-2 bg-gradient-to-b from-muted/30 to-transparent w-full cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => onImageClick?.(order)}
-          >
-            <TeslaCarThumbnail
-              vehicleType={order.vehicleType as VehicleType}
-              color={order.color}
-              wheels={order.wheels}
-              model={order.model}
-              drive={order.drive}
-              interior={order.interior}
-            />
-          </button>
-        )}
-
-        <CardContent className="p-4">
-          {/* Header row: Name + Admin menu */}
-          <div className="flex items-start justify-between gap-2 mb-3">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg tracking-tight truncate">
-                <Link
-                  href={`/track/${encodeURIComponent(order.name)}`}
-                  className="hover:text-primary transition-colors hover:underline underline-offset-2"
-                >
-                  {order.name}
-                </Link>
-                {order.source === 'tost' && (
-                  <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-block align-middle hover:opacity-70 transition-opacity">
-                    <img src="/tost-badge.svg" alt="TOST" className="h-8 w-auto" />
-                  </a>
-                )}
-              </h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-                <Calendar className="h-3 w-3" />
-                <span>{order.orderDate || tc('noDate')}</span>
-                {order.country && (() => {
-                  const countryOpt = countries.find(c => c.value === order.country)
-                  return (
-                    <span className="flex items-center gap-1">
-                      {countryOpt?.flag && <TwemojiEmoji emoji={countryOpt.flag} size={14} />}
-                      {countryOpt?.label || order.country}
-                    </span>
-                  )
-                })()}
-              </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              {actionButton}
+              <Link
+                href={`/track/${encodeURIComponent(order.name)}`}
+                className="truncate text-base font-semibold leading-tight hover:text-primary"
+              >
+                {order.vehicleType || order.name}
+              </Link>
+              {countryOpt?.flag && <TwemojiEmoji emoji={countryOpt.flag} size={13} />}
+              {order.source === 'tost' && (
+                <Image src="/tost-badge.svg" alt="TOST" width={42} height={21} className="h-5 w-auto shrink-0" />
+              )}
             </div>
-            {isAdmin ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {order.source !== 'tost' && (
-                    <DropdownMenuItem onClick={() => onEdit(order)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      {tc('edit')}
-                    </DropdownMenuItem>
-                  )}
-                  {order.source === 'tost' && onEditTostFields && (
-                    <DropdownMenuItem onClick={() => onEditTostFields(order)}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      {t('editTostFields')}
-                    </DropdownMenuItem>
-                  )}
-                  {onGenerateResetCode && order.source !== 'tost' && (
-                    <DropdownMenuItem onClick={() => onGenerateResetCode(order.id, order.name)}>
-                      <KeyRound className="mr-2 h-4 w-4" />
-                      {th('generateResetCode')}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem
-                    onClick={() => onDelete(order.id)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {tc('delete')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : order.source === 'tost' && onEditTostFields ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 shrink-0"
-                onClick={() => onEditTostFields(order)}
-                title={t('editTostFields')}
+            <p className="mt-1 truncate text-sm text-muted-foreground">
+              {[modelLabel || rangeLabel, driveLabel].filter(Boolean).join(' · ') || order.name}
+            </p>
+          </div>
+
+          <div className="min-w-0 text-right">
+            <p className="text-sm font-medium tabular-nums">{order.orderDate || tc('noDate')}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {waitingDays !== null ? `~ ${waitingDays} Tage` : order.deliveryWindow || 'n/a'}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-end gap-1">
+            {order.vehicleType && VEHICLE_TYPES.some(vt => vt.value === order.vehicleType) ? (
+              <button
+                type="button"
+                className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden"
+                onClick={() => onImageClick?.(order)}
               >
-                <FileText className="h-4 w-4" />
-              </Button>
-            ) : order.source !== 'tost' ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 shrink-0"
-                onClick={() => onEditByCode?.(order)}
-                title={tc('edit')}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
+                <TeslaCarThumbnail
+                  vehicleType={order.vehicleType as VehicleType}
+                  color={order.color}
+                  wheels={order.wheels}
+                  model={order.model}
+                  drive={order.drive}
+                  interior={order.interior}
+                />
+              </button>
             ) : null}
           </div>
-
-          {/* Car config badges */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {order.vehicleType && (
-              <Badge variant="default" className="text-xs font-bold">
-                {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[order.vehicleType] || order.vehicleType}
-              </Badge>
-            )}
-            {order.model && (
-              <Badge
-                variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
-                className={cn("text-xs", order.model.toLowerCase().includes('premium') || order.model.toLowerCase().includes('long')
-                  ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800'
-                  : ''
-                )}
-              >
-                {getLabel(models, order.model)}
-              </Badge>
-            )}
-            {order.range && (
-              <Badge variant="outline" className={cn("text-xs",
-                (order.range === 'maximale_reichweite' || order.range.toLowerCase().includes('max'))
-                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
-                  : ''
-              )}>
-                {order.range === 'maximale_reichweite'
-                  ? to('range.maxRangeShort')
-                  : getLabel(ranges, order.range)
-                }
-              </Badge>
-            )}
-            {order.drive && (
-              <Badge variant="outline" className={cn("text-xs font-mono",
-                (getLabel(drives, order.drive).includes('AWD') || getLabel(drives, order.drive).includes('Dual'))
-                  ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800'
-                  : ''
-              )}>
-                {getLabel(drives, order.drive)}
-              </Badge>
-            )}
-            {colorInfo && (
-              <Badge variant="outline" className="text-xs gap-1">
-                <span
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full inline-block",
-                    colorInfo.border && "border border-border"
-                  )}
-                  style={{ backgroundColor: colorInfo.hex }}
-                />
-                {colorInfo?.label || order.color}
-              </Badge>
-            )}
-            {order.interior && (
-              <Badge variant="outline" className="text-xs">
-                {getLabel(interiors, order.interior)}
-              </Badge>
-            )}
-          </div>
-
-          {/* Key details grid */}
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
-            {order.vin && (
-              <div className="col-span-2 flex items-center gap-2">
-                <Hash className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="font-mono text-xs truncate">{order.vin}</span>
-              </div>
-            )}
-            {order.deliveryLocation && (
-              <div className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">{order.deliveryLocation}</span>
-              </div>
-            )}
-            {order.deliveryWindow && (
-              <div className="flex items-center gap-2">
-                <Car className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate text-xs">{order.deliveryWindow}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Delivery status */}
-          {order.deliveryDate && (
-            <div className="mt-3 pt-3 border-t">
-              <Badge variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white shadow-sm shadow-green-600/20">
-                {th('delivered', { date: order.deliveryDate })}
-              </Badge>
-            </div>
-          )}
-
-          {/* Duration stats - compact row */}
-          {(order.orderToVin || order.orderToDelivery) && (
-            <div className="mt-3 pt-3 border-t flex gap-4 text-xs text-muted-foreground">
-              {order.orderToVin && (
-                <span>B→VIN: <span className="font-mono">{order.orderToVin}d</span></span>
-              )}
-              {order.orderToDelivery && (
-                <span>B→L: <span className="font-mono">{order.orderToDelivery}d</span></span>
-              )}
-            </div>
-          )}
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </CardContent>
       </Card>
   )

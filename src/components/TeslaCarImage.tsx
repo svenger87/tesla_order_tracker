@@ -229,8 +229,11 @@ function tryUploadToCache(teslaUrl: string, cacheUrl: string, paramKey: string) 
       if (!res.ok) return
       return res.blob()
     })
-    .then(blob => {
+    .then(async blob => {
       if (!blob || blob.size < 1024) return
+      const signature = new Uint8Array(await blob.slice(0, 4).arrayBuffer())
+      const isPng = signature[0] === 0x89 && signature[1] === 0x50 && signature[2] === 0x4E && signature[3] === 0x47
+      if (!isPng) return
       return fetch(cacheUrl, { method: 'POST', body: blob })
     })
     .then(res => {
@@ -273,14 +276,24 @@ export const TeslaCarImage = memo(function TeslaCarImage({
 
   // Check manifest (no HTTP requests = no 404 console noise)
   useEffect(() => {
+    let cancelled = false
     uploadAttempted.current = false
-    setHasError(false)
-    setIsLoading(true)
-    setImgSrc(null)
+
+    queueMicrotask(() => {
+      if (cancelled) return
+      setHasError(false)
+      setIsLoading(true)
+      setImgSrc(null)
+    })
 
     fetchManifest().then(manifest => {
+      if (cancelled) return
       setImgSrc(manifest.has(paramKey) ? cacheUrl : teslaUrl)
     })
+
+    return () => {
+      cancelled = true
+    }
   }, [paramKey, cacheUrl, teslaUrl])
 
   const handleLoad = () => {
@@ -339,17 +352,18 @@ export const TeslaCarImage = memo(function TeslaCarImage({
         </div>
       )}
       {imgSrc && (
+        // Dynamic Tesla compositor URLs are already remote/lazy/fallback controlled;
+        // next/image emits aspect-ratio warnings for these constrained table images.
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           key={imgSrc}
           src={imgSrc}
           alt={`${vehicleType} - ${color || 'default'} with ${wheels || 'default'}" wheels`}
-          width={size}
-          height={Math.round(size * 0.6)}
           className={cn(
             "object-contain",
             isLoading && "opacity-0"
           )}
-          style={{ width: size, height: 'auto', maxHeight: size * 0.6 }}
+          style={{ width: size, height: 'auto' }}
           onLoad={handleLoad}
           onError={handleError}
           loading="lazy"

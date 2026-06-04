@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Order } from '@/lib/types'
 import { OrderGroup } from '@/lib/groupOrders'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -17,7 +16,6 @@ import {
 interface OrderSearchProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  orders: Order[]
   orderGroups: OrderGroup[]
   onSelectOrder: (orderId: string, quarterLabel: string) => void
 }
@@ -25,7 +23,6 @@ interface OrderSearchProps {
 export function OrderSearch({
   open,
   onOpenChange,
-  orders,
   orderGroups,
   onSelectOrder,
 }: OrderSearchProps) {

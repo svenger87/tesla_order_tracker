@@ -175,9 +175,9 @@ export function useOptions(vehicleType?: VehicleType) {
     const translateOptions = (type: string, opts: FormOption[]): FormOption[] => {
       if (!TRANSLATABLE_TYPES.has(type)) return opts
       return opts.map(opt => {
-        const key = `${type}.${opt.value}`
-        return to.has(key as any)
-          ? { ...opt, label: to(key as any) }
+        const key = `${type}.${opt.value}` as Parameters<typeof to>[0]
+        return to.has(key)
+          ? { ...opt, label: to(key) }
           : opt
       })
     }

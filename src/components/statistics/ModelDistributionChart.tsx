@@ -36,7 +36,7 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
       return [...topItems, { model: t('other'), count: otherCount, fill: COLORS[5] }]
     }
     return topItems
-  }, [data])
+  }, [data, t])
 
   const total = useMemo(() =>
     displayData.reduce((sum, item) => sum + item.count, 0),

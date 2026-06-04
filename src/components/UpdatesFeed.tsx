@@ -66,9 +66,13 @@ interface UpdatesFeedProps {
   globalFilters: { countries: string[]; vehicleType: string | 'all' }
 }
 
-function formatRelativeTime(iso: string, t: (k: string, v?: Record<string, string | number | Date>) => string): string {
+function formatRelativeTimeFromNow(
+  iso: string,
+  now: number,
+  t: (k: string, v?: Record<string, string | number | Date>) => string
+): string {
   const d = new Date(iso)
-  const diffMin = Math.max(1, Math.floor((Date.now() - d.getTime()) / 60000))
+  const diffMin = Math.max(1, Math.floor((now - d.getTime()) / 60000))
   if (diffMin < 60) return t('time.minutesAgo', { n: diffMin })
   const diffHour = Math.floor(diffMin / 60)
   if (diffHour < 24) return t('time.hoursAgo', { n: diffHour })
@@ -107,6 +111,7 @@ const POLL_MS = 60_000
 export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   const t = useTranslations('updatesFeed')
   const isMobile = useIsMobile()
+  const [now, setNow] = useState(() => Date.now())
   const [expanded, setExpanded] = useState(true)
   const [entries, setEntries] = useState<FeedEntry[]>([])
   const [nextCursor, setNextCursor] = useState<string | null>(null)
@@ -119,6 +124,11 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   // True once the user (or a saved preference) has explicitly chosen a state —
   // prevents the isMobile default from overriding the remembered choice.
   const hasExplicitState = useRef(false)
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), POLL_MS)
+    return () => clearInterval(id)
+  }, [])
 
   // Keep ref in sync so the polling setInterval callback reads the latest value without stale closure
   useEffect(() => { paginatedRef.current = paginated }, [paginated])
@@ -267,6 +277,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                     type="button"
                     onClick={() => toggleEvent(ev)}
                     aria-pressed={on}
+                    aria-label={`${t('title')}: ${ev}`}
                     className={`rounded-full border px-2.5 py-0.5 text-xs ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
                   >
                     {t(`event.${ev}`)}
@@ -289,7 +300,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                         <Link
                           href={`/track/${encodeURIComponent(e.orderName)}`}
                           className="flex w-full items-center gap-3 rounded px-2 py-1.5 hover:bg-muted/60"
-                          aria-label={`${e.orderName} (${vehicleAndTrim(e.vehicleType, e.model, e.drive)}): ${t(`event.${e.eventType}`)}, ${formatRelativeTime(e.changedAt, t)}`}
+                          aria-label={`${e.orderName} (${vehicleAndTrim(e.vehicleType, e.model, e.drive)}): ${t(`event.${e.eventType}`)}, ${formatRelativeTimeFromNow(e.changedAt, now, t)}`}
                         >
                           <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
                           {e.country && FLAG_BY_COUNTRY.get(e.country) && (
@@ -301,7 +312,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                           {e.eventType === 'window' && e.newValue && (
                             <span className="text-xs text-muted-foreground truncate">→ {e.newValue}</span>
                           )}
-                          <span className="ml-auto shrink-0 text-xs text-muted-foreground">{formatRelativeTime(e.changedAt, t)}</span>
+                          <span className="ml-auto shrink-0 text-xs text-muted-foreground">{formatRelativeTimeFromNow(e.changedAt, now, t)}</span>
                         </Link>
                       </li>
                     ))}

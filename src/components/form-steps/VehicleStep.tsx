@@ -1,6 +1,6 @@
 import { OrderFormData, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import { FormOption } from '@/hooks/useOptions'
-import { ConstraintsForModel, FieldConstraint } from '@/hooks/useConstraints'
+import { ConstraintsForModel } from '@/hooks/useConstraints'
 import { Label } from '@/components/ui/label'
 import {
   Select,

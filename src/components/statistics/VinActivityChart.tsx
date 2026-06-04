@@ -23,7 +23,6 @@ interface VinActivityChartProps {
 
 export function VinActivityChart({ orders }: VinActivityChartProps) {
   const t = useTranslations('vinActivity')
-  const tc = useTranslations('common')
 
   const activity = useMemo(() => calculateVinActivity(orders), [orders])
 

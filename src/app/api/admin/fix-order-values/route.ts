@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 
 // Mapping of bad raw values → correct normalized values per field
@@ -47,7 +47,7 @@ const FIXES: Record<string, Record<string, string>> = {
 }
 
 // POST - Fix order values that were stored as display labels instead of normalized values
-export async function POST(request: NextRequest) {
+export async function POST() {
   const admin = await getAdminFromCookie()
   if (!admin) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 401 })

@@ -17,8 +17,8 @@ export function OrderGroupHeader({ label, total, delivered, pending }: OrderGrou
   return (
     <div className="flex items-center justify-between w-full pr-4">
       <div className="flex items-center gap-2 sm:gap-3">
-        <span className="text-base sm:text-lg font-bold tracking-tight">{label}</span>
-        <Badge variant="secondary" className="font-mono tabular-nums text-xs">
+        <span className="text-sm sm:text-base font-semibold tracking-tight">{label}</span>
+        <Badge variant="secondary" className="font-mono tabular-nums text-xs rounded-md">
           {total}
         </Badge>
       </div>
@@ -35,7 +35,7 @@ export function OrderGroupHeader({ label, total, delivered, pending }: OrderGrou
           <Badge
             variant={deliveryRate >= 50 ? 'default' : 'outline'}
             className={cn(
-              "ml-1 tabular-nums font-semibold",
+              "ml-1 tabular-nums font-semibold rounded-md",
               deliveryRate >= 75 && "animate-pulse-glow",
               deliveryRate >= 50 && deliveryRate < 75 && "ring-1 ring-primary/50"
             )}

@@ -1,6 +1,5 @@
 'use client'
 
-import { Fragment } from 'react'
 import { Order } from '@/lib/types'
 import { getOrderStatus } from '@/lib/statistics'
 import { useTranslations } from 'next-intl'
