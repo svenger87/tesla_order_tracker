@@ -58,7 +58,7 @@ const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: 
                 <div
                   className={cn(
                     'relative flex items-center justify-center rounded-full transition-colors shrink-0',
-                    'h-7 w-7',
+                    'h-6 w-6',
                     isScheduledDelivery
                       ? 'bg-amber-500 text-white'
                       : isLastStep && isCompleted && !isScheduled
@@ -71,9 +71,9 @@ const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: 
                   )}
                 >
                   {isCompleted && index < currentIndex && !isScheduledDelivery ? (
-                    <Check className="h-3.5 w-3.5" />
+                    <Check className="h-3 w-3" />
                   ) : (
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-3 w-3" />
                   )}
                 </div>
               </TooltipTrigger>
@@ -90,7 +90,7 @@ const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: 
             {index < STEPS.length - 1 && (
               <div
                 className={cn(
-                  'h-px w-1.5 shrink-0',
+                  'h-px w-1 shrink-0',
                   index < currentIndex ? 'bg-primary' : 'bg-muted'
                 )}
               />

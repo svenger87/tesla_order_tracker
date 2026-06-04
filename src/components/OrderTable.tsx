@@ -379,10 +379,10 @@ interface ColumnDef {
 
 const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
-  { key: 'status',             label: 'status',             group: 'essential',     width: 180 },
+  { key: 'status',             label: 'status',             group: 'essential',     width: 150 },
   { key: 'name',               label: 'name',               group: 'essential',     width: 180 },
   { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 110 },
-  { key: 'carImage',           label: 'image',              group: 'configuration', width: 80  },
+  { key: 'carImage',           label: 'image',              group: 'configuration', width: 72  },
   { key: 'orderDate',          label: 'orderDate',          group: 'essential',     width: 120 },
   // Configuration
   { key: 'country',            label: 'country',            group: 'configuration', width: 130 },
@@ -657,12 +657,12 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   // table miscomputes catastrophically in Firefox (table inflates to millions of px),
   // pushing all cell content far off-screen.
   const tableMinWidth = useMemo(
-    () => 48 + COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0),
+    () => 42 + COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0),
     [visibleColumns],
   )
 
   // Virtualizer for desktop table rows
-  const ROW_HEIGHT = 41
+  const ROW_HEIGHT = 38
   // TanStack Virtual intentionally returns imperative functions; keep this hook outside compiler memoization.
   // eslint-disable-next-line react-hooks/incompatible-library
   const tableVirtualizer = useVirtualizer({
@@ -674,7 +674,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
 
   // Virtualizer for mobile cards
   const mobileContainerRef = useRef<HTMLDivElement>(null)
-  const CARD_HEIGHT = 78
+  const CARD_HEIGHT = 58
   const mobileVirtualizer = useVirtualizer({
     count: filteredAndSortedOrders.length,
     getScrollElement: () => mobileContainerRef.current,
@@ -693,7 +693,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   }, [scrollToOrderId, filteredAndSortedOrders, isMobile, tableVirtualizer, mobileVirtualizer])
 
   const renderRowAction = (order: Order, compact = false) => {
-    const buttonClassName = compact ? 'h-7 w-7 shrink-0' : 'h-8 w-8 shrink-0'
+    const buttonClassName = compact ? 'h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground' : 'h-8 w-8 shrink-0'
 
     if (isAdmin) {
       return (
@@ -762,7 +762,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       )
     }
 
-    return <span className={compact ? 'h-7 w-7 shrink-0' : 'h-8 w-8 shrink-0'} />
+    return <span className={compact ? 'h-6 w-6 shrink-0' : 'h-8 w-8 shrink-0'} />
   }
 
   return (
@@ -888,8 +888,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="grid grid-cols-[34px_minmax(0,1fr)_90px_64px] gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground">
-              <span>Status</span>
+            <div className="grid grid-cols-[30px_minmax(0,1fr)_78px_58px_38px_10px] gap-1.5 border-b bg-muted/30 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+              <span />
               <span>Modell</span>
               <button
                 type="button"
@@ -900,6 +900,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 <ArrowUpDown className="h-3 w-3" />
               </button>
               <span>Wartezeit</span>
+              <span className="text-right">Bild</span>
+              <span />
             </div>
             <div
               ref={mobileContainerRef}
@@ -957,11 +959,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       {!isMobile ? (<><div
         ref={tableContainerRef}
         onScroll={handleTableScroll}
-        className="bg-card dark:bg-card w-full max-h-[70vh] overflow-auto scrollbar-hide-horizontal"
+        className="bg-card dark:bg-card w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
+        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-[11px] [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
-            <col style={{ width: 48 }} />
+            <col style={{ width: 42 }} />
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
               <col key={c.key} style={{ width: c.width }} />
             ))}
@@ -1027,7 +1029,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 data-index={virtualRow.index}
                 ref={tableVirtualizer.measureElement}
                 className={cn(
-                  "border-b hover:bg-muted/50 border-l-2 border-l-transparent",
+                  "border-b hover:bg-muted/40 border-l-2 border-l-transparent",
                   order.deliveryDate
                     ? "hover:border-l-green-500"
                     : "hover:border-l-amber-500",
@@ -1037,16 +1039,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 title={isStale ? th('staleHint') : undefined}
               >
-                <TableCell data-noclip className="p-1 text-center">
+                <TableCell data-noclip className="px-2 py-1 text-center">
                   {renderRowAction(order, true)}
                 </TableCell>
                 {isColumnVisible('status') && (
-                  <TableCell data-noclip className="whitespace-nowrap">
+                  <TableCell data-noclip className="whitespace-nowrap px-2 py-1">
                     <OrderProgressBar order={order} compact />
                   </TableCell>
                 )}
                 {isColumnVisible('name') && (
-                  <TableCell className="font-medium overflow-hidden">
+                  <TableCell className="font-medium overflow-hidden px-2 py-1">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Link
                         href={`/track/${encodeURIComponent(order.name)}`}
@@ -1087,7 +1089,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                           model={order.model}
                           drive={order.drive}
                           interior={order.interior}
-                          size={80}
+                          size={64}
                           fetchSize={400}
                         />
                       </button>
