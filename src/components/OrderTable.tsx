@@ -657,7 +657,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   // table miscomputes catastrophically in Firefox (table inflates to millions of px),
   // pushing all cell content far off-screen.
   const tableMinWidth = useMemo(
-    () => COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0),
+    () => 48 + COLUMN_DEFS.reduce((sum, c) => sum + (visibleColumns.has(c.key) ? c.width : 0), 0),
     [visibleColumns],
   )
 
@@ -961,14 +961,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       >
         <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
+            <col style={{ width: 48 }} />
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
               <col key={c.key} style={{ width: c.width }} />
             ))}
-            {/* Actions column — always rendered at end */}
-            <col style={{ width: 60 }} />
           </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted/70 dark:bg-muted hover:bg-muted dark:hover:bg-muted">
+            <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted text-center" title={tc('actions')}>
+              <span className="sr-only">{tc('actions')}</span>
+            </TableHead>
             {isColumnVisible('status') && <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
@@ -1005,13 +1007,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         <TableBody>
           {filteredAndSortedOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={visibleColumns.size} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={visibleColumns.size + 1} className="text-center py-8 text-muted-foreground">
                 {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
               </TableCell>
             </TableRow>
           ) : (<>
             {tableVirtualizer.getVirtualItems()[0]?.start > 0 && (
-              <tr><td colSpan={visibleColumns.size} style={{ height: tableVirtualizer.getVirtualItems()[0].start, padding: 0, border: 'none' }} /></tr>
+              <tr><td colSpan={visibleColumns.size + 1} style={{ height: tableVirtualizer.getVirtualItems()[0].start, padding: 0, border: 'none' }} /></tr>
             )}
             {tableVirtualizer.getVirtualItems().map((virtualRow) => {
               const order = filteredAndSortedOrders[virtualRow.index]
@@ -1035,6 +1037,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 title={isStale ? th('staleHint') : undefined}
               >
+                <TableCell data-noclip className="p-1 text-center">
+                  {renderRowAction(order, true)}
+                </TableCell>
                 {isColumnVisible('status') && (
                   <TableCell data-noclip className="whitespace-nowrap">
                     <OrderProgressBar order={order} compact />
@@ -1043,7 +1048,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('name') && (
                   <TableCell className="font-medium overflow-hidden">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {renderRowAction(order, true)}
                       <Link
                         href={`/track/${encodeURIComponent(order.name)}`}
                         className="hover:text-primary transition-colors hover:underline underline-offset-2 truncate"
@@ -1267,7 +1271,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
               const items = tableVirtualizer.getVirtualItems()
               const lastItem = items[items.length - 1]
               const bottomPad = lastItem ? tableVirtualizer.getTotalSize() - lastItem.end : 0
-              return bottomPad > 0 ? <tr><td colSpan={visibleColumns.size} style={{ height: bottomPad, padding: 0, border: 'none' }} /></tr> : null
+              return bottomPad > 0 ? <tr><td colSpan={visibleColumns.size + 1} style={{ height: bottomPad, padding: 0, border: 'none' }} /></tr> : null
             })()}
           </>)}
         </TableBody>

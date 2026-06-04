@@ -15,7 +15,6 @@ import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
-import { InsightsStrip } from '@/components/statistics/InsightsStrip'
 import { VeteransList } from '@/components/VeteransList'
 import { UpdatesFeed } from '@/components/UpdatesFeed'
 import { Header } from '@/components/Header'
@@ -43,7 +42,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, ChevronDown, Calculator, Medal, Filter } from 'lucide-react'
+import { RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, Calculator, Medal } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function Home() {
@@ -68,10 +67,6 @@ export default function Home() {
   const STATS_OPEN_KEY_MOBILE = 'tesla-tracker-stats-open-v3-mobile'
   const [showStats, setShowStats] = useState<boolean>(true)
   const [statsHydrated, setStatsHydrated] = useState(false)
-  const FILTER_OPEN_KEY_DESKTOP = 'tesla-tracker-filter-open-v3-desktop'
-  const FILTER_OPEN_KEY_MOBILE = 'tesla-tracker-filter-open-v3-mobile'
-  const [filterOpen, setFilterOpen] = useState<boolean>(true)
-  const [filterHydrated, setFilterHydrated] = useState(false)
   const [showPrediction, setShowPrediction] = useState(false)
   // Search state
   const [showSearch, setShowSearch] = useState(false)
@@ -143,27 +138,6 @@ export default function Home() {
     const key = isMobile ? STATS_OPEN_KEY_MOBILE : STATS_OPEN_KEY_DESKTOP
     try { localStorage.setItem(key, String(showStats)) } catch {}
   }, [showStats, statsHydrated])
-
-  // Load filter bar open state from localStorage
-  useEffect(() => {
-    let raw: string | null = null
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const key = isMobile ? FILTER_OPEN_KEY_MOBILE : FILTER_OPEN_KEY_DESKTOP
-    try {
-      raw = localStorage.getItem(key)
-    } catch {}
-    if (raw !== null) setFilterOpen(raw === 'true')
-    else setFilterOpen(!isMobile)
-    setFilterHydrated(true)
-  }, [])
-
-  // Save filter bar open state to localStorage
-  useEffect(() => {
-    if (!filterHydrated) return
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const key = isMobile ? FILTER_OPEN_KEY_MOBILE : FILTER_OPEN_KEY_DESKTOP
-    try { localStorage.setItem(key, String(filterOpen)) } catch {}
-  }, [filterOpen, filterHydrated])
 
   // Apply global filters to orders in a single pass
   const filteredOrders = useMemo(() => {
@@ -354,29 +328,13 @@ export default function Home() {
         {/* Hero Section */}
         <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
-        {!loading && (
-          <InsightsStrip orders={filteredOrders} compact />
-        )}
-
         {/* Global Filter Bar */}
         {!loading && (
-          <Collapsible open={filterOpen} onOpenChange={setFilterOpen}>
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" size="sm" className="h-10 w-full justify-between gap-2 px-4 text-base sm:h-8 sm:w-auto sm:justify-center sm:px-3 sm:text-sm">
-                <Filter className="h-4 w-4" />
-                <span className="mr-auto sm:mr-0">{tc('filter')}</span>
-                {hasActiveGlobalFilters && <span className="rounded-full bg-primary text-primary-foreground px-1.5 py-0.5 text-xs leading-none">{[globalFilters.vehicle !== 'all', globalFilters.period.type !== 'all', globalFilters.model, globalFilters.range, globalFilters.color, globalFilters.drive, globalFilters.wheels, globalFilters.interior, globalFilters.country, globalFilters.deliveryLocation].filter(Boolean).length}</span>}
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${filterOpen ? 'rotate-180' : ''}`} />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <GlobalFilterBar
-                orders={orders}
-                filters={globalFilters}
-                onChange={setGlobalFilters}
-              />
-            </CollapsibleContent>
-          </Collapsible>
+          <GlobalFilterBar
+            orders={orders}
+            filters={globalFilters}
+            onChange={setGlobalFilters}
+          />
         )}
 
         <div className="flex flex-col gap-2 sm:rounded-xl sm:border sm:bg-card/90 sm:p-2 sm:shadow-[var(--shadow-card)] sm:backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center">
@@ -411,11 +369,32 @@ export default function Home() {
                 </Button>
               </div>
               <div className="px-3 py-3 sm:px-4">
-                <StatisticsDashboard
-                  orders={filteredOrders}
-                  selectedPeriod={globalFilters.period}
-                  selectedVehicle={globalFilters.vehicle}
-                />
+                <div className="space-y-4">
+                  <StatisticsDashboard
+                    orders={filteredOrders}
+                    selectedPeriod={globalFilters.period}
+                    selectedVehicle={globalFilters.vehicle}
+                  />
+                  <Collapsible>
+                    <Card className="overflow-hidden shadow-none">
+                      <CollapsibleTrigger asChild>
+                        <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
+                          <CardTitle className="flex items-center gap-2 text-base">
+                            <Medal className="h-4 w-4 text-yellow-500" />
+                            {t('veterans')}
+                            <ChevronUp className="h-4 w-4 ml-auto transition-transform duration-200 [[data-state=closed]_&]:rotate-180" />
+                          </CardTitle>
+                          <CardDescription>{t('veteransDescription')}</CardDescription>
+                        </CardHeader>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <CardContent>
+                          <VeteransList orders={orders} />
+                        </CardContent>
+                      </CollapsibleContent>
+                    </Card>
+                  </Collapsible>
+                </div>
               </div>
             </div>
           </section>
@@ -470,28 +449,6 @@ export default function Home() {
             )}
           </CardContent>
         </Card>
-
-        {showStats && !loading && (
-          <Collapsible>
-            <Card className="overflow-hidden shadow-[var(--shadow-card)]">
-                <CollapsibleTrigger asChild>
-                  <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Medal className="h-4 w-4 text-yellow-500" />
-                      {t('veterans')}
-                      <ChevronUp className="h-4 w-4 ml-auto transition-transform duration-200 [[data-state=closed]_&]:rotate-180" />
-                    </CardTitle>
-                    <CardDescription>{t('veteransDescription')}</CardDescription>
-                  </CardHeader>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CardContent>
-                    <VeteransList orders={orders} />
-                  </CardContent>
-                </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )}
 
         {/* Updates Feed */}
         <UpdatesFeed

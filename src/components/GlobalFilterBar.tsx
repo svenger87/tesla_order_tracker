@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, RANGES, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_S_TRIMS, MODEL_X_TRIMS, CYBERTRUCK_TRIMS, ROADSTER_TRIMS, COUNTRIES } from '@/lib/types'
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
-import { FilterCollapse } from '@/components/FilterCollapse'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -155,10 +154,9 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
   const clearFilters = () => onChange(defaultGlobalFilters)
 
   return (
-    <div className="flex flex-col gap-2 bg-muted/20 rounded-xl p-3 sm:bg-transparent sm:p-0">
-      <div className="flex flex-wrap items-center gap-4 w-full">
-        <FilterCollapse activeCount={totalActiveCount}>
-          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:items-center lg:flex-nowrap">
+    <div className="rounded-xl border bg-card/90 p-3 shadow-[var(--shadow-card)] sm:p-4">
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 [&_[data-slot=select-trigger]]:w-full">
             {/* Vehicle Type */}
             <Select
               value={filters.vehicle}
@@ -369,27 +367,25 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 </SelectContent>
               </Select>
             )}
-          </div>
+        </div>
 
-          {/* Clear Filters */}
+        <div className="flex min-h-6 flex-wrap items-center gap-2">
           {totalActiveCount > 0 && (
-            <button
-              onClick={clearFilters}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2 sm:mt-0"
-            >
-              <X className="h-3 w-3" />
-              {tc('reset')}
-            </button>
+            <>
+              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
+                <Filter className="h-3 w-3 mr-1" />
+                {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
+              </Badge>
+              <button
+                onClick={clearFilters}
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                <X className="h-3 w-3" />
+                {tc('reset')}
+              </button>
+            </>
           )}
-        </FilterCollapse>
-
-        {/* Active filters indicator */}
-        {totalActiveCount > 0 && (
-          <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
-            <Filter className="h-3 w-3 mr-1" />
-            {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
-          </Badge>
-        )}
+        </div>
       </div>
     </div>
   )

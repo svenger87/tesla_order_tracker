@@ -140,12 +140,14 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       "relative overflow-hidden rounded-none border-0 border-b bg-card shadow-none transition-colors hover:bg-muted/20",
       isStale && "opacity-60 hover:opacity-100 transition-opacity",
     )}>
-        <CardContent className="grid grid-cols-[16px_minmax(0,1fr)_82px_72px_12px] items-center gap-2 px-3 py-2.5">
+        <CardContent className="grid grid-cols-[16px_36px_minmax(0,1fr)_82px_72px_12px] items-center gap-2 px-3 py-2.5">
           <span className={cn('h-3.5 w-3.5 rounded-full shadow-sm', statusClass)} title={status} />
+          <div className="flex items-center justify-center">
+            {actionButton}
+          </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              {actionButton}
               <Link
                 href={`/track/${encodeURIComponent(order.name)}`}
                 className="truncate text-base font-semibold leading-tight hover:text-primary"
