@@ -17,7 +17,7 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
   return (
     <footer className="border-t mt-12 bg-muted/20">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-      <div className="w-full max-w-[98vw] mx-auto px-4 py-10 sm:py-16">
+      <div className="w-full px-3 py-10 sm:px-4 sm:py-16 lg:px-5 2xl:px-6">
         <div className="flex flex-col items-center gap-5">
           {/* Links row */}
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-sm text-muted-foreground">

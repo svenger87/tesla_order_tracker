@@ -42,7 +42,7 @@ export function Header({ isAdmin, settings }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-lg shadow-sm">
       <div className="h-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40" />
-      <div className="w-full max-w-[98vw] mx-auto px-3 py-2 sm:px-4 sm:py-3">
+      <div className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-5 2xl:px-6">
         <div className="flex items-center justify-between">
           {/* Brand banner (icon + wordmark in one image) */}
           <Link

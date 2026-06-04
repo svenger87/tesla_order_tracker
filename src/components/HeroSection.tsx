@@ -14,7 +14,7 @@ export function HeroSection({ onSearchOpen, onNewOrder }: HeroSectionProps) {
   const th = useTranslations('home')
 
   return (
-    <section className="relative overflow-hidden px-4 py-3 sm:px-2 sm:py-7">
+    <section className="relative overflow-hidden py-3 sm:py-7">
       <div className="flex flex-col gap-3.5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <p className="mb-2 hidden text-xs font-semibold uppercase tracking-[0.18em] text-primary sm:block">

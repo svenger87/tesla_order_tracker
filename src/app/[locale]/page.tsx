@@ -324,7 +324,7 @@ export default function Home() {
         settings={settings}
       />
 
-      <main className="w-full max-w-[1440px] mx-auto px-3 py-3 space-y-3 sm:px-5 sm:py-6 sm:space-y-5 lg:px-6">
+      <main className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
         {/* Hero Section */}
         <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
@@ -402,7 +402,7 @@ export default function Home() {
 
         {/* Orders Section */}
         <Card className="overflow-hidden border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
-          <CardHeader className="border-b bg-transparent px-0 pb-2 pt-0 sm:bg-card sm:px-6 sm:py-6">
+          <CardHeader className="border-b bg-transparent px-0 pb-2 pt-0 sm:bg-card sm:px-4 sm:py-5">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2 text-[22px] sm:text-xl">
@@ -424,7 +424,7 @@ export default function Home() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="px-0 sm:px-6">
+          <CardContent className="px-0 sm:px-4">
             {loading ? (
               <div className="space-y-4">
                 <Skeleton className="h-16 w-full animate-shimmer" />
