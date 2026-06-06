@@ -72,7 +72,9 @@
     "delivered": "Leveret: {date}",
     "errorGeneratingCode": "Fejl ved generering af kode",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistik",
+    "statsSubtitle": "Leveringstider, konfigurationer og trends"
   },
   "search": {
     "placeholder": "Søg bestillinger efter navn, VIN, land...",

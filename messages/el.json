@@ -72,7 +72,9 @@
     "delivered": "Παραδόθηκε: {date}",
     "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Στατιστικά",
+    "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις"
   },
   "search": {
     "placeholder": "Αναζήτηση παραγγελιών κατά όνομα, VIN, χώρα...",

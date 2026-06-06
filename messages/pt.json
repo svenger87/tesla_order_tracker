@@ -72,7 +72,9 @@
     "delivered": "Entregue: {date}",
     "errorGeneratingCode": "Erro ao gerar o código",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Estatísticas",
+    "statsSubtitle": "Prazos de entrega, configurações e tendências"
   },
   "search": {
     "placeholder": "Pesquisar encomendas por nome, VIN, país...",

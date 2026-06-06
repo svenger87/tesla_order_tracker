@@ -72,7 +72,9 @@
     "delivered": "Доставено: {date}",
     "errorGeneratingCode": "Грешка при генериране на кода",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Статистики",
+    "statsSubtitle": "Време за доставка, конфигурации и тенденции"
   },
   "search": {
     "placeholder": "Търсете поръчки по име, VIN, държава...",

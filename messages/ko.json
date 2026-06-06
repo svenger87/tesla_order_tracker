@@ -72,7 +72,9 @@
     "delivered": "인도 완료: {date}",
     "errorGeneratingCode": "코드 생성 오류",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "통계",
+    "statsSubtitle": "배송 시간, 구성 및 트렌드"
   },
   "search": {
     "placeholder": "이름, VIN, 국가로 주문 검색...",

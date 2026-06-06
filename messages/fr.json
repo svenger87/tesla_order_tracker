@@ -72,7 +72,9 @@
     "delivered": "Livré : {date}",
     "errorGeneratingCode": "Erreur lors de la génération du code",
     "staleBadge": "stale",
-    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours — les données peuvent être obsolètes."
+    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours — les données peuvent être obsolètes.",
+    "statsTitle": "Statistiques",
+    "statsSubtitle": "Délais de livraison, configurations et tendances"
   },
   "search": {
     "placeholder": "Rechercher des commandes par nom, VIN, pays...",

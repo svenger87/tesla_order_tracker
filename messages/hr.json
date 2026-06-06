@@ -72,7 +72,9 @@
     "delivered": "Isporučeno: {date}",
     "errorGeneratingCode": "Greška pri generiranju koda",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistike",
+    "statsSubtitle": "Vremena isporuke, konfiguracije i trendovi"
   },
   "search": {
     "placeholder": "Pretražite narudžbe po imenu, VIN-u, državi...",

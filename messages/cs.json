@@ -72,7 +72,9 @@
     "delivered": "Dodáno: {date}",
     "errorGeneratingCode": "Chyba při generování kódu",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistiky",
+    "statsSubtitle": "Dodací lhůty, konfigurace a trendy"
   },
   "search": {
     "placeholder": "Hledat objednávky podle jména, VIN, země...",

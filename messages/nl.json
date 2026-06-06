@@ -72,7 +72,9 @@
     "delivered": "Geleverd: {date}",
     "errorGeneratingCode": "Fout bij het genereren van de code",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistieken",
+    "statsSubtitle": "Levertijden, configuraties en trends"
   },
   "search": {
     "placeholder": "Bestellingen zoeken op naam, VIN, land...",
