@@ -293,8 +293,7 @@ export function calculateDaysBetween(startDateStr: string | null, endDateStr: st
 }
 
 function getMonthKey(date: Date): string {
-  const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
-  return `${months[date.getMonth()]} ${date.getFullYear()}`
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
 export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehicleType?: VehicleType): OrderStatistics {

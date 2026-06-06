@@ -1,7 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 
 interface OrdersTimelineChartProps {
@@ -10,6 +11,16 @@ interface OrdersTimelineChartProps {
 
 export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
   const t = useTranslations('statistics')
+  const locale = useLocale()
+
+  const formatMonth = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' })
+    return (key: string) => {
+      const [y, m] = key.split('-')
+      return fmt.format(new Date(parseInt(y), parseInt(m) - 1))
+    }
+  }, [locale])
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
@@ -43,6 +54,7 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
             tick={{ className: 'fill-foreground' }}
             tickLine={{ className: 'stroke-muted-foreground' }}
             axisLine={{ className: 'stroke-muted-foreground' }}
+            tickFormatter={formatMonth}
           />
           <YAxis
             className="text-xs"
@@ -65,6 +77,7 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
+            labelFormatter={formatMonth}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar
