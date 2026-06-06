@@ -563,6 +563,7 @@
       "nv": "Ei saatavilla"
     },
     "seats": {
+      "4": "4-paikkainen",
       "5": "5-paikkainen",
       "6": "6-paikkainen",
       "7": "7-paikkainen"
