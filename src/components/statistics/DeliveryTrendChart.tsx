@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Order } from '@/lib/types'
 import { calculateDeliveryTrend } from '@/lib/prediction'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -24,8 +24,17 @@ interface DeliveryTrendChartProps {
 export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const t = useTranslations('trend')
   const tc = useTranslations('common')
+  const locale = useLocale()
 
   const trend = useMemo(() => calculateDeliveryTrend(orders), [orders])
+
+  const formatMonth = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' })
+    return (key: string) => {
+      const [y, m] = key.split('-')
+      return fmt.format(new Date(parseInt(y), parseInt(m) - 1))
+    }
+  }, [locale])
 
   if (!trend || trend.monthlyAverages.length < 3) return null
 
@@ -75,11 +84,12 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+              <XAxis dataKey="monthKey" tick={{ fontSize: 11 }} tickFormatter={formatMonth} />
               <YAxis tick={{ fontSize: 11 }} label={{ value: tc('days'), angle: -90, position: 'insideLeft', style: { fontSize: 11 } }} />
               <Tooltip
                 contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 formatter={(value) => [`${value} ${tc('days')}`, t('avgDeliveryTime')]}
+                labelFormatter={formatMonth}
               />
               <Area
                 type="monotone"

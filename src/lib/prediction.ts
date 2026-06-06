@@ -33,7 +33,7 @@ export interface DeliveryPrediction {
 }
 
 export interface DeliveryTrend {
-  monthlyAverages: { month: string; avgDays: number; medianDays: number; count: number }[]
+  monthlyAverages: { monthKey: string; month: string; avgDays: number; medianDays: number; count: number }[]
   currentTrend: 'accelerating' | 'decelerating' | 'stable'
   trendChangePercent: number
 }
@@ -240,6 +240,7 @@ export function calculateDeliveryTrend(orders: Order[]): DeliveryTrend | null {
     const [year, m] = month.split('-')
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return {
+      monthKey: month,
       month: `${monthNames[parseInt(m) - 1]} ${year}`,
       avgDays: avg,
       medianDays: med,
