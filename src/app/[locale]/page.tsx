@@ -170,7 +170,7 @@ export default function Home() {
     )
   }, [orders, globalFilters])
 
-  const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
+  const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders, tc('noDate')), [filteredOrders, tc])
   const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.range !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)

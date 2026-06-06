@@ -25,7 +25,7 @@ function getQuarterLabel(year: number, quarter: number): string {
   return `Q${quarter} ${year}`
 }
 
-export function groupOrdersByQuarter(orders: Order[]): OrderGroup[] {
+export function groupOrdersByQuarter(orders: Order[], noDateLabel = 'No date'): OrderGroup[] {
   const groups: Map<string, OrderGroup> = new Map()
 
   // Group orders by quarter
@@ -43,7 +43,7 @@ export function groupOrdersByQuarter(orders: Order[]): OrderGroup[] {
       quarter = 0
     }
 
-    const label = year === 0 ? 'Ohne Datum' : getQuarterLabel(year, quarter)
+    const label = year === 0 ? noDateLabel : getQuarterLabel(year, quarter)
     const key = `${year}-${quarter}`
 
     if (!groups.has(key)) {
@@ -58,9 +58,8 @@ export function groupOrdersByQuarter(orders: Order[]): OrderGroup[] {
     groups.get(key)!.orders.push(order)
   })
 
-  // Sort groups by date (most recent first), with "Unknown" at the end
+  // Sort groups by date (most recent first), no-date bucket last
   return Array.from(groups.values()).sort((a, b) => {
-    // "Ohne Datum" should be last
     if (a.year === 0) return 1
     if (b.year === 0) return -1
 
