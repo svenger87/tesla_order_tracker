@@ -20,6 +20,10 @@ const COUNTRY_ALIASES: Record<string, string> = {
 // Sentinel for null/empty/unknown — display layer maps this to a localized label.
 export const UNKNOWN_COUNTRY = '__unknown__'
 
+// Sentinel for option distributions (interior, range, towHitch, seats, autopilot)
+// whose value couldn't be resolved. Display layer maps this to a localized label.
+export const UNKNOWN_OPTION = '__unknown__'
+
 // Returns a stable identifier: lowercase ISO code (e.g. 'de'), the UNKNOWN_COUNTRY
 // sentinel, or the trimmed raw value when no mapping is found. The display layer
 // is responsible for turning this into a localized label.
@@ -63,6 +67,7 @@ export interface OrderStatistics {
   avgOrderToPapers: number | null
   avgPapersToDelivery: number | null
   modelDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an option value (e.g. 'maximale_reichweite') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   rangeDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an ISO country code (lowercase, e.g. 'de'), the UNKNOWN_COUNTRY sentinel, or a raw fallback string. Resolve at display time via a useOptions() lookup. */
   countryDistribution: { name: string; count: number; fill: string }[]
@@ -71,11 +76,16 @@ export interface OrderStatistics {
   deliveriesOverTime: { month: string; count: number }[]
   waitTimeDistribution: { range: string; count: number; min: number; max: number }[]
   wheelsDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an option value (e.g. 'black') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   interiorDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an option value (e.g. 'none', 'fsd') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   autopilotDistribution: { name: string; count: number; fill: string }[]
   driveDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an option value (e.g. 'ja', 'nein') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   towHitchDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an option value (e.g. '5') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   seatsDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is a Tesla brand color name (kept verbatim — universal, not translated) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   colorDistribution: { name: string; count: number; fill: string }[]
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
   vinWeekdayDistribution: { dayOfWeek: number; count: number }[]
@@ -241,6 +251,24 @@ function normalizeOption<T extends { value: string; label: string }>(
   return trimmed
 }
 
+// Like normalizeOption, but returns the stable option *value* (e.g. 'black', 'ja',
+// '5') instead of the German label, so the display layer can localize it via
+// useOptions(). Used for distributions whose option type has translations.
+function normalizeOptionValue<T extends { value: string; label: string }>(
+  value: string | null | undefined,
+  options: T[],
+  fallback: string = UNKNOWN_OPTION
+): string {
+  if (!value) return fallback
+  const trimmed = value.trim()
+  const byValue = options.find(o => o.value.toLowerCase() === trimmed.toLowerCase())
+  if (byValue) return byValue.value
+  const byLabel = options.find(o => o.label.toLowerCase() === trimmed.toLowerCase())
+  if (byLabel) return byLabel.value
+  // No match — return raw value; display layer shows it verbatim.
+  return trimmed
+}
+
 // Normalize model names (combines Model Y and Model 3 trims)
 function normalizeModel(model: string | null | undefined): string {
   if (!model) return 'Unbekannt'
@@ -368,12 +396,12 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
 
   // Range (Reichweite) distribution - all models (Performance = Max RW, Standard = Standard)
   const RANGE_COLORS: Record<string, string> = {
-    'Maximale Reichweite': 'var(--chart-2)',
-    'Standard': 'var(--chart-3)',
+    'maximale_reichweite': 'var(--chart-2)',
+    'standard': 'var(--chart-3)',
   }
   const rangeCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const range = normalizeOption(order.range, RANGES, 'Unbekannt')
+    const range = normalizeOptionValue(order.range, RANGES)
     rangeCounts[range] = (rangeCounts[range] || 0) + 1
   })
   const rangeDistribution = Object.entries(rangeCounts)
@@ -477,13 +505,13 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
 
   // Interior distribution (black & white colors, normalized)
   const INTERIOR_COLORS: Record<string, string> = {
-    'Schwarz': '#1a1a1a',
-    'Weiß': '#e5e5e5',
-    'Unbekannt': '#9ca3af',
+    'black': '#1a1a1a',
+    'white': '#e5e5e5',
+    [UNKNOWN_OPTION]: '#9ca3af',
   }
   const interiorCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const interior = normalizeOption(order.interior, INTERIORS, 'Unbekannt')
+    const interior = normalizeOptionValue(order.interior, INTERIORS)
     interiorCounts[interior] = (interiorCounts[interior] || 0) + 1
   })
   const interiorDistribution = Object.entries(interiorCounts)
@@ -497,7 +525,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Autopilot distribution (normalized to labels)
   const autopilotCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const autopilot = normalizeOption(order.autopilot, AUTOPILOT_OPTIONS, 'Kein')
+    const autopilot = normalizeOptionValue(order.autopilot, AUTOPILOT_OPTIONS, 'none')
     autopilotCounts[autopilot] = (autopilotCounts[autopilot] || 0) + 1
   })
   const autopilotDistribution = Object.entries(autopilotCounts)
@@ -525,7 +553,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Tow hitch (AHK) distribution (normalized to labels)
   const towHitchCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const towHitch = normalizeOption(order.towHitch, TOW_HITCH_OPTIONS, 'Unbekannt')
+    const towHitch = normalizeOptionValue(order.towHitch, TOW_HITCH_OPTIONS)
     towHitchCounts[towHitch] = (towHitchCounts[towHitch] || 0) + 1
   })
   const towHitchDistribution = Object.entries(towHitchCounts)
@@ -539,7 +567,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Seats (Sitze) distribution - null treated as 5-Sitzer
   const seatsCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const seats = normalizeOption(order.seats || '5', SEATS_OPTIONS, '5-Sitzer')
+    const seats = normalizeOptionValue(order.seats || '5', SEATS_OPTIONS, '5')
     seatsCounts[seats] = (seatsCounts[seats] || 0) + 1
   })
   const seatsDistribution = Object.entries(seatsCounts)
@@ -556,7 +584,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     // Look up color label and hex from COLORS constant
     const colorValue = order.color || ''
     const colorInfo = COLORS.find(c => c.value === colorValue || c.label.toLowerCase() === colorValue.toLowerCase())
-    const colorLabel = colorInfo?.label || colorValue || 'Unbekannt'
+    const colorLabel = colorInfo?.label || colorValue || UNKNOWN_OPTION
     const colorHex = colorInfo?.hex || findColorHex(colorValue)
 
     if (!colorCounts[colorLabel]) {

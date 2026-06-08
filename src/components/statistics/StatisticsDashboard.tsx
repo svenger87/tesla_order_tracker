@@ -4,7 +4,7 @@ import { useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType } from '@/lib/types'
-import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY } from '@/lib/statistics'
+import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } from '@/lib/statistics'
 import { useOptions } from '@/hooks/useOptions'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { StatCard } from './StatCard'
@@ -47,7 +47,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const t = useTranslations('statistics')
   const tcd = useTranslations('countryDelivery')
   const tCommon = useTranslations('common')
-  const { countries } = useOptions()
+  const { countries, ranges, interiors, autopilot, towHitch, seats } = useOptions()
 
   const tabsRef = useRef<HTMLDivElement>(null)
 
@@ -80,6 +80,58 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const localizedCountryDistribution = useMemo(
     () => stats.countryDistribution.map(d => ({ ...d, name: resolveCountry(d.name).label })),
     [stats.countryDistribution, resolveCountry]
+  )
+
+  // Distributions emit stable option values (e.g. 'black', 'ja', '5'); map them
+  // to localized labels via useOptions(), which already returns translated labels
+  // for translatable types. The UNKNOWN_OPTION slice is hidden unless it's the
+  // only entry (mirrors MiniPieChart) and otherwise shown as the localized
+  // "unknown" label — kept locale-consistent here rather than in the chart.
+  const localizeDistribution = useCallback(
+    (
+      dist: { name: string; count: number; fill: string }[],
+      optionList: { value: string; label: string }[],
+    ) => {
+      const labelByValue = new Map(optionList.map(o => [o.value.toLowerCase(), o.label]))
+      const hasReal = dist.some(d => d.name !== UNKNOWN_OPTION)
+      return dist
+        .filter(d => d.name !== UNKNOWN_OPTION || !hasReal)
+        .map(d => ({
+          ...d,
+          name:
+            d.name === UNKNOWN_OPTION
+              ? tCommon('unknown')
+              : labelByValue.get(d.name.toLowerCase()) ?? d.name,
+        }))
+    },
+    [tCommon],
+  )
+
+  const localizedRangeDistribution = useMemo(
+    () => localizeDistribution(stats.rangeDistribution, ranges),
+    [stats.rangeDistribution, ranges, localizeDistribution],
+  )
+  const localizedInteriorDistribution = useMemo(
+    () => localizeDistribution(stats.interiorDistribution, interiors),
+    [stats.interiorDistribution, interiors, localizeDistribution],
+  )
+  const localizedTowHitchDistribution = useMemo(
+    () => localizeDistribution(stats.towHitchDistribution, towHitch),
+    [stats.towHitchDistribution, towHitch, localizeDistribution],
+  )
+  const localizedSeatsDistribution = useMemo(
+    () => localizeDistribution(stats.seatsDistribution, seats),
+    [stats.seatsDistribution, seats, localizeDistribution],
+  )
+  const localizedAutopilotDistribution = useMemo(
+    () => localizeDistribution(stats.autopilotDistribution, autopilot),
+    [stats.autopilotDistribution, autopilot, localizeDistribution],
+  )
+  // Tesla color names are universal brand names (not translated) — pass an empty
+  // option list so only the UNKNOWN_OPTION sentinel gets localized.
+  const localizedColorDistribution = useMemo(
+    () => localizeDistribution(stats.colorDistribution, []),
+    [stats.colorDistribution, localizeDistribution],
   )
 
   return (
@@ -227,8 +279,8 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <MiniPieChart data={stats.modelDistribution} title={t('modelDistribution')} delay={0} />
               <MiniPieChart data={stats.driveDistribution} title={t('driveDistribution')} delay={0.05} />
-              <MiniPieChart data={stats.rangeDistribution} title={t('rangeDistribution')} delay={0.1} />
-              <MiniPieChart data={stats.colorDistribution} title={t('colorDistribution')} delay={0.15} />
+              <MiniPieChart data={localizedRangeDistribution} title={t('rangeDistribution')} delay={0.1} />
+              <MiniPieChart data={localizedColorDistribution} title={t('colorDistribution')} delay={0.15} />
             </div>
           </motion.div>
         </TabsContent>
@@ -242,11 +294,11 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             transition={{ duration: 0.2 }}
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <MiniPieChart data={stats.interiorDistribution} title={t('interiorDistribution')} delay={0} />
+              <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} />
               <MiniPieChart data={stats.wheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
-              <MiniPieChart data={stats.towHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
-              <MiniPieChart data={stats.seatsDistribution} title={t('seatsDistribution')} delay={0.15} />
-              <MiniPieChart data={stats.autopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
+              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
+              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} />
+              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
             </div>
           </motion.div>
         </TabsContent>
