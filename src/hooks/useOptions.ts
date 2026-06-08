@@ -165,23 +165,21 @@ export function useOptions(vehicleType?: VehicleType) {
   // Memoize options by type, falling back to hardcoded if API returns empty
   const options = useMemo(() => {
     const getOptionsForType = (type: string): FormOption[] => {
-      // Filter API options by type and vehicle type (null matches all vehicles)
+      // An option applies to a vehicle when it is global (vehicleType === null,
+      // "Alle Fahrzeuge") or explicitly scoped to that vehicle. Per-trim
+      // availability is governed by the constraint system (useConstraints), NOT
+      // here — so admin-added options are always respected. We intentionally do
+      // NOT gate options against a hardcoded per-vehicle allow-list: that used to
+      // silently drop any newly added global option (e.g. a new color) that the
+      // hardcoded list didn't know about.
       const typeOptions = apiOptions.filter(o =>
         o.type === type &&
         (o.vehicleType === null || o.vehicleType === vehicleType)
       )
       if (typeOptions.length > 0) {
-        const vehicleFallback = vehicleType ? VEHICLE_FALLBACK_OPTIONS[vehicleType]?.[type] : undefined
-        if (vehicleType && vehicleFallback) {
-          const fallbackValues = new Set(vehicleFallback.map(o => o.value))
-          const scopedOptions = typeOptions.filter(o =>
-            o.vehicleType === vehicleType || (o.vehicleType === null && fallbackValues.has(o.value))
-          )
-          return apiToFormOptions(scopedOptions.length > 0 ? scopedOptions : typeOptions)
-        }
         return apiToFormOptions(typeOptions)
       }
-      // Use vehicle-specific fallback if available, otherwise use global fallback
+      // API returned nothing for this type → fall back to hardcoded defaults
       if (vehicleType && VEHICLE_FALLBACK_OPTIONS[vehicleType]?.[type]) {
         return VEHICLE_FALLBACK_OPTIONS[vehicleType][type]!
       }
