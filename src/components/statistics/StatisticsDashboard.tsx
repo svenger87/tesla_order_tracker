@@ -127,6 +127,12 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
     () => localizeDistribution(stats.autopilotDistribution, autopilot),
     [stats.autopilotDistribution, autopilot, localizeDistribution],
   )
+  // Tesla color names are universal brand names (not translated) — pass an empty
+  // option list so only the UNKNOWN_OPTION sentinel gets localized.
+  const localizedColorDistribution = useMemo(
+    () => localizeDistribution(stats.colorDistribution, []),
+    [stats.colorDistribution, localizeDistribution],
+  )
 
   return (
     <motion.div
@@ -274,7 +280,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
               <MiniPieChart data={stats.modelDistribution} title={t('modelDistribution')} delay={0} />
               <MiniPieChart data={stats.driveDistribution} title={t('driveDistribution')} delay={0.05} />
               <MiniPieChart data={localizedRangeDistribution} title={t('rangeDistribution')} delay={0.1} />
-              <MiniPieChart data={stats.colorDistribution} title={t('colorDistribution')} delay={0.15} />
+              <MiniPieChart data={localizedColorDistribution} title={t('colorDistribution')} delay={0.15} />
             </div>
           </motion.div>
         </TabsContent>

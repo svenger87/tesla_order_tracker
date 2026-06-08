@@ -85,6 +85,7 @@ export interface OrderStatistics {
   towHitchDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. '5') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   seatsDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is a Tesla brand color name (kept verbatim — universal, not translated) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   colorDistribution: { name: string; count: number; fill: string }[]
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
   vinWeekdayDistribution: { dayOfWeek: number; count: number }[]
@@ -583,7 +584,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     // Look up color label and hex from COLORS constant
     const colorValue = order.color || ''
     const colorInfo = COLORS.find(c => c.value === colorValue || c.label.toLowerCase() === colorValue.toLowerCase())
-    const colorLabel = colorInfo?.label || colorValue || 'Unbekannt'
+    const colorLabel = colorInfo?.label || colorValue || UNKNOWN_OPTION
     const colorHex = colorInfo?.hex || findColorHex(colorValue)
 
     if (!colorCounts[colorLabel]) {
