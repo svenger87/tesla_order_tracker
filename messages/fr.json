@@ -72,7 +72,9 @@
     "delivered": "Livré : {date}",
     "errorGeneratingCode": "Erreur lors de la génération du code",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours — les données peuvent être obsolètes.",
+    "statsTitle": "Statistiques",
+    "statsSubtitle": "Délais de livraison, configurations et tendances"
   },
   "search": {
     "placeholder": "Rechercher des commandes par nom, VIN, pays...",
@@ -253,9 +255,9 @@
     "editTostFieldsDescription": "Ces champs peuvent être modifiés manuellement, même pour les commandes gérées par TOST.",
     "papersReceivedDate": "Documents reçus le",
     "saveError": "Erreur lors de l'enregistrement",
-    "productionDate": "Production date",
+    "productionDate": "Date de production",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Basculer le filtre : toutes / masquer stale / seulement stale (≥60 jours sans mise à jour pour les commandes ouvertes)"
   },
   "progress": {
     "ordered": "Commandé",
@@ -563,6 +565,7 @@
       "nv": "N/D"
     },
     "seats": {
+      "4": "4 places",
       "5": "5 places",
       "6": "6 places",
       "7": "7 places"
@@ -590,36 +593,36 @@
     "revealEmail": "[Cliquez pour afficher]"
   },
   "privacy": {
-    "title": "Privacy Policy",
-    "lastUpdated": "Last updated: {date}",
-    "lastUpdatedDate": "May 2026",
-    "backToHome": "Back to homepage",
-    "controller": "1. Data Controller",
-    "controllerBody": "The controller responsible for the data processing on this website under the GDPR is:\n\nSven Rosema\nAn der Wallhecke 5\n26899 Rhede (Ems)\nGermany\n\nContact details are listed at the bottom of this page.",
-    "scope": "2. Scope and notes",
-    "scopeBody": "This privacy policy applies to https://tff-order-stats.de. tff-order-stats.de is a private, non-commercial community project around Tesla orders. It is operated without intent to generate profit. Personal data is collected only to the extent technically necessary.",
-    "serverLogs": "3. Server logs",
-    "serverLogsBody": "When the website is accessed, the hosting provider (Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Germany) collects technical data in so-called server logs: IP address, time of the request, requested URL, HTTP status, transferred byte size, referrer and user-agent. These data are technically required for the secure operation of the website. Legal basis: Art. 6(1)(f) GDPR (legitimate interest in operating and securing the site). Retention period: a maximum of 14 days, after which logs are automatically deleted.",
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : {date}",
+    "lastUpdatedDate": "Mai 2026",
+    "backToHome": "Retour à l'accueil",
+    "controller": "1. Responsable du traitement",
+    "controllerBody": "Le responsable du traitement des données sur ce site web au sens du RGPD est :\n\nSven Rosema\nAn der Wallhecke 5\n26899 Rhede (Ems)\nAllemagne\n\nLes coordonnées figurent en bas de cette page.",
+    "scope": "2. Champ d'application et notes",
+    "scopeBody": "La présente politique de confidentialité s'applique à https://tff-order-stats.de. tff-order-stats.de est un projet communautaire privé et non commercial autour des commandes Tesla. Il est exploité sans intention de générer des bénéfices. Les données personnelles ne sont collectées que dans la mesure techniquement nécessaire.",
+    "serverLogs": "3. Journaux serveur",
+    "serverLogsBody": "Lors de l'accès au site, l'hébergeur (Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Allemagne) collecte des données techniques dans des journaux serveur : adresse IP, heure de la requête, URL demandée, code HTTP, taille transférée, référent et user-agent. Ces données sont techniquement nécessaires au fonctionnement sécurisé du site. Base juridique : Art. 6(1)(f) RGPD (intérêt légitime à l'exploitation et à la sécurité du site). Durée de conservation : 14 jours maximum, après quoi les journaux sont automatiquement supprimés.",
     "cookies": "4. Cookies",
-    "cookiesBody": "The website uses one strictly necessary cookie only:\n\n• admin_token — set exclusively after a successful admin login and used for authentication. HttpOnly, Secure, SameSite=Strict. Lifetime: 7 days.\n\nNo cookies are set for regular visitors without admin access. Consent under § 25(2) TTDSG is not required, as the cookie is strictly necessary for the service the user expressly requested (admin login). Legal basis: Art. 6(1)(b) GDPR.",
-    "localStorage": "5. Browser local storage",
-    "localStorageBody": "The website stores the following technical preferences exclusively in your browser's local storage (never transmitted to the server):\n\n• selected language\n• selected filters, sorting and visible table columns\n• visibility of filter/statistics sections\n• filters in the updates feed\n• selected theme (light/dark)\n\nThese data never leave your browser and are used solely to improve usability. You can clear them at any time via your browser settings.",
-    "analytics": "6. Web analytics (Umami)",
-    "analyticsBody": "Reach measurement uses the self-hosted open-source software Umami, running on the same server as the website. No cookies are set and no personal data is transferred to any third party. Umami collects only anonymised information: pages visited, referrer source (e.g. search engine), coarse geolocation (country), browser/device type and screen resolution. IP addresses are hashed before storage and not retained in identifiable form. Legal basis: Art. 6(1)(f) GDPR (legitimate interest in statistical evaluation to improve the website).",
-    "orderData": "7. Order entries",
-    "orderDataBody": "When you submit an order through the form, the data you provide (a self-chosen display name, vehicle configuration, order date, delivery window, country, etc.) is stored in the database and shown publicly. No email address or real name is required. If you set a password for your entry, it is stored exclusively as a bcrypt hash and never in plaintext. You can edit or delete your entry at any time via the edit button or by contacting the address below.\n\nIf you use the third-party app TOST (https://www.tesla-order-status-tracker.de), data entered there is forwarded to this website through their API. The TOST app's own privacy policy applies to data processed within TOST. Legal basis for storage on this website: Art. 6(1)(a) GDPR (consent through active submission).",
-    "externalResources": "8. Embedded external resources",
-    "externalResourcesBody": "Loading the site fetches the following external resources, which transmits your IP address to the respective providers:\n\n• Twemoji icons via cdn.jsdelivr.net (Fastly/Cloudflare) — display of country flags.\n• Google Fonts — fonts are bundled at build time and served from the same domain, so no direct calls to Google occur during normal use.\n\nVehicle preview images are generated server-side via the official Tesla compositor endpoint and served exclusively from the website's own domain. No direct request to tesla.com is made from your browser.\n\nLegal basis for external resources: Art. 6(1)(f) GDPR (legitimate interest in up-to-date presentation and CDN-based performance).",
-    "donationLinks": "9. Donation links",
-    "donationLinksBody": "The footer and menu contain optional links to Buy Me a Coffee and PayPal. They are loaded only when actively clicked; nothing is transmitted to these providers beforehand.",
-    "rights": "10. Your rights",
-    "rightsBody": "Under the GDPR you have the right to:\n\n• access (Art. 15)\n• rectification (Art. 16)\n• erasure (Art. 17)\n• restriction of processing (Art. 18)\n• data portability (Art. 20)\n• object to processing based on legitimate interests (Art. 21)\n• withdraw consent at any time with future effect (Art. 7(3))\n\nAn informal message to the contact address below is sufficient to exercise these rights.",
-    "complaints": "11. Right to lodge a complaint",
-    "complaintsBody": "Without prejudice to other remedies, you may lodge a complaint with a data protection supervisory authority, in particular the one responsible for your place of residence or the alleged infringement. The authority responsible for the controller is the Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hannover.",
-    "changes": "12. Changes to this notice",
-    "changesBody": "This privacy notice may be adjusted when data processing changes or legal requirements demand it. The current version is always available on this page.",
-    "contact": "Contact for privacy enquiries",
-    "contactBody": "Please direct enquiries about your rights and data protection to:"
+    "cookiesBody": "Le site utilise un seul cookie strictement nécessaire :\n\n• admin_token — défini exclusivement après une connexion admin réussie et utilisé pour l'authentification. HttpOnly, Secure, SameSite=Strict. Durée de vie : 7 jours.\n\nAucun cookie n'est défini pour les visiteurs sans accès admin. Le consentement selon § 25(2) TTDSG n'est pas requis, car le cookie est strictement nécessaire au service expressément demandé par l'utilisateur (connexion admin). Base juridique : Art. 6(1)(b) RGPD.",
+    "localStorage": "5. Stockage local du navigateur",
+    "localStorageBody": "Le site stocke les préférences techniques suivantes exclusivement dans le stockage local de votre navigateur (jamais transmises au serveur) :\n\n• langue sélectionnée\n• filtres, tris et colonnes de tableau visibles\n• visibilité des sections filtres/statistiques\n• filtres dans le flux de mises à jour\n• thème sélectionné (clair/sombre)\n\nCes données ne quittent jamais votre navigateur et sont utilisées uniquement pour améliorer l'ergonomie. Vous pouvez les effacer à tout moment via les paramètres de votre navigateur.",
+    "analytics": "6. Analyse web (Umami)",
+    "analyticsBody": "La mesure d'audience utilise le logiciel open-source auto-hébergé Umami, fonctionnant sur le même serveur que le site. Aucun cookie n'est défini et aucune donnée personnelle n'est transmise à un tiers. Umami collecte uniquement des informations anonymisées : pages visitées, source du référent (ex. moteur de recherche), localisation approximative (pays), type de navigateur/appareil et résolution d'écran. Les adresses IP sont hachées avant stockage et ne sont pas conservées sous forme identifiable. Base juridique : Art. 6(1)(f) RGPD (intérêt légitime à l'évaluation statistique pour améliorer le site).",
+    "orderData": "7. Saisies de commandes",
+    "orderDataBody": "Lorsque vous soumettez une commande via le formulaire, les données fournies (un nom d'affichage librement choisi, la configuration du véhicule, la date de commande, la fenêtre de livraison, le pays, etc.) sont stockées dans la base de données et affichées publiquement. Aucune adresse e-mail ni nom réel n'est requis. Si vous définissez un mot de passe pour votre saisie, il est stocké exclusivement sous forme de hash bcrypt et jamais en texte clair. Vous pouvez modifier ou supprimer votre saisie à tout moment via le bouton d'édition ou en contactant l'adresse ci-dessous.\n\nSi vous utilisez l'application tierce TOST (https://www.tesla-order-status-tracker.de), les données saisies y sont transmises à ce site via leur API. La politique de confidentialité propre de l'application TOST s'applique aux données traitées dans TOST. Base juridique pour le stockage sur ce site : Art. 6(1)(a) RGPD (consentement par soumission active).",
+    "externalResources": "8. Ressources externes intégrées",
+    "externalResourcesBody": "Le chargement du site récupère les ressources externes suivantes, ce qui transmet votre adresse IP aux fournisseurs respectifs :\n\n• Icônes Twemoji via cdn.jsdelivr.net (Fastly/Cloudflare) — affichage des drapeaux de pays.\n• Google Fonts — les polices sont regroupées au moment de la construction et servies depuis le même domaine, donc aucun appel direct à Google n'a lieu lors d'une utilisation normale.\n\nLes images d'aperçu des véhicules sont générées côté serveur via le compositeur officiel Tesla et servies exclusivement depuis le domaine du site. Aucune requête directe vers tesla.com n'est effectuée depuis votre navigateur.\n\nBase juridique pour les ressources externes : Art. 6(1)(f) RGPD (intérêt légitime à une présentation à jour et à la performance via CDN).",
+    "donationLinks": "9. Liens de don",
+    "donationLinksBody": "Le pied de page et le menu contiennent des liens facultatifs vers Buy Me a Coffee et PayPal. Ils ne sont chargés qu'en cas de clic actif ; rien n'est transmis à ces fournisseurs au préalable.",
+    "rights": "10. Vos droits",
+    "rightsBody": "En vertu du RGPD, vous avez le droit de :\n\n• accéder à vos données (Art. 15)\n• les rectifier (Art. 16)\n• les effacer (Art. 17)\n• limiter leur traitement (Art. 18)\n• les recevoir dans un format portable (Art. 20)\n• vous opposer au traitement fondé sur des intérêts légitimes (Art. 21)\n• retirer votre consentement à tout moment pour l'avenir (Art. 7(3))\n\nUn message informel à l'adresse de contact ci-dessous suffit pour exercer ces droits.",
+    "complaints": "11. Droit d'introduire une réclamation",
+    "complaintsBody": "Sans préjudice d'autres recours, vous pouvez introduire une réclamation auprès d'une autorité de contrôle de protection des données, en particulier celle de votre lieu de résidence ou du lieu de l'infraction présumée. L'autorité compétente pour le responsable du traitement est la Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hanovre.",
+    "changes": "12. Modifications de cet avis",
+    "changesBody": "Cet avis de confidentialité peut être adapté lorsque le traitement des données change ou que des exigences légales le nécessitent. La version actuelle est toujours disponible sur cette page.",
+    "contact": "Contact pour les demandes de confidentialité",
+    "contactBody": "Veuillez adresser les demandes concernant vos droits et la protection des données à :"
   },
   "trust": {
     "totalOrders": "Commandes suivies",
@@ -649,8 +652,8 @@
     "basedOn": "Basé sur {count} commandes",
     "notEnoughData": "Données insuffisantes pour la prévision. Sélectionnez un type de véhicule.",
     "lowDataHint": "Peu de données — la prédiction peut être imprécise. Plus de commandes amélioreront la précision.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Basé sur {count} livraisons des {days} derniers jours",
+    "exceedsPessimisticHint": "Votre temps d'attente actuel ({days} jours) dépasse déjà l'estimation pessimiste (75% des livraisons comparables). Les temps d'attente actuels sont plus longs que la distribution historique — considérez cette prédiction avec prudence."
   },
   "trend": {
     "title": "Tendance de livraison",
@@ -741,9 +744,9 @@
     "orderToDelivery": "Commande → Livraison",
     "orderToPapers": "Commande → Documents",
     "papersToDelivery": "Documents → Livraison",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Basé sur {count} livraisons des {days} derniers jours",
+    "exceedsPessimisticHint": "Votre temps d'attente actuel ({days} jours) dépasse déjà l'estimation pessimiste. La prédiction est basée sur les délais de livraison historiques et n'est plus fiable dans cette situation — référez-vous à la fenêtre de livraison officielle Tesla.",
+    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours. Les données ci-dessous ne sont peut-être plus à jour."
   },
   "support": {
     "communityMessage": "Ces données sont maintenues par la communauté pour la communauté. Si ce site vous aide, vous pouvez soutenir les coûts de serveur.",
@@ -755,7 +758,7 @@
     "adminDashboard": "Tableau de bord administrateur",
     "navigationMenu": "Menu de navigation",
     "impressum": "Mentions légales",
-    "privacy": "Privacy"
+    "privacy": "Confidentialité"
   },
   "footer": {
     "operatedBy": "Géré par Sven",
@@ -763,31 +766,31 @@
     "stats": "{orders} commandes · {delivered} livrées"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Mises à jour récentes",
+    "entries": "entrées",
+    "loading": "Chargement…",
+    "loadMore": "Charger plus",
+    "empty": "Aucune mise à jour récente.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "week": "Cette semaine",
+      "older": "Plus ancien"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN attribué",
+      "production": "En production",
+      "papers": "Documents reçus",
+      "delivery": "Livré",
+      "window": "Fenêtre de livraison modifiée",
+      "created": "Nouvelle commande"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "il y a {n} min",
+      "hoursAgo": "il y a {n}h",
+      "yesterday": "hier",
+      "daysAgo": "il y a {n}j",
+      "weeksAgo": "il y a {n} sem"
     }
   }
 }

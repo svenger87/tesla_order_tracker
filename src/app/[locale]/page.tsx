@@ -170,7 +170,7 @@ export default function Home() {
     )
   }, [orders, globalFilters])
 
-  const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders), [filteredOrders])
+  const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders, tc('noDate')), [filteredOrders, tc])
   const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.range !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)
@@ -355,8 +355,8 @@ export default function Home() {
             <div className="border-b bg-card">
               <div className="flex items-center justify-between border-b px-4 py-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Statistiken</p>
-                  <h3 className="text-base font-semibold tracking-tight">Lieferzeiten, Konfigurationen und Trends</h3>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</p>
+                  <h3 className="text-base font-semibold tracking-tight">{t('statsSubtitle')}</h3>
                 </div>
                 <Button
                   variant="outline"

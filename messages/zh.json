@@ -72,7 +72,9 @@
     "delivered": "已交付：{date}",
     "errorGeneratingCode": "生成代码时出错",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "统计",
+    "statsSubtitle": "交货时间、配置和趋势"
   },
   "search": {
     "placeholder": "按名称、VIN、国家搜索订单...",
@@ -563,6 +565,7 @@
       "nv": "不适用"
     },
     "seats": {
+      "4": "4 座",
       "5": "5 座",
       "6": "6座",
       "7": "7 座"

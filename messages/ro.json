@@ -72,7 +72,9 @@
     "delivered": "Livrat: {date}",
     "errorGeneratingCode": "Eroare la generarea codului",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistici",
+    "statsSubtitle": "Termene de livrare, configurații și tendințe"
   },
   "search": {
     "placeholder": "Căutați comenzi după nume, VIN, țară...",
@@ -563,6 +565,7 @@
       "nv": "N/D"
     },
     "seats": {
+      "4": "4 locuri",
       "5": "5 locuri",
       "6": "6 locuri",
       "7": "7 locuri"

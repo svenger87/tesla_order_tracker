@@ -72,7 +72,9 @@
     "delivered": "Доставено: {date}",
     "errorGeneratingCode": "Грешка при генериране на кода",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Статистики",
+    "statsSubtitle": "Време за доставка, конфигурации и тенденции"
   },
   "search": {
     "placeholder": "Търсете поръчки по име, VIN, държава...",
@@ -563,6 +565,7 @@
       "nv": "Н/П"
     },
     "seats": {
+      "4": "4 места",
       "5": "5 места",
       "6": "6-местен",
       "7": "7 места"

@@ -72,7 +72,9 @@
     "delivered": "Dostarczono: {date}",
     "errorGeneratingCode": "Błąd generowania kodu",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statystyki",
+    "statsSubtitle": "Czasy dostaw, konfiguracje i trendy"
   },
   "search": {
     "placeholder": "Szukaj zamówień po nazwie, VIN, kraju...",
@@ -563,6 +565,7 @@
       "nv": "Niedostępny"
     },
     "seats": {
+      "4": "4-miejscowy",
       "5": "5-miejscowy",
       "6": "6-osobowy",
       "7": "7-miejscowy"

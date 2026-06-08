@@ -72,7 +72,9 @@
     "generateResetCode": "Einmalcode generieren",
     "vehicleImage": "Fahrzeugbild",
     "delivered": "Geliefert: {date}",
-    "errorGeneratingCode": "Fehler beim Generieren des Codes"
+    "errorGeneratingCode": "Fehler beim Generieren des Codes",
+    "statsTitle": "Statistiken",
+    "statsSubtitle": "Lieferzeiten, Konfigurationen und Trends"
   },
   "search": {
     "placeholder": "Bestellungen nach Name, VIN, Land suchen...",
@@ -563,6 +565,7 @@
       "nv": "n.v."
     },
     "seats": {
+      "4": "4-Sitzer",
       "5": "5-Sitzer",
       "6": "6-Sitzer",
       "7": "7-Sitzer"
@@ -594,43 +597,30 @@
     "lastUpdated": "Stand: {date}",
     "lastUpdatedDate": "Mai 2026",
     "backToHome": "Zurück zur Startseite",
-
     "controller": "1. Verantwortlicher",
     "controllerBody": "Verantwortlich für die Datenverarbeitung auf dieser Website im Sinne der DSGVO ist:\n\nSven Rosema\nAn der Wallhecke 5\n26899 Rhede (Ems)\nDeutschland\n\nKontakt siehe unten.",
-
     "scope": "2. Geltungsbereich und Hinweis",
     "scopeBody": "Diese Datenschutzerklärung gilt für die Website https://tff-order-stats.de. tff-order-stats.de ist ein privates, nicht kommerzielles Community-Projekt rund um Tesla-Bestellungen. Es wird ohne Gewinnerzielungsabsicht betrieben. Personenbezogene Daten werden ausschließlich im technisch notwendigen Umfang erhoben.",
-
     "serverLogs": "3. Server-Logs (Zugriffe)",
     "serverLogsBody": "Beim Aufruf der Website werden durch den Hosting-Anbieter (Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Deutschland) technische Daten in sogenannten Server-Logs erhoben: IP-Adresse, Zeitpunkt des Aufrufs, aufgerufene URL, HTTP-Status, übertragene Datenmenge, Referrer und User-Agent. Diese Daten sind technisch notwendig für den sicheren Betrieb der Website. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bereitstellung und Sicherheit der Seite). Die Speicherdauer beträgt maximal 14 Tage, danach werden die Logs automatisch gelöscht.",
-
     "cookies": "4. Cookies",
     "cookiesBody": "Die Website verwendet ein einziges technisch notwendiges Cookie:\n\n• admin_token — wird ausschließlich nach erfolgreichem Admin-Login gesetzt und dient der Authentifizierung des Administrators. HttpOnly, Secure, SameSite=Strict. Laufzeit: 7 Tage.\n\nFür reguläre Nutzer ohne Admin-Zugang werden keine Cookies gesetzt. Eine Einwilligung ist nach § 25 Abs. 2 TTDSG nicht erforderlich, da das Cookie für den vom Nutzer ausdrücklich gewünschten Dienst (Admin-Login) unbedingt erforderlich ist. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.",
-
     "localStorage": "5. Lokale Speicherung im Browser (localStorage)",
     "localStorageBody": "Die Website speichert ausschließlich auf deinem Gerät (kein Versand an den Server) folgende technische Präferenzen in der lokalen Browser-Datenbank (localStorage):\n\n• gewählte Sprache\n• gewählte Filter, Sortierung und sichtbare Tabellen-Spalten\n• Sichtbarkeit der Filter- und Statistik-Bereiche\n• Filter im Updates-Feed\n• gewähltes Theme (hell/dunkel)\n\nDiese Daten verlassen deinen Browser nicht und werden ausschließlich zur Verbesserung der Bedienbarkeit verwendet. Du kannst sie jederzeit über die Browser-Einstellungen löschen.",
-
     "analytics": "6. Reichweitenmessung (Umami)",
     "analyticsBody": "Zur Reichweitenmessung wird die selbst gehostete Open-Source-Software Umami eingesetzt. Umami läuft auf demselben Server wie diese Website. Es werden keine Cookies gesetzt und keine personenbezogenen Daten an Dritte übertragen. Umami erfasst lediglich anonymisiert: aufgerufene Seiten, Referrer-Quelle (z. B. Suchmaschine), grobe Geolokation (Land), Browser/Gerät-Typ und Bildschirmauflösung. IP-Adressen werden vor der Speicherung gehasht und nicht in identifizierbarer Form abgelegt. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an statistischer Auswertung zur Optimierung der Website).",
-
     "orderData": "7. Selbst eingetragene Bestelldaten",
     "orderDataBody": "Wenn du eine Bestellung über das Formular einträgst, werden die von dir angegebenen Daten (selbst gewählter Anzeigename, Konfiguration, Bestelldatum, Lieferfenster, Land etc.) in der Datenbank gespeichert und öffentlich angezeigt. Eine E-Mail-Adresse oder Klarname ist nicht erforderlich. Wenn du ein Passwort für deinen Eintrag setzt, wird dieses ausschließlich als bcrypt-Hash gespeichert und niemals im Klartext. Du kannst deinen Eintrag jederzeit über das Bearbeiten-Symbol oder per Anfrage an die unten genannte Kontaktadresse ändern oder löschen lassen.\n\nSofern du die Drittanbieter-App TOST (https://www.tesla-order-status-tracker.de) verwendest, werden die dort gepflegten Daten über deren API an diese Website übertragen. Für die Verarbeitung in der TOST-App gilt deren eigene Datenschutzerklärung. Rechtsgrundlage für die Speicherung in dieser Datenbank: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung durch aktives Eintragen).",
-
     "externalResources": "8. Eingebundene externe Ressourcen",
     "externalResourcesBody": "Beim Aufruf werden folgende externe Ressourcen geladen, wodurch deine IP-Adresse an die jeweiligen Anbieter übertragen wird:\n\n• Twemoji-Icons über cdn.jsdelivr.net (Fastly/Cloudflare) — Anzeige von Landesflaggen.\n• Google Fonts — Schriftarten werden über das Next.js Build-System lokal eingebunden, sodass im Regelfall kein Direktaufruf an Google erfolgt.\n\nFahrzeug-Vorschaubilder werden serverseitig über die offizielle Tesla-Compositor-Schnittstelle generiert und ausschließlich vom eigenen Server ausgeliefert. Es findet kein direkter Aufruf von tesla.com aus deinem Browser statt.\n\nRechtsgrundlage für externe Ressourcen: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer zeitgemäßen Darstellung und an Performance durch CDN-Auslieferung).",
-
     "donationLinks": "9. Spenden-Links",
     "donationLinksBody": "Im Footer und Menü befinden sich optionale Links zu Buy Me a Coffee und PayPal, die ausschließlich beim aktiven Klick aufgerufen werden. Erst dann werden Daten an die jeweiligen Anbieter übertragen. Es findet kein automatisches Laden dieser Dienste statt.",
-
     "rights": "10. Deine Rechte",
     "rightsBody": "Du hast nach DSGVO jederzeit das Recht auf:\n\n• Auskunft über die zu deiner Person gespeicherten Daten (Art. 15)\n• Berichtigung (Art. 16)\n• Löschung (Art. 17)\n• Einschränkung der Verarbeitung (Art. 18)\n• Datenübertragbarkeit (Art. 20)\n• Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21)\n• Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft (Art. 7 Abs. 3)\n\nZur Geltendmachung genügt eine formlose Nachricht an die unten genannte Kontaktadresse.",
-
     "complaints": "11. Beschwerderecht",
     "complaintsBody": "Unbeschadet anderer Rechtsbehelfe steht dir ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde zu, insbesondere bei der für deinen Wohnsitz oder das mutmaßliche Versäumnis zuständigen Behörde. Für den Verantwortlichen zuständig ist die Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hannover.",
-
     "changes": "12. Änderungen dieser Erklärung",
     "changesBody": "Diese Datenschutzerklärung kann angepasst werden, wenn sich die Datenverarbeitung ändert oder rechtliche Vorgaben dies erfordern. Die jeweils aktuelle Fassung ist auf dieser Seite einsehbar.",
-
     "contact": "Kontakt für Datenschutzanfragen",
     "contactBody": "Anfragen zu deinen Rechten und zum Datenschutz richte bitte an:"
   },

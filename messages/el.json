@@ -72,7 +72,9 @@
     "delivered": "Παραδόθηκε: {date}",
     "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Στατιστικά",
+    "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις"
   },
   "search": {
     "placeholder": "Αναζήτηση παραγγελιών κατά όνομα, VIN, χώρα...",
@@ -563,6 +565,7 @@
       "nv": "Μ/Δ"
     },
     "seats": {
+      "4": "4θέσιο",
       "5": "5θέσιο",
       "6": "6-θέσιο",
       "7": "7θέσιο"

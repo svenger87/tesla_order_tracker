@@ -72,7 +72,9 @@
     "delivered": "Geleverd: {date}",
     "errorGeneratingCode": "Fout bij het genereren van de code",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistieken",
+    "statsSubtitle": "Levertijden, configuraties en trends"
   },
   "search": {
     "placeholder": "Bestellingen zoeken op naam, VIN, land...",
@@ -563,6 +565,7 @@
       "nv": "N.v.t."
     },
     "seats": {
+      "4": "4-zitter",
       "5": "5-zitter",
       "6": "6-zits",
       "7": "7-zitter"

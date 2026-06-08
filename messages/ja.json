@@ -72,7 +72,9 @@
     "delivered": "納車済み：{date}",
     "errorGeneratingCode": "コード生成エラー",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "統計",
+    "statsSubtitle": "納期、構成、トレンド"
   },
   "search": {
     "placeholder": "名前、VIN、国で注文を検索...",
@@ -563,6 +565,7 @@
       "nv": "対象外"
     },
     "seats": {
+      "4": "4人乗り",
       "5": "5人乗り",
       "6": "6人乗り",
       "7": "7人乗り"

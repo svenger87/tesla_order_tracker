@@ -72,7 +72,9 @@
     "delivered": "Kiszállítva: {date}",
     "errorGeneratingCode": "Hiba a kód generálásakor",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statisztikák",
+    "statsSubtitle": "Szállítási idők, konfigurációk és trendek"
   },
   "search": {
     "placeholder": "Rendelések keresése név, VIN, ország alapján...",
@@ -563,6 +565,7 @@
       "nv": "Nem elérhető"
     },
     "seats": {
+      "4": "4 üléses",
       "5": "5 üléses",
       "6": "6 üléses",
       "7": "7 üléses"

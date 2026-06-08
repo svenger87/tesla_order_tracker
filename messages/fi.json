@@ -72,7 +72,9 @@
     "delivered": "Toimitettu: {date}",
     "errorGeneratingCode": "Virhe koodin luomisessa",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Tilastot",
+    "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit"
   },
   "search": {
     "placeholder": "Hae tilauksia nimellä, VIN-numerolla, maalla...",
@@ -563,6 +565,7 @@
       "nv": "Ei saatavilla"
     },
     "seats": {
+      "4": "4-paikkainen",
       "5": "5-paikkainen",
       "6": "6-paikkainen",
       "7": "7-paikkainen"

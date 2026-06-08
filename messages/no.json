@@ -72,7 +72,9 @@
     "delivered": "Levert: {date}",
     "errorGeneratingCode": "Feil ved generering av kode",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Statistikk",
+    "statsSubtitle": "Leveringstider, konfigurasjoner og trender"
   },
   "search": {
     "placeholder": "Søk bestillinger etter navn, VIN, land...",
@@ -563,6 +565,7 @@
       "nv": "Ikke tilgj."
     },
     "seats": {
+      "4": "4-seter",
       "5": "5-seter",
       "6": "6-seter",
       "7": "7-seter"

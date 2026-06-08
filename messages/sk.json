@@ -72,7 +72,9 @@
     "delivered": "Dodané: {date}",
     "errorGeneratingCode": "Chyba pri generovaní kódu",
     "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated."
+    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "statsTitle": "Štatistiky",
+    "statsSubtitle": "Dodacie lehoty, konfigurácie a trendy"
   },
   "search": {
     "placeholder": "Hľadajte objednávky podľa mena, VIN, krajiny...",
@@ -563,6 +565,7 @@
       "nv": "N/D"
     },
     "seats": {
+      "4": "4-miestne",
       "5": "5-miestne",
       "6": "6-miestny",
       "7": "7-miestne"
