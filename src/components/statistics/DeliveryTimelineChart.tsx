@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
+import { useMonthKeyFormatter } from '@/hooks/useMonthKeyFormatter'
 
 interface DeliveryTimelineChartProps {
   data: { month: string; count: number }[]
@@ -10,6 +11,8 @@ interface DeliveryTimelineChartProps {
 
 export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
   const t = useTranslations('statistics')
+  const formatMonth = useMonthKeyFormatter()
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
@@ -43,6 +46,7 @@ export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
             tick={{ className: 'fill-foreground' }}
             tickLine={{ className: 'stroke-muted-foreground' }}
             axisLine={{ className: 'stroke-muted-foreground' }}
+            tickFormatter={formatMonth}
           />
           <YAxis
             className="text-xs"
@@ -65,6 +69,7 @@ export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('deliveriesCount', { value: String(value) }), t('count')]}
+            labelFormatter={(label) => formatMonth(label as string)}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar

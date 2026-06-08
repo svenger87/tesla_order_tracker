@@ -64,7 +64,7 @@ export interface OrderStatistics {
   seatsDistribution: { name: string; count: number; fill: string }[]
   colorDistribution: { name: string; count: number; fill: string }[]
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
-  vinWeekdayDistribution: { name: string; count: number }[]
+  vinWeekdayDistribution: { dayOfWeek: number; count: number }[]
   countryDeliveryStats: { country: string; avgDays: number; medianDays: number; count: number }[]
   tostOrders: number
   manualOrders: number
@@ -293,8 +293,7 @@ export function calculateDaysBetween(startDateStr: string | null, endDateStr: st
 }
 
 function getMonthKey(date: Date): string {
-  const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
-  return `${months[date.getMonth()]} ${date.getFullYear()}`
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
 export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehicleType?: VehicleType): OrderStatistics {
@@ -574,8 +573,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     }))
     .sort((a, b) => b.count - a.count)
 
-  // VIN weekday distribution (Mon–Sun)
-  const WEEKDAY_NAMES = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+  // VIN weekday distribution
   const weekdayCounts = [0, 0, 0, 0, 0, 0, 0] // index 0=Sun … 6=Sat
   filteredOrders.forEach(order => {
     const date = parseGermanDate(order.vinReceivedDate)
@@ -583,7 +581,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   })
   // Reorder: Mon(1)…Sun(0)
   const vinWeekdayDistribution = [1, 2, 3, 4, 5, 6, 0].map(i => ({
-    name: WEEKDAY_NAMES[i],
+    dayOfWeek: i,
     count: weekdayCounts[i],
   }))
 

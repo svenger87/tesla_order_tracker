@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Order } from '@/lib/types'
 import { calculateDeliveryTrend } from '@/lib/prediction'
+import { useMonthKeyFormatter } from '@/hooks/useMonthKeyFormatter'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react'
@@ -24,6 +25,7 @@ interface DeliveryTrendChartProps {
 export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const t = useTranslations('trend')
   const tc = useTranslations('common')
+  const formatMonth = useMonthKeyFormatter()
 
   const trend = useMemo(() => calculateDeliveryTrend(orders), [orders])
 
@@ -75,11 +77,12 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+              <XAxis dataKey="monthKey" tick={{ fontSize: 11 }} tickFormatter={formatMonth} />
               <YAxis tick={{ fontSize: 11 }} label={{ value: tc('days'), angle: -90, position: 'insideLeft', style: { fontSize: 11 } }} />
               <Tooltip
                 contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 formatter={(value) => [`${value} ${tc('days')}`, t('avgDeliveryTime')]}
+                labelFormatter={(label) => formatMonth(label as string)}
               />
               <Area
                 type="monotone"

@@ -1,16 +1,23 @@
 'use client'
 
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 
 interface VinWeekdayChartProps {
-  data: { name: string; count: number }[]
+  data: { dayOfWeek: number; count: number }[]
 }
 
 export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
   const t = useTranslations('statistics')
+  const locale = useLocale()
   const totalVins = data.reduce((sum, d) => sum + d.count, 0)
+
+  const formatWeekday = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+    return (dayOfWeek: number) => fmt.format(new Date(2025, 0, 5 + dayOfWeek))
+  }, [locale])
 
   if (totalVins < 5) {
     return (
@@ -40,11 +47,12 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis
-            dataKey="name"
+            dataKey="dayOfWeek"
             className="text-xs"
             tick={{ className: 'fill-foreground' }}
             tickLine={{ className: 'stroke-muted-foreground' }}
             axisLine={{ className: 'stroke-muted-foreground' }}
+            tickFormatter={formatWeekday}
           />
           <YAxis
             className="text-xs"
@@ -68,6 +76,7 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('vinWeekdayCount', { value: String(value) }), t('count')]}
+            labelFormatter={(label) => formatWeekday(label as number)}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar
