@@ -1,9 +1,9 @@
 'use client'
 
-import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
+import { useMonthKeyFormatter } from '@/hooks/useMonthKeyFormatter'
 
 interface DeliveryTimelineChartProps {
   data: { month: string; count: number }[]
@@ -11,15 +11,7 @@ interface DeliveryTimelineChartProps {
 
 export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
   const t = useTranslations('statistics')
-  const locale = useLocale()
-
-  const formatMonth = useMemo(() => {
-    const fmt = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' })
-    return (key: string) => {
-      const [y, m] = key.split('-')
-      return fmt.format(new Date(parseInt(y), parseInt(m) - 1))
-    }
-  }, [locale])
+  const formatMonth = useMonthKeyFormatter()
 
   if (data.length === 0) {
     return (

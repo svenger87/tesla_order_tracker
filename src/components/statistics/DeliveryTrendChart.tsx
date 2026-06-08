@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { Order } from '@/lib/types'
 import { calculateDeliveryTrend } from '@/lib/prediction'
+import { useMonthKeyFormatter } from '@/hooks/useMonthKeyFormatter'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react'
@@ -24,17 +25,9 @@ interface DeliveryTrendChartProps {
 export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const t = useTranslations('trend')
   const tc = useTranslations('common')
-  const locale = useLocale()
+  const formatMonth = useMonthKeyFormatter()
 
   const trend = useMemo(() => calculateDeliveryTrend(orders), [orders])
-
-  const formatMonth = useMemo(() => {
-    const fmt = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' })
-    return (key: string) => {
-      const [y, m] = key.split('-')
-      return fmt.format(new Date(parseInt(y), parseInt(m) - 1))
-    }
-  }, [locale])
 
   if (!trend || trend.monthlyAverages.length < 3) return null
 
