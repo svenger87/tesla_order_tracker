@@ -1,10 +1,12 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType } from '@/lib/types'
-import { calculateStatistics, StatsPeriod } from '@/lib/statistics'
+import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY } from '@/lib/statistics'
+import { useOptions } from '@/hooks/useOptions'
+import { TwemojiEmoji } from '@/components/TwemojiText'
 import { StatCard } from './StatCard'
 import { DeliveryTimeline } from './DeliveryTimeline'
 import { CountryDistributionChart } from './CountryDistributionChart'
@@ -44,12 +46,40 @@ interface StatisticsDashboardProps {
 export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }: StatisticsDashboardProps) {
   const t = useTranslations('statistics')
   const tcd = useTranslations('countryDelivery')
+  const tCommon = useTranslations('common')
+  const { countries } = useOptions()
 
   const tabsRef = useRef<HTMLDivElement>(null)
 
   const stats = useMemo(
     () => calculateStatistics(orders, selectedPeriod, selectedVehicle === 'all' ? undefined : selectedVehicle),
     [orders, selectedPeriod, selectedVehicle]
+  )
+
+  // Case-insensitive bidirectional lookup (by ISO code OR label) against the
+  // same source-of-truth used by OrderTable, so country labels and flags stay
+  // consistent across the app.
+  const countryByKey = useMemo(() => {
+    const m = new Map<string, { label: string; flag?: string }>()
+    for (const c of countries) {
+      const entry = { label: c.label, flag: c.flag }
+      m.set(c.value.toLowerCase(), entry)
+      m.set(c.label.toLowerCase(), entry)
+    }
+    return m
+  }, [countries])
+
+  const resolveCountry = useCallback(
+    (value: string): { label: string; flag?: string } => {
+      if (value === UNKNOWN_COUNTRY) return { label: tCommon('unknown') }
+      return countryByKey.get(value.toLowerCase()) ?? { label: value }
+    },
+    [countryByKey, tCommon]
+  )
+
+  const localizedCountryDistribution = useMemo(
+    () => stats.countryDistribution.map(d => ({ ...d, name: resolveCountry(d.name).label })),
+    [stats.countryDistribution, resolveCountry]
   )
 
   return (
@@ -241,7 +271,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                   <CardDescription>{t('topCountries')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                  <CountryDistributionChart data={stats.countryDistribution} />
+                  <CountryDistributionChart data={localizedCountryDistribution} />
                 </CardContent>
                 <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
               </Card>
@@ -286,16 +316,24 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {stats.countryDeliveryStats.map((row, i) => (
-                          <TableRow key={row.country} style={{ borderLeft: `3px solid oklch(${0.55 + (i / total) * 0.15} ${0.16 - (i / total) * 0.06} ${145 - (i / total) * 70})` }}>
-                            <TableCell className="font-medium tabular-nums">
-                              {i === 0 ? '\u{1F947}' : i === 1 ? '\u{1F948}' : i === 2 ? '\u{1F949}' : i + 1}
-                            </TableCell>
-                            <TableCell>{row.country}</TableCell>
-                            <TableCell className="text-right tabular-nums font-medium">{row.medianDays}d</TableCell>
-                            <TableCell className="text-right tabular-nums">{row.count}</TableCell>
-                          </TableRow>
-                        ))}
+                        {stats.countryDeliveryStats.map((row, i) => {
+                          const info = resolveCountry(row.country)
+                          return (
+                            <TableRow key={row.country} style={{ borderLeft: `3px solid oklch(${0.55 + (i / total) * 0.15} ${0.16 - (i / total) * 0.06} ${145 - (i / total) * 70})` }}>
+                              <TableCell className="font-medium tabular-nums">
+                                {i === 0 ? '\u{1F947}' : i === 1 ? '\u{1F948}' : i === 2 ? '\u{1F949}' : i + 1}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-1.5">
+                                  {info.flag && <TwemojiEmoji emoji={info.flag} size={16} className="shrink-0" />}
+                                  <span>{info.label}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums font-medium">{row.medianDays}d</TableCell>
+                              <TableCell className="text-right tabular-nums">{row.count}</TableCell>
+                            </TableRow>
+                          )
+                        })}
                       </TableBody>
                     </Table>
                   </CardContent>
