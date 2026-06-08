@@ -69,7 +69,7 @@ export function OrdersTimelineChart({ data }: OrdersTimelineChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
-            labelFormatter={formatMonth}
+            labelFormatter={(label) => formatMonth(label as string)}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar

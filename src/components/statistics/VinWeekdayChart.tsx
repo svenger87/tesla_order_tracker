@@ -76,7 +76,7 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('vinWeekdayCount', { value: String(value) }), t('count')]}
-            labelFormatter={formatWeekday}
+            labelFormatter={(label) => formatWeekday(label as number)}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar

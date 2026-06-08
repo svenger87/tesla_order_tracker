@@ -82,7 +82,7 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
               <Tooltip
                 contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 formatter={(value) => [`${value} ${tc('days')}`, t('avgDeliveryTime')]}
-                labelFormatter={formatMonth}
+                labelFormatter={(label) => formatMonth(label as string)}
               />
               <Area
                 type="monotone"

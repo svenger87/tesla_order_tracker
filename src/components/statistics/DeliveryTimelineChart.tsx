@@ -69,7 +69,7 @@ export function DeliveryTimelineChart({ data }: DeliveryTimelineChartProps) {
               fontWeight: 600,
             }}
             formatter={(value) => [t('deliveriesCount', { value: String(value) }), t('count')]}
-            labelFormatter={formatMonth}
+            labelFormatter={(label) => formatMonth(label as string)}
             cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
           />
           <Bar
