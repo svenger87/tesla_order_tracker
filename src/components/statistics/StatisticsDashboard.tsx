@@ -133,6 +133,20 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
     () => localizeDistribution(stats.colorDistribution, []),
     [stats.colorDistribution, localizeDistribution],
   )
+  // Trim names (Standard/Premium/…), drive (RWD/AWD) and wheel sizes are also
+  // universal — only their UNKNOWN_OPTION fallback needs localizing.
+  const localizedModelDistribution = useMemo(
+    () => localizeDistribution(stats.modelDistribution, []),
+    [stats.modelDistribution, localizeDistribution],
+  )
+  const localizedDriveDistribution = useMemo(
+    () => localizeDistribution(stats.driveDistribution, []),
+    [stats.driveDistribution, localizeDistribution],
+  )
+  const localizedWheelsDistribution = useMemo(
+    () => localizeDistribution(stats.wheelsDistribution, []),
+    [stats.wheelsDistribution, localizeDistribution],
+  )
 
   return (
     <motion.div
@@ -277,8 +291,8 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             transition={{ duration: 0.2 }}
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <MiniPieChart data={stats.modelDistribution} title={t('modelDistribution')} delay={0} />
-              <MiniPieChart data={stats.driveDistribution} title={t('driveDistribution')} delay={0.05} />
+              <MiniPieChart data={localizedModelDistribution} title={t('modelDistribution')} delay={0} />
+              <MiniPieChart data={localizedDriveDistribution} title={t('driveDistribution')} delay={0.05} />
               <MiniPieChart data={localizedRangeDistribution} title={t('rangeDistribution')} delay={0.1} />
               <MiniPieChart data={localizedColorDistribution} title={t('colorDistribution')} delay={0.15} />
             </div>
@@ -295,7 +309,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} />
-              <MiniPieChart data={stats.wheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
+              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
               <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
               <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} />
               <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
