@@ -18,8 +18,10 @@ interface CodeDefinition {
 // Body codes per trim+drive combo
 const BODY_CODES: CodeDefinition[] = [
   // Model Y Juniper
-  { category: 'body', vehicleType: 'Model Y', lookupKey: 'standard_rwd', code: 'MTY61', label: 'Standard RWD' },
-  { category: 'body', vehicleType: 'Model Y', lookupKey: 'standard_awd', code: 'MTY77', label: 'Standard AWD' },
+  // Standard trims use Tesla's newer "design_studio_2" body generation (MTY68/MTY78),
+  // required for the 2026 refresh colors like Coastal Blue (PB03). Pairs with interior IBB6.
+  { category: 'body', vehicleType: 'Model Y', lookupKey: 'standard_rwd', code: 'MTY68', label: 'Standard RWD' },
+  { category: 'body', vehicleType: 'Model Y', lookupKey: 'standard_awd', code: 'MTY78', label: 'Standard AWD' },
   { category: 'body', vehicleType: 'Model Y', lookupKey: 'premium_rwd', code: 'MTY60', label: 'Premium RWD' },
   { category: 'body', vehicleType: 'Model Y', lookupKey: 'premium_awd', code: 'MTY48', label: 'Premium AWD' },
   { category: 'body', vehicleType: 'Model Y', lookupKey: 'performance', code: 'MTY70', label: 'Performance' },
@@ -47,7 +49,8 @@ const WHEEL_CODES: CodeDefinition[] = [
 // Interior codes per trim+interior combo
 const INTERIOR_CODES: CodeDefinition[] = [
   // Model Y Juniper
-  { category: 'interior', vehicleType: 'Model Y', lookupKey: 'standard_black', code: 'IBB3', label: 'Standard Schwarz' },
+  // Standard MY uses the new-generation black interior (IBB6), required by the MTY68/MTY78 bodies.
+  { category: 'interior', vehicleType: 'Model Y', lookupKey: 'standard_black', code: 'IBB6', label: 'Standard Schwarz' },
   // Standard MY Juniper only comes in black — no white interior option
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'premium_black', code: 'IPB12', label: 'Premium Schwarz' },
   { category: 'interior', vehicleType: 'Model Y', lookupKey: 'premium_white', code: 'IPW12', label: 'Premium Weiß' },
@@ -74,6 +77,7 @@ const COLOR_CODES: CodeDefinition[] = [
   { category: 'color', vehicleType: 'Model Y', lookupKey: 'ultra_red', code: 'PR01', label: 'Ultra Red', sortOrder: 5 },
   { category: 'color', vehicleType: 'Model Y', lookupKey: 'glacier_blue', code: 'PB01', label: 'Glacier Blue', sortOrder: 6 },
   { category: 'color', vehicleType: 'Model Y', lookupKey: 'marine_blue', code: 'PB02', label: 'Marine Blue', sortOrder: 7 },
+  { category: 'color', vehicleType: 'Model Y', lookupKey: 'coastal_blue', code: 'PB03', label: 'Coastal Blue', sortOrder: 8 },
   { category: 'color', vehicleType: 'Model Y', lookupKey: 'deep_blue', code: 'PPSB', label: 'Deep Blue Metallic', sortOrder: 8 },
   { category: 'color', vehicleType: 'Model Y', lookupKey: 'midnight_cherry', code: 'PR00', label: 'Midnight Cherry Red', sortOrder: 9 },
   // Legacy MY colors

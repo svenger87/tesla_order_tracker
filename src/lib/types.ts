@@ -201,6 +201,7 @@ export const COLORS = [
   { value: 'ultra_red', label: 'Ultra Red', hex: '#C41E3A', border: false },
   { value: 'glacier_blue', label: 'Glacier Blue', hex: '#8FBBD9', border: false },  // New Juniper
   { value: 'marine_blue', label: 'Marine Blue', hex: '#1E3A5F', border: false },    // New Juniper
+  { value: 'coastal_blue', label: 'Coastal Blue', hex: '#3E6E9E', border: false },  // 2026 MY refresh (compositor PB03)
   { value: 'deep_blue', label: 'Deep Blue Metallic', hex: '#1C3A5F', border: false },
   { value: 'midnight_cherry', label: 'Midnight Cherry Red', hex: '#5C0029', border: false },
   // Cybertruck

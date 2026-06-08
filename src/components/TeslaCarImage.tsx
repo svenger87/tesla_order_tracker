@@ -15,6 +15,7 @@ const FALLBACK_COLOR_CODES: Record<string, string> = {
   'ultra_red': 'PR01',
   'glacier_blue': 'PB01',
   'marine_blue': 'PB02',
+  'coastal_blue': 'PB03',
   'deep_blue': 'PPSB',
   'midnight_cherry': 'PR00',
   'midnight_silver': 'PMNG',
