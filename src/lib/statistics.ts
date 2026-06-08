@@ -574,11 +574,12 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     .sort((a, b) => b.count - a.count)
 
   // VIN weekday distribution
-  const weekdayCounts = [0, 0, 0, 0, 0, 0, 0]
+  const weekdayCounts = [0, 0, 0, 0, 0, 0, 0] // index 0=Sun … 6=Sat
   filteredOrders.forEach(order => {
     const date = parseGermanDate(order.vinReceivedDate)
     if (date) weekdayCounts[date.getDay()]++
   })
+  // Reorder: Mon(1)…Sun(0)
   const vinWeekdayDistribution = [1, 2, 3, 4, 5, 6, 0].map(i => ({
     dayOfWeek: i,
     count: weekdayCounts[i],
