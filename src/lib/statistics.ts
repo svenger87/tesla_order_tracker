@@ -66,6 +66,7 @@ export interface OrderStatistics {
   avgOrderToDelivery: number | null
   avgOrderToPapers: number | null
   avgPapersToDelivery: number | null
+  /** `name` is a Tesla trim name (kept verbatim — universal, not translated) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   modelDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. 'maximale_reichweite') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   rangeDistribution: { name: string; count: number; fill: string }[]
@@ -75,11 +76,13 @@ export interface OrderStatistics {
   // New statistics
   deliveriesOverTime: { month: string; count: number }[]
   waitTimeDistribution: { range: string; count: number; min: number; max: number }[]
+  /** `name` is a wheel size (e.g. '18"', kept verbatim — universal) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   wheelsDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. 'black') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   interiorDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. 'none', 'fsd') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   autopilotDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is a drive label (RWD/AWD, kept verbatim — universal) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   driveDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. 'ja', 'nein') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
   towHitchDistribution: { name: string; count: number; fill: string }[]
@@ -223,7 +226,7 @@ function findColorHex(colorName: string): string | null {
 
 // Normalize wheel sizes (e.g., "20", "20\"", "20 Zoll" -> "20\"")
 function normalizeWheels(wheels: string | null | undefined): string {
-  if (!wheels) return 'Unbekannt'
+  if (!wheels) return UNKNOWN_OPTION
   const trimmed = wheels.trim()
   // Extract just the number
   const match = trimmed.match(/(\d{2})/)
@@ -271,7 +274,7 @@ function normalizeOptionValue<T extends { value: string; label: string }>(
 
 // Normalize model names (combines Model Y and Model 3 trims)
 function normalizeModel(model: string | null | undefined): string {
-  if (!model) return 'Unbekannt'
+  if (!model) return UNKNOWN_OPTION
   // Try Model Y trims first
   const normalized = normalizeOption(model, MODEL_Y_TRIMS, '')
   if (normalized) return normalized
@@ -539,7 +542,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Drive distribution (normalized)
   const driveCounts: Record<string, number> = {}
   filteredOrders.forEach(order => {
-    const drive = normalizeOption(order.drive, DRIVES, 'Unbekannt')
+    const drive = normalizeOption(order.drive, DRIVES, UNKNOWN_OPTION)
     driveCounts[drive] = (driveCounts[drive] || 0) + 1
   })
   const driveDistribution = Object.entries(driveCounts)
