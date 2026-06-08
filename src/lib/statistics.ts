@@ -1,42 +1,55 @@
 import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
 
-// Build COUNTRY_NAMES from the canonical COUNTRIES constant to stay in sync
-const COUNTRY_NAMES: Record<string, string> = Object.fromEntries(
-  COUNTRIES.map(c => [c.value.toUpperCase(), c.label])
+// Build code/label lookup tables from the canonical COUNTRIES constant.
+// CODE_SET stores ISO codes (uppercase) for fast membership checks.
+// LABEL_TO_CODE lets us recognize raw German names like "Deutschland" → "de".
+const CODE_SET: Set<string> = new Set(COUNTRIES.map(c => c.value.toUpperCase()))
+const LABEL_TO_CODE: Record<string, string> = Object.fromEntries(
+  COUNTRIES.map(c => [c.label.toUpperCase(), c.value])
 )
 
+// Foreign-language variants seen in raw data that don't match an ISO code or the
+// German label. Extend as new spellings appear.
+const COUNTRY_ALIASES: Record<string, string> = {
+  SPANJE: 'es',
+  LUXEMBOURG: 'lu',
+  NEDERLAND: 'nl',
+  CROATIA: 'hr',
+}
+
+// Sentinel for null/empty/unknown — display layer maps this to a localized label.
+export const UNKNOWN_COUNTRY = '__unknown__'
+
+// Returns a stable identifier: lowercase ISO code (e.g. 'de'), the UNKNOWN_COUNTRY
+// sentinel, or the trimmed raw value when no mapping is found. The display layer
+// is responsible for turning this into a localized label.
 function normalizeCountry(country: string | null | undefined): string {
-  if (!country || country === '-') return 'Unbekannt'
+  if (!country || country === '-') return UNKNOWN_COUNTRY
   let trimmed = country.trim()
 
   // Remove flag emoji prefix (flag emojis are regional indicator symbols)
   // They appear as pairs like 🇩🇪 🇦🇹 etc.
   trimmed = trimmed.replace(/^[\u{1F1E0}-\u{1F1FF}]{2}\s*/u, '')
 
-  // Check if it's a 2-letter country code (exact match)
-  const upper = trimmed.toUpperCase()
-  if (COUNTRY_NAMES[upper]) {
-    return COUNTRY_NAMES[upper]
-  }
+  if (!trimmed) return UNKNOWN_COUNTRY
 
-  // Check if format is "XX CountryName" (e.g., "DE Deutschland")
+  // 2-letter ISO code (exact match)
+  const upper = trimmed.toUpperCase()
+  if (CODE_SET.has(upper)) return upper.toLowerCase()
+
+  // Format "XX CountryName" (e.g., "DE Deutschland")
   const match = trimmed.match(/^([A-Z]{2})\s+(.+)$/i)
   if (match) {
     const code = match[1].toUpperCase()
-    const name = match[2]
-    return COUNTRY_NAMES[code] || name
+    if (CODE_SET.has(code)) return code.toLowerCase()
   }
 
-  // Normalize common country name variations
-  const COUNTRY_ALIASES: Record<string, string> = {
-    'SPANJE': 'Spanien',
-    'LUXEMBOURG': 'Luxemburg',
-  }
-  if (COUNTRY_ALIASES[upper]) {
-    return COUNTRY_ALIASES[upper]
-  }
+  // Raw German label (e.g. "Deutschland", "Frankreich") — reverse lookup
+  if (LABEL_TO_CODE[upper]) return LABEL_TO_CODE[upper]
 
-  // Return as-is if no pattern matches
+  if (COUNTRY_ALIASES[upper]) return COUNTRY_ALIASES[upper]
+
+  // Return as-is if nothing matched (display layer will show it verbatim)
   return trimmed
 }
 
@@ -51,6 +64,7 @@ export interface OrderStatistics {
   avgPapersToDelivery: number | null
   modelDistribution: { name: string; count: number; fill: string }[]
   rangeDistribution: { name: string; count: number; fill: string }[]
+  /** `name` is an ISO country code (lowercase, e.g. 'de'), the UNKNOWN_COUNTRY sentinel, or a raw fallback string. Resolve at display time via a useOptions() lookup. */
   countryDistribution: { name: string; count: number; fill: string }[]
   ordersOverTime: { month: string; count: number }[]
   // New statistics
@@ -65,6 +79,7 @@ export interface OrderStatistics {
   colorDistribution: { name: string; count: number; fill: string }[]
   deliveryLocationDistribution: { name: string; count: number; fill: string }[]
   vinWeekdayDistribution: { dayOfWeek: number; count: number }[]
+  /** `country` is an ISO country code (lowercase, e.g. 'de'), the UNKNOWN_COUNTRY sentinel, or a raw fallback string. Resolve at display time via a useOptions() lookup. */
   countryDeliveryStats: { country: string; avgDays: number; medianDays: number; count: number }[]
   tostOrders: number
   manualOrders: number
