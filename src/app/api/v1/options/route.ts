@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { withApiAuth } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { ApiOptions, ApiOption } from '@/lib/api-types'
+import { ALPHABETICAL_OPTION_TYPES, compareOptionLabels } from '@/lib/optionSort'
 import {
   COUNTRIES,
   MODELS,
@@ -97,11 +98,9 @@ export const GET = withApiAuth(async (request: NextRequest) => {
       fallback: ApiOption[]
     ): ApiOption[] => {
       const options = dbOptionsByType[type]?.length > 0 ? dbOptionsByType[type] : fallback
-      // Sort countries alphabetically with German locale for proper umlaut handling
-      if (type === 'country') {
-        return options.sort((a, b) =>
-          a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
-        )
+      // Countries and delivery locations sort alphabetically (German umlaut handling)
+      if (ALPHABETICAL_OPTION_TYPES.has(type)) {
+        return options.sort((a, b) => compareOptionLabels(a.label, b.label))
       }
       return options
     }

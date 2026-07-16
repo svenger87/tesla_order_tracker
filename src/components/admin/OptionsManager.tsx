@@ -31,6 +31,7 @@ import { FlagEmojiPicker } from './FlagEmojiPicker'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useTranslations } from 'next-intl'
 import { VEHICLE_TYPES } from '@/lib/types'
+import { ALPHABETICAL_OPTION_TYPES, compareOptionLabels } from '@/lib/optionSort'
 
 interface OptionMetadata {
   flag?: string
@@ -112,9 +113,9 @@ export function OptionsManager() {
 
   const getOptionsForType = (type: string) => {
     const typeOptions = options.filter(o => o.type === type)
-    // Sort countries alphabetically with German locale for proper umlaut handling
-    if (type === 'country') {
-      return typeOptions.sort((a, b) => a.label.localeCompare(b.label, 'de', { sensitivity: 'base' }))
+    // Countries and delivery locations sort alphabetically (German umlaut handling)
+    if (ALPHABETICAL_OPTION_TYPES.has(type)) {
+      return typeOptions.sort((a, b) => compareOptionLabels(a.label, b.label))
     }
     return typeOptions.sort((a, b) => a.sortOrder - b.sortOrder)
   }

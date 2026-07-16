@@ -25,6 +25,7 @@ import {
   SEATS_OPTIONS,
   VehicleType,
 } from '@/lib/types'
+import { compareOptionLabels } from '@/lib/optionSort'
 
 interface OptionMetadata {
   flag?: string
@@ -198,8 +199,14 @@ export function useOptions(vehicleType?: VehicleType) {
     }
 
     // Sort countries alphabetically with current locale for proper sorting
+    // (client-side because labels may be translated)
     const sortedCountries = translateOptions('country', getOptionsForType('country'))
-      .sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: 'base' }))
+      .sort((a, b) => compareOptionLabels(a.label, b.label, locale))
+
+    // Delivery locations sort alphabetically too — their sortOrder is unreliable
+    // (admin-added entries get appended)
+    const sortedDeliveryLocations = getOptionsForType('deliveryLocation')
+      .sort((a, b) => compareOptionLabels(a.label, b.label, locale))
 
     return {
       countries: sortedCountries,
@@ -212,7 +219,7 @@ export function useOptions(vehicleType?: VehicleType) {
       autopilot: translateOptions('autopilot', getOptionsForType('autopilot')),
       towHitch: translateOptions('towHitch', getOptionsForType('towHitch')),
       seats: translateOptions('seats', getOptionsForType('seats')),
-      deliveryLocations: getOptionsForType('deliveryLocation'),
+      deliveryLocations: sortedDeliveryLocations,
     }
   }, [apiOptions, vehicleType, to, locale])
 
