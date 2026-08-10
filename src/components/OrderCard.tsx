@@ -148,7 +148,10 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
 
   return (
     <Card className={cn(
-      "relative overflow-hidden rounded-none border-0 border-b bg-card shadow-none transition-colors hover:bg-muted/20",
+      // Card's base style carries gap-6/py-6; unset it here, or every row in
+      // the virtualised mobile list pays 48px of dead padding — 105px rows
+      // around 56px of content, and the 58px estimate is never close.
+      "relative gap-0 overflow-hidden rounded-none border-0 border-b bg-card py-0 shadow-none transition-colors hover:bg-muted/20",
       isStale && "opacity-60 hover:opacity-100 transition-opacity",
     )}>
         {/* The row itself is the link, so the whole card is one tap target
