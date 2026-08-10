@@ -24,12 +24,12 @@ A community-driven web application for tracking Tesla Model Y orders, delivery t
 - **Framework**: [Next.js 16](https://nextjs.org/) with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4 + shadcn/ui components
-- **Database**: SQLite (local) / [Turso](https://turso.tech/) (production)
+- **Database**: SQLite (local and production, via `better-sqlite3`)
 - **ORM**: Prisma 7
 - **Charts**: Recharts
 - **Forms**: React Hook Form + Zod validation
 - **Authentication**: JWT-based admin authentication
-- **Deployment**: Vercel
+- **Deployment**: Docker image built by GitHub Actions → GHCR → VPS, fronted by Caddy
 
 ## Getting Started
 
@@ -112,47 +112,24 @@ Users can create orders using an "edit code" system:
 
 ## Deployment
 
-### Vercel (Recommended)
+Deployment is fully automated by `.github/workflows/deploy.yml` — there is nothing
+to run by hand. Pushing to a branch builds a multi-arch image, publishes it to
+GHCR and rolls it out over SSH:
 
-1. **Link to Vercel**:
-   ```bash
-   vercel link
-   ```
+| Branch    | Service       | URL                                                        |
+|-----------|---------------|------------------------------------------------------------|
+| `staging` | `app-staging` | <https://staging.tff-order-stats.de> |
+| `master`  | `app`         | <https://tff-order-stats.de>         |
 
-2. **Set up Turso Database** (production):
-   - Create a Turso database at [turso.tech](https://turso.tech/)
-   - Get your database URL and auth token
-   - Add environment variables in Vercel:
-     ```
-     TURSO_DATABASE_URL=libsql://your-database.turso.io
-     TURSO_AUTH_TOKEN=your-turso-auth-token
-     JWT_SECRET=your-production-jwt-secret
-     ADMIN_USERNAME=admin
-     ADMIN_PASSWORD=your-secure-admin-password
-     ```
+**Always ship to `staging` first**, check it there, then merge to `master`.
 
-3. **Deploy**:
-   ```bash
-   npm run deploy
-   # or for preview
-   npm run deploy:preview
-   ```
+On the VPS the workflow pulls the new image, restarts only the target service,
+reloads Caddy and polls `/api/health`. If the health check does not pass within
+60 seconds it re-tags and restarts the previous image, so a broken build cannot
+take the site down. The image is never built on the VPS.
 
-### Quick Deploy Script
-
-Use the included deploy script:
-```bash
-# Linux/macOS
-./deploy.sh "Your commit message"
-
-# Windows PowerShell
-.\deploy.ps1 "Your commit message"
-```
-
-This script will:
-1. Commit any changes
-2. Push to GitHub
-3. Deploy to Vercel
+`docker-compose.yml` also runs Caddy (TLS + reverse proxy), Uptime Kuma
+(<https://status.tff-order-stats.de>) and Umami analytics.
 
 ## Database
 
@@ -171,22 +148,12 @@ npx prisma db push
 npx prisma studio
 ```
 
-### Production (Turso)
+### Production
 
-For production, the app uses Turso (libSQL) for edge-compatible database hosting.
-
-1. Create a Turso database:
-   ```bash
-   turso db create tesla-tracker
-   turso db show tesla-tracker
-   ```
-
-2. Get your credentials:
-   ```bash
-   turso db tokens create tesla-tracker
-   ```
-
-3. The app automatically uses Turso when `TURSO_DATABASE_URL` is set.
+Production runs the same SQLite engine, on a Docker volume mounted at
+`/app/data` (`prod.db` for master, `staging.db` for staging). The container
+entrypoint runs `scripts/migrate-schema.mjs` before starting the server, so
+schema changes apply on deploy.
 
 ## Data Import
 
@@ -242,12 +209,14 @@ tesla_order_tracker/
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | Yes (local) | SQLite database path |
-| `TURSO_DATABASE_URL` | Yes (prod) | Turso database URL |
-| `TURSO_AUTH_TOKEN` | Yes (prod) | Turso authentication token |
+| `DATABASE_URL` | Yes | SQLite database path |
 | `JWT_SECRET` | Yes | Secret for JWT tokens |
 | `ADMIN_USERNAME` | Yes | Default admin username |
 | `ADMIN_PASSWORD` | Yes | Default admin password |
+| `EXTERNAL_API_KEY` | No | API key for the external `/api/v1` REST API |
+| `UMAMI_WEBSITE_ID` | No | Enables the Umami analytics script |
+
+See `.env.example` (local) and `.env.production.example` (server) for the full set.
 
 ## Support the Project
 
@@ -281,4 +250,4 @@ This project is open source and available under the [MIT License](LICENSE).
 - Tesla community for tracking their orders
 - [shadcn/ui](https://ui.shadcn.com/) for beautiful components
 - [Recharts](https://recharts.org/) for charting
-- [Turso](https://turso.tech/) for edge database hosting
+- [Caddy](https://caddyserver.com/) for zero-config TLS

@@ -6,6 +6,7 @@ staging-src/
 page-snapshot.md
 nul
 CLAUDE.md
+docs/superpowers/
 
 # dependencies
 /node_modules
