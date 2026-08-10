@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ChevronDown } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import {
   COUNTRIES,
@@ -47,6 +48,7 @@ type EventType = (typeof ALL_EVENT_TYPES)[number]
 
 const EVENT_FILTER_KEY = 'tesla-tracker-feed-events'
 const EXPANDED_KEY = 'tesla-tracker-feed-expanded'
+const TOST_FILTER_KEY = 'tesla-tracker-feed-tost'
 
 export interface FeedEntry {
   id: string
@@ -57,6 +59,7 @@ export interface FeedEntry {
   model: string | null
   drive: string | null
   eventType: EventType
+  source: string | null
   oldValue: string | null
   newValue: string | null
   changedAt: string
@@ -117,6 +120,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [enabledEvents, setEnabledEvents] = useState<Set<EventType>>(new Set(ALL_EVENT_TYPES))
+  const [includeTost, setIncludeTost] = useState(true)
   const [hydrated, setHydrated] = useState(false)
   const [paginated, setPaginated] = useState(false)
   const paginatedRef = useRef(paginated)
@@ -170,6 +174,8 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
         for (const e of arr) if ((ALL_EVENT_TYPES as readonly string[]).includes(e)) next.add(e as EventType)
         if (next.size > 0) setEnabledEvents(next)
       }
+      const tost = localStorage.getItem(TOST_FILTER_KEY)
+      if (tost === 'false') setIncludeTost(false)
     } catch {}
     setHydrated(true)
   }, [])
@@ -180,6 +186,12 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
     try { localStorage.setItem(EVENT_FILTER_KEY, JSON.stringify([...enabledEvents])) } catch {}
   }, [enabledEvents, hydrated])
 
+  // Persist TOST filter
+  useEffect(() => {
+    if (!hydrated) return
+    try { localStorage.setItem(TOST_FILTER_KEY, String(includeTost)) } catch {}
+  }, [includeTost, hydrated])
+
   const buildUrl = useCallback((cursor: string | null) => {
     const p = new URLSearchParams()
     p.set('limit', '50')
@@ -187,8 +199,9 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
     if (globalFilters.countries.length > 0) p.set('country', globalFilters.countries.join(','))
     if (globalFilters.vehicleType !== 'all') p.set('vehicleType', globalFilters.vehicleType)
     if (enabledEvents.size < ALL_EVENT_TYPES.length) p.set('events', [...enabledEvents].join(','))
+    if (!includeTost) p.set('includeTost', 'false')
     return `/api/orders/history?${p.toString()}`
-  }, [globalFilters, enabledEvents])
+  }, [globalFilters, enabledEvents, includeTost])
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -255,20 +268,21 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
 
   return (
     <Card aria-label={t('title')}>
-        <CardHeader className="cursor-pointer p-0">
+        <CardHeader className="p-0">
           <button
             type="button"
             onClick={toggleExpanded}
-            className="flex w-full items-center justify-between px-6 py-4 font-semibold"
+            className="flex w-full items-center justify-between px-4 py-4 font-semibold sm:px-6"
             aria-expanded={expanded}
           >
             <span>{t('title')} {entries.length > 0 && <span className="ml-2 rounded-full bg-muted px-2 text-xs">{entries.length}</span>}</span>
-            <span aria-hidden>{expanded ? '−' : '+'}</span>
+            <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} aria-hidden />
           </button>
         </CardHeader>
         {expanded && (
-          <CardContent className="border-t pt-3 space-y-4">
-            <div className="flex flex-wrap gap-1.5">
+          <CardContent className="border-t px-2 pt-3 space-y-4 sm:px-6">
+            {/* Horizontally scrollable on phones so the chips never wrap into a tall block */}
+            <div className="-mx-2 flex gap-1.5 overflow-x-auto px-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {ALL_EVENT_TYPES.map((ev) => {
                 const on = enabledEvents.has(ev)
                 return (
@@ -277,13 +291,22 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                     type="button"
                     onClick={() => toggleEvent(ev)}
                     aria-pressed={on}
-                    aria-label={`${t('title')}: ${ev}`}
-                    className={`rounded-full border px-2.5 py-0.5 text-xs ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                    aria-label={`${t('title')}: ${t(`event.${ev}`)}`}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
                   >
                     {t(`event.${ev}`)}
                   </button>
                 )
               })}
+              <button
+                type="button"
+                onClick={() => setIncludeTost(v => !v)}
+                aria-pressed={includeTost}
+                aria-label={`${t('title')}: TOST`}
+                className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${includeTost ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+              >
+                TOST
+              </button>
             </div>
             {entries.length === 0 && !loading && (
               <p className="text-sm text-muted-foreground">{t('empty')}</p>
@@ -299,20 +322,27 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                       <li key={e.id}>
                         <Link
                           href={`/track/${encodeURIComponent(e.orderName)}`}
-                          className="flex w-full items-center gap-3 rounded px-2 py-1.5 hover:bg-muted/60"
+                          className="flex w-full items-start gap-2.5 rounded px-2 py-2 hover:bg-muted/60 sm:items-center sm:gap-3 sm:py-1.5"
                           aria-label={`${e.orderName} (${vehicleAndTrim(e.vehicleType, e.model, e.drive)}): ${t(`event.${e.eventType}`)}, ${formatRelativeTimeFromNow(e.changedAt, now, t)}`}
                         >
-                          <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
+                          <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full sm:mt-0" style={{ backgroundColor: eventColorHex(e.eventType) }} aria-hidden />
                           {e.country && FLAG_BY_COUNTRY.get(e.country) && (
                             <span className="shrink-0 text-base leading-none" aria-hidden>{FLAG_BY_COUNTRY.get(e.country)}</span>
                           )}
-                          <span className="font-medium truncate">{e.orderName}</span>
-                          <Badge variant="outline" className="shrink-0 text-xs">{vehicleAndTrim(e.vehicleType, e.model, e.drive)}</Badge>
-                          <span className="text-sm text-muted-foreground truncate">{t(`event.${e.eventType}`)}</span>
-                          {e.eventType === 'window' && e.newValue && (
-                            <span className="text-xs text-muted-foreground truncate">→ {e.newValue}</span>
-                          )}
-                          <span className="ml-auto shrink-0 text-xs text-muted-foreground">{formatRelativeTimeFromNow(e.changedAt, now, t)}</span>
+                          {/* Phones stack name over event; from sm up everything sits on one line. */}
+                          <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
+                            <span className="flex min-w-0 items-center gap-2">
+                              <span className="truncate font-medium">{e.orderName}</span>
+                              <Badge variant="outline" className="shrink-0 text-[10px] sm:text-xs">{vehicleAndTrim(e.vehicleType, e.model, e.drive)}</Badge>
+                            </span>
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <span className="truncate text-xs text-muted-foreground sm:text-sm">{t(`event.${e.eventType}`)}</span>
+                              {e.eventType === 'window' && e.newValue && (
+                                <span className="truncate text-xs text-muted-foreground">→ {e.newValue}</span>
+                              )}
+                            </span>
+                          </span>
+                          <span className="shrink-0 pt-0.5 text-xs text-muted-foreground sm:pt-0">{formatRelativeTimeFromNow(e.changedAt, now, t)}</span>
                         </Link>
                       </li>
                     ))}
@@ -321,7 +351,12 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
               )
             })}
             {nextCursor && (
-              <button type="button" onClick={loadMore} disabled={loading} className="text-sm text-primary underline">
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={loading}
+                className="h-10 w-full rounded-md border text-sm font-medium text-primary hover:bg-muted/60 disabled:opacity-60 sm:h-8 sm:w-auto sm:px-4"
+              >
                 {loading ? t('loading') : t('loadMore')}
               </button>
             )}

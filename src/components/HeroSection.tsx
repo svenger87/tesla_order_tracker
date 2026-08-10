@@ -20,12 +20,14 @@ export function HeroSection({ onSearchOpen, onNewOrder }: HeroSectionProps) {
           <p className="mb-2 hidden text-xs font-semibold uppercase tracking-[0.18em] text-primary sm:block">
             TFF Order Stats
           </p>
-          <h2 className="text-[34px] font-semibold leading-tight tracking-tight sm:text-5xl">
-            <span className="sm:hidden">TFF Order Stats</span>
+          {/* Phones get the short variants — both translated, so no locale falls
+              back to German the way the hardcoded strings here used to. */}
+          <h2 className="text-[30px] font-semibold leading-tight tracking-tight sm:text-5xl">
+            <span className="sm:hidden">{th('titleShort')}</span>
             <span className="hidden sm:inline">{t('title')}</span>
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-3 sm:text-base">
-            <span className="sm:hidden">Tesla Bestellungen</span>
+            <span className="sm:hidden">{th('subtitle')}</span>
             <span className="hidden sm:inline">{t('subtitle')}</span>
           </p>
         </div>

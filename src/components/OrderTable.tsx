@@ -767,10 +767,12 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
 
   return (
     <div className="space-y-2">
-      {/* Toolbar: Search, VIN/Delivery toggles, Columns */}
-      <div className="hidden flex-wrap items-center gap-2 border-b bg-muted/20 px-3 py-2 sm:flex">
+      {/* Toolbar: Search, VIN/Delivery toggles, Columns.
+          Used to be desktop-only, which left the mobile card view with no
+          search and no filters at all. */}
+      <div className="flex flex-wrap items-center gap-2 border-b bg-muted/20 px-3 py-2">
         {/* Name Search */}
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
@@ -784,7 +786,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 setLocalFilters(f => ({ ...f, nameSearch: val }))
               }, 250)
             }}
-            className="h-8 w-[140px] sm:w-[180px] pl-8 pr-7 text-sm"
+            className="h-10 w-full pl-8 pr-7 text-sm sm:h-8 sm:w-[180px]"
           />
           {searchInput && (
             <button
@@ -803,7 +805,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         <Button
           variant={localFilters.hasVin === 'yes' ? 'default' : localFilters.hasVin === 'no' ? 'secondary' : 'outline'}
           size="sm"
-          className="h-8 text-xs"
+          className="h-9 text-xs sm:h-8"
           onClick={() => setLocalFilters(f => ({
             ...f,
             hasVin: f.hasVin === '' ? 'yes' : f.hasVin === 'yes' ? 'no' : ''
@@ -815,7 +817,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         <Button
           variant={localFilters.hasDelivery === 'yes' ? 'default' : localFilters.hasDelivery === 'no' ? 'secondary' : 'outline'}
           size="sm"
-          className="h-8 text-xs"
+          className="h-9 text-xs sm:h-8"
           onClick={() => setLocalFilters(f => ({
             ...f,
             hasDelivery: f.hasDelivery === '' ? 'yes' : f.hasDelivery === 'yes' ? 'no' : ''
@@ -827,7 +829,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         <Button
           variant={localFilters.staleness === 'hide' ? 'secondary' : localFilters.staleness === 'only' ? 'default' : 'outline'}
           size="sm"
-          className="h-8 text-xs"
+          className="h-9 text-xs sm:h-8"
           title={t('staleTooltip')}
           onClick={() => setLocalFilters(f => ({
             ...f,
@@ -836,9 +838,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         >
           {t('staleFilter')} {localFilters.staleness === 'hide' ? '\u2717' : localFilters.staleness === 'only' ? '\u2713' : ''}
         </Button>
+        {/* Column visibility only applies to the desktop table */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="hidden gap-2 sm:inline-flex">
               <Columns3 className="h-4 w-4" />
               {tc('columns')}
             </Button>
@@ -888,25 +891,36 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="grid grid-cols-[30px_minmax(0,1fr)_78px_58px_38px_10px] gap-1.5 border-b bg-muted/30 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+            {/* Track widths must stay in sync with OrderCard's grid, or the
+                labels sit over the wrong column (they used to: "Wartezeit"
+                landed above the car image and "Bild" above the chevron). */}
+            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b bg-muted/30 px-3 py-2 text-[11px] font-medium text-muted-foreground">
               <span />
-              <span>Modell</span>
+              <span className="truncate">{t('name')}</span>
               <button
                 type="button"
-                className="flex items-center gap-1 text-left"
-                onClick={() => setSortField('orderDate')}
+                className="flex flex-col items-end text-right leading-tight"
+                onClick={() => handleSort('orderDate')}
               >
-                Bestelldatum
-                <ArrowUpDown className="h-3 w-3" />
+                <span className="flex items-center gap-1">
+                  <span className="truncate">{t('orderDate')}</span>
+                  {sortField === 'orderDate' ? (
+                    sortDirection === 'asc'
+                      ? <ArrowUp className="h-3 w-3 shrink-0 text-primary" />
+                      : <ArrowDown className="h-3 w-3 shrink-0 text-primary" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 shrink-0" />
+                  )}
+                </span>
+                <span className="truncate text-[10px] font-normal opacity-70">{t('waitingDays')}</span>
               </button>
-              <span>Wartezeit</span>
-              <span className="text-right">Bild</span>
-              <span />
+              <span className="sr-only">{t('image')}</span>
+              <span className="sr-only">{tc('actions')}</span>
             </div>
             <div
               ref={mobileContainerRef}
               className="overflow-auto"
-              style={{ maxHeight: '70vh' }}
+              style={{ maxHeight: '70dvh' }}
             >
               <div
                 style={{
