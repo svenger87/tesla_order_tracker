@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 const FIELD_TO_EVENT: Record<string, string> = {
+  // Both VIN fields surface as one `vin` event — see VIN_FIELD in lib/order-history.
+  vin: 'vin',
   vinReceivedDate: 'vin',
   productionDate: 'production',
   papersReceivedDate: 'papers',
@@ -20,7 +22,24 @@ export async function GET(request: NextRequest) {
   const vehicleType = url.searchParams.get('vehicleType')
   const eventsParam = url.searchParams.get('events')?.split(',').filter(Boolean)
   const events = (eventsParam && eventsParam.length > 0 ? eventsParam : ALL_EVENTS) as readonly string[]
-  const includeTost = url.searchParams.get('includeTost') === 'true'
+  // TOST-synced field changes (VIN, production, delivery, …) are real news and
+  // are shown by default. Only the `_created` rows a bulk sheet import produces
+  // are held back — those arrive hundreds at a time and would bury the feed.
+  // `includeTost=false` drops everything the sync wrote.
+  const includeTost = url.searchParams.get('includeTost') !== 'false'
+
+  // Written as ORs on the non-nullable `field` column rather than a NOT over
+  // `source`, so rows with a NULL source can't fall into SQL's three-valued
+  // logic and vanish from the feed.
+  const sourceFilter = includeTost
+    ? {
+        OR: [
+          { field: { not: '_created' } },
+          { source: null },
+          { source: { not: 'tost' } },
+        ],
+      }
+    : { OR: [{ source: null }, { source: { not: 'tost' } }] }
 
   const eventToFields = Object.entries(FIELD_TO_EVENT)
     .filter(([, ev]) => events.includes(ev))
@@ -37,7 +56,7 @@ export async function GET(request: NextRequest) {
     // if TOST sync ever produces many same-ms history rows, switch to a composite
     // (changedAt, id) cursor.
     ...(cursor ? { changedAt: { lt: new Date(cursor) } } : {}),
-    ...(includeTost ? {} : { OR: [{ source: null }, { source: { not: 'tost' } }] }),
+    ...sourceFilter,
     order: {
       archived: false,
       ...(country && country.length ? { country: { in: country } } : {}),
@@ -69,6 +88,7 @@ export async function GET(request: NextRequest) {
     drive: r.order.drive,
     field: r.field,
     eventType: FIELD_TO_EVENT[r.field] ?? r.field,
+    source: r.source,
     oldValue: r.oldValue,
     newValue: r.newValue,
     changedAt: r.changedAt.toISOString(),

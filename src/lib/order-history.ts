@@ -6,6 +6,7 @@ import type { Prisma, Order } from '@/generated/prisma/client'
  * Add to TRACKED_FIELDS to expand the feed surface area.
  */
 export const TRACKED_FIELDS = [
+  'vin',
   'vinReceivedDate',
   'productionDate',
   'papersReceivedDate',
@@ -14,6 +15,17 @@ export const TRACKED_FIELDS = [
 ] as const
 
 export type TrackedField = (typeof TRACKED_FIELDS)[number]
+
+/**
+ * `vin` and `vinReceivedDate` describe the same real-world event ("VIN assigned")
+ * and both map to the `vin` feed event. Plenty of entries only ever fill one of
+ * the two — the sheet sync often has the VIN but no date, and users editing by
+ * hand routinely skip "VIN erhalten am" — so both have to be tracked or the
+ * update is invisible in the feed (issue #17). When a single edit sets both, the
+ * VIN itself wins so the feed shows one entry instead of two.
+ */
+const VIN_FIELD = 'vin'
+const VIN_DATE_FIELD = 'vinReceivedDate'
 
 type OrderLike = Partial<Order>
 
@@ -58,11 +70,17 @@ export async function recordOrderChanges(
 
   const FLAP_WINDOW_MS = 5 * 60 * 1000
 
-  for (const f of TRACKED_FIELDS) {
-    const oldV = normalize((before as Record<string, unknown>)[f])
-    const newV = normalize((after as Record<string, unknown>)[f])
-    if (oldV === newV) continue
+  const changed = TRACKED_FIELDS.map((f) => ({
+    field: f,
+    oldV: normalize((before as Record<string, unknown>)[f]),
+    newV: normalize((after as Record<string, unknown>)[f]),
+  })).filter((c) => c.oldV !== c.newV)
 
+  const fields = changed.some((c) => c.field === VIN_FIELD)
+    ? changed.filter((c) => c.field !== VIN_DATE_FIELD)
+    : changed
+
+  for (const { field: f, oldV, newV } of fields) {
     const recent = await client.orderHistory.findFirst({
       where: { orderId, field: f, source },
       orderBy: { changedAt: 'desc' },
