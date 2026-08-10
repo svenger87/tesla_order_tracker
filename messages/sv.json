@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statistik",
-    "statsSubtitle": "Leveranstider, konfigurationer och trender"
+    "statsSubtitle": "Leveranstider, konfigurationer och trender",
+    "cancelledBadge": "Avbeställd",
+    "cancelledHint": "Den här beställningen är avbeställd och ingår inte i statistiken."
   },
   "search": {
     "placeholder": "Sök beställningar efter namn, VIN, land...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Lösenorden matchar inte",
       "saveError": "Fel vid sparande",
       "nameMinLength": "Användarnamnet måste vara minst 3 tecken"
-    }
+    },
+    "cancelledTitle": "Beställning avbeställd?",
+    "cancelledDescription": "Om du avbeställt din order hos Tesla, markera den här. Den försvinner från listan och räknas inte längre in i statistiken — din post sparas ändå.",
+    "cancelledLabel": "Den här beställningen är avbeställd",
+    "cancelledHint": "Du kan ångra när som helst genom att avmarkera rutan."
   },
   "editCodeModal": {
     "orderCreated": "Beställning skapad!",
@@ -258,7 +264,9 @@
     "saveError": "Fel vid sparande",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Avbeställda",
+    "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda"
   },
   "progress": {
     "ordered": "Beställd",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Leverans",
     "totalWaitTime": "Total väntetid",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} avbeställda (ej medräknade)"
   },
   "admin": {
     "dashboard": "Administrationspanel",

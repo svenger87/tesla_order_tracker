@@ -182,6 +182,7 @@ interface TableLocalFilters {
   hasVin: '' | 'yes' | 'no'
   hasDelivery: '' | 'yes' | 'no'
   staleness: '' | 'hide' | 'only'
+  cancelled: '' | 'show' | 'only'
 }
 
 const emptyLocalFilters: TableLocalFilters = {
@@ -189,6 +190,9 @@ const emptyLocalFilters: TableLocalFilters = {
   hasVin: '',
   hasDelivery: '',
   staleness: '',
+  // '' hides cancelled orders — the default, so a dead order stops cluttering
+  // the list for everyone once its owner flags it.
+  cancelled: '',
 }
 
 // Parse date string (DD.MM.YYYY format) to Date for sorting
@@ -606,6 +610,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const filteredAndSortedOrders = useMemo(() => {
     let result = orders
 
+    // Apply cancellation filter
+    if (localFilters.cancelled === '') {
+      result = result.filter(o => !o.cancelled)
+    } else if (localFilters.cancelled === 'only') {
+      result = result.filter(o => !!o.cancelled)
+    }
+
     // Apply name search filter
     if (localFilters.nameSearch) {
       const searchLower = localFilters.nameSearch.toLowerCase()
@@ -838,6 +849,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         >
           {t('staleFilter')} {localFilters.staleness === 'hide' ? '\u2717' : localFilters.staleness === 'only' ? '\u2713' : ''}
         </Button>
+        {/* Cancelled pill: '' (hidden) → 'show' (mixed in) → 'only' → '' */}
+        <Button
+          variant={localFilters.cancelled === 'show' ? 'secondary' : localFilters.cancelled === 'only' ? 'default' : 'outline'}
+          size="sm"
+          className="h-9 text-xs sm:h-8"
+          title={t('cancelledTooltip')}
+          onClick={() => setLocalFilters(f => ({
+            ...f,
+            cancelled: f.cancelled === '' ? 'show' : f.cancelled === 'show' ? 'only' : ''
+          }))}
+        >
+          {t('cancelledFilter')} {localFilters.cancelled === 'show' ? '+' : localFilters.cancelled === 'only' ? '✓' : ''}
+        </Button>
         {/* Column visibility only applies to the desktop table */}
         <Popover>
           <PopoverTrigger asChild>
@@ -1047,7 +1071,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   order.deliveryDate
                     ? "hover:border-l-green-500"
                     : "hover:border-l-amber-500",
-                  isStale && "opacity-60 hover:opacity-100 transition-opacity",
+                  (isStale || order.cancelled) && "opacity-60 hover:opacity-100 transition-opacity",
                   isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25",
                   isSearchHighlighted && "bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
                 )}
@@ -1071,6 +1095,14 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       >
                         {order.name}
                       </Link>
+                      {order.cancelled && (
+                        <span
+                          className="shrink-0 rounded-sm border border-destructive/40 bg-destructive/10 px-1 py-px text-[10px] font-medium text-destructive"
+                          title={th('cancelledHint')}
+                        >
+                          {th('cancelledBadge')}
+                        </span>
+                      )}
                       {order.source === 'tost' && (
                         <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="shrink-0 inline-block align-middle hover:opacity-70 transition-opacity">
                           <Image src="/tost-badge.svg" alt="TOST" width={64} height={32} className="h-8 w-auto" />

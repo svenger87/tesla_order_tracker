@@ -75,7 +75,9 @@
     "delivered": "Geliefert: {date}",
     "errorGeneratingCode": "Fehler beim Generieren des Codes",
     "statsTitle": "Statistiken",
-    "statsSubtitle": "Lieferzeiten, Konfigurationen und Trends"
+    "statsSubtitle": "Lieferzeiten, Konfigurationen und Trends",
+    "cancelledBadge": "Storniert",
+    "cancelledHint": "Diese Bestellung wurde storniert und zählt nicht in die Statistik."
   },
   "search": {
     "placeholder": "Bestellungen nach Name, VIN, Land suchen...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Passwörter stimmen nicht überein",
       "saveError": "Fehler beim Speichern",
       "nameMinLength": "Benutzername muss mindestens 3 Zeichen lang sein"
-    }
+    },
+    "cancelledTitle": "Bestellung storniert?",
+    "cancelledDescription": "Wenn du deine Bestellung bei Tesla storniert hast, markiere sie hier. Sie verschwindet aus der Liste und fließt nicht mehr in die Statistik ein — dein Eintrag bleibt aber erhalten.",
+    "cancelledLabel": "Diese Bestellung wurde storniert",
+    "cancelledHint": "Du kannst das jederzeit wieder rückgängig machen, indem du den Haken entfernst."
   },
   "editCodeModal": {
     "orderCreated": "Bestellung erstellt!",
@@ -258,7 +264,9 @@
     "editTostFieldsDescription": "Diese Felder können manuell bearbeitet werden, auch bei TOST-verwalteten Bestellungen.",
     "papersReceivedDate": "Papiere erhalten am",
     "productionDate": "Produktionsdatum",
-    "saveError": "Fehler beim Speichern"
+    "saveError": "Fehler beim Speichern",
+    "cancelledFilter": "Storniert",
+    "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte"
   },
   "progress": {
     "ordered": "Bestellt",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Auslieferung",
     "totalWaitTime": "Gesamte Wartezeit",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Abschnitt"
+    "pipelineSegment": "Abschnitt",
+    "cancelledExcluded": "{count} storniert (nicht eingerechnet)"
   },
   "admin": {
     "dashboard": "Admin Dashboard",

@@ -75,7 +75,9 @@
     "delivered": "Delivered: {date}",
     "errorGeneratingCode": "Error generating code",
     "statsTitle": "Statistics",
-    "statsSubtitle": "Delivery times, configurations and trends"
+    "statsSubtitle": "Delivery times, configurations and trends",
+    "cancelledBadge": "Cancelled",
+    "cancelledHint": "This order was cancelled and is excluded from the statistics."
   },
   "search": {
     "placeholder": "Search orders by name, VIN, country...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Passwords do not match",
       "saveError": "Error saving",
       "nameMinLength": "Username must be at least 3 characters"
-    }
+    },
+    "cancelledTitle": "Order cancelled?",
+    "cancelledDescription": "If you cancelled your order at Tesla, flag it here. It disappears from the list and stops counting towards the statistics — your entry is kept either way.",
+    "cancelledLabel": "This order was cancelled",
+    "cancelledHint": "You can undo this at any time by clearing the checkbox."
   },
   "editCodeModal": {
     "orderCreated": "Order created!",
@@ -258,7 +264,9 @@
     "editTostFieldsDescription": "These fields can be edited manually, even for TOST-managed orders.",
     "papersReceivedDate": "Papers received on",
     "productionDate": "Production date",
-    "saveError": "Error saving"
+    "saveError": "Error saving",
+    "cancelledFilter": "Cancelled",
+    "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled"
   },
   "progress": {
     "ordered": "Ordered",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Delivery",
     "totalWaitTime": "Total Wait Time",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} cancelled (not counted)"
   },
   "admin": {
     "dashboard": "Admin Dashboard",

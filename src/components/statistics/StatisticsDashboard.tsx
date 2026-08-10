@@ -35,6 +35,7 @@ import {
   Package,
   MapPin,
   Users,
+  Ban,
 } from 'lucide-react'
 
 interface StatisticsDashboardProps {
@@ -155,13 +156,21 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      {/* Warning for orders without valid dates */}
-      {stats.ordersWithoutDate > 0 && (
-        <div className="flex">
-          <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            {t('withoutValidDate', { count: stats.ordersWithoutDate })}
-          </Badge>
+      {/* Warnings for data excluded from every figure below */}
+      {(stats.ordersWithoutDate > 0 || stats.cancelledOrders > 0) && (
+        <div className="flex flex-wrap gap-2">
+          {stats.ordersWithoutDate > 0 && (
+            <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
+              <AlertCircle className="h-3 w-3 mr-1" />
+              {t('withoutValidDate', { count: stats.ordersWithoutDate })}
+            </Badge>
+          )}
+          {stats.cancelledOrders > 0 && (
+            <Badge variant="outline" className="border-destructive/40 text-destructive">
+              <Ban className="h-3 w-3 mr-1" />
+              {t('cancelledExcluded', { count: stats.cancelledOrders })}
+            </Badge>
+          )}
         </div>
       )}
 

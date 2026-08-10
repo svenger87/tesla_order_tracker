@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "统计",
-    "statsSubtitle": "交货时间、配置和趋势"
+    "statsSubtitle": "交货时间、配置和趋势",
+    "cancelledBadge": "已取消",
+    "cancelledHint": "该订单已取消，不计入统计数据。"
   },
   "search": {
     "placeholder": "按名称、VIN、国家搜索订单...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "密码不匹配",
       "saveError": "保存出错",
       "nameMinLength": "用户名至少需要3个字符"
-    }
+    },
+    "cancelledTitle": "订单已取消？",
+    "cancelledDescription": "如果你已在 Tesla 取消订单，请在此标记。它会从列表中消失且不再计入统计，但你的记录仍会保留。",
+    "cancelledLabel": "该订单已取消",
+    "cancelledHint": "取消勾选即可随时撤销。"
   },
   "editCodeModal": {
     "orderCreated": "订单已创建！",
@@ -258,7 +264,9 @@
     "saveError": "保存出错",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "已取消",
+    "cancelledTooltip": "切换筛选：隐藏已取消 / 一并显示 / 仅显示已取消"
   },
   "progress": {
     "ordered": "已下单",
@@ -358,7 +366,8 @@
     "timelineDelivery": "交付",
     "totalWaitTime": "总等待时间",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} 个已取消（未计入）"
   },
   "admin": {
     "dashboard": "管理员仪表板",

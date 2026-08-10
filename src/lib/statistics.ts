@@ -62,6 +62,8 @@ export interface OrderStatistics {
   deliveredOrders: number
   pendingOrders: number
   ordersWithoutDate: number
+  /** Orders their owner flagged as cancelled. Excluded from every other figure here. */
+  cancelledOrders: number
   avgOrderToVin: number | null
   avgOrderToDelivery: number | null
   avgOrderToPapers: number | null
@@ -350,6 +352,11 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   if (vehicleType) {
     filteredOrders = filteredOrders.filter(o => o.vehicleType === vehicleType)
   }
+
+  // Cancelled orders never reached delivery, so every average built below would
+  // be skewed by them. Count them once, then drop them.
+  const cancelledOrders = filteredOrders.filter(o => o.cancelled).length
+  filteredOrders = filteredOrders.filter(o => !o.cancelled)
 
   const totalOrders = filteredOrders.length
   const deliveredOrders = filteredOrders.filter(o => o.deliveryDate).length
@@ -696,6 +703,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
 
   return {
     totalOrders,
+    cancelledOrders,
     deliveredOrders,
     pendingOrders,
     ordersWithoutDate,

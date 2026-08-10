@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Estadísticas",
-    "statsSubtitle": "Plazos de entrega, configuraciones y tendencias"
+    "statsSubtitle": "Plazos de entrega, configuraciones y tendencias",
+    "cancelledBadge": "Cancelado",
+    "cancelledHint": "Este pedido fue cancelado y queda excluido de las estadísticas."
   },
   "search": {
     "placeholder": "Buscar pedidos por nombre, VIN, país...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Las contraseñas no coinciden",
       "saveError": "Error al guardar",
       "nameMinLength": "El nombre de usuario debe tener al menos 3 caracteres"
-    }
+    },
+    "cancelledTitle": "¿Pedido cancelado?",
+    "cancelledDescription": "Si cancelaste tu pedido en Tesla, márcalo aquí. Desaparecerá de la lista y dejará de contar en las estadísticas — tu entrada se conserva.",
+    "cancelledLabel": "Este pedido fue cancelado",
+    "cancelledHint": "Puedes deshacerlo en cualquier momento desmarcando la casilla."
   },
   "editCodeModal": {
     "orderCreated": "¡Pedido creado!",
@@ -258,7 +264,9 @@
     "saveError": "Error al guardar",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Cancelados",
+    "cancelledTooltip": "Cambiar filtro: ocultar cancelados / incluirlos / solo cancelados"
   },
   "progress": {
     "ordered": "Pedido realizado",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Entrega",
     "totalWaitTime": "Tiempo de espera total",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} cancelados (no contabilizados)"
   },
   "admin": {
     "dashboard": "Panel de administración",

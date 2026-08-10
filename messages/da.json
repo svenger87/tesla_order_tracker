@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statistik",
-    "statsSubtitle": "Leveringstider, konfigurationer og trends"
+    "statsSubtitle": "Leveringstider, konfigurationer og trends",
+    "cancelledBadge": "Annulleret",
+    "cancelledHint": "Denne ordre er annulleret og indgår ikke i statistikken."
   },
   "search": {
     "placeholder": "Søg bestillinger efter navn, VIN, land...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Adgangskoderne stemmer ikke overens",
       "saveError": "Fejl ved lagring",
       "nameMinLength": "Brugernavnet skal være mindst 3 tegn"
-    }
+    },
+    "cancelledTitle": "Ordre annulleret?",
+    "cancelledDescription": "Hvis du har annulleret din ordre hos Tesla, så markér den her. Den forsvinder fra listen og tæller ikke længere med i statistikken — din registrering bevares.",
+    "cancelledLabel": "Denne ordre er annulleret",
+    "cancelledHint": "Du kan altid fortryde ved at fjerne fluebenet."
   },
   "editCodeModal": {
     "orderCreated": "Bestilling oprettet!",
@@ -258,7 +264,9 @@
     "saveError": "Fejl ved lagring",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Annulleret",
+    "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede"
   },
   "progress": {
     "ordered": "Bestilt",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Levering",
     "totalWaitTime": "Samlet ventetid",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} annulleret (ikke medregnet)"
   },
   "admin": {
     "dashboard": "Administrationspanel",

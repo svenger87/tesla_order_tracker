@@ -28,7 +28,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2, Ban } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -147,6 +148,7 @@ const emptyFormData: OrderFormData = {
   typeApproval: '',
   typeVariant: '',
   deliveryDate: '',
+  cancelled: false,
   // Password options
   useCustomPassword: true,
   customPassword: '',
@@ -278,6 +280,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           deliveryLocation: order.deliveryLocation || '',
           vin: order.vin || '',
           vinReceivedDate: order.vinReceivedDate || '',
+          cancelled: order.cancelled ?? false,
           papersReceivedDate: order.papersReceivedDate || '',
           productionDate: order.productionDate || '',
           typeApproval: order.typeApproval || '',
@@ -1209,6 +1212,33 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </div>
             )}
           </div>
+
+          {/* Cancellation — edit mode only; a new order is never born cancelled */}
+          {order && (
+            <div className={cn(
+              'mt-4 space-y-3 rounded-lg border p-4 transition-colors',
+              formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'bg-muted/30'
+            )}>
+              <h4 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
+                <Ban className={cn('h-4 w-4', formData.cancelled ? 'text-destructive' : 'text-muted-foreground')} />
+                {t('cancelledTitle')}
+              </h4>
+              <p className="text-sm text-muted-foreground">{t('cancelledDescription')}</p>
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="cancelled"
+                  checked={!!formData.cancelled}
+                  onCheckedChange={(v) => handleChange('cancelled', v === true)}
+                />
+                <Label htmlFor="cancelled" className="cursor-pointer text-sm font-medium">
+                  {t('cancelledLabel')}
+                </Label>
+              </div>
+              {formData.cancelled && (
+                <p className="text-xs text-muted-foreground">{t('cancelledHint')}</p>
+              )}
+            </div>
+          )}
 
           {/* New Password for Legacy Orders */}
           {order && isLegacy && (

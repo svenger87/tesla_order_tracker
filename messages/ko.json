@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "통계",
-    "statsSubtitle": "배송 시간, 구성 및 트렌드"
+    "statsSubtitle": "배송 시간, 구성 및 트렌드",
+    "cancelledBadge": "취소됨",
+    "cancelledHint": "이 주문은 취소되어 통계에서 제외됩니다."
   },
   "search": {
     "placeholder": "이름, VIN, 국가로 주문 검색...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "비밀번호가 일치하지 않습니다",
       "saveError": "저장 오류",
       "nameMinLength": "사용자 이름은 최소 3자 이상이어야 합니다"
-    }
+    },
+    "cancelledTitle": "주문을 취소하셨나요?",
+    "cancelledDescription": "Tesla에서 주문을 취소하셨다면 여기에 표시하세요. 목록에서 사라지고 통계에도 반영되지 않지만, 입력하신 내용은 그대로 보관됩니다.",
+    "cancelledLabel": "이 주문은 취소되었습니다",
+    "cancelledHint": "체크를 해제하면 언제든지 되돌릴 수 있습니다."
   },
   "editCodeModal": {
     "orderCreated": "주문이 생성되었습니다!",
@@ -258,7 +264,9 @@
     "saveError": "저장 오류",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "취소됨",
+    "cancelledTooltip": "필터 전환: 취소된 주문 숨기기 / 표시 / 취소된 주문만"
   },
   "progress": {
     "ordered": "주문 완료",
@@ -358,7 +366,8 @@
     "timelineDelivery": "배송",
     "totalWaitTime": "총 대기 시간",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count}건 취소됨 (집계 제외)"
   },
   "admin": {
     "dashboard": "관리자 대시보드",

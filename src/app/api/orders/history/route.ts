@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
     ...sourceFilter,
     order: {
       archived: false,
+      cancelled: false,
       ...(country && country.length ? { country: { in: country } } : {}),
       ...(vehicleType ? { vehicleType } : {}),
     },

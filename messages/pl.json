@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statystyki",
-    "statsSubtitle": "Czasy dostaw, konfiguracje i trendy"
+    "statsSubtitle": "Czasy dostaw, konfiguracje i trendy",
+    "cancelledBadge": "Anulowane",
+    "cancelledHint": "To zamówienie zostało anulowane i nie jest wliczane do statystyk."
   },
   "search": {
     "placeholder": "Szukaj zamówień po nazwie, VIN, kraju...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Hasła nie są zgodne",
       "saveError": "Błąd zapisu",
       "nameMinLength": "Nazwa użytkownika musi mieć co najmniej 3 znaki"
-    }
+    },
+    "cancelledTitle": "Zamówienie anulowane?",
+    "cancelledDescription": "Jeśli anulowałeś zamówienie w Tesli, oznacz je tutaj. Zniknie z listy i przestanie liczyć się do statystyk — Twój wpis zostanie zachowany.",
+    "cancelledLabel": "To zamówienie zostało anulowane",
+    "cancelledHint": "Możesz to cofnąć w każdej chwili, odznaczając pole."
   },
   "editCodeModal": {
     "orderCreated": "Zamówienie utworzone!",
@@ -258,7 +264,9 @@
     "saveError": "Błąd zapisu",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Anulowane",
+    "cancelledTooltip": "Przełącz filtr: ukryj anulowane / pokaż je / tylko anulowane"
   },
   "progress": {
     "ordered": "Zamówiono",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Dostawa",
     "totalWaitTime": "Całkowity czas oczekiwania",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} anulowanych (nie wliczono)"
   },
   "admin": {
     "dashboard": "Panel administratora",

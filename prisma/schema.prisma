@@ -43,6 +43,8 @@ model Order {
   papersToDelivery      Int?     // Papiere bis Auslieferung
   archived              Boolean  @default(false)
   archivedAt            DateTime?
+  cancelled             Boolean  @default(false) // Storniert — order was cancelled at Tesla, set by its owner
+  cancelledAt           DateTime?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
@@ -50,6 +52,7 @@ model Order {
 
   @@index([name, orderDate])
   @@index([archived])
+  @@index([cancelled])
   @@index([archived, createdAt])
   @@index([vehicleType])
   @@index([source])

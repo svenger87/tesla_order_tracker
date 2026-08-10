@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "統計",
-    "statsSubtitle": "納期、構成、トレンド"
+    "statsSubtitle": "納期、構成、トレンド",
+    "cancelledBadge": "キャンセル済み",
+    "cancelledHint": "この注文はキャンセルされたため、統計には含まれません。"
   },
   "search": {
     "placeholder": "名前、VIN、国で注文を検索...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "パスワードが一致しません",
       "saveError": "保存エラー",
       "nameMinLength": "ユーザー名は3文字以上である必要があります"
-    }
+    },
+    "cancelledTitle": "注文をキャンセルしましたか？",
+    "cancelledDescription": "Teslaで注文をキャンセルした場合はここにチェックを入れてください。一覧から消え、統計にも含まれなくなりますが、登録内容は保持されます。",
+    "cancelledLabel": "この注文はキャンセルされました",
+    "cancelledHint": "チェックを外せばいつでも元に戻せます。"
   },
   "editCodeModal": {
     "orderCreated": "注文が作成されました！",
@@ -258,7 +264,9 @@
     "saveError": "保存エラー",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "キャンセル済み",
+    "cancelledTooltip": "フィルター切替: キャンセル済みを隠す / 表示する / キャンセル済みのみ"
   },
   "progress": {
     "ordered": "注文済み",
@@ -358,7 +366,8 @@
     "timelineDelivery": "納車",
     "totalWaitTime": "合計待ち時間",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} 件キャンセル済み（集計対象外）"
   },
   "admin": {
     "dashboard": "管理者ダッシュボード",

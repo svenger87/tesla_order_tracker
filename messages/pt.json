@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Estatísticas",
-    "statsSubtitle": "Prazos de entrega, configurações e tendências"
+    "statsSubtitle": "Prazos de entrega, configurações e tendências",
+    "cancelledBadge": "Cancelada",
+    "cancelledHint": "Esta encomenda foi cancelada e está excluída das estatísticas."
   },
   "search": {
     "placeholder": "Pesquisar encomendas por nome, VIN, país...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "As palavras-passe não coincidem",
       "saveError": "Erro ao guardar",
       "nameMinLength": "O nome de usuário deve ter pelo menos 3 caracteres"
-    }
+    },
+    "cancelledTitle": "Encomenda cancelada?",
+    "cancelledDescription": "Se cancelaste a tua encomenda na Tesla, assinala-a aqui. Desaparece da lista e deixa de contar para as estatísticas — o teu registo é mantido.",
+    "cancelledLabel": "Esta encomenda foi cancelada",
+    "cancelledHint": "Podes desfazer a qualquer momento desmarcando a caixa."
   },
   "editCodeModal": {
     "orderCreated": "Encomenda criada!",
@@ -258,7 +264,9 @@
     "saveError": "Erro ao guardar",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Canceladas",
+    "cancelledTooltip": "Alternar filtro: ocultar canceladas / incluir / apenas canceladas"
   },
   "progress": {
     "ordered": "Encomendado",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Entrega",
     "totalWaitTime": "Tempo total de espera",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} canceladas (não contabilizadas)"
   },
   "admin": {
     "dashboard": "Painel de administração",

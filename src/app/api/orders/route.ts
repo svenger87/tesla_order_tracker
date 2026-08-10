@@ -67,6 +67,22 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
   return input === stored
 }
 
+/**
+ * "Storniert" is owner-driven: whoever holds the edit code can flag their order
+ * as cancelled and clear it again. `cancelledAt` is stamped only on the
+ * transition, so re-saving an already-cancelled order keeps the original date.
+ * An absent `cancelled` key leaves the state alone — the TOST field editor and
+ * any older client post partial bodies and must not silently un-cancel.
+ */
+function cancellationFields(
+  data: Record<string, unknown>,
+  before: { cancelled?: boolean } | null,
+): { cancelled?: boolean; cancelledAt?: Date | null } {
+  if (typeof data.cancelled !== 'boolean') return {}
+  if (data.cancelled === (before?.cancelled ?? false)) return {}
+  return { cancelled: data.cancelled, cancelledAt: data.cancelled ? new Date() : null }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -115,6 +131,8 @@ export async function GET(request: NextRequest) {
           papersToDelivery: true,
           archived: true,
           archivedAt: true,
+          cancelled: true,
+          cancelledAt: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -158,7 +176,7 @@ export async function GET(request: NextRequest) {
         },
       })
       // Add default archived fields to the response
-      orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, updatedAt: o.createdAt }))
+      orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, cancelled: false, cancelledAt: null, updatedAt: o.createdAt }))
     }
     return NextResponse.json(orders, {
       headers: { 'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=25' },
@@ -414,6 +432,7 @@ export async function PUT(request: NextRequest) {
               typeApproval: (constrainedData.typeApproval as string) || null,
               typeVariant: (constrainedData.typeVariant as string) || null,
               deliveryDate: (constrainedData.deliveryDate as string) || null,
+              ...cancellationFields(constrainedData, before),
               ...timePeriods,
             },
           })
@@ -485,6 +504,7 @@ export async function PUT(request: NextRequest) {
           typeApproval: (constrainedData.typeApproval as string) || null,
           typeVariant: (constrainedData.typeVariant as string) || null,
           deliveryDate: (constrainedData.deliveryDate as string) || null,
+          ...cancellationFields(constrainedData, before),
           ...timePeriods,
         },
       })

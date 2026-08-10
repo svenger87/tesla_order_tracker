@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statistici",
-    "statsSubtitle": "Termene de livrare, configurații și tendințe"
+    "statsSubtitle": "Termene de livrare, configurații și tendințe",
+    "cancelledBadge": "Anulată",
+    "cancelledHint": "Această comandă a fost anulată și este exclusă din statistici."
   },
   "search": {
     "placeholder": "Căutați comenzi după nume, VIN, țară...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Parolele nu se potrivesc",
       "saveError": "Eroare la salvare",
       "nameMinLength": "Numele de utilizator trebuie să aibă cel puțin 3 caractere"
-    }
+    },
+    "cancelledTitle": "Comandă anulată?",
+    "cancelledDescription": "Dacă ți-ai anulat comanda la Tesla, marcheaz-o aici. Dispare din listă și nu mai contează în statistici — înregistrarea ta se păstrează.",
+    "cancelledLabel": "Această comandă a fost anulată",
+    "cancelledHint": "Poți reveni oricând debifând căsuța."
   },
   "editCodeModal": {
     "orderCreated": "Comanda a fost creată!",
@@ -258,7 +264,9 @@
     "saveError": "Eroare la salvare",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Anulate",
+    "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele"
   },
   "progress": {
     "ordered": "Comandat",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Livrare",
     "totalWaitTime": "Timp total de așteptare",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} anulate (necontorizate)"
   },
   "admin": {
     "dashboard": "Panou de administrare",

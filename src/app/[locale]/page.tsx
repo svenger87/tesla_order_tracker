@@ -171,6 +171,10 @@ export default function Home() {
   }, [orders, globalFilters])
 
   const orderGroups = useMemo(() => groupOrdersByQuarter(filteredOrders, tc('noDate')), [filteredOrders, tc])
+
+  // Cancelled orders stay in `filteredOrders` so the table's own chip can reveal
+  // them, but nothing that computes an average may see them.
+  const liveOrders = useMemo(() => filteredOrders.filter(o => !o.cancelled), [filteredOrders])
   const hasActiveGlobalFilters = globalFilters.vehicle !== 'all' || globalFilters.period.type !== 'all' || globalFilters.model !== '' || globalFilters.range !== '' || globalFilters.color !== '' || globalFilters.drive !== '' || globalFilters.wheels !== '' || globalFilters.interior !== '' || globalFilters.country !== '' || globalFilters.deliveryLocation !== ''
 
   const [refreshing, setRefreshing] = useState(false)
@@ -389,7 +393,7 @@ export default function Home() {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <CardContent>
-                          <VeteransList orders={orders} />
+                          <VeteransList orders={orders.filter(o => !o.cancelled)} />
                         </CardContent>
                       </CollapsibleContent>
                     </Card>
@@ -411,8 +415,8 @@ export default function Home() {
                 </CardTitle>
                 <CardDescription className="text-sm">
                   {hasActiveGlobalFilters
-                    ? `${filteredOrders.length} von ${orders.length} ${t('orders')}`
-                    : t('ordersCount', { count: orders.length })}
+                    ? `${liveOrders.length} / ${orders.filter(o => !o.cancelled).length} ${t('orders')}`
+                    : t('ordersCount', { count: orders.filter(o => !o.cancelled).length })}
                   {orderGroups.length > 0 && ` ${t('quartersCount', { count: orderGroups.length })}`}
                 </CardDescription>
               </div>
@@ -475,7 +479,7 @@ export default function Home() {
             </DialogTitle>
             <DialogDescription>{tp('description')}</DialogDescription>
           </DialogHeader>
-          <DeliveryPrediction orders={filteredOrders} />
+          <DeliveryPrediction orders={liveOrders} />
         </DialogContent>
       </Dialog>
 

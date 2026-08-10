@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statistiche",
-    "statsSubtitle": "Tempi di consegna, configurazioni e tendenze"
+    "statsSubtitle": "Tempi di consegna, configurazioni e tendenze",
+    "cancelledBadge": "Annullato",
+    "cancelledHint": "Questo ordine è stato annullato ed è escluso dalle statistiche."
   },
   "search": {
     "placeholder": "Cerca ordini per nome, VIN, paese...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Le password non corrispondono",
       "saveError": "Errore nel salvataggio",
       "nameMinLength": "Il nome utente deve contenere almeno 3 caratteri"
-    }
+    },
+    "cancelledTitle": "Ordine annullato?",
+    "cancelledDescription": "Se hai annullato il tuo ordine da Tesla, segnalalo qui. Sparirà dall'elenco e non conterà più nelle statistiche — la tua voce resta salvata.",
+    "cancelledLabel": "Questo ordine è stato annullato",
+    "cancelledHint": "Puoi annullare la modifica in qualsiasi momento togliendo la spunta."
   },
   "editCodeModal": {
     "orderCreated": "Ordine creato!",
@@ -258,7 +264,9 @@
     "saveError": "Errore nel salvataggio",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Annullati",
+    "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati"
   },
   "progress": {
     "ordered": "Ordinato",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Consegna",
     "totalWaitTime": "Tempo di attesa totale",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} annullati (non conteggiati)"
   },
   "admin": {
     "dashboard": "Pannello di amministrazione",

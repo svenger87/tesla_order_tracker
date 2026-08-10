@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statistieken",
-    "statsSubtitle": "Levertijden, configuraties en trends"
+    "statsSubtitle": "Levertijden, configuraties en trends",
+    "cancelledBadge": "Geannuleerd",
+    "cancelledHint": "Deze bestelling is geannuleerd en telt niet mee in de statistieken."
   },
   "search": {
     "placeholder": "Bestellingen zoeken op naam, VIN, land...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Wachtwoorden komen niet overeen",
       "saveError": "Fout bij opslaan",
       "nameMinLength": "Gebruikersnaam moet minimaal 3 tekens bevatten"
-    }
+    },
+    "cancelledTitle": "Bestelling geannuleerd?",
+    "cancelledDescription": "Als je je bestelling bij Tesla hebt geannuleerd, markeer haar hier. Ze verdwijnt uit de lijst en telt niet meer mee in de statistieken — je invoer blijft bewaard.",
+    "cancelledLabel": "Deze bestelling is geannuleerd",
+    "cancelledHint": "Je kunt dit altijd ongedaan maken door het vinkje weg te halen."
   },
   "editCodeModal": {
     "orderCreated": "Bestelling aangemaakt!",
@@ -258,7 +264,9 @@
     "saveError": "Fout bij opslaan",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Geannuleerd",
+    "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde"
   },
   "progress": {
     "ordered": "Besteld",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Levering",
     "totalWaitTime": "Totale wachttijd",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} geannuleerd (niet meegeteld)"
   },
   "admin": {
     "dashboard": "Beheerdersdashboard",

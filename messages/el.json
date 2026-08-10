@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Στατιστικά",
-    "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις"
+    "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις",
+    "cancelledBadge": "Ακυρώθηκε",
+    "cancelledHint": "Αυτή η παραγγελία ακυρώθηκε και εξαιρείται από τα στατιστικά."
   },
   "search": {
     "placeholder": "Αναζήτηση παραγγελιών κατά όνομα, VIN, χώρα...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Οι κωδικοί πρόσβασης δεν ταιριάζουν",
       "saveError": "Σφάλμα αποθήκευσης",
       "nameMinLength": "Το όνομα χρήστη πρέπει να έχει τουλάχιστον 3 χαρακτήρες"
-    }
+    },
+    "cancelledTitle": "Ακυρωμένη παραγγελία;",
+    "cancelledDescription": "Αν ακυρώσατε την παραγγελία σας στην Tesla, σημειώστε το εδώ. Εξαφανίζεται από τη λίστα και παύει να μετρά στα στατιστικά — η καταχώρισή σας διατηρείται.",
+    "cancelledLabel": "Αυτή η παραγγελία ακυρώθηκε",
+    "cancelledHint": "Μπορείτε να το αναιρέσετε ανά πάσα στιγμή αποεπιλέγοντας το πλαίσιο."
   },
   "editCodeModal": {
     "orderCreated": "Η παραγγελία δημιουργήθηκε!",
@@ -258,7 +264,9 @@
     "saveError": "Σφάλμα αποθήκευσης",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Ακυρωμένες",
+    "cancelledTooltip": "Εναλλαγή φίλτρου: απόκρυψη ακυρωμένων / εμφάνιση / μόνο ακυρωμένες"
   },
   "progress": {
     "ordered": "Παραγγέλθηκε",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Παράδοση",
     "totalWaitTime": "Συνολικός χρόνος αναμονής",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} ακυρωμένες (δεν μετρούν)"
   },
   "admin": {
     "dashboard": "Πίνακας Ελέγχου Διαχειριστή",

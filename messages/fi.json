@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Tilastot",
-    "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit"
+    "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit",
+    "cancelledBadge": "Peruutettu",
+    "cancelledHint": "Tämä tilaus on peruutettu eikä sitä lasketa tilastoihin."
   },
   "search": {
     "placeholder": "Hae tilauksia nimellä, VIN-numerolla, maalla...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Salasanat eivät täsmää",
       "saveError": "Virhe tallennettaessa",
       "nameMinLength": "Käyttäjänimen on oltava vähintään 3 merkkiä"
-    }
+    },
+    "cancelledTitle": "Tilaus peruutettu?",
+    "cancelledDescription": "Jos peruutit tilauksesi Teslalla, merkitse se tähän. Se katoaa listalta eikä enää vaikuta tilastoihin — merkintäsi säilyy silti.",
+    "cancelledLabel": "Tämä tilaus on peruutettu",
+    "cancelledHint": "Voit perua tämän milloin tahansa poistamalla valinnan."
   },
   "editCodeModal": {
     "orderCreated": "Tilaus luotu!",
@@ -258,7 +264,9 @@
     "saveError": "Virhe tallennettaessa",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Peruutetut",
+    "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut"
   },
   "progress": {
     "ordered": "Tilattu",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Toimitus",
     "totalWaitTime": "Kokonaisodotusaika",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} peruutettu (ei laskettu mukaan)"
   },
   "admin": {
     "dashboard": "Ylläpidon hallintapaneeli",

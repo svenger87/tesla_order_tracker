@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours — les données peuvent être obsolètes.",
     "statsTitle": "Statistiques",
-    "statsSubtitle": "Délais de livraison, configurations et tendances"
+    "statsSubtitle": "Délais de livraison, configurations et tendances",
+    "cancelledBadge": "Annulée",
+    "cancelledHint": "Cette commande a été annulée et est exclue des statistiques."
   },
   "search": {
     "placeholder": "Rechercher des commandes par nom, VIN, pays...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Les mots de passe ne correspondent pas",
       "saveError": "Erreur lors de l'enregistrement",
       "nameMinLength": "Le nom d'utilisateur doit contenir au moins 3 caractères"
-    }
+    },
+    "cancelledTitle": "Commande annulée ?",
+    "cancelledDescription": "Si vous avez annulé votre commande chez Tesla, signalez-le ici. Elle disparaît de la liste et ne compte plus dans les statistiques — votre saisie est conservée.",
+    "cancelledLabel": "Cette commande a été annulée",
+    "cancelledHint": "Vous pouvez revenir en arrière à tout moment en décochant la case."
   },
   "editCodeModal": {
     "orderCreated": "Commande créée !",
@@ -258,7 +264,9 @@
     "saveError": "Erreur lors de l'enregistrement",
     "productionDate": "Date de production",
     "staleFilter": "Stale",
-    "staleTooltip": "Basculer le filtre : toutes / masquer stale / seulement stale (≥60 jours sans mise à jour pour les commandes ouvertes)"
+    "staleTooltip": "Basculer le filtre : toutes / masquer stale / seulement stale (≥60 jours sans mise à jour pour les commandes ouvertes)",
+    "cancelledFilter": "Annulées",
+    "cancelledTooltip": "Changer le filtre : masquer les annulées / les inclure / uniquement les annulées"
   },
   "progress": {
     "ordered": "Commandé",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Livraison",
     "totalWaitTime": "Temps d'attente total",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} annulée(s) (non comptée(s))"
   },
   "admin": {
     "dashboard": "Tableau de bord administrateur",

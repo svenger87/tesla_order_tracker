@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Статистики",
-    "statsSubtitle": "Време за доставка, конфигурации и тенденции"
+    "statsSubtitle": "Време за доставка, конфигурации и тенденции",
+    "cancelledBadge": "Отказана",
+    "cancelledHint": "Тази поръчка е отказана и не се включва в статистиката."
   },
   "search": {
     "placeholder": "Търсете поръчки по име, VIN, държава...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Паролите не съвпадат",
       "saveError": "Грешка при запазване",
       "nameMinLength": "Потребителското име трябва да е поне 3 символа"
-    }
+    },
+    "cancelledTitle": "Отказана поръчка?",
+    "cancelledDescription": "Ако сте отказали поръчката си в Tesla, отбележете я тук. Тя изчезва от списъка и спира да се брои в статистиката — записът ви се запазва.",
+    "cancelledLabel": "Тази поръчка е отказана",
+    "cancelledHint": "Можете да върнете това по всяко време, като махнете отметката."
   },
   "editCodeModal": {
     "orderCreated": "Поръчката е създадена!",
@@ -258,7 +264,9 @@
     "saveError": "Грешка при запазване",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Отказани",
+    "cancelledTooltip": "Превключване на филтъра: скрий отказаните / покажи ги / само отказани"
   },
   "progress": {
     "ordered": "Поръчано",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Доставка",
     "totalWaitTime": "Общо време на чакане",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} отказани (не се броят)"
   },
   "admin": {
     "dashboard": "Административен панел",

@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Statisztikák",
-    "statsSubtitle": "Szállítási idők, konfigurációk és trendek"
+    "statsSubtitle": "Szállítási idők, konfigurációk és trendek",
+    "cancelledBadge": "Törölve",
+    "cancelledHint": "Ezt a rendelést törölték, és nem számít bele a statisztikába."
   },
   "search": {
     "placeholder": "Rendelések keresése név, VIN, ország alapján...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "A jelszavak nem egyeznek",
       "saveError": "Mentési hiba",
       "nameMinLength": "A felhasználónévnek legalább 3 karakter hosszúnak kell lennie"
-    }
+    },
+    "cancelledTitle": "Rendelés törölve?",
+    "cancelledDescription": "Ha lemondtad a rendelésedet a Teslánál, jelöld meg itt. Eltűnik a listáról, és többé nem számít bele a statisztikába — a bejegyzésed megmarad.",
+    "cancelledLabel": "Ezt a rendelést törölték",
+    "cancelledHint": "Bármikor visszavonhatod a jelölés eltávolításával."
   },
   "editCodeModal": {
     "orderCreated": "Rendelés létrehozva!",
@@ -258,7 +264,9 @@
     "saveError": "Mentési hiba",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Töröltek",
+    "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek"
   },
   "progress": {
     "ordered": "Megrendelve",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Kiszállítás",
     "totalWaitTime": "Teljes várakozási idő",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} törölve (nincs beszámítva)"
   },
   "admin": {
     "dashboard": "Rendszergazdai kezelőpanel",

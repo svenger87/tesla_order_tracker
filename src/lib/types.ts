@@ -43,6 +43,8 @@ export interface Order {
   papersToDelivery: number | null
   archived: boolean
   archivedAt: string | null
+  cancelled?: boolean
+  cancelledAt?: string | null
   createdAt: string
   updatedAt?: string
 }
@@ -70,6 +72,7 @@ export interface OrderFormData {
   typeApproval: string
   typeVariant: string
   deliveryDate: string
+  cancelled: boolean  // Storniert — only settable while editing an existing order
   // Password options for edit code
   useCustomPassword: boolean
   customPassword: string

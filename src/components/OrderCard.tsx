@@ -152,7 +152,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       // the virtualised mobile list pays 48px of dead padding — 105px rows
       // around 56px of content, and the 58px estimate is never close.
       "relative gap-0 overflow-hidden rounded-none border-0 border-b bg-card py-0 shadow-none transition-colors hover:bg-muted/20",
-      isStale && "opacity-60 hover:opacity-100 transition-opacity",
+      (isStale || order.cancelled) && "opacity-60 hover:opacity-100 transition-opacity",
     )}>
         {/* The row itself is the link, so the whole card is one tap target
             rather than just the name text. Interactive children sit above it
@@ -173,6 +173,14 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
           <div className="min-w-0">
             <div className="flex items-center gap-1">
               <span className="truncate text-sm font-semibold leading-tight">{order.name}</span>
+              {order.cancelled && (
+                <span
+                  className="shrink-0 rounded-sm border border-destructive/40 bg-destructive/10 px-1 py-px text-[9px] font-medium text-destructive"
+                  title={th('cancelledHint')}
+                >
+                  {th('cancelledBadge')}
+                </span>
+              )}
               {countryOpt?.flag && <TwemojiEmoji emoji={countryOpt.flag} size={13} />}
               {order.source === 'tost' && (
                 <Image src="/tost-badge.svg" alt="TOST" width={42} height={21} className="h-4 w-auto shrink-0" />

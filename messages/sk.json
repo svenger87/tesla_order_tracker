@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "Štatistiky",
-    "statsSubtitle": "Dodacie lehoty, konfigurácie a trendy"
+    "statsSubtitle": "Dodacie lehoty, konfigurácie a trendy",
+    "cancelledBadge": "Zrušené",
+    "cancelledHint": "Táto objednávka bola zrušená a nie je zahrnutá do štatistík."
   },
   "search": {
     "placeholder": "Hľadajte objednávky podľa mena, VIN, krajiny...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Heslá sa nezhodujú",
       "saveError": "Chyba pri ukladaní",
       "nameMinLength": "Používateľské meno musí mať aspoň 3 znaky"
-    }
+    },
+    "cancelledTitle": "Objednávka zrušená?",
+    "cancelledDescription": "Ak ste objednávku v Tesle zrušili, označte ju tu. Zmizne zo zoznamu a prestane sa počítať do štatistík — váš záznam zostane zachovaný.",
+    "cancelledLabel": "Táto objednávka bola zrušená",
+    "cancelledHint": "Kedykoľvek to môžete vrátiť späť zrušením zaškrtnutia."
   },
   "editCodeModal": {
     "orderCreated": "Objednávka bola vytvorená!",
@@ -258,7 +264,9 @@
     "saveError": "Chyba pri ukladaní",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "Zrušené",
+    "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené"
   },
   "progress": {
     "ordered": "Objednané",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Dodanie",
     "totalWaitTime": "Celková čakacia doba",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} zrušených (nezapočítané)"
   },
   "admin": {
     "dashboard": "Administrátorský panel",

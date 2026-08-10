@@ -75,7 +75,9 @@
     "staleBadge": "stale",
     "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
     "statsTitle": "İstatistikler",
-    "statsSubtitle": "Teslimat süreleri, konfigürasyonlar ve trendler"
+    "statsSubtitle": "Teslimat süreleri, konfigürasyonlar ve trendler",
+    "cancelledBadge": "İptal edildi",
+    "cancelledHint": "Bu sipariş iptal edildi ve istatistiklere dahil edilmiyor."
   },
   "search": {
     "placeholder": "Siparişlerde isim, VIN, ülke ile ara...",
@@ -161,7 +163,11 @@
       "passwordMismatch": "Şifreler eşleşmiyor",
       "saveError": "Kaydetme hatası",
       "nameMinLength": "Kullanıcı adı en az 3 karakter olmalıdır"
-    }
+    },
+    "cancelledTitle": "Sipariş iptal mi edildi?",
+    "cancelledDescription": "Tesla'daki siparişini iptal ettiysen burada işaretle. Listeden kaybolur ve istatistiklere sayılmaz — kaydın yine de saklanır.",
+    "cancelledLabel": "Bu sipariş iptal edildi",
+    "cancelledHint": "İşareti kaldırarak istediğin zaman geri alabilirsin."
   },
   "editCodeModal": {
     "orderCreated": "Sipariş oluşturuldu!",
@@ -258,7 +264,9 @@
     "saveError": "Kaydetme hatası",
     "productionDate": "Production date",
     "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)"
+    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "cancelledFilter": "İptal edilenler",
+    "cancelledTooltip": "Filtreyi değiştir: iptal edilenleri gizle / göster / yalnızca iptal edilenler"
   },
   "progress": {
     "ordered": "Sipariş verildi",
@@ -358,7 +366,8 @@
     "timelineDelivery": "Teslimat",
     "totalWaitTime": "Toplam bekleme süresi",
     "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment"
+    "pipelineSegment": "Segment",
+    "cancelledExcluded": "{count} iptal edildi (sayılmadı)"
   },
   "admin": {
     "dashboard": "Yönetici Paneli",
