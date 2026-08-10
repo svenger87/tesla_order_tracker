@@ -7,6 +7,9 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "ship": "bash scripts/ship.sh",
+    "ship:promote": "bash scripts/ship.sh promote",
+    "ship:status": "bash scripts/ship.sh status",
     "validate:vehicle-config": "tsx scripts/validate-vehicle-config.ts",
     "import:sheets": "tsx scripts/import-from-sheets.ts"
   },

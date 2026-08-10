@@ -121,7 +121,22 @@ GHCR and rolls it out over SSH:
 | `staging` | `app-staging` | <https://staging.tff-order-stats.de> |
 | `master`  | `app`         | <https://tff-order-stats.de>         |
 
-**Always ship to `staging` first**, check it there, then merge to `master`.
+**Always ship to `staging` first**, check it there, then promote to `master`.
+`scripts/ship.sh` enforces that order and refuses any push that would discard
+someone else's work:
+
+```bash
+npm run ship            # current branch -> staging (runs lint + build first)
+npm run ship:status     # what each branch points at, and whether both sites are up
+npm run ship:promote    # staging -> master, i.e. production (asks for confirmation)
+```
+
+Both commands wait for the resulting GitHub Actions run and report whether it
+went green. `promote` refuses to release a staging build whose health check is
+not answering. Pass `--skip-checks` to skip lint/build, `--no-wait` to return as
+soon as the push lands. The script needs a GitHub token — it uses your existing
+git credential helper, or falls back to a token file (`ship.sh --help` lists the
+paths it looks in).
 
 On the VPS the workflow pulls the new image, restarts only the target service,
 reloads Caddy and polls `/api/health`. If the health check does not pass within
