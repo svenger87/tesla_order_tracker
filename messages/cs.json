@@ -90,7 +90,9 @@
     "title": "Hledat objednávky",
     "description": "Najděte objednávku ve všech čtvrtletích",
     "hint": "Navigujte šipkami, vyberte Enterem",
-    "openSearch": "Hledat"
+    "openSearch": "Hledat",
+    "results": "{count} výsledků",
+    "noResultsHint": "Zkuste jméno, VIN, zemi nebo místo předání."
   },
   "form": {
     "personalData": "Osobní údaje",

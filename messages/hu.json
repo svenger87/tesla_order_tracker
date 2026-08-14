@@ -90,7 +90,9 @@
     "title": "Rendelések keresése",
     "description": "Rendelés keresése az összes negyedévben",
     "hint": "Navigálás a nyílbillentyűkkel, kiválasztás Enterrel",
-    "openSearch": "Keresés"
+    "openSearch": "Keresés",
+    "results": "{count} találat",
+    "noResultsHint": "Próbáljon nevet, alvázszámot, országot vagy átvételi helyet."
   },
   "form": {
     "personalData": "Személyes adatok",

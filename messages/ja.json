@@ -90,7 +90,9 @@
     "title": "注文を検索",
     "description": "すべての四半期から注文を検索",
     "hint": "矢印キーで移動、Enter で選択",
-    "openSearch": "検索"
+    "openSearch": "検索",
+    "results": "{count} 件",
+    "noResultsHint": "名前・VIN・国・受取場所でお試しください。"
   },
   "form": {
     "personalData": "個人情報",

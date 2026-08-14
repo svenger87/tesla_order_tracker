@@ -90,7 +90,9 @@
     "title": "Szukaj zamówień",
     "description": "Znajdź zamówienie we wszystkich kwartałach",
     "hint": "Nawiguj strzałkami, wybierz Enterem",
-    "openSearch": "Szukaj"
+    "openSearch": "Szukaj",
+    "results": "{count} wyników",
+    "noResultsHint": "Spróbuj podać imię, VIN, kraj lub miejsce odbioru."
   },
   "form": {
     "personalData": "Dane osobowe",

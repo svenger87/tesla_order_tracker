@@ -495,6 +495,7 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
         onOpenChange={setShowSearch}
         orderGroups={orderGroups}
         onSelectOrder={handleSearchSelect}
+        options={tableOptions}
       />
 
       {/* Modals */}

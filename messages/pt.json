@@ -90,7 +90,9 @@
     "title": "Pesquisar encomendas",
     "description": "Encontrar uma encomenda em todos os trimestres",
     "hint": "Navegue com as teclas de seta, selecione com Enter",
-    "openSearch": "Pesquisar"
+    "openSearch": "Pesquisar",
+    "results": "{count} resultados",
+    "noResultsHint": "Experimenta um nome, VIN, país ou local de entrega."
   },
   "form": {
     "personalData": "Dados pessoais",

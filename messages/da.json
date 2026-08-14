@@ -90,7 +90,9 @@
     "title": "Søg bestillinger",
     "description": "Find en bestilling på tværs af alle kvartaler",
     "hint": "Naviger med piletasterne, vælg med Enter",
-    "openSearch": "Søg"
+    "openSearch": "Søg",
+    "results": "{count} resultater",
+    "noResultsHint": "Prøv navn, VIN, land eller leveringssted."
   },
   "form": {
     "personalData": "Personlige data",

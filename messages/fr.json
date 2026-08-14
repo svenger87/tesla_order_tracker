@@ -90,7 +90,9 @@
     "title": "Rechercher des commandes",
     "description": "Trouver une commande dans tous les trimestres",
     "hint": "Naviguez avec les touches fléchées, sélectionnez avec Entrée",
-    "openSearch": "Rechercher"
+    "openSearch": "Rechercher",
+    "results": "{count} résultats",
+    "noResultsHint": "Essayez un nom, un VIN, un pays ou un lieu de livraison."
   },
   "form": {
     "personalData": "Données personnelles",
