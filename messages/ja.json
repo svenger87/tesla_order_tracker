@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "リクエストが多すぎます。しばらくしてからお試しください。",
+    "orderNotFound": "注文が見つかりません。",
+    "conflict": "この記録は他の人によって変更されました。ページを再読み込みしてもう一度お試しください。",
+    "resetCodeInvalid": "ワンタイムコードが無効または期限切れです。",
+    "resetCodeRequired": "ワンタイムコードが必要です。",
+    "tostFieldsRestricted": "この注文は TOST が管理しています。編集できるのは注文日、書類日、生産日、型式認可、型式バリエーションのみです。",
+    "adminRequired": "管理者権限が必要です。",
+    "orderDateInFuture": "注文日を未来の日付にすることはできません。",
+    "datesOutOfOrder": "日付の順序が正しくありません。注文日、生産日、書類日、納車日をご確認ください。",
+    "legacyPasswordRequired": "既存の登録には新しいパスワードが必要です。"
   }
 }

@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Çok fazla istek. Lütfen daha sonra tekrar deneyin.",
+    "orderNotFound": "Sipariş bulunamadı.",
+    "conflict": "Bu kayıt bu sırada başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.",
+    "resetCodeInvalid": "Geçersiz veya süresi dolmuş tek kullanımlık kod.",
+    "resetCodeRequired": "Tek kullanımlık kod gerekli.",
+    "tostFieldsRestricted": "Bu sipariş TOST tarafından yönetiliyor. Yalnızca sipariş tarihi, belge tarihi, üretim tarihi, tip onayı ve tip varyantı düzenlenebilir.",
+    "adminRequired": "Yönetici erişimi gerekli.",
+    "orderDateInFuture": "Sipariş tarihi gelecekte olamaz.",
+    "datesOutOfOrder": "Tarihler mantıklı bir sırada değil. Sipariş, üretim, belge ve teslimat tarihlerini kontrol edin.",
+    "legacyPasswordRequired": "Mevcut kayıtlar için yeni bir parola gerekli."
   }
 }

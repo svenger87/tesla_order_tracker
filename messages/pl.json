@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później.",
+    "orderNotFound": "Nie znaleziono zamówienia.",
+    "conflict": "W międzyczasie ktoś inny zmienił ten wpis. Odśwież stronę i spróbuj ponownie.",
+    "resetCodeInvalid": "Nieprawidłowy lub wygasły kod jednorazowy.",
+    "resetCodeRequired": "Wymagany kod jednorazowy.",
+    "tostFieldsRestricted": "To zamówienie jest zarządzane przez TOST. Edytować można tylko datę zamówienia, datę dokumentów, datę produkcji, homologację i wariant typu.",
+    "adminRequired": "Wymagany dostęp administratora.",
+    "orderDateInFuture": "Data zamówienia nie może być w przyszłości.",
+    "datesOutOfOrder": "Daty nie tworzą prawdopodobnej kolejności. Sprawdź datę zamówienia, produkcji, dokumentów i dostawy.",
+    "legacyPasswordRequired": "Dla starszych wpisów wymagane jest nowe hasło."
   }
 }

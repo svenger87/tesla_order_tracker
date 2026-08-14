@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Previše zahtjeva. Pokušajte ponovno kasnije.",
+    "orderNotFound": "Narudžba nije pronađena.",
+    "conflict": "Netko drugi je u međuvremenu promijenio ovaj unos. Ponovno učitajte stranicu i pokušajte opet.",
+    "resetCodeInvalid": "Nevažeći ili istekao jednokratni kod.",
+    "resetCodeRequired": "Potreban je jednokratni kod.",
+    "tostFieldsRestricted": "Ovom narudžbom upravlja TOST. Uređivati se mogu samo datum narudžbe, datum dokumenata, datum proizvodnje, homologacija i varijanta tipa.",
+    "adminRequired": "Potreban je administratorski pristup.",
+    "orderDateInFuture": "Datum narudžbe ne može biti u budućnosti.",
+    "datesOutOfOrder": "Datumi nisu u vjerodostojnom redoslijedu. Provjerite datume narudžbe, proizvodnje, dokumenata i isporuke.",
+    "legacyPasswordRequired": "Za starije unose potrebna je nova lozinka."
   }
 }

@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Demasiados pedidos. Tenta novamente mais tarde.",
+    "orderNotFound": "Pedido não encontrado.",
+    "conflict": "Entretanto, outra pessoa alterou este registo. Recarrega a página e tenta novamente.",
+    "resetCodeInvalid": "Código de utilização única inválido ou expirado.",
+    "resetCodeRequired": "É necessário um código de utilização única.",
+    "tostFieldsRestricted": "Este pedido é gerido pelo TOST. Só podem ser editados a data do pedido, a data dos documentos, a data de produção, a homologação e a variante de tipo.",
+    "adminRequired": "É necessário acesso de administrador.",
+    "orderDateInFuture": "A data do pedido não pode estar no futuro.",
+    "datesOutOfOrder": "Estas datas não seguem uma ordem plausível. Verifica as datas de pedido, produção, documentos e entrega.",
+    "legacyPasswordRequired": "É necessária uma nova palavra-passe para registos antigos."
   }
 }

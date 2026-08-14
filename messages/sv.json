@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "För många förfrågningar. Försök igen senare.",
+    "orderNotFound": "Beställningen hittades inte.",
+    "conflict": "Någon annan har ändrat den här posten under tiden. Ladda om sidan och försök igen.",
+    "resetCodeInvalid": "Ogiltig eller utgången engångskod.",
+    "resetCodeRequired": "Engångskod krävs.",
+    "tostFieldsRestricted": "Den här beställningen hanteras av TOST. Endast beställningsdatum, pappersdatum, produktionsdatum, typgodkännande och typvariant kan redigeras.",
+    "adminRequired": "Administratörsåtkomst krävs.",
+    "orderDateInFuture": "Beställningsdatumet kan inte ligga i framtiden.",
+    "datesOutOfOrder": "Datumen står inte i en rimlig ordning. Kontrollera beställnings-, produktions-, pappers- och leveransdatum.",
+    "legacyPasswordRequired": "Ett nytt lösenord krävs för äldre poster."
   }
 }

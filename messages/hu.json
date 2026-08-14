@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Túl sok kérés. Kérjük, próbálja meg később.",
+    "orderNotFound": "A rendelés nem található.",
+    "conflict": "Időközben valaki más módosította ezt a bejegyzést. Töltse újra az oldalt, és próbálja újra.",
+    "resetCodeInvalid": "Érvénytelen vagy lejárt egyszeri kód.",
+    "resetCodeRequired": "Egyszeri kód szükséges.",
+    "tostFieldsRestricted": "Ezt a rendelést a TOST kezeli. Csak a rendelés dátuma, az iratok dátuma, a gyártás dátuma, a típusjóváhagyás és a típusváltozat szerkeszthető.",
+    "adminRequired": "Rendszergazdai hozzáférés szükséges.",
+    "orderDateInFuture": "A rendelés dátuma nem lehet a jövőben.",
+    "datesOutOfOrder": "A dátumok nem állnak életszerű sorrendben. Ellenőrizze a rendelés, gyártás, iratok és szállítás dátumát.",
+    "legacyPasswordRequired": "A régi bejegyzésekhez új jelszó szükséges."
   }
 }

@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "For mange forespørgsler. Prøv igen senere.",
+    "orderNotFound": "Ordren blev ikke fundet.",
+    "conflict": "Posten er ændret af en anden i mellemtiden. Genindlæs siden, og prøv igen.",
+    "resetCodeInvalid": "Ugyldig eller udløbet engangskode.",
+    "resetCodeRequired": "Engangskode påkrævet.",
+    "tostFieldsRestricted": "Denne ordre administreres af TOST. Kun ordredato, papirdato, produktionsdato, typegodkendelse og typevariant kan redigeres.",
+    "adminRequired": "Administratoradgang kræves.",
+    "orderDateInFuture": "Ordredatoen kan ikke ligge i fremtiden.",
+    "datesOutOfOrder": "Datoerne står ikke i en plausibel rækkefølge. Tjek ordre-, produktions-, papir- og leveringsdato.",
+    "legacyPasswordRequired": "Der kræves en ny adgangskode til ældre poster."
   }
 }

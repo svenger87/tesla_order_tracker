@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    "orderNotFound": "주문을 찾을 수 없습니다.",
+    "conflict": "그 사이 다른 사람이 이 항목을 변경했습니다. 페이지를 새로 고친 후 다시 시도해 주세요.",
+    "resetCodeInvalid": "일회용 코드가 유효하지 않거나 만료되었습니다.",
+    "resetCodeRequired": "일회용 코드가 필요합니다.",
+    "tostFieldsRestricted": "이 주문은 TOST에서 관리합니다. 주문일, 서류일, 생산일, 형식 승인, 형식 변형만 편집할 수 있습니다.",
+    "adminRequired": "관리자 권한이 필요합니다.",
+    "orderDateInFuture": "주문일은 미래일 수 없습니다.",
+    "datesOutOfOrder": "날짜 순서가 올바르지 않습니다. 주문일, 생산일, 서류일, 인도일을 확인해 주세요.",
+    "legacyPasswordRequired": "기존 항목에는 새 비밀번호가 필요합니다."
   }
 }

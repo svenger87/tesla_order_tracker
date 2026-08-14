@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Troppe richieste. Riprova più tardi.",
+    "orderNotFound": "Ordine non trovato.",
+    "conflict": "Qualcun altro ha modificato questa voce nel frattempo. Ricarica la pagina e riprova.",
+    "resetCodeInvalid": "Codice monouso non valido o scaduto.",
+    "resetCodeRequired": "È richiesto un codice monouso.",
+    "tostFieldsRestricted": "Questo ordine è gestito da TOST. È possibile modificare solo data d'ordine, data dei documenti, data di produzione, omologazione e variante di tipo.",
+    "adminRequired": "È richiesto l'accesso amministratore.",
+    "orderDateInFuture": "La data dell'ordine non può essere nel futuro.",
+    "datesOutOfOrder": "Queste date non seguono un ordine plausibile. Controlla le date di ordine, produzione, documenti e consegna.",
+    "legacyPasswordRequired": "È richiesta una nuova password per le voci preesistenti."
   }
 }

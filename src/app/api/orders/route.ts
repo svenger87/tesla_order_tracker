@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     for (const { field, label } of requiredFields) {
       if (!body[field] || (typeof body[field] === 'string' && !body[field].trim())) {
         return NextResponse.json(
-          { error: `${label} ist erforderlich` },
+          { error: `${label} ist erforderlich`, code: 'FIELD_REQUIRED', field: label },
           { status: 400 }
         )
       }
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
     // Validate username minimum length
     if (typeof body.name === 'string' && body.name.trim().length < 3) {
       return NextResponse.json(
-        { error: 'Benutzername muss mindestens 3 Zeichen lang sein' },
+        { error: 'Benutzername muss mindestens 3 Zeichen lang sein', code: 'NAME_TOO_SHORT' },
         { status: 400 }
       )
     }
@@ -281,19 +281,19 @@ export async function POST(request: NextRequest) {
     // Validate password (required for all new orders)
     if (!body.customPassword) {
       return NextResponse.json(
-        { error: 'Passwort ist erforderlich' },
+        { error: 'Passwort ist erforderlich', code: 'PASSWORD_REQUIRED' },
         { status: 400 }
       )
     }
     if (body.customPassword.length < 6) {
       return NextResponse.json(
-        { error: 'Passwort muss mindestens 6 Zeichen lang sein' },
+        { error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' },
         { status: 400 }
       )
     }
     if (!/\d/.test(body.customPassword)) {
       return NextResponse.json(
-        { error: 'Passwort muss mindestens eine Zahl enthalten' },
+        { error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' },
         { status: 400 }
       )
     }
@@ -354,7 +354,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Failed to create order:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }
 
@@ -381,7 +381,7 @@ export async function PUT(request: NextRequest) {
       const attemptedFields = Object.keys(rawData).filter(k => k !== 'id')
       const disallowedFields = attemptedFields.filter(f => !tostUserEditableFields.includes(f))
       if (disallowedFields.length > 0) {
-        return NextResponse.json({ error: 'This order is managed by TOST. Only order date, papers received date, type approval, and type variant can be edited.' }, { status: 403 })
+        return NextResponse.json({ error: 'This order is managed by TOST. Only order date, papers received date, type approval, and type variant can be edited.', code: 'TOST_FIELDS_RESTRICTED' }, { status: 403 })
       }
       // Allow the edit — update only the allowed fields directly.
       // Read from `data`, not `rawData`: normalizeDateFields() ran on the copy,
@@ -449,22 +449,22 @@ export async function PUT(request: NextRequest) {
       const order = await prisma.order.findUnique({ where: { id } })
 
       if (!order) {
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Order not found', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
       // Legacy order flow - user verified via username
       if (isLegacy && order.editCode === null) {
         // For legacy orders, user must set a new password
         if (!newEditCode) {
-          return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge' }, { status: 400 })
+          return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge', code: 'LEGACY_PASSWORD_REQUIRED' }, { status: 400 })
         }
 
         // Validate new password
         if (newEditCode.length < 6) {
-          return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
+          return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' }, { status: 400 })
         }
         if (!/\d/.test(newEditCode)) {
-          return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
+          return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' }, { status: 400 })
         }
 
         const legacySequenceError = dateSequenceError(data)
@@ -523,11 +523,11 @@ export async function PUT(request: NextRequest) {
 
       // Standard edit code verification
       if (!editCode) {
-        return NextResponse.json({ error: 'Edit code required' }, { status: 401 })
+        return NextResponse.json({ error: 'Edit code required', code: 'EDIT_CODE_REQUIRED' }, { status: 401 })
       }
 
       if (!order.editCode || !(await comparePassword(editCode, order.editCode))) {
-        return NextResponse.json({ error: 'Invalid edit code' }, { status: 401 })
+        return NextResponse.json({ error: 'Invalid edit code', code: 'INVALID_EDIT_CODE' }, { status: 401 })
       }
     }
 
@@ -593,7 +593,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated successfully' })
   } catch (error) {
     console.error('Failed to update order:', error)
-    return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }
 
@@ -601,7 +601,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
     if (!admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
+      return NextResponse.json({ error: 'Admin access required', code: 'ADMIN_REQUIRED' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -615,6 +615,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Order deleted successfully' })
   } catch (error) {
     console.error('Failed to delete order:', error)
-    return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }
