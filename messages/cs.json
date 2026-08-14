@@ -711,7 +711,14 @@
   "hero": {
     "title": "Objednávky a statistiky Tesla",
     "subtitle": "Největší komunitní databáze termínů dodání Tesla. Model Y, Model 3 — celosvětově.",
-    "findMyOrder": "Najít mou objednávku"
+    "findMyOrder": "Najít mou objednávku",
+    "claim": "<em>{days}</em> dní od objednávky po předání",
+    "claimSub": "Medián z {delivered} předaných objednávek. {waiting} stále čeká — nejdéle {longest} dní.",
+    "kicker": "Komunitní databáze · Model Y a Model 3",
+    "ordersLabel": "Objednávky",
+    "deliveredLabel": "předáno",
+    "withVin": "{count} s VIN, čeká",
+    "withoutVin": "{count} bez VIN"
   },
   "tracking": {
     "backToOverview": "Zpět na přehled",

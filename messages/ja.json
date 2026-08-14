@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla 注文と統計",
     "subtitle": "Tesla の納車スケジュールに関する最大のコミュニティデータベース。Model Y、Model 3 — 世界中。",
-    "findMyOrder": "注文を検索"
+    "findMyOrder": "注文を検索",
+    "claim": "注文から納車まで <em>{days}</em> 日",
+    "claimSub": "納車済み {delivered} 件の中央値。{waiting} 件が待機中 — 最長 {longest} 日。",
+    "kicker": "コミュニティ データベース · Model Y / Model 3",
+    "ordersLabel": "注文",
+    "deliveredLabel": "納車済み",
+    "withVin": "VIN あり {count} 件が待機",
+    "withoutVin": "VIN なし {count} 件"
   },
   "tracking": {
     "backToOverview": "概要に戻る",

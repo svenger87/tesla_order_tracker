@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla narudžbe i statistike",
     "subtitle": "Najveća baza podataka zajednice za rokove isporuke Tesla vozila. Model Y, Model 3 — diljem svijeta.",
-    "findMyOrder": "Pronađi moju narudžbu"
+    "findMyOrder": "Pronađi moju narudžbu",
+    "claim": "<em>{days}</em> dana od narudžbe do preuzimanja",
+    "claimSub": "Medijan od {delivered} isporučenih narudžbi. {waiting} još čeka — najdulja {longest} dana.",
+    "kicker": "Baza zajednice · Model Y i Model 3",
+    "ordersLabel": "Narudžbe",
+    "deliveredLabel": "isporučeno",
+    "withVin": "{count} s VIN-om, čeka",
+    "withoutVin": "{count} bez VIN-a"
   },
   "tracking": {
     "backToOverview": "Natrag na pregled",

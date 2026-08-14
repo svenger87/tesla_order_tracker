@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla bestellingen en statistieken",
     "subtitle": "De grootste communitydatabase voor Tesla levertijden. Model Y, Model 3 — wereldwijd.",
-    "findMyOrder": "Mijn bestelling zoeken"
+    "findMyOrder": "Mijn bestelling zoeken",
+    "claim": "<em>{days}</em> dagen van bestelling tot overdracht",
+    "claimSub": "Mediaan van {delivered} geleverde bestellingen. {waiting} wachten nog — de langste al {longest} dagen.",
+    "kicker": "Community-database · Model Y & Model 3",
+    "ordersLabel": "Bestellingen",
+    "deliveredLabel": "geleverd",
+    "withVin": "{count} met VIN, wacht",
+    "withoutVin": "{count} zonder VIN"
   },
   "tracking": {
     "backToOverview": "Terug naar overzicht",

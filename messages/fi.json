@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla-tilaukset ja tilastot",
     "subtitle": "Suurin yhteisötietokanta Teslan toimitusaikatauluille. Model Y, Model 3 — maailmanlaajuisesti.",
-    "findMyOrder": "Etsi tilaukseni"
+    "findMyOrder": "Etsi tilaukseni",
+    "claim": "<em>{days}</em> päivää tilauksesta luovutukseen",
+    "claimSub": "Mediaani {delivered} toimitetusta tilauksesta. {waiting} odottaa yhä — pisin {longest} päivää.",
+    "kicker": "Yhteisötietokanta · Model Y ja Model 3",
+    "ordersLabel": "Tilaukset",
+    "deliveredLabel": "toimitettu",
+    "withVin": "{count} VIN-koodilla, odottaa",
+    "withoutVin": "{count} ilman VIN-koodia"
   },
   "tracking": {
     "backToOverview": "Takaisin yleiskatsaukseen",

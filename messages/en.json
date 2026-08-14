@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla Orders and Statistics",
     "subtitle": "The largest community database for Tesla delivery timelines. Model Y, Model 3 — worldwide.",
-    "findMyOrder": "Find my order"
+    "findMyOrder": "Find my order",
+    "claim": "<em>{days}</em> days from order to handover",
+    "claimSub": "Median of {delivered} delivered orders. {waiting} still waiting — the longest for {longest} days.",
+    "kicker": "Community database · Model Y & Model 3",
+    "ordersLabel": "Orders",
+    "deliveredLabel": "delivered",
+    "withVin": "{count} with VIN, waiting",
+    "withoutVin": "{count} without VIN"
   },
   "tracking": {
     "backToOverview": "Back to overview",

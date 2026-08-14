@@ -711,7 +711,14 @@
   "hero": {
     "title": "Поръчки и статистики на Tesla",
     "subtitle": "Най-голямата база данни на общността за срокове на доставка на Tesla. Model Y, Model 3 — по целия свят.",
-    "findMyOrder": "Намери моята поръчка"
+    "findMyOrder": "Намери моята поръчка",
+    "claim": "<em>{days}</em> дни от поръчката до предаването",
+    "claimSub": "Медиана от {delivered} предадени поръчки. {waiting} все още чакат — най-дългата от {longest} дни.",
+    "kicker": "Общностна база данни · Model Y и Model 3",
+    "ordersLabel": "Поръчки",
+    "deliveredLabel": "предадени",
+    "withVin": "{count} с VIN, чакат",
+    "withoutVin": "{count} без VIN"
   },
   "tracking": {
     "backToOverview": "Назад към прегледа",
