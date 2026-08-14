@@ -1,7 +1,8 @@
 import { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
-import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
+import { Order, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
+import { findColorInfo } from '@/lib/color-lookup'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
 import { Link } from '@/i18n/navigation'
@@ -11,16 +12,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { TrackingPageClient } from './client'
 
 // Helpers
-function findColorInfo(colorLabel: string | null) {
-  if (!colorLabel) return null
-  const normalizedLabel = colorLabel.toLowerCase().trim()
-  return COLORS.find(c =>
-    normalizedLabel.includes(c.label.toLowerCase()) ||
-    c.label.toLowerCase().includes(normalizedLabel) ||
-    c.value === normalizedLabel
-  )
-}
-
 function findCountryInfo(country: string | null) {
   if (!country) return null
   return COUNTRIES.find(c => c.value === country || c.label.toLowerCase() === country.toLowerCase())

@@ -9,6 +9,7 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
+import { findColorInfo } from '@/lib/color-lookup'
 import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
@@ -41,30 +42,6 @@ import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
 import { TeslaCarImage } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
-
-// Pre-build color lookup map for O(1) access
-const colorMap = new Map<string, typeof COLORS[0]>()
-COLORS.forEach(c => {
-  colorMap.set(c.label.toLowerCase(), c)
-  // Also add internal code format (with underscores)
-  colorMap.set(c.label.toLowerCase().replace(/\s+/g, '_'), c)
-  // Also add partial matches
-  c.label.toLowerCase().split(' ').forEach(word => {
-    if (word.length > 3) colorMap.set(word, c)
-  })
-})
-
-function findColorInfo(colorLabel: string | null) {
-  if (!colorLabel) return null
-  const key = colorLabel.toLowerCase().trim()
-  // Try exact match first
-  if (colorMap.has(key)) return colorMap.get(key)
-  // Try finding by partial
-  for (const [k, v] of colorMap) {
-    if (key.includes(k) || k.includes(key)) return v
-  }
-  return null
-}
 
 // Memoized color cell to avoid re-renders
 const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
