@@ -13,7 +13,8 @@
     "ship:promote": "bash scripts/ship.sh promote",
     "ship:status": "bash scripts/ship.sh status",
     "validate:vehicle-config": "tsx scripts/validate-vehicle-config.ts",
-    "import:sheets": "tsx scripts/import-from-sheets.ts"
+    "import:sheets": "tsx scripts/import-from-sheets.ts",
+    "fix:order-values": "tsx scripts/fix-order-values.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
