@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl'
 import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, RANGES, MODEL_Y_TRIMS, MODEL_3_TRIMS, MODEL_S_TRIMS, MODEL_X_TRIMS, CYBERTRUCK_TRIMS, ROADSTER_TRIMS, COUNTRIES } from '@/lib/types'
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
-import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -153,240 +154,134 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
 
   const clearFilters = () => onChange(defaultGlobalFilters)
 
+  /**
+   * Configuration filters, described once instead of eight near-identical
+   * Select blocks. They live behind one button now: ten dropdowns sat directly
+   * under the page headline, which made the least interesting thing on the page
+   * the second thing you saw, and cost about 150px before any data appeared.
+   * Whatever is set stays visible as a chip, so folding them away does not hide
+   * that a filter is on.
+   */
+  const configFilters = [
+    { key: 'model' as const, label: t('modelDistribution'), options: filterOptions.modelOptions },
+    { key: 'range' as const, label: t('rangeDistribution'), options: filterOptions.rangeOptions },
+    { key: 'color' as const, label: t('colorDistribution'), options: filterOptions.colorOptions },
+    { key: 'drive' as const, label: t('driveDistribution'), options: filterOptions.driveOptions },
+    { key: 'wheels' as const, label: t('wheelsDistribution'), options: filterOptions.wheelsOptions },
+    { key: 'interior' as const, label: t('interiorDistribution'), options: filterOptions.interiorOptions },
+    { key: 'country' as const, label: t('countryDistribution'), options: filterOptions.countryOptions },
+    { key: 'deliveryLocation' as const, label: tt('deliveryLocation'), options: filterOptions.deliveryLocationOptions },
+  ].filter(f => f.options.length > 1)
+
+  const activeConfig = configFilters.filter(f => filters[f.key])
+
+  const labelFor = (key: typeof configFilters[number]['key']) => {
+    const def = configFilters.find(f => f.key === key)
+    return def?.options.find(o => o.value === filters[key])?.label ?? filters[key]
+  }
+
   return (
-    <div className="rounded-xl border bg-card/90 p-3 shadow-[var(--shadow-card)] sm:p-4">
-      <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 [&_[data-slot=select-trigger]]:w-full">
-            {/* Vehicle Type */}
-            <Select
-              value={filters.vehicle}
-              onValueChange={(value) => onChange({ ...filters, vehicle: value as VehicleType | 'all' })}
-            >
-              <SelectTrigger className="sm:w-[128px]">
-                <SelectValue placeholder={t('vehicleSelect')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('vehicle')}: {tc('all')}</SelectItem>
-                {VEHICLE_TYPES.map((vt) => (
-                  <SelectItem key={vt.value} value={vt.value}>
-                    {vt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="flex flex-wrap items-center gap-2">
+      <Select
+        value={filters.vehicle}
+        onValueChange={(value) => onChange({ ...filters, vehicle: value as VehicleType | 'all' })}
+      >
+        <SelectTrigger className="h-9 w-[140px]">
+          <SelectValue placeholder={t('vehicleSelect')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('vehicle')}: {tc('all')}</SelectItem>
+          {VEHICLE_TYPES.map((vt) => (
+            <SelectItem key={vt.value} value={vt.value}>{vt.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-            {/* Period */}
-            <Select
-              value={periodToKey(filters.period)}
-              onValueChange={(key) => onChange({ ...filters, period: keyToPeriod(key) })}
-            >
-              <SelectTrigger className="sm:w-[150px]">
-                <SelectValue placeholder={t('periodSelect')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('allTime')}</SelectItem>
-                {availablePeriods.years.length > 0 && (
-                  <>
-                    {availablePeriods.years.map((year) => (
-                      <SelectItem key={`year-${year}`} value={`year-${year}`}>
-                        {t('year', { year })}
+      <Select
+        value={periodToKey(filters.period)}
+        onValueChange={(key) => onChange({ ...filters, period: keyToPeriod(key) })}
+      >
+        <SelectTrigger className="h-9 w-[150px]">
+          <SelectValue placeholder={t('periodSelect')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('allTime')}</SelectItem>
+          {availablePeriods.years.map((year) => (
+            <SelectItem key={`year-${year}`} value={`year-${year}`}>{t('year', { year })}</SelectItem>
+          ))}
+          {availablePeriods.quarters.map(({ year, quarter }) => (
+            <SelectItem key={`quarter-${year}-${quarter}`} value={`quarter-${year}-${quarter}`}>
+              {formatQuarter(year, quarter)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {configFilters.length > 0 && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9 gap-2">
+              <Filter className="h-4 w-4" />
+              {tc('filter')}
+              {activeConfig.length > 0 && (
+                <span className="rounded-full bg-foreground px-1.5 text-[10px] font-semibold text-background tabular-nums">
+                  {activeConfig.length}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="w-[280px] p-3">
+            <div className="grid gap-2">
+              {configFilters.map(({ key, label, options }) => (
+                <Select
+                  key={key}
+                  value={filters[key] || '_all'}
+                  onValueChange={(v) => onChange({ ...filters, [key]: v === '_all' ? '' : v })}
+                >
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue placeholder={label} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_all">{label}: {tc('all')}</SelectItem>
+                    {options.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {'flag' in o && o.flag ? (
+                          <span className="flex items-center gap-2">
+                            <TwemojiEmoji emoji={o.flag as string} size={16} />
+                            {o.label}
+                          </span>
+                        ) : o.label}
                       </SelectItem>
                     ))}
-                  </>
-                )}
-                {availablePeriods.quarters.length > 0 && (
-                  <>
-                    {availablePeriods.quarters.map(({ year, quarter }) => (
-                      <SelectItem
-                        key={`quarter-${year}-${quarter}`}
-                        value={`quarter-${year}-${quarter}`}
-                      >
-                        {formatQuarter(year, quarter)}
-                      </SelectItem>
-                    ))}
-                  </>
-                )}
-              </SelectContent>
-            </Select>
+                  </SelectContent>
+                </Select>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
 
-            {/* Model */}
-            {filterOptions.modelOptions.length > 1 && (
-              <Select
-                value={filters.model || '_all'}
-                onValueChange={(v) => onChange({ ...filters, model: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[150px]">
-                  <SelectValue placeholder={t('modelDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('modelDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.modelOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+      {activeConfig.map(({ key, label }) => (
+        <button
+          key={key}
+          onClick={() => onChange({ ...filters, [key]: '' })}
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border bg-card px-2.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <span className="text-foreground">{labelFor(key)}</span>
+          <span className="sr-only">{label}</span>
+          <X className="h-3 w-3" />
+        </button>
+      ))}
 
-            {/* Range (Reichweite) */}
-            {filterOptions.rangeOptions.length > 1 && (
-              <Select
-                value={filters.range || '_all'}
-                onValueChange={(v) => onChange({ ...filters, range: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[154px]">
-                  <SelectValue placeholder={t('rangeDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('rangeDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.rangeOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Color */}
-            {filterOptions.colorOptions.length > 1 && (
-              <Select
-                value={filters.color || '_all'}
-                onValueChange={(v) => onChange({ ...filters, color: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[150px]">
-                  <SelectValue placeholder={t('colorDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('colorDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.colorOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      <span className="flex items-center gap-2">
-                        {COLORS.find(c => c.value === o.value)?.hex && (
-                          <span
-                            className="w-3 h-3 rounded-full inline-block shrink-0 border border-border"
-                            style={{ backgroundColor: COLORS.find(c => c.value === o.value)?.hex }}
-                          />
-                        )}
-                        {o.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Drive */}
-            {filterOptions.driveOptions.length > 1 && (
-              <Select
-                value={filters.drive || '_all'}
-                onValueChange={(v) => onChange({ ...filters, drive: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[140px]">
-                  <SelectValue placeholder={t('driveDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('driveDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.driveOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Wheels */}
-            {filterOptions.wheelsOptions.length > 1 && (
-              <Select
-                value={filters.wheels || '_all'}
-                onValueChange={(v) => onChange({ ...filters, wheels: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[126px]">
-                  <SelectValue placeholder={t('wheelsDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('wheelsDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.wheelsOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Interior */}
-            {filterOptions.interiorOptions.length > 1 && (
-              <Select
-                value={filters.interior || '_all'}
-                onValueChange={(v) => onChange({ ...filters, interior: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[150px]">
-                  <SelectValue placeholder={t('interiorDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('interiorDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.interiorOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Country */}
-            {filterOptions.countryOptions.length > 1 && (
-              <Select
-                value={filters.country || '_all'}
-                onValueChange={(v) => onChange({ ...filters, country: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[176px]">
-                  <SelectValue placeholder={t('countryDistribution')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{t('countryDistribution')}: {tc('all')}</SelectItem>
-                  {filterOptions.countryOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      <span className="flex items-center gap-2">
-                        {o.flag && <TwemojiEmoji emoji={o.flag} size={16} />}
-                        {o.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Delivery Location */}
-            {filterOptions.deliveryLocationOptions.length > 1 && (
-              <Select
-                value={filters.deliveryLocation || '_all'}
-                onValueChange={(v) => onChange({ ...filters, deliveryLocation: v === '_all' ? '' : v })}
-              >
-                <SelectTrigger className="sm:w-[128px]">
-                  <SelectValue placeholder={tt('deliveryLocation')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">{tt('deliveryLocation')}: {tc('all')}</SelectItem>
-                  {filterOptions.deliveryLocationOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-        </div>
-
-        <div className="flex min-h-6 flex-wrap items-center gap-2">
-          {totalActiveCount > 0 && (
-            <>
-              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
-                <Filter className="h-3 w-3 mr-1" />
-                {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
-              </Badge>
-              <button
-                onClick={clearFilters}
-                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
-                <X className="h-3 w-3" />
-                {tc('reset')}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      {totalActiveCount > 0 && (
+        <button
+          onClick={clearFilters}
+          className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="h-3 w-3" />
+          {tc('reset')}
+        </button>
+      )}
     </div>
   )
 }

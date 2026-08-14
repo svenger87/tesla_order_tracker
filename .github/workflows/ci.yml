@@ -35,4 +35,10 @@ jobs:
         run: node scripts/validate-translations.mjs
 
       - name: Build
-        run: npx next build
+        # Mirrors the Dockerfile's builder stage. Without the worker limit
+        # Turbopack fails to resolve its own next/font/google internals on the
+        # runner and the build dies with a few hundred module-not-found errors —
+        # the same reason the Dockerfile pins it.
+        env:
+          NEXT_PRIVATE_WORKER_THREADS: 2
+        run: npm run build
