@@ -45,7 +45,8 @@
     "hide": "隐藏",
     "show": "显示",
     "only": "仅显示",
-    "compact": "紧凑"
+    "compact": "紧凑",
+    "deleteError": "删除失败。"
   },
   "home": {
     "title": "Tesla 订单与统计",

@@ -45,7 +45,8 @@
     "hide": "Skrýt",
     "show": "Zobrazit",
     "only": "Pouze",
-    "compact": "Kompaktní"
+    "compact": "Kompaktní",
+    "deleteError": "Smazání se nezdařilo."
   },
   "home": {
     "title": "Objednávky a statistiky Tesla",

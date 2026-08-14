@@ -45,7 +45,8 @@
     "hide": "Sakrij",
     "show": "Prikaži",
     "only": "Samo",
-    "compact": "Kompaktno"
+    "compact": "Kompaktno",
+    "deleteError": "Brisanje nije uspjelo."
   },
   "home": {
     "title": "Tesla narudžbe i statistike",

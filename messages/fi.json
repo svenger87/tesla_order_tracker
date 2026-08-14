@@ -45,7 +45,8 @@
     "hide": "Piilota",
     "show": "Näytä",
     "only": "Vain",
-    "compact": "Tiivis"
+    "compact": "Tiivis",
+    "deleteError": "Poistaminen epäonnistui."
   },
   "home": {
     "title": "Tesla-tilaukset ja tilastot",

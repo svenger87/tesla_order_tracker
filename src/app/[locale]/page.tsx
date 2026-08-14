@@ -270,9 +270,15 @@ export default function Home() {
       const res = await fetch(`/api/orders?id=${orderId}`, { method: 'DELETE' })
       if (res.ok) {
         fetchOrders(false, true)
+      } else {
+        // A failed delete used to be entirely silent: the row stayed where it
+        // was with no explanation, which reads as "the button does nothing".
+        const data = await res.json().catch(() => null)
+        toast.error(data?.error || tc('deleteError'))
       }
     } catch (error) {
       console.error('Failed to delete order:', error)
+      toast.error(tc('deleteError'))
     }
     setDeleteConfirm(null)
   }
@@ -295,7 +301,7 @@ export default function Home() {
       })
     } catch (error) {
       console.error('Failed to generate reset code:', error)
-      alert(error instanceof Error ? error.message : t('errorGeneratingCode'))
+      toast.error(error instanceof Error ? error.message : t('errorGeneratingCode'))
     }
   }, [t])
 

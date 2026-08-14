@@ -45,7 +45,8 @@
     "hide": "Gizle",
     "show": "Göster",
     "only": "Yalnızca",
-    "compact": "Kompakt"
+    "compact": "Kompakt",
+    "deleteError": "Silme başarısız oldu."
   },
   "home": {
     "title": "Tesla Siparişleri ve İstatistikleri",

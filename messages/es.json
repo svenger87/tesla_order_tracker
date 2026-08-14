@@ -45,7 +45,8 @@
     "hide": "Ocultar",
     "show": "Mostrar",
     "only": "Solo",
-    "compact": "Compacto"
+    "compact": "Compacto",
+    "deleteError": "Error al eliminar."
   },
   "home": {
     "title": "Pedidos y estadísticas de Tesla",

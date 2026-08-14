@@ -45,7 +45,8 @@
     "hide": "Ocultar",
     "show": "Mostrar",
     "only": "Apenas",
-    "compact": "Compacto"
+    "compact": "Compacto",
+    "deleteError": "Falha ao eliminar."
   },
   "home": {
     "title": "Encomendas e estatísticas Tesla",

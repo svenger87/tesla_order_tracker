@@ -45,7 +45,8 @@
     "hide": "Dölj",
     "show": "Visa",
     "only": "Endast",
-    "compact": "Kompakt"
+    "compact": "Kompakt",
+    "deleteError": "Borttagningen misslyckades."
   },
   "home": {
     "title": "Tesla-beställningar och statistik",

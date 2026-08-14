@@ -45,7 +45,8 @@
     "hide": "Ascunde",
     "show": "Arată",
     "only": "Doar",
-    "compact": "Compact"
+    "compact": "Compact",
+    "deleteError": "Ștergerea a eșuat."
   },
   "home": {
     "title": "Comenzi și statistici Tesla",

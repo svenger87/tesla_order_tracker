@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RefreshCw, AlertTriangle, Database, Bug, Download } from 'lucide-react'
 
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
 interface MultiSheetSyncResult extends SyncResult {
   sheets?: Array<SyncResult & { sheetLabel: string }>
@@ -284,7 +285,7 @@ export function ImportExportTab() {
                 document.body.removeChild(a)
               } catch (err) {
                 console.error('Export error:', err)
-                alert(t('exportFailed'))
+                toast.error(t('exportFailed'))
               } finally {
                 setExporting(false)
               }

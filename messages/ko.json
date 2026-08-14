@@ -45,7 +45,8 @@
     "hide": "숨기기",
     "show": "표시",
     "only": "만 표시",
-    "compact": "간략히"
+    "compact": "간략히",
+    "deleteError": "삭제에 실패했습니다."
   },
   "home": {
     "title": "Tesla 주문 및 통계",

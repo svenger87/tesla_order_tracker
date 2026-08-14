@@ -45,7 +45,8 @@
     "hide": "Verbergen",
     "show": "Tonen",
     "only": "Alleen",
-    "compact": "Compact"
+    "compact": "Compact",
+    "deleteError": "Verwijderen mislukt."
   },
   "home": {
     "title": "Tesla bestellingen en statistieken",

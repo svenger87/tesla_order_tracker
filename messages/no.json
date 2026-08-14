@@ -45,7 +45,8 @@
     "hide": "Skjul",
     "show": "Vis",
     "only": "Bare",
-    "compact": "Kompakt"
+    "compact": "Kompakt",
+    "deleteError": "Sletting mislyktes."
   },
   "home": {
     "title": "Tesla-bestillinger og statistikk",

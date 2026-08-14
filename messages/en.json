@@ -45,7 +45,8 @@
     "hide": "Hide",
     "show": "Show",
     "only": "Only",
-    "compact": "Compact"
+    "compact": "Compact",
+    "deleteError": "Deletion failed."
   },
   "home": {
     "title": "Tesla Orders and Statistics",

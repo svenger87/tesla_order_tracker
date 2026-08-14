@@ -45,7 +45,8 @@
     "hide": "非表示",
     "show": "表示",
     "only": "のみ表示",
-    "compact": "コンパクト"
+    "compact": "コンパクト",
+    "deleteError": "削除に失敗しました。"
   },
   "home": {
     "title": "Tesla 注文と統計",
