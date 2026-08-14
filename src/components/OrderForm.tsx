@@ -28,8 +28,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2, Ban } from 'lucide-react'
+import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -47,6 +46,7 @@ import {
   AppearanceStep,
   DeliveryStep,
   TrackingStep,
+  CancellationStep,
   PasswordStep,
 } from '@/components/form-steps'
 import { useApiError } from '@/hooks/useApiError'
@@ -629,13 +629,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         icon: ClipboardList,
         label: t('statusTracking'),
         content: (
-          <TrackingStep
-            formData={formData}
-            handleChange={handleChange}
-            t={(key: string) => t(key)}
-            DatePickerField={DatePickerField}
-            dateLocale={dateLocale}
-          />
+          <div className="space-y-4">
+            <TrackingStep
+              formData={formData}
+              handleChange={handleChange}
+              t={(key: string) => t(key)}
+              DatePickerField={DatePickerField}
+              dateLocale={dateLocale}
+            />
+            {/* Reachable on a phone at last — this control existed only in the
+                desktop tree, so wizard users could not cancel their order. */}
+            {order && (
+              <CancellationStep
+                formData={formData}
+                handleChange={handleChange}
+                t={(key: string) => t(key)}
+              />
+            )}
+          </div>
         ),
       },
     ]
@@ -1219,28 +1230,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           {/* Cancellation — edit mode only; a new order is never born cancelled */}
           {order && (
-            <div className={cn(
-              'mt-4 space-y-3 rounded-lg border p-4 transition-colors',
-              formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'surface-subtle'
-            )}>
-              <h4 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <Ban className={cn('h-4 w-4', formData.cancelled ? 'text-destructive' : 'text-muted-foreground')} />
-                {t('cancelledTitle')}
-              </h4>
-              <p className="text-sm text-muted-foreground">{t('cancelledDescription')}</p>
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  id="cancelled"
-                  checked={!!formData.cancelled}
-                  onCheckedChange={(v) => handleChange('cancelled', v === true)}
-                />
-                <Label htmlFor="cancelled" className="cursor-pointer text-sm font-medium">
-                  {t('cancelledLabel')}
-                </Label>
-              </div>
-              {formData.cancelled && (
-                <p className="text-xs text-muted-foreground">{t('cancelledHint')}</p>
-              )}
+            <div className="mt-4">
+              <CancellationStep
+                formData={formData}
+                handleChange={handleChange}
+                t={(key: string) => t(key)}
+              />
             </div>
           )}
 

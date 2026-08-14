@@ -290,6 +290,22 @@
   outline-offset: 2px;
 }
 
+/**
+ * Draw the ring inside where there is no room outside it.
+ *
+ * The offset above puts the ring 2px beyond the element. An element sitting
+ * flush against a container with overflow:hidden therefore loses that part of
+ * it — the search field is the first child of a clipped dialog, so the top of
+ * its ring was sliced off. Same ring, drawn inward.
+ *
+ * This has to live here rather than as a utility class on the component:
+ * the rule above is unlayered, and unlayered styles beat anything Tailwind
+ * emits inside a layer no matter how specific the class is.
+ */
+[data-slot="command-input"]:focus-visible {
+  outline-offset: -3px;
+}
+
 /* Tesla theme utilities */
 .text-tesla-red {
   color: oklch(0.55 0.22 25);
