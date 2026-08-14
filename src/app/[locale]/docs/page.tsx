@@ -15,7 +15,7 @@ const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
 
 export default function ApiDocsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <style jsx global>{`
         /* Swagger UI customizations */
         .swagger-ui .topbar {
@@ -39,36 +39,38 @@ export default function ApiDocsPage() {
         .swagger-ui .opblock .opblock-summary-operation-id {
           font-size: 0.875rem;
         }
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-          .swagger-ui,
-          .swagger-ui .info .title,
-          .swagger-ui .info .description,
-          .swagger-ui .opblock-tag,
-          .swagger-ui table thead tr th,
-          .swagger-ui table tbody tr td,
-          .swagger-ui .tab li,
-          .swagger-ui .opblock .opblock-summary-description,
-          .swagger-ui .opblock-description-wrapper p {
+        /* Dark mode: keyed to the app theme class, not the OS setting.
+           next-themes toggles the .dark class on the html element, so a
+           prefers-color-scheme query here disagreed with the rest of the app
+           whenever the OS setting and the in-app toggle differed. */
+        .dark .swagger-ui,
+        .dark .swagger-ui .info .title,
+        .dark .swagger-ui .info .description,
+        .dark .swagger-ui .opblock-tag,
+        .dark .swagger-ui table thead tr th,
+        .dark .swagger-ui table tbody tr td,
+        .dark .swagger-ui .tab li,
+        .dark .swagger-ui .opblock .opblock-summary-description,
+        .dark .swagger-ui .opblock-description-wrapper p {
             color: #e5e5e5;
           }
-          .swagger-ui .opblock {
+        .dark .swagger-ui .opblock {
             background: #1a1a1a;
             border-color: #333;
           }
-          .swagger-ui .opblock .opblock-summary {
+        .dark .swagger-ui .opblock .opblock-summary {
             border-color: #333;
           }
-          .swagger-ui .opblock-body pre.microlight {
+        .dark .swagger-ui .opblock-body pre.microlight {
             background: #2d2d2d;
           }
-          .swagger-ui section.models {
+        .dark .swagger-ui section.models {
             border-color: #333;
           }
-          .swagger-ui section.models.is-open h4 {
+        .dark .swagger-ui section.models.is-open h4 {
             border-color: #333;
           }
-        }
+
       `}</style>
       <div className="container mx-auto px-4 py-8">
         <SwaggerUI url="/api/api-docs" />
