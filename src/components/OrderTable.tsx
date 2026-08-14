@@ -949,7 +949,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       </div>
 
       {/* Mobile Card View - only rendered on small screens */}
-      {isMobile ? (
+      {/* Both views are always in the DOM and switched with CSS. Branching on a
+          JS media query meant the server always emitted the desktop table, so
+          every phone painted it once and then swapped to cards — a visible jump
+          on each page load, and more obvious now that the page ships with its
+          data. The hidden container measures zero, so its virtualizer keeps
+          only the overscan rows. */}
+      <div className="md:hidden">{
         filteredAndSortedOrders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
@@ -1032,10 +1038,10 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             </div>
           </div>
         )
-      ) : null}
+      }</div>
 
       {/* Desktop Table View - only rendered on medium+ screens */}
-      {!isMobile ? (<><div
+      <div className="hidden md:block"><div
         ref={tableContainerRef}
         onScroll={handleTableScroll}
         className="bg-card dark:bg-card w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
@@ -1383,7 +1389,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <div style={{ width: scrollWidth, height: '1px' }} />
         </div>
       )}
-      </>) : null}
+      </div>
 
       {/* Car image modal */}
       <Dialog open={!!imageModalOrder} onOpenChange={(open) => { if (!open) setImageModalOrder(null) }}>
