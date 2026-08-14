@@ -940,7 +940,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {/* Track widths must stay in sync with OrderCard's grid, or the
                 labels sit over the wrong column (they used to: "Wartezeit"
                 landed above the car image and "Bild" above the chevron). */}
-            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b bg-muted/30 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b surface-subtle px-3 py-2 text-[11px] font-medium text-muted-foreground">
               <span />
               <span className="truncate">{t('name')}</span>
               <button

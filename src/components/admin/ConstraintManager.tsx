@@ -487,7 +487,7 @@ export function ConstraintManager() {
               const config = fieldConfigs[field.type] || { type: 'none', allowedValues: [], fixedValue: '' }
 
               return (
-                <div key={field.type} className="space-y-3 p-4 rounded-lg bg-muted/30">
+                <div key={field.type} className="space-y-3 p-4 rounded-lg surface-subtle">
                   <div className="flex items-center justify-between">
                     <Label className="text-base font-medium">{tf(field.type as 'wheels' | 'color' | 'interior' | 'range' | 'drive' | 'towHitch' | 'seats')}</Label>
                     {config.type !== 'none' && (

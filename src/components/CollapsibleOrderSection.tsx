@@ -96,7 +96,7 @@ export function CollapsibleOrderSection({
           value={group.label}
           className="overflow-hidden rounded-lg border bg-card transition-colors hover:border-primary/20"
         >
-          <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 hover:no-underline transition-colors">
+          <AccordionTrigger className="px-4 py-3 hover:surface-subtle hover:no-underline transition-colors">
             <OrderGroupHeader
               label={group.label}
               total={stats.total}
