@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
 import { checkRateLimit, clientKey } from '@/lib/rate-limit'
 import { computeETag, isNotModified } from '@/lib/http-cache'
+import { fetchOrders } from '@/lib/orders-query'
 import { recordOrderChanges } from '@/lib/order-history'
 import {
   COLORS,
@@ -126,96 +127,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const includeArchived = searchParams.get('includeArchived') === 'true'
 
-    // Check if admin - only admins can see archived orders
+    // Only admins may see archived orders
     const admin = await getAdminFromCookie()
-    const showArchived = admin && includeArchived
-
-    // Try to query with archive filter, fall back to without if field doesn't exist
-    let orders
-    try {
-      orders = await prisma.order.findMany({
-        where: showArchived ? {} : { archived: false },
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          vehicleType: true,
-          orderDate: true,
-          country: true,
-          model: true,
-          range: true,
-          drive: true,
-          color: true,
-          interior: true,
-          wheels: true,
-          towHitch: true,
-          autopilot: true,
-          seats: true,
-          source: true,
-          tostUserId: true,
-          deliveryWindow: true,
-          deliveryLocation: true,
-          vin: true,
-          vinReceivedDate: true,
-          papersReceivedDate: true,
-          productionDate: true,
-          typeApproval: true,
-          typeVariant: true,
-          deliveryDate: true,
-          orderToProduction: true,
-          orderToVin: true,
-          orderToDelivery: true,
-          orderToPapers: true,
-          papersToDelivery: true,
-          archived: true,
-          archivedAt: true,
-          cancelled: true,
-          cancelledAt: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-    } catch {
-      // If archived field doesn't exist yet (migration not run), fetch without it
-      orders = await prisma.order.findMany({
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          vehicleType: true,
-          orderDate: true,
-          country: true,
-          model: true,
-          range: true,
-          drive: true,
-          color: true,
-          interior: true,
-          wheels: true,
-          towHitch: true,
-          autopilot: true,
-          seats: true,
-          source: true,
-          tostUserId: true,
-          deliveryWindow: true,
-          deliveryLocation: true,
-          vin: true,
-          vinReceivedDate: true,
-          papersReceivedDate: true,
-          productionDate: true,
-          typeApproval: true,
-          typeVariant: true,
-          deliveryDate: true,
-          orderToProduction: true,
-          orderToVin: true,
-          orderToDelivery: true,
-          orderToPapers: true,
-          papersToDelivery: true,
-          createdAt: true,
-        },
-      })
-      // Add default archived fields to the response
-      orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, cancelled: false, cancelledAt: null, updatedAt: o.createdAt }))
-    }
+    const orders = await fetchOrders({ includeArchived: Boolean(admin && includeArchived) })
 
     // Every open tab polls this every 30 seconds and gets the entire dataset
     // back. Most of those polls return exactly what the client already has.
