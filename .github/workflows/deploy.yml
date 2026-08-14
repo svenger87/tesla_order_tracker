@@ -90,7 +90,22 @@ jobs:
 
             # Restart the target service and reload Caddy config
             docker compose up -d --no-deps $SERVICE
-            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null || true
+
+            # This was `2>/dev/null || true`, so a rejected or unreloadable
+            # Caddyfile looked exactly like a clean deploy: the job went green,
+            # the config never took effect, and nothing anywhere said so.
+            CADDY_OK=1
+            echo ">>> Validating Caddyfile"
+            if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile; then
+              echo ">>> Caddyfile is INVALID — the running proxy config is left untouched"
+              CADDY_OK=0
+            else
+              echo ">>> Reloading Caddy"
+              if ! docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile; then
+                echo ">>> Caddy reload FAILED — the running proxy config is left untouched"
+                CADDY_OK=0
+              fi
+            fi
 
             # Wait for health check
             echo ">>> Waiting for health check on port $PORT..."
@@ -98,6 +113,12 @@ jobs:
               if wget -qO- http://localhost:$PORT/api/health 2>/dev/null | grep -q '"ok"'; then
                 echo ">>> Health check passed!"
                 docker logout ghcr.io 2>/dev/null || true
+                # The app is up either way — no rollback for a proxy problem —
+                # but a deploy whose config never applied is not a success.
+                if [ "$CADDY_OK" != "1" ]; then
+                  echo ">>> App is healthy, but the Caddy config was NOT applied (see above)."
+                  exit 1
+                fi
                 exit 0
               fi
               sleep 2
