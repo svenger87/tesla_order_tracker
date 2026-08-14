@@ -80,15 +80,15 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
             }}
             itemStyle={{
-              color: 'hsl(var(--foreground))',
+              color: 'var(--foreground)',
             }}
             labelStyle={{
-              color: 'hsl(var(--foreground))',
+              color: 'var(--foreground)',
             }}
             formatter={(value) => {
               const numValue = typeof value === 'number' ? value : 0

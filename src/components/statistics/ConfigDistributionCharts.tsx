@@ -112,17 +112,17 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   fontSize: '12px',
-                  color: 'hsl(var(--foreground))',
+                  color: 'var(--foreground)',
                 }}
                 itemStyle={{
-                  color: 'hsl(var(--foreground))',
+                  color: 'var(--foreground)',
                 }}
                 labelStyle={{
-                  color: 'hsl(var(--foreground))',
+                  color: 'var(--foreground)',
                   fontWeight: 600,
                 }}
                 formatter={(value, _name, props) => {
