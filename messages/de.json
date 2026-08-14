@@ -773,7 +773,14 @@
     "orderToVin": "Bestellung → VIN",
     "orderToDelivery": "Bestellung → Lieferung",
     "orderToPapers": "Bestellung → Papiere",
-    "papersToDelivery": "Papiere → Lieferung"
+    "papersToDelivery": "Papiere → Lieferung",
+    "waitedLabel": "Gewartet",
+    "waitingLabel": "Wartet seit",
+    "daysUnit": "Tage",
+    "fasterThanComparable": "{days} Tage schneller als vergleichbare Bestellungen (Median {median})",
+    "slowerThanComparable": "{days} Tage länger als vergleichbare Bestellungen (Median {median})",
+    "matchesComparable": "Genau im Schnitt vergleichbarer Bestellungen (Median {median})",
+    "comparableTypically": "Vergleichbare Bestellungen brauchten im Median {median} Tage"
   },
   "updatesFeed": {
     "title": "Letzte Updates",

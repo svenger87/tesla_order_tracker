@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
 import { Order, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
 import { findColorInfo } from '@/lib/color-lookup'
+import { getWaitComparison } from '@/lib/wait-comparison'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
 import { Link } from '@/i18n/navigation'
@@ -42,6 +43,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
 
   const t = await getTranslations({ locale, namespace: 'tracking' })
   const tp = await getTranslations({ locale, namespace: 'progress' })
+  const to = await getTranslations({ locale, namespace: 'options' })
 
   // Fetch all non-archived orders and settings
   const [allOrders, settings] = await Promise.all([
@@ -200,6 +202,10 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     ).slice(0, 8)
   }
 
+  // How long this took, next to comparable orders. The comparable set was
+  // already gathered above and shown as cards; this turns it into an answer.
+  const waitComparison = getWaitComparison(order, similar)
+
   // Percentile calculation for delivered orders
   let fasterPercent: number | null = null
   if (order.orderToDelivery != null) {
@@ -214,10 +220,27 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     }
   }
 
-  // Resolve internal values to display labels
-  const resolve = (value: string | null, options: { value: string; label: string }[]): string | null => {
+  /**
+   * Resolve a stored value to a label in the reader's language.
+   *
+   * The constants in lib/types carry German labels — they are the seed data,
+   * not the display layer — so resolving against them alone put "Schwarz",
+   * "Nein" and "5-Sitzer" on the English page next to English field names. The
+   * rest of the app goes through useOptions(), which reads the `options`
+   * namespace; this is a server component, so it does the same lookup directly.
+   */
+  const resolve = (
+    value: string | null,
+    options: { value: string; label: string }[],
+    type?: string,
+  ): string | null => {
     if (!value) return null
     const match = options.find(o => o.value === value || o.label.toLowerCase() === value.toLowerCase())
+    const key = match?.value ?? value
+    if (type) {
+      const translationKey = `${type}.${key}` as Parameters<typeof to.has>[0]
+      if (to.has(translationKey)) return to(translationKey)
+    }
     return match?.label || value
   }
 
@@ -228,14 +251,14 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     { label: t('orderDate'), value: order.orderDate },
     { label: t('vehicle'), value: order.vehicleType },
     { label: t('model'), value: resolve(order.model, allTrims) },
-    { label: t('range'), value: resolve(order.range, RANGES) },
+    { label: t('range'), value: resolve(order.range, RANGES, 'range') },
     { label: t('drive'), value: resolve(order.drive, DRIVES) },
     { label: t('color'), value: colorInfo?.label || order.color },
-    { label: t('interior'), value: resolve(order.interior, INTERIORS) },
+    { label: t('interior'), value: resolve(order.interior, INTERIORS, 'interior') },
     { label: t('wheels'), value: order.wheels ? `${order.wheels}"` : null },
-    { label: t('towHitch'), value: resolve(order.towHitch, TOW_HITCH_OPTIONS) },
-    { label: t('seats'), value: resolve(order.seats, SEATS_OPTIONS) },
-    { label: t('autopilot'), value: resolve(order.autopilot, AUTOPILOT_OPTIONS) },
+    { label: t('towHitch'), value: resolve(order.towHitch, TOW_HITCH_OPTIONS, 'towHitch') },
+    { label: t('seats'), value: resolve(order.seats, SEATS_OPTIONS, 'seats') },
+    { label: t('autopilot'), value: resolve(order.autopilot, AUTOPILOT_OPTIONS, 'autopilot') },
     { label: t('country'), value: countryInfo?.label || order.country },
     { label: t('deliveryWindow'), value: order.deliveryWindow },
     { label: t('deliveryLocation'), value: order.deliveryLocation },
@@ -276,6 +299,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
       similar={similar}
       prediction={predictionData}
       fasterPercent={fasterPercent}
+      waitComparison={waitComparison}
       detailFields={detailFields}
       durationFields={durationFields}
       colorInfo={colorInfo ? { hex: colorInfo.hex, border: colorInfo.border, label: colorInfo.label } : null}
@@ -286,7 +310,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
         model: resolve(order.model, allTrims),
         range: resolve(order.range, RANGES),
         drive: resolve(order.drive, DRIVES),
-        interior: resolve(order.interior, INTERIORS),
+        interior: resolve(order.interior, INTERIORS, 'interior'),
       }}
     />
   )

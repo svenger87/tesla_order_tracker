@@ -773,7 +773,14 @@
     "orderToVin": "Order → VIN",
     "orderToDelivery": "Order → Delivery",
     "orderToPapers": "Order → Documents",
-    "papersToDelivery": "Documents → Delivery"
+    "papersToDelivery": "Documents → Delivery",
+    "waitedLabel": "Waited",
+    "waitingLabel": "Waiting",
+    "daysUnit": "days",
+    "fasterThanComparable": "{days} days faster than comparable orders (median {median})",
+    "slowerThanComparable": "{days} days slower than comparable orders (median {median})",
+    "matchesComparable": "Right on the median for comparable orders ({median})",
+    "comparableTypically": "Comparable orders took a median of {median} days"
   },
   "updatesFeed": {
     "title": "Recent updates",

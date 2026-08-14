@@ -773,7 +773,14 @@
     "papersToDelivery": "Documents → Livraison",
     "predictionSampleRecent": "Basé sur {count} livraisons des {days} derniers jours",
     "exceedsPessimisticHint": "Votre temps d'attente actuel ({days} jours) dépasse déjà l'estimation pessimiste. La prédiction est basée sur les délais de livraison historiques et n'est plus fiable dans cette situation — référez-vous à la fenêtre de livraison officielle Tesla.",
-    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours. Les données ci-dessous ne sont peut-être plus à jour."
+    "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours. Les données ci-dessous ne sont peut-être plus à jour.",
+    "waitedLabel": "Attente",
+    "waitingLabel": "En attente",
+    "daysUnit": "jours",
+    "fasterThanComparable": "{days} jours plus vite que des commandes comparables (médiane {median})",
+    "slowerThanComparable": "{days} jours de plus que des commandes comparables (médiane {median})",
+    "matchesComparable": "Pile sur la médiane des commandes comparables ({median})",
+    "comparableTypically": "Les commandes comparables ont pris {median} jours en médiane"
   },
   "support": {
     "communityMessage": "Ces données sont maintenues par la communauté pour la communauté. Si ce site vous aide, vous pouvez soutenir les coûts de serveur.",

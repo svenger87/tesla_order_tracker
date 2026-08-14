@@ -1,78 +1,104 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Order } from '@/lib/types'
 import { useTranslations } from 'next-intl'
-import { Badge } from '@/components/ui/badge'
+import { parseGermanDate } from '@/lib/date-utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { Info } from 'lucide-react'
 
 interface SimilarOrdersProps {
   orders: Order[]
   currentOrderId: string
+  /** The wait this list is being compared against, so it can be marked. */
+  ownWaitDays?: number | null
 }
 
-export function SimilarOrders({ orders, currentOrderId }: SimilarOrdersProps) {
+/**
+ * Comparable orders, as a comparison.
+ *
+ * This was eight cards each carrying a vehicle badge and a trim badge — both
+ * identical on every card, because the orders are comparable by definition, so
+ * the badges said nothing and the brand red said it eight times. What actually
+ * differs is the wait, and that was the smallest thing on the row. It is now a
+ * ranked list with a bar, which is the only reason to show these at all: to see
+ * where your own wait sits among them.
+ */
+export function SimilarOrders({ orders, currentOrderId, ownWaitDays }: SimilarOrdersProps) {
   const t = useTranslations('tracking')
 
-  const filtered = orders.filter(o => o.id !== currentOrderId)
+  const rows = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-  if (filtered.length === 0) return null
+    return orders
+      .filter(o => o.id !== currentOrderId)
+      .map(o => {
+        const from = parseGermanDate(o.orderDate)
+        const to = parseGermanDate(o.deliveryDate)
+        const delivered = Boolean(to && to.getTime() <= today.getTime())
+        return {
+          id: o.id,
+          name: o.name,
+          orderDate: o.orderDate,
+          delivered,
+          waitDays: from ? Math.round(((delivered && to ? to : today).getTime() - from.getTime()) / 86_400_000) : null,
+        }
+      })
+      .sort((a, b) => (a.waitDays ?? Infinity) - (b.waitDays ?? Infinity))
+  }, [orders, currentOrderId])
+
+  if (rows.length === 0) return null
+
+  const longest = Math.max(...rows.map(r => r.waitDays ?? 0), ownWaitDays ?? 0, 1)
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{t('similarOrders')}</CardTitle>
-        {filtered.length < 3 && (
-          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+        {rows.length < 3 && (
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Info className="h-3.5 w-3.5 shrink-0" />
             {t('fewSimilar')}
           </p>
         )}
       </CardHeader>
       <CardContent>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {filtered.map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+        <ul className="grid gap-px overflow-hidden rounded-lg border bg-border">
+          {rows.map(row => (
+            <li
+              key={row.id}
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 bg-card px-3 py-2.5"
             >
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm truncate">{order.name}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                    {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
-                  </Badge>
-                  {order.model && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                      {order.model}
-                    </Badge>
-                  )}
-                </div>
-                {order.orderDate && (
-                  <p className="text-xs text-muted-foreground mt-1">{order.orderDate}</p>
-                )}
-              </div>
-              <div className="text-right shrink-0">
-                {order.deliveryDate ? (
-                  <div>
-                    <Badge variant="default" className="bg-green-600 text-white text-[10px] px-1.5 py-0">
-                      {order.deliveryDate}
-                    </Badge>
-                    {order.orderToDelivery != null && (
-                      <p className="text-[11px] text-muted-foreground mt-1 font-mono">
-                        {order.orderToDelivery}d
-                      </p>
-                    )}
-                  </div>
+              <span className="min-w-0 truncate text-sm font-medium">{row.name}</span>
+              <span className="text-right text-sm font-semibold tabular-nums">
+                {row.waitDays !== null ? (
+                  <>
+                    {row.waitDays}
+                    <span className="ml-1 text-[10px] font-normal uppercase tracking-wide text-muted-foreground">
+                      {t('daysUnit')}
+                    </span>
+                  </>
                 ) : (
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                    {t('pending')}
-                  </Badge>
+                  <span className="text-xs font-normal text-muted-foreground">–</span>
                 )}
-              </div>
-            </div>
+              </span>
+
+              <span className="col-span-2 flex items-center gap-2">
+                <span className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                  <span
+                    className={cn('block h-full rounded-full', row.delivered ? 'bg-success' : 'bg-pending')}
+                    style={{ width: `${Math.round(((row.waitDays ?? 0) / longest) * 100)}%` }}
+                  />
+                </span>
+                <span className="shrink-0 text-[11px] text-muted-foreground">
+                  {row.delivered ? row.orderDate : t('pending')}
+                </span>
+              </span>
+            </li>
           ))}
-        </div>
+        </ul>
       </CardContent>
     </Card>
   )

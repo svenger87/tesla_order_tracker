@@ -37,6 +37,12 @@ interface TrackingPageClientProps {
     daysElapsedFromReference: number
   } | null
   fasterPercent: number | null
+  waitComparison: {
+    waitedDays: number
+    isDelivered: boolean
+    comparableMedian: number | null
+    differenceDays: number | null
+  } | null
   detailFields: { label: string; value: string | null }[]
   durationFields: { label: string; value: number | null }[]
   colorInfo: { hex: string; border: boolean; label: string } | null
@@ -56,6 +62,7 @@ export function TrackingPageClient({
   similar,
   prediction,
   fasterPercent,
+  waitComparison,
   detailFields,
   durationFields,
   colorInfo,
@@ -251,13 +258,55 @@ export function TrackingPageClient({
                     )}
                   </div>
 
-                  {/* Faster percent badge */}
-                  {fasterPercent !== null && fasterPercent > 0 && (
-                    <div className="flex justify-center sm:justify-start">
-                      <Badge variant="outline" className="text-green-700 border-green-200 bg-green-50 dark:text-green-400 dark:border-green-800 dark:bg-green-900/30 gap-1">
-                        <TrendingUp className="h-3 w-3" />
-                        {t('deliveredFaster', { percent: fasterPercent })}
-                      </Badge>
+                  {/* The wait is what this page is about, so it is the largest
+                      thing on it after the name — and it says straight away
+                      whether that number is normal. The comparable orders were
+                      already on the page as a list of cards; now they answer a
+                      question instead of just being present. */}
+                  {waitComparison && (
+                    <div className="flex flex-col items-center gap-1 sm:items-start">
+                      <div className="flex items-baseline gap-2">
+                        <span className={cn(
+                          'text-4xl font-extrabold tabular-nums tracking-tight sm:text-5xl',
+                          waitComparison.isDelivered ? 'text-success' : 'text-pending',
+                        )}>
+                          {waitComparison.waitedDays}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {t('daysUnit')} · {waitComparison.isDelivered ? t('waitedLabel') : t('waitingLabel')}
+                        </span>
+                      </div>
+
+                      {waitComparison.differenceDays !== null && waitComparison.comparableMedian !== null && (
+                        <p className="text-xs text-muted-foreground">
+                          {/* A verdict only makes sense once the wait has
+                              ended. Calling someone "44 days faster" while they
+                              are on day 25 of an open wait would tell everyone
+                              who ordered last week that they are winning. Until
+                              handover, the comparable figure is stated and left
+                              at that. */}
+                          {!waitComparison.isDelivered
+                            ? t('comparableTypically', { median: waitComparison.comparableMedian })
+                            : waitComparison.differenceDays! < 0
+                              ? t('fasterThanComparable', {
+                                  days: Math.abs(waitComparison.differenceDays!),
+                                  median: waitComparison.comparableMedian,
+                                })
+                              : waitComparison.differenceDays! > 0
+                                ? t('slowerThanComparable', {
+                                    days: waitComparison.differenceDays!,
+                                    median: waitComparison.comparableMedian,
+                                  })
+                                : t('matchesComparable', { median: waitComparison.comparableMedian })}
+                        </p>
+                      )}
+
+                      {fasterPercent !== null && fasterPercent > 0 && (
+                        <Badge variant="outline" className="mt-1 gap-1 border-success/30 bg-success/10 text-success">
+                          <TrendingUp className="h-3 w-3" />
+                          {t('deliveredFaster', { percent: fasterPercent })}
+                        </Badge>
+                      )}
                     </div>
                   )}
                 </div>
@@ -405,7 +454,7 @@ export function TrackingPageClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <SimilarOrders orders={similar} currentOrderId={order.id} />
+            <SimilarOrders orders={similar} currentOrderId={order.id} ownWaitDays={waitComparison?.waitedDays ?? null} />
           </motion.div>
         )}
 

@@ -773,7 +773,14 @@
     "papersToDelivery": "Asiakirjat → toimitus",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Odotettu",
+    "waitingLabel": "Odottaa",
+    "daysUnit": "päivää",
+    "fasterThanComparable": "{days} päivää nopeammin kuin vastaavat tilaukset (mediaani {median})",
+    "slowerThanComparable": "{days} päivää hitaammin kuin vastaavat tilaukset (mediaani {median})",
+    "matchesComparable": "Täsmälleen vastaavien tilausten mediaani ({median})",
+    "comparableTypically": "Vastaavat tilaukset kestivät mediaanina {median} päivää"
   },
   "support": {
     "communityMessage": "Tätä dataa ylläpitää yhteisö yhteisölle. Jos tämä sivusto auttaa sinua, voit tukea palvelinkustannuksia.",
