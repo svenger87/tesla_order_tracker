@@ -94,6 +94,10 @@ export function CollapsibleOrderSection({
         <AccordionItem
           key={group.label}
           value={group.label}
+          // Lets the search jump straight to a quarter. Without it the caller
+          // had to guess, scanning every open Radix element on the page for one
+          // whose text happened to contain the quarter label.
+          data-quarter={group.label}
           className="overflow-hidden rounded-lg border bg-card transition-colors hover:border-primary/20"
         >
           <AccordionTrigger className="px-4 py-3 hover:surface-subtle hover:no-underline transition-colors">

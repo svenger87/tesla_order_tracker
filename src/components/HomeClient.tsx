@@ -305,6 +305,7 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
   }, [t, apiError])
 
   const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
+  const [searchTarget, setSearchTarget] = useState<{ orderId: string; quarterLabel: string } | null>(null)
 
   const handleSearchSelect = useCallback((orderId: string, quarterLabel: string) => {
     // Expand the target quarter, keeping already-open ones (quarter label already known from search result)
@@ -312,19 +313,40 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
       return prev.includes(quarterLabel) ? prev : [...prev, quarterLabel]
     })
     setHighlightOrderId(orderId)
-
-    requestAnimationFrame(() => {
-      const triggers = document.querySelectorAll('[data-state="open"]')
-      const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-      setTimeout(() => setScrollToOrderId(orderId), 300)
-    })
+    setSearchTarget({ orderId, quarterLabel })
 
     setTimeout(() => setHighlightOrderId(null), 3000)
-    setTimeout(() => setScrollToOrderId(null), 1000)
   }, [])
+
+  /**
+   * Scroll to the order the search landed on, once its quarter is on screen.
+   *
+   * This ran in a requestAnimationFrame fired straight after asking React to
+   * expand the quarter, so it raced the render that creates the section — and
+   * it located that section by scanning every element with `data-state="open"`
+   * for one whose text contained the quarter label. That attribute is on any
+   * open Radix component: a dropdown, a tooltip, the filter popover. An effect
+   * runs after the commit, and the quarter now carries its own attribute.
+   */
+  useEffect(() => {
+    if (!searchTarget) return
+
+    const section = document.querySelector(
+      `[data-quarter="${CSS.escape(searchTarget.quarterLabel)}"]`
+    )
+    // On phones the quarters are one flat table, so there is no section to
+    // scroll to — scrollToOrderId still takes the view to the row itself.
+    section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setSearchTarget(null)
+
+    // Let the quarter finish opening before pointing the table at the row.
+    const toRow = setTimeout(() => setScrollToOrderId(searchTarget.orderId), 300)
+    const clear = setTimeout(() => setScrollToOrderId(null), 1300)
+    return () => {
+      clearTimeout(toRow)
+      clearTimeout(clear)
+    }
+  }, [searchTarget])
 
   return (
     <div className="min-h-screen bg-background">
