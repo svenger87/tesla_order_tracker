@@ -680,7 +680,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   )
 
   // Virtualizer for desktop table rows
-  const ROW_HEIGHT = 38
+  // Estimate only — the virtualizer remeasures each rendered row. Nudged up
+  // with the body text going from 11px to 12px so the first paint is closer.
+  const ROW_HEIGHT = 40
   // TanStack Virtual intentionally returns imperative functions; keep this hook outside compiler memoization.
   // eslint-disable-next-line react-hooks/incompatible-library
   const tableVirtualizer = useVirtualizer({
@@ -940,7 +942,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {/* Track widths must stay in sync with OrderCard's grid, or the
                 labels sit over the wrong column (they used to: "Wartezeit"
                 landed above the car image and "Bild" above the chevron). */}
-            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b surface-subtle px-3 py-2 text-[11px] font-medium text-muted-foreground">
+            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b surface-subtle px-3 py-2 text-xs font-medium text-muted-foreground">
               <span />
               <span className="truncate">{t('name')}</span>
               <button
@@ -958,7 +960,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     <ArrowUpDown className="h-3 w-3 shrink-0" />
                   )}
                 </span>
-                <span className="truncate text-[10px] font-normal opacity-70">{t('waitingDays')}</span>
+                <span className="truncate text-[11px] font-normal opacity-70">{t('waitingDays')}</span>
               </button>
               <span className="sr-only">{t('image')}</span>
               <span className="sr-only">{tc('actions')}</span>
@@ -1021,7 +1023,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         onScroll={handleTableScroll}
         className="bg-card dark:bg-card w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-[11px] [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
+        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
             <col style={{ width: 42 }} />
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
