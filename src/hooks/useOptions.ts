@@ -26,6 +26,7 @@ import {
   VehicleType,
 } from '@/lib/types'
 import { compareOptionLabels } from '@/lib/optionSort'
+import { dedupedJson } from '@/lib/dedupe-fetch'
 
 interface OptionMetadata {
   flag?: string
@@ -146,13 +147,10 @@ export function useOptions(vehicleType?: VehicleType) {
           params.set('vehicleType', vehicleType)
         }
         const url = `/api/options${params.toString() ? `?${params}` : ''}`
-        const res = await fetch(url)
-        if (res.ok) {
-          const data = await res.json()
-          setApiOptions(data)
-        } else {
-          setError('Failed to load options')
-        }
+        // Six components call this hook, and each used to open its own request
+        // on mount — the same list arrived four times on one page load.
+        const data = await dedupedJson<ApiOption[]>(url)
+        setApiOptions(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
