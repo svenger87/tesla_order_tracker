@@ -4,6 +4,7 @@ import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
 import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+import { computeETag, isNotModified } from '@/lib/http-cache'
 import { recordOrderChanges } from '@/lib/order-history'
 import {
   COLORS,
@@ -215,9 +216,24 @@ export async function GET(request: NextRequest) {
       // Add default archived fields to the response
       orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, cancelled: false, cancelledAt: null, updatedAt: o.createdAt }))
     }
-    return NextResponse.json(orders, {
-      headers: { 'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=25' },
-    })
+
+    // Every open tab polls this every 30 seconds and gets the entire dataset
+    // back. Most of those polls return exactly what the client already has.
+    const etag = computeETag(orders)
+    const cacheHeaders = {
+      // max-age=0 + must-revalidate makes the browser re-ask every time and send
+      // If-None-Match, which is what turns an unchanged poll into an empty 304.
+      // Without it the response carried only s-maxage, which shared caches honour
+      // and browsers ignore, so no client ever revalidated.
+      'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=5, stale-while-revalidate=25',
+      'ETag': etag,
+    }
+
+    if (isNotModified(request.headers.get('if-none-match'), etag)) {
+      return new NextResponse(null, { status: 304, headers: cacheHeaders })
+    }
+
+    return NextResponse.json(orders, { headers: cacheHeaders })
   } catch (error) {
     console.error('Failed to fetch orders:', error)
     // Return empty array to prevent frontend crash
