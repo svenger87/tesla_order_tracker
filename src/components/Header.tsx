@@ -138,12 +138,17 @@ export function Header({ isAdmin, settings }: HeaderProps) {
               <Link href="/admin">
                 <Button variant="outline" size="icon" className="h-9 w-9 border-primary/30 text-primary" title="Admin">
                   <LogIn className="h-4 w-4" />
+                  {/* The icon-only buttons above carry one of these; these two
+                      were left without a name, and a title alone is not one a
+                      touch device ever shows. */}
+                  <span className="sr-only">Admin</span>
                 </Button>
               </Link>
             ) : (
               <Link href="/admin/login">
                 <Button variant="ghost" size="icon" className="h-9 w-9" title="Admin">
                   <LogIn className="h-4 w-4" />
+                  <span className="sr-only">Admin</span>
                 </Button>
               </Link>
             )}

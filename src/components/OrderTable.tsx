@@ -738,6 +738,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className={buttonClassName} title={tc('actions')}>
               <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">{tc('actions')}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -795,6 +796,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           title={tc('edit')}
         >
           <Pencil className="h-4 w-4" />
+          <span className="sr-only">{tc('edit')}</span>
         </Button>
       )
     }

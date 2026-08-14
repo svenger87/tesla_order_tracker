@@ -451,7 +451,11 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={() => fetchOrders(true)} disabled={refreshing} className="text-muted-foreground">
                   <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  {/* Below sm the label is hidden, which left the button with no
+                      name at all on exactly the devices that never show a title
+                      tooltip. sr-only keeps it named once the text goes away. */}
                   <span className="hidden sm:inline">{tc('refresh')}</span>
+                  <span className="sr-only sm:hidden">{tc('refresh')}</span>
                 </Button>
               </div>
             </div>
