@@ -14,6 +14,8 @@ interface TrackingStepProps {
     locale?: Locale
   }>
   dateLocale: Locale
+  /** See PersonalDataStep — `contents` lets the desktop grid own these fields. */
+  className?: string
 }
 
 export function TrackingStep({
@@ -22,9 +24,10 @@ export function TrackingStep({
   t,
   DatePickerField,
   dateLocale,
+  className = 'space-y-4',
 }: TrackingStepProps) {
   return (
-    <div className="space-y-4">
+    <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="vin">{t('vin')}</Label>
         <Input

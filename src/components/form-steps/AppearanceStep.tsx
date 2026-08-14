@@ -32,6 +32,8 @@ interface AppearanceStepProps {
   ) => T[]
   filterOptions: (modelValue: string, fieldType: keyof ConstraintsForModel, options: FormOption[]) => FormOption[]
   t: (key: string, values?: Record<string, string>) => string
+  /** See PersonalDataStep — `contents` lets the desktop grid own these fields. */
+  className?: string
 }
 
 export function AppearanceStep({
@@ -51,9 +53,10 @@ export function AppearanceStep({
   getFieldOptions,
   filterOptions,
   t,
+  className = 'space-y-4',
 }: AppearanceStepProps) {
   return (
-    <div className="space-y-4">
+    <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="color">{t('color')} *</Label>
         <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
