@@ -79,7 +79,14 @@ jobs:
 
             # Update config files from the pushed branch
             git fetch origin ${{ github.ref_name }}
-            git checkout origin/${{ github.ref_name }} -- docker-compose.yml Caddyfile
+            git checkout origin/${{ github.ref_name }} -- docker-compose.yml
+
+            # The Caddyfile is written in place rather than checked out. Docker
+            # bind-mounts a single file by inode, and `git checkout` replaces the
+            # file instead of rewriting it — which silently detaches the mount, so
+            # the container keeps serving the copy it started with no matter how
+            # often the config is "updated" and reloaded.
+            git show origin/${{ github.ref_name }}:Caddyfile > Caddyfile
 
             # Log in and pull the new image (NEVER build on VPS)
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
@@ -95,6 +102,22 @@ jobs:
             # Caddyfile looked exactly like a clean deploy: the job went green,
             # the config never took effect, and nothing anywhere said so.
             CADDY_OK=1
+
+            # Catches a detached bind mount directly: if these differ, the
+            # container is reading something other than the repo's config and
+            # every reload below is operating on the wrong file.
+            echo ">>> Checking the container sees the current Caddyfile"
+            if ! docker compose exec -T caddy cat /etc/caddy/Caddyfile | diff -q - Caddyfile >/dev/null; then
+              echo ">>> MISMATCH: the Caddyfile inside the caddy container is not the one in the repo."
+              echo ">>> Recreating the caddy container to re-attach the mount"
+              docker compose up -d --force-recreate caddy
+              sleep 3
+              if ! docker compose exec -T caddy cat /etc/caddy/Caddyfile | diff -q - Caddyfile >/dev/null; then
+                echo ">>> Still mismatched after recreate — not a stale mount, needs a look"
+                CADDY_OK=0
+              fi
+            fi
+
             echo ">>> Validating Caddyfile"
             if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile; then
               echo ">>> Caddyfile is INVALID — the running proxy config is left untouched"
