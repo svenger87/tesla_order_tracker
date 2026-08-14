@@ -438,7 +438,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       let requestBody
       if (order) {
         if (isLegacy) {
-          requestBody = { id: order.id, isLegacy: true, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
+          // editCode carries the name the user proved they knew in the verify
+          // step; the server re-checks it rather than trusting isLegacy alone.
+          requestBody = { id: order.id, isLegacy: true, editCode, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         } else {
           requestBody = { id: order.id, editCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         }
