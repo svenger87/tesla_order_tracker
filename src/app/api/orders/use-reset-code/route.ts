@@ -1,10 +1,23 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+
+// A 6-digit code is only 900k possibilities — without a limit it is guessable
+// in minutes, which would hand over the order it was issued for.
+const RESET_CODE_RULE = { limit: 5, windowMs: 15 * 60 * 1000 }
 
 // User endpoint to use a one-time reset code and set a new password
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(clientKey(request, 'use-reset-code'), RESET_CODE_RULE)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Zu viele Versuche. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+      )
+    }
+
     const { resetCode, newPassword } = await request.json()
 
     if (!resetCode) {

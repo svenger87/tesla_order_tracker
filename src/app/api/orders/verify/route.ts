@@ -1,6 +1,11 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+
+// Password guessing against individual orders, and bulk probing of which orders
+// still have no password at all, both run through here.
+const VERIFY_RULE = { limit: 30, windowMs: 5 * 60 * 1000 }
 
 // Bcrypt-aware password comparison
 async function comparePassword(input: string, stored: string): Promise<boolean> {
@@ -12,6 +17,14 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
 
 export async function GET(request: NextRequest) {
   try {
+    const limit = checkRateLimit(clientKey(request, 'verify'), VERIFY_RULE)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Zu viele Versuche. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const editCode = searchParams.get('editCode')
     const orderId = searchParams.get('orderId')
