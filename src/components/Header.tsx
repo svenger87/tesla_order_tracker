@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
@@ -239,46 +239,5 @@ export function Header({ isAdmin, settings }: HeaderProps) {
         </SheetContent>
       </Sheet>
     </header>
-  )
-}
-
-/**
- * Self-contained header wrapper that fetches its own data.
- * Used in layout.tsx (server component) to avoid prop drilling.
- */
-export function HeaderWithData() {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [settings, setSettings] = useState<{ showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-
-    void Promise.all([
-      fetch('/api/auth/check'),
-      fetch('/api/settings'),
-    ])
-      .then(async ([authRes, settingsRes]) => {
-        const [authData, settingsData] = await Promise.all([
-          authRes.json(),
-          settingsRes.json(),
-        ])
-        if (cancelled) return
-        setIsAdmin(authData.authenticated)
-        setSettings(settingsData)
-      })
-      .catch(() => {
-        // Silently handle; header renders fine without admin/settings.
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return (
-    <Header
-      isAdmin={isAdmin}
-      settings={settings}
-    />
   )
 }
