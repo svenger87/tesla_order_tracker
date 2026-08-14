@@ -173,9 +173,20 @@ npx prisma studio
 ### Production
 
 Production runs the same SQLite engine, on a Docker volume mounted at
-`/app/data` (`prod.db` for master, `staging.db` for staging). The container
-entrypoint runs `scripts/migrate-schema.mjs` before starting the server, so
-schema changes apply on deploy.
+`/app/data` (`prod.db` for master, `staging.db` for staging).
+
+Schema changes reach production through **one** mechanism, and it is not Prisma
+Migrate: the container entrypoint runs `scripts/migrate-schema.mjs`, which diffs
+`schema-template.db` — built into the image from `prisma/schema.prisma` — against
+the live database and adds whatever tables, columns and indexes are missing.
+
+In practice: **edit `prisma/schema.prisma`, and the next deploy applies it.**
+
+The step is additive only. It never drops or renames a column and never
+backfills data, so anything destructive or data-shaped belongs in a script under
+`scripts/`, run deliberately. `prisma/migrations/` is kept for local development;
+older hand-written SQL lives in [`docs/legacy-migrations`](docs/legacy-migrations)
+and is not run by anything.
 
 ## Data Import
 
