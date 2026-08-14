@@ -45,7 +45,8 @@
     "hide": "Skryť",
     "show": "Zobraziť",
     "only": "Iba",
-    "compact": "Kompaktné"
+    "compact": "Kompaktné",
+    "deleteError": "Odstránenie zlyhalo."
   },
   "home": {
     "title": "Objednávky a štatistiky Tesla",

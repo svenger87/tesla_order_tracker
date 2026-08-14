@@ -45,7 +45,8 @@
     "hide": "Elrejtés",
     "show": "Megjelenítés",
     "only": "Csak",
-    "compact": "Kompakt"
+    "compact": "Kompakt",
+    "deleteError": "A törlés sikertelen."
   },
   "home": {
     "title": "Tesla rendelések és statisztikák",

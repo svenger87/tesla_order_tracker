@@ -45,7 +45,8 @@
     "hide": "Masquer",
     "show": "Afficher",
     "only": "Uniquement",
-    "compact": "Compact"
+    "compact": "Compact",
+    "deleteError": "La suppression a échoué."
   },
   "home": {
     "title": "Commandes et statistiques Tesla",

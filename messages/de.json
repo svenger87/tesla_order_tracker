@@ -45,7 +45,8 @@
     "hide": "Ausblenden",
     "show": "Anzeigen",
     "only": "Nur",
-    "compact": "Kompakt"
+    "compact": "Kompakt",
+    "deleteError": "Löschen fehlgeschlagen."
   },
   "home": {
     "title": "Tesla Bestellungen und Statistiken",
