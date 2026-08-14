@@ -43,7 +43,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { RefreshCw, Car, BarChart3, Copy, Check, KeyRound, ChevronUp, Calculator, Medal } from 'lucide-react'
+import { RefreshCw, Car, Copy, Check, KeyRound, ChevronUp, Calculator, Medal } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface HomeClientProps {
@@ -347,37 +347,38 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
           />
         )}
 
-        <div className="flex flex-col gap-2 sm:rounded-xl sm:border sm:bg-card/90 sm:p-2 sm:shadow-[var(--shadow-card)] sm:backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowStats(!showStats)}
-            className="h-10 justify-between gap-2 px-4 text-base sm:h-8 sm:justify-center sm:px-3 sm:text-sm"
-          >
-            <BarChart3 className="h-4 w-4" />
-            <span className="mr-auto sm:mr-0">{showStats ? t('hideStats') : t('showStats')}</span>
-            <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
-          </Button>
-        </div>
 
-        {showStats && !loading && (
-          <section className="overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)]">
-            <div className="border-b bg-card">
-              <div className="flex items-center justify-between border-b px-4 py-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</p>
-                  <h3 className="text-base font-semibold tracking-tight">{t('statsSubtitle')}</h3>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPrediction(true)}
-                  className="hidden gap-2 sm:inline-flex"
-                >
-                  <Calculator className="h-4 w-4" />
-                  {tp('title')}
-                </Button>
-              </div>
+        {/* The disclosure sits on the thing it discloses. It used to be a
+            full-width bordered card containing one button, directly above the
+            card it toggled. */}
+        <section className="overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)]">
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <button
+              type="button"
+              onClick={() => setShowStats(!showStats)}
+              className="flex min-w-0 items-center gap-3 text-left"
+              aria-expanded={showStats}
+            >
+              <ChevronUp className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
+              <span className="min-w-0">
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</span>
+                <span className="block truncate text-base font-semibold tracking-tight">{t('statsSubtitle')}</span>
+              </span>
+            </button>
+            {showStats && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPrediction(true)}
+                className="hidden shrink-0 gap-2 sm:inline-flex"
+              >
+                <Calculator className="h-4 w-4" />
+                {tp('title')}
+              </Button>
+            )}
+          </div>
+          {showStats && !loading && (
+            <div className="border-t">
               <div className="px-3 py-3 sm:px-4">
                 <div className="space-y-4">
                   <StatisticsDashboard
@@ -407,8 +408,8 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
                 </div>
               </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* Orders Section */}
         <Card className="overflow-hidden border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
