@@ -1322,9 +1322,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       const isDelivered = deliveryParsed && deliveryParsed <= new Date()
                       return (
                         <Badge
-                          variant={isDelivered ? "default" : "outline"}
+                          /* Always `outline`: the `default` variant brings its
+                             own bg-primary, so a delivered badge carried both
+                             that and bg-success and the winner came down to
+                             stylesheet order. */
+                          variant="outline"
                           className={isDelivered
-                            ? "bg-success text-white hover:opacity-90"
+                            ? "border-success/30 bg-success/15 text-success"
                             : "text-muted-foreground"
                           }
                         >

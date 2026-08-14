@@ -59,7 +59,7 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
               className={cn(
                 'flex-1 h-1 rounded-full transition-colors duration-500',
                 index < currentIndex
-                  ? isDelivered ? 'bg-green-500' : 'bg-primary'
+                  ? isDelivered ? 'bg-success' : 'bg-pending'
                   : 'bg-muted'
               )}
             />
@@ -75,15 +75,15 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
           const dateValue = order[step.dateField]
 
           const circleColor = isScheduledDelivery
-            ? 'bg-amber-500 text-white'
+            ? 'bg-pending text-white'
             : isLastStep && isDelivered
-              ? 'bg-green-500 text-white'
+              ? 'bg-success text-white'
               : isCompleted
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-pending text-white'
                 : 'bg-muted text-muted-foreground'
 
           const ringStyle = isCurrent && !isScheduledDelivery && !isDelivered
-            ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-background'
+            ? 'ring-2 ring-pending/50 ring-offset-2 ring-offset-background'
             : isScheduledDelivery
               ? 'ring-2 ring-amber-500/50 ring-offset-2 ring-offset-background'
               : isDelivered && isLastStep
@@ -113,10 +113,10 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
                     className={cn(
                       'absolute inset-0 rounded-full',
                       isScheduledDelivery
-                        ? 'bg-amber-500'
+                        ? 'bg-pending'
                         : isDelivered
-                          ? 'bg-green-500'
-                          : 'bg-primary'
+                          ? 'bg-success'
+                          : 'bg-pending'
                     )}
                     animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
                     transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
