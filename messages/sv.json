@@ -41,7 +41,11 @@
     "projectSupport": "Stöd detta projekt",
     "reset": "Återställ",
     "ordersRefreshed": "{count} beställningar uppdaterade",
-    "refreshError": "Fel vid uppdatering"
+    "refreshError": "Fel vid uppdatering",
+    "hide": "Dölj",
+    "show": "Visa",
+    "only": "Endast",
+    "compact": "Kompakt"
   },
   "home": {
     "title": "Tesla-beställningar och statistik",

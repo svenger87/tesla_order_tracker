@@ -41,7 +41,11 @@
     "projectSupport": "このプロジェクトを支援する",
     "reset": "リセット",
     "ordersRefreshed": "{count} 件の注文を更新しました",
-    "refreshError": "更新に失敗しました"
+    "refreshError": "更新に失敗しました",
+    "hide": "非表示",
+    "show": "表示",
+    "only": "のみ表示",
+    "compact": "コンパクト"
   },
   "home": {
     "title": "Tesla 注文と統計",

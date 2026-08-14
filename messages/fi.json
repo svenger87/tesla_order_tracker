@@ -41,7 +41,11 @@
     "projectSupport": "Tue tätä projektia",
     "reset": "Nollaa",
     "ordersRefreshed": "{count} tilausta päivitetty",
-    "refreshError": "Virhe päivittäessä"
+    "refreshError": "Virhe päivittäessä",
+    "hide": "Piilota",
+    "show": "Näytä",
+    "only": "Vain",
+    "compact": "Tiivis"
   },
   "home": {
     "title": "Tesla-tilaukset ja tilastot",

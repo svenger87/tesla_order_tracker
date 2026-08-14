@@ -41,7 +41,11 @@
     "projectSupport": "Projekt unterstützen",
     "reset": "Zurücksetzen",
     "ordersRefreshed": "{count} Bestellungen aktualisiert",
-    "refreshError": "Fehler beim Aktualisieren"
+    "refreshError": "Fehler beim Aktualisieren",
+    "hide": "Ausblenden",
+    "show": "Anzeigen",
+    "only": "Nur",
+    "compact": "Kompakt"
   },
   "home": {
     "title": "Tesla Bestellungen und Statistiken",

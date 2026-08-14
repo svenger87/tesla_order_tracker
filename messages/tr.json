@@ -41,7 +41,11 @@
     "projectSupport": "Bu projeyi destekleyin",
     "reset": "Sıfırla",
     "ordersRefreshed": "{count} sipariş yenilendi",
-    "refreshError": "Yenileme sırasında hata"
+    "refreshError": "Yenileme sırasında hata",
+    "hide": "Gizle",
+    "show": "Göster",
+    "only": "Yalnızca",
+    "compact": "Kompakt"
   },
   "home": {
     "title": "Tesla Siparişleri ve İstatistikleri",

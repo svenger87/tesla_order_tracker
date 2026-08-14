@@ -41,7 +41,11 @@
     "projectSupport": "支持此项目",
     "reset": "重置",
     "ordersRefreshed": "{count} 个订单已刷新",
-    "refreshError": "刷新失败"
+    "refreshError": "刷新失败",
+    "hide": "隐藏",
+    "show": "显示",
+    "only": "仅显示",
+    "compact": "紧凑"
   },
   "home": {
     "title": "Tesla 订单与统计",

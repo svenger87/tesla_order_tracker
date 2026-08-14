@@ -41,7 +41,11 @@
     "projectSupport": "Wesprzyj ten projekt",
     "reset": "Resetuj",
     "ordersRefreshed": "{count} zamówień odświeżonych",
-    "refreshError": "Błąd podczas odświeżania"
+    "refreshError": "Błąd podczas odświeżania",
+    "hide": "Ukryj",
+    "show": "Pokaż",
+    "only": "Tylko",
+    "compact": "Kompaktowy"
   },
   "home": {
     "title": "Zamówienia i statystyki Tesla",

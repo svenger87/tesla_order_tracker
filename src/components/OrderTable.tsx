@@ -349,11 +349,17 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
   const isActive = currentField === field
 
   return (
+    // A real button rather than a click handler on the cell: sorting used to be
+    // mouse-only, and aria-sort gives screen readers the current direction.
     <TableHead
-      className={cn("font-bold whitespace-nowrap cursor-pointer select-none hover:bg-muted/80 transition-colors bg-muted dark:bg-muted", className)}
-      onClick={() => onSort(field)}
+      aria-sort={isActive ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+      className={cn("font-bold whitespace-nowrap select-none bg-muted dark:bg-muted p-0", className)}
     >
-      <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className="flex w-full items-center gap-1 px-2 py-1 text-left transition-colors hover:bg-muted/80 focus-visible:outline-2 focus-visible:-outline-offset-2"
+      >
         <span className="truncate">{children}</span>
         <span className="ml-1 shrink-0">
           {isActive ? (
@@ -366,7 +372,7 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
             <ArrowUpDown className="h-3 w-3 opacity-30" />
           )}
         </span>
-      </div>
+      </button>
     </TableHead>
   )
 }
@@ -419,12 +425,30 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
-// All columns visible by default
-const DEFAULT_VISIBLE_COLUMNS = new Set(
-  COLUMN_DEFS.map(c => c.key)
-)
+/**
+ * Column presets.
+ *
+ * Everything used to be on by default, which put the table at roughly 3,900px
+ * of minimum width — horizontal scrolling from the first second, on every
+ * screen. "Compact" is what someone checking on their own order needs; the
+ * other two are one click away.
+ */
+const ESSENTIAL_KEYS = COLUMN_DEFS.filter(c => c.group === 'essential').map(c => c.key)
 
-const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
+const COLUMN_PRESETS = {
+  compact: [...ESSENTIAL_KEYS, 'carImage', 'country', 'model', 'deliveryWindow', 'deliveryDate', 'waitingDays'],
+  configuration: [...ESSENTIAL_KEYS, ...COLUMN_DEFS.filter(c => c.group === 'configuration').map(c => c.key)],
+  all: COLUMN_DEFS.map(c => c.key),
+} as const
+
+type PresetName = keyof typeof COLUMN_PRESETS
+
+const DEFAULT_VISIBLE_COLUMNS = new Set<string>(COLUMN_PRESETS.compact)
+
+// v3: the default changed from "everything" to the compact preset. Bumping the
+// key lets existing visitors see the new default once instead of keeping a
+// stored set that predates it; their own later choices persist as before.
+const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v3'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 const COLUMNS_SCHEMA = COLUMN_DEFS.map(c => c.key).sort().join(',')
 
@@ -543,6 +567,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   }, [visibleColumns, isHydrated])
 
   const isColumnVisible = useCallback((key: string) => visibleColumns.has(key), [visibleColumns])
+
+  const isPresetActive = useCallback((preset: PresetName) => {
+    const keys = COLUMN_PRESETS[preset]
+    return keys.length === visibleColumns.size && keys.every(k => visibleColumns.has(k))
+  }, [visibleColumns])
 
   const toggleColumn = useCallback((key: string) => {
     setVisibleColumns(prev => {
@@ -813,7 +842,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             </button>
           )}
         </div>
-        {/* VIN pill toggle */}
+        {/* Each pill cycles and names the state it is in. They used to read
+            "VIN ✓" / "VIN ✗", which said neither what the symbol meant nor what
+            pressing again would do — and announced nothing to a screen reader. */}
         <Button
           variant={localFilters.hasVin === 'yes' ? 'default' : localFilters.hasVin === 'no' ? 'secondary' : 'outline'}
           size="sm"
@@ -823,7 +854,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             hasVin: f.hasVin === '' ? 'yes' : f.hasVin === 'yes' ? 'no' : ''
           }))}
         >
-          VIN {localFilters.hasVin === 'yes' ? '\u2713' : localFilters.hasVin === 'no' ? '\u2717' : ''}
+          {t('vin')}: {localFilters.hasVin === 'yes' ? tc('yes') : localFilters.hasVin === 'no' ? tc('no') : tc('all')}
         </Button>
         {/* Delivery pill toggle */}
         <Button
@@ -835,7 +866,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             hasDelivery: f.hasDelivery === '' ? 'yes' : f.hasDelivery === 'yes' ? 'no' : ''
           }))}
         >
-          {t('deliveredFilter')} {localFilters.hasDelivery === 'yes' ? '\u2713' : localFilters.hasDelivery === 'no' ? '\u2717' : ''}
+          {t('deliveredFilter')}: {localFilters.hasDelivery === 'yes' ? tc('yes') : localFilters.hasDelivery === 'no' ? tc('no') : tc('all')}
         </Button>
         {/* Stale pill toggle: '' (all) \u2192 'hide' (hide stale) \u2192 'only' (only stale) \u2192 '' */}
         <Button
@@ -848,7 +879,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             staleness: f.staleness === '' ? 'hide' : f.staleness === 'hide' ? 'only' : ''
           }))}
         >
-          {t('staleFilter')} {localFilters.staleness === 'hide' ? '\u2717' : localFilters.staleness === 'only' ? '\u2713' : ''}
+          {t('staleFilter')}: {localFilters.staleness === 'hide' ? tc('hide') : localFilters.staleness === 'only' ? tc('only') : tc('all')}
         </Button>
         {/* Cancelled pill: '' (hidden) → 'show' (mixed in) → 'only' → '' */}
         <Button
@@ -861,7 +892,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             cancelled: f.cancelled === '' ? 'show' : f.cancelled === 'show' ? 'only' : ''
           }))}
         >
-          {t('cancelledFilter')} {localFilters.cancelled === 'show' ? '+' : localFilters.cancelled === 'only' ? '✓' : ''}
+          {t('cancelledFilter')}: {localFilters.cancelled === 'show' ? tc('show') : localFilters.cancelled === 'only' ? tc('only') : tc('hide')}
         </Button>
         {/* Column visibility only applies to the desktop table */}
         <Popover>
@@ -874,6 +905,19 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <PopoverContent className="w-[240px] p-3" align="start">
             <div className="space-y-3">
               <p className="text-sm font-medium">{tc('visibleColumns')}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {(['compact', 'configuration', 'all'] as PresetName[]).map(preset => (
+                  <Button
+                    key={preset}
+                    variant={isPresetActive(preset) ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-7 flex-1 text-xs"
+                    onClick={() => setVisibleColumns(new Set(COLUMN_PRESETS[preset]))}
+                  >
+                    {tc(preset)}
+                  </Button>
+                ))}
+              </div>
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tc('configuration')}</p>
                 {COLUMN_DEFS.filter(c => c.group === 'configuration').map(col => (

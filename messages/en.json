@@ -41,7 +41,11 @@
     "projectSupport": "Support this project",
     "reset": "Reset",
     "ordersRefreshed": "{count} orders refreshed",
-    "refreshError": "Failed to refresh orders"
+    "refreshError": "Failed to refresh orders",
+    "hide": "Hide",
+    "show": "Show",
+    "only": "Only",
+    "compact": "Compact"
   },
   "home": {
     "title": "Tesla Orders and Statistics",

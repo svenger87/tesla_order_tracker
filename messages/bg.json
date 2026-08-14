@@ -41,7 +41,11 @@
     "projectSupport": "Подкрепете този проект",
     "reset": "Нулиране",
     "ordersRefreshed": "{count} поръчки опреснени",
-    "refreshError": "Грешка при опресняване"
+    "refreshError": "Грешка при опресняване",
+    "hide": "Скрий",
+    "show": "Покажи",
+    "only": "Само",
+    "compact": "Компактно"
   },
   "home": {
     "title": "Поръчки и статистики на Tesla",
