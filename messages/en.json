@@ -177,7 +177,9 @@
     "clickEditToChange": "Click \"Edit\" and enter your password to change your order data.",
     "saveCodeWarning": "Save this code to edit your order later.",
     "codeShownOnce": "This code is only shown once!",
-    "codeUsageHint": "Use this code under \"Edit order\" to change your data."
+    "codeUsageHint": "Use this code under \"Edit order\" to change your data.",
+    "backToOverview": "Back to overview",
+    "viewMyOrder": "View my order"
   },
   "editByCode": {
     "passwordPromptTitle": "Edit order",
@@ -796,7 +798,9 @@
     "adminDashboard": "Admin Dashboard",
     "navigationMenu": "Navigation menu",
     "impressum": "Legal Notice",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Toggle theme",
+    "changeLanguage": "Change language"
   },
   "footer": {
     "operatedBy": "Operated by Sven",

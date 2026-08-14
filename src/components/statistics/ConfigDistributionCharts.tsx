@@ -50,8 +50,10 @@ interface MiniPieChartProps {
 
 export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieChartProps) {
   const t = useTranslations('statistics')
-  // Filter out "Unbekannt" if there are other values
-  const filteredData = data.filter(d => d.name !== 'Unbekannt' || data.length === 1)
+  // The caller has already dropped the UNKNOWN_OPTION sentinel and localized
+  // every name. The filter that used to sit here compared against the German
+  // "Unbekannt", so it never matched in any other language anyway.
+  const filteredData = data
 
   if (filteredData.length === 0) {
     return (

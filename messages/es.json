@@ -177,7 +177,9 @@
     "clickEditToChange": "Haga clic en \"Editar\" e introduzca su contraseña para modificar los datos de su pedido.",
     "saveCodeWarning": "Guarde este código para editar su pedido más adelante.",
     "codeShownOnce": "¡Este código solo se muestra una vez!",
-    "codeUsageHint": "Utilice este código en \"Editar pedido\" para cambiar sus datos."
+    "codeUsageHint": "Utilice este código en \"Editar pedido\" para cambiar sus datos.",
+    "backToOverview": "Volver al resumen",
+    "viewMyOrder": "Ver mi pedido"
   },
   "editByCode": {
     "passwordPromptTitle": "Editar pedido",
@@ -768,7 +770,9 @@
     "adminDashboard": "Panel de administración",
     "navigationMenu": "Menú de navegación",
     "impressum": "Aviso legal",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Cambiar tema",
+    "changeLanguage": "Cambiar idioma"
   },
   "footer": {
     "operatedBy": "Operado por Sven",

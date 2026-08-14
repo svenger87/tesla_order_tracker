@@ -177,7 +177,9 @@
     "clickEditToChange": "Sipariş verilerinizi değiştirmek için \"Düzenle\"ye tıklayın ve şifrenizi girin.",
     "saveCodeWarning": "Siparişinizi daha sonra düzenlemek için bu kodu kaydedin.",
     "codeShownOnce": "Bu kod yalnızca bir kez gösterilir!",
-    "codeUsageHint": "Verilerinizi değiştirmek için bu kodu \"Siparişi düzenle\" bölümünde kullanın."
+    "codeUsageHint": "Verilerinizi değiştirmek için bu kodu \"Siparişi düzenle\" bölümünde kullanın.",
+    "backToOverview": "Genel bakışa dön",
+    "viewMyOrder": "Siparişimi görüntüle"
   },
   "editByCode": {
     "passwordPromptTitle": "Siparişi düzenle",
@@ -768,7 +770,9 @@
     "adminDashboard": "Yönetici Paneli",
     "navigationMenu": "Gezinme menüsü",
     "impressum": "Yasal Bildirim",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Temayı değiştir",
+    "changeLanguage": "Dili değiştir"
   },
   "footer": {
     "operatedBy": "Sven tarafından işletilmektedir",

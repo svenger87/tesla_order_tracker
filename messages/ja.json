@@ -177,7 +177,9 @@
     "clickEditToChange": "「編集」をクリックし、パスワードを入力して注文データを変更してください。",
     "saveCodeWarning": "後で注文を編集するために、このコードを保存してください。",
     "codeShownOnce": "このコードは一度のみ表示されます！",
-    "codeUsageHint": "「注文を編集」でこのコードを使用してデータを変更してください。"
+    "codeUsageHint": "「注文を編集」でこのコードを使用してデータを変更してください。",
+    "backToOverview": "一覧に戻る",
+    "viewMyOrder": "自分の注文を見る"
   },
   "editByCode": {
     "passwordPromptTitle": "注文を編集",
@@ -768,7 +770,9 @@
     "adminDashboard": "管理者ダッシュボード",
     "navigationMenu": "ナビゲーションメニュー",
     "impressum": "法的情報",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "テーマを切り替える",
+    "changeLanguage": "言語を変更"
   },
   "footer": {
     "operatedBy": "Sven が運営",

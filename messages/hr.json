@@ -177,7 +177,9 @@
     "clickEditToChange": "Kliknite \"Uredi“ i unesite lozinku za promjenu podataka narudžbe.",
     "saveCodeWarning": "Spremite ovaj kôd za kasniju izmjenu narudžbe.",
     "codeShownOnce": "Ovaj kôd se prikazuje samo jednom!",
-    "codeUsageHint": "Koristite ovaj kôd pod \"Uređivanje narudžbe“ za promjenu podataka."
+    "codeUsageHint": "Koristite ovaj kôd pod \"Uređivanje narudžbe“ za promjenu podataka.",
+    "backToOverview": "Natrag na pregled",
+    "viewMyOrder": "Pogledaj moju narudžbu"
   },
   "editByCode": {
     "passwordPromptTitle": "Uređivanje narudžbe",
@@ -768,7 +770,9 @@
     "adminDashboard": "Administratorska ploča",
     "navigationMenu": "Navigacijski izbornik",
     "impressum": "Pravna obavijest",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Promijeni temu",
+    "changeLanguage": "Promijeni jezik"
   },
   "footer": {
     "operatedBy": "Vodi Sven",

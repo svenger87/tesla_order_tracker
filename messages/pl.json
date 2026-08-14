@@ -177,7 +177,9 @@
     "clickEditToChange": "Kliknij \"Edytuj\" i wprowadź hasło, aby zmienić dane zamówienia.",
     "saveCodeWarning": "Zapisz ten kod, aby móc edytować zamówienie później.",
     "codeShownOnce": "Ten kod jest wyświetlany tylko raz!",
-    "codeUsageHint": "Użyj tego kodu w sekcji \"Edytuj zamówienie\", aby zmienić dane."
+    "codeUsageHint": "Użyj tego kodu w sekcji \"Edytuj zamówienie\", aby zmienić dane.",
+    "backToOverview": "Powrót do przeglądu",
+    "viewMyOrder": "Zobacz moje zamówienie"
   },
   "editByCode": {
     "passwordPromptTitle": "Edytuj zamówienie",
@@ -768,7 +770,9 @@
     "adminDashboard": "Panel administratora",
     "navigationMenu": "Menu nawigacji",
     "impressum": "Nota prawna",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Zmień motyw",
+    "changeLanguage": "Zmień język"
   },
   "footer": {
     "operatedBy": "Prowadzony przez Svena",

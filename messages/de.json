@@ -177,7 +177,9 @@
     "clickEditToChange": "Klicke auf \"Bearbeiten\" und gib dein Passwort ein, um deine Bestelldaten zu ändern.",
     "saveCodeWarning": "Speichere diesen Code, um deine Bestellung später bearbeiten zu können.",
     "codeShownOnce": "Dieser Code wird nur einmal angezeigt!",
-    "codeUsageHint": "Mit diesem Code kannst du unter \"Bestellung bearbeiten\" deine Daten ändern."
+    "codeUsageHint": "Mit diesem Code kannst du unter \"Bestellung bearbeiten\" deine Daten ändern.",
+    "backToOverview": "Zur Übersicht",
+    "viewMyOrder": "Meine Bestellung ansehen"
   },
   "editByCode": {
     "passwordPromptTitle": "Bestellung bearbeiten",
@@ -796,7 +798,9 @@
     "adminDashboard": "Admin Dashboard",
     "navigationMenu": "Navigationsmenü",
     "impressum": "Impressum",
-    "privacy": "Datenschutz"
+    "privacy": "Datenschutz",
+    "toggleTheme": "Design wechseln",
+    "changeLanguage": "Sprache wechseln"
   },
   "footer": {
     "operatedBy": "Betrieben von Sven",

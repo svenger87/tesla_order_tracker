@@ -177,7 +177,9 @@
     "clickEditToChange": "点击“编辑”并输入您的密码来更改订单数据。",
     "saveCodeWarning": "请保存此代码以便日后编辑您的订单。",
     "codeShownOnce": "此代码仅显示一次！",
-    "codeUsageHint": "在“编辑订单”中使用此代码来更改您的数据。"
+    "codeUsageHint": "在“编辑订单”中使用此代码来更改您的数据。",
+    "backToOverview": "返回总览",
+    "viewMyOrder": "查看我的订单"
   },
   "editByCode": {
     "passwordPromptTitle": "编辑订单",
@@ -768,7 +770,9 @@
     "adminDashboard": "管理员仪表板",
     "navigationMenu": "导航菜单",
     "impressum": "法律声明",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "切换主题",
+    "changeLanguage": "更改语言"
   },
   "footer": {
     "operatedBy": "由 Sven 运营",
