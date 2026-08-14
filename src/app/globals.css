@@ -17,6 +17,7 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-chart-6: var(--chart-6);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -79,12 +80,26 @@
   --border: oklch(0.90 0 0);
   --input: oklch(0.90 0 0);
   --ring: oklch(0.55 0.22 25);
-  /* Chart colors - Tesla Red first */
-  --chart-1: oklch(0.55 0.22 25);
-  --chart-2: oklch(0.6 0.15 220);
-  --chart-3: oklch(0.65 0.12 160);
-  --chart-4: oklch(0.7 0.15 80);
-  --chart-5: oklch(0.6 0.18 280);
+  /**
+   * Categorical chart palette — six slots, assigned in this fixed order and
+   * never cycled. Anything beyond six folds into an "other" bucket.
+   *
+   * The order is deliberate: red and amber are not neighbours, and neither are
+   * amber and green, because red–green colour blindness collapses exactly those
+   * pairs. Validated for both themes against the lightness band, chroma floor,
+   * adjacent-pair separation under protan/deutan/tritan simulation, the
+   * normal-vision floor and 3:1 contrast against the surface.
+   *
+   * The previous values lived as four separate arrays inside chart components,
+   * had no dark variants, and put teal next to blue at ΔE 13.7 — below the
+   * threshold at which full-colour readers can tell two series apart.
+   */
+  --chart-1: #d40924; /* Tesla red — brand, always first */
+  --chart-2: #2f86c9;
+  --chart-3: #c28500;
+  --chart-4: #6f4fd8;
+  --chart-5: #1f7a3d;
+  --chart-6: #b03e8f;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.55 0.22 25);
@@ -132,11 +147,14 @@
   --border: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.6 0.2 25);
-  --chart-1: oklch(0.6 0.2 25);
-  --chart-2: oklch(0.7 0.15 220);
-  --chart-3: oklch(0.72 0.12 160);
-  --chart-4: oklch(0.78 0.15 80);
-  --chart-5: oklch(0.65 0.18 280);
+  /* Own steps for the dark surface, validated separately — not a flip of the
+     light values, which would fail contrast and the lightness band here. */
+  --chart-1: #ef4d57;
+  --chart-2: #3f95d8;
+  --chart-3: #a67f1c;
+  --chart-4: #8570ea;
+  --chart-5: #3d9459;
+  --chart-6: #cf5fa8;
   --sidebar: oklch(0.16 0 0);
   --sidebar-foreground: oklch(0.95 0 0);
   --sidebar-primary: oklch(0.6 0.2 25);

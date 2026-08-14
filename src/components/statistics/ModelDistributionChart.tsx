@@ -4,20 +4,11 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { CHART_COLORS } from '@/lib/chart-colors'
 
 interface ModelDistributionChartProps {
   data: { model: string; count: number; fill: string }[]
 }
-
-// Colors without hsl() wrapper - direct oklch values
-const COLORS = [
-  'oklch(0.55 0.22 25)',   // Tesla Red (chart-1)
-  'oklch(0.65 0.15 220)',  // Blue (chart-2)
-  'oklch(0.70 0.12 160)',  // Teal (chart-3)
-  'oklch(0.75 0.15 80)',   // Yellow (chart-4)
-  'oklch(0.60 0.18 280)',  // Purple (chart-5)
-  'oklch(0.50 0.10 0)',    // Gray for "Andere"
-]
 
 const MAX_ITEMS = 5 // Maximum items before combining into "Andere"
 
@@ -33,7 +24,7 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
     const otherCount = otherItems.reduce((sum, item) => sum + item.count, 0)
 
     if (otherCount > 0) {
-      return [...topItems, { model: t('other'), count: otherCount, fill: COLORS[5] }]
+      return [...topItems, { model: t('other'), count: otherCount, fill: 'var(--muted-foreground)' }]
     }
     return topItems
   }, [data, t])
@@ -73,7 +64,7 @@ export function ModelDistributionChart({ data }: ModelDistributionChartProps) {
             {displayData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
+                fill={CHART_COLORS[index % CHART_COLORS.length]}
                 className="stroke-background stroke-2"
               />
             ))}

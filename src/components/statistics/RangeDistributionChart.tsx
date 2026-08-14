@@ -4,18 +4,11 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { CHART_COLORS } from '@/lib/chart-colors'
 
 interface RangeDistributionChartProps {
   data: { name: string; count: number; fill: string }[]
 }
-
-const COLORS = [
-  'oklch(0.65 0.15 220)',  // Blue (chart-2)
-  'oklch(0.70 0.12 160)',  // Teal (chart-3)
-  'oklch(0.75 0.15 80)',   // Yellow (chart-4)
-  'oklch(0.60 0.18 280)',  // Purple (chart-5)
-  'oklch(0.50 0.10 0)',    // Gray for "Andere"
-]
 
 export function RangeDistributionChart({ data }: RangeDistributionChartProps) {
   const t = useTranslations('statistics')
@@ -54,7 +47,7 @@ export function RangeDistributionChart({ data }: RangeDistributionChartProps) {
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.fill || COLORS[index % COLORS.length]}
+                fill={entry.fill || CHART_COLORS[index % CHART_COLORS.length]}
                 className="stroke-background stroke-2"
               />
             ))}
