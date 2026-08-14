@@ -41,7 +41,11 @@
     "projectSupport": "Támogassa a projektet",
     "reset": "Visszaállítás",
     "ordersRefreshed": "{count} rendelés frissítve",
-    "refreshError": "Hiba a frissítés során"
+    "refreshError": "Hiba a frissítés során",
+    "hide": "Elrejtés",
+    "show": "Megjelenítés",
+    "only": "Csak",
+    "compact": "Kompakt"
   },
   "home": {
     "title": "Tesla rendelések és statisztikák",

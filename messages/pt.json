@@ -41,7 +41,11 @@
     "projectSupport": "Apoiar este projeto",
     "reset": "Repor",
     "ordersRefreshed": "{count} encomendas atualizadas",
-    "refreshError": "Erro ao atualizar"
+    "refreshError": "Erro ao atualizar",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "only": "Apenas",
+    "compact": "Compacto"
   },
   "home": {
     "title": "Encomendas e estatísticas Tesla",

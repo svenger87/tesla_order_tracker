@@ -41,7 +41,11 @@
     "projectSupport": "Podporte tento projekt",
     "reset": "Obnoviť",
     "ordersRefreshed": "{count} objednávok aktualizovaných",
-    "refreshError": "Chyba pri aktualizácii"
+    "refreshError": "Chyba pri aktualizácii",
+    "hide": "Skryť",
+    "show": "Zobraziť",
+    "only": "Iba",
+    "compact": "Kompaktné"
   },
   "home": {
     "title": "Objednávky a štatistiky Tesla",

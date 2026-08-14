@@ -41,7 +41,11 @@
     "projectSupport": "Apoyar este proyecto",
     "reset": "Restablecer",
     "ordersRefreshed": "{count} pedidos actualizados",
-    "refreshError": "Error al actualizar"
+    "refreshError": "Error al actualizar",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "only": "Solo",
+    "compact": "Compacto"
   },
   "home": {
     "title": "Pedidos y estadísticas de Tesla",

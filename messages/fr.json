@@ -41,7 +41,11 @@
     "projectSupport": "Soutenir ce projet",
     "reset": "Réinitialiser",
     "ordersRefreshed": "{count} commandes actualisées",
-    "refreshError": "Erreur lors de l'actualisation"
+    "refreshError": "Erreur lors de l'actualisation",
+    "hide": "Masquer",
+    "show": "Afficher",
+    "only": "Uniquement",
+    "compact": "Compact"
   },
   "home": {
     "title": "Commandes et statistiques Tesla",

@@ -41,7 +41,11 @@
     "projectSupport": "Podržite ovaj projekt",
     "reset": "Poništi",
     "ordersRefreshed": "{count} narudžbi osvježeno",
-    "refreshError": "Greška pri osvježavanju"
+    "refreshError": "Greška pri osvježavanju",
+    "hide": "Sakrij",
+    "show": "Prikaži",
+    "only": "Samo",
+    "compact": "Kompaktno"
   },
   "home": {
     "title": "Tesla narudžbe i statistike",

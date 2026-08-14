@@ -41,7 +41,11 @@
     "projectSupport": "Sprijiniți acest proiect",
     "reset": "Resetează",
     "ordersRefreshed": "{count} comenzi actualizate",
-    "refreshError": "Eroare la actualizare"
+    "refreshError": "Eroare la actualizare",
+    "hide": "Ascunde",
+    "show": "Arată",
+    "only": "Doar",
+    "compact": "Compact"
   },
   "home": {
     "title": "Comenzi și statistici Tesla",

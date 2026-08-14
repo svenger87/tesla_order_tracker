@@ -41,7 +41,11 @@
     "projectSupport": "Dit project ondersteunen",
     "reset": "Resetten",
     "ordersRefreshed": "{count} bestellingen vernieuwd",
-    "refreshError": "Fout bij het vernieuwen"
+    "refreshError": "Fout bij het vernieuwen",
+    "hide": "Verbergen",
+    "show": "Tonen",
+    "only": "Alleen",
+    "compact": "Compact"
   },
   "home": {
     "title": "Tesla bestellingen en statistieken",

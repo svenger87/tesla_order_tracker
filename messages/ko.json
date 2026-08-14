@@ -41,7 +41,11 @@
     "projectSupport": "이 프로젝트를 지원해 주세요",
     "reset": "초기화",
     "ordersRefreshed": "{count}개 주문 새로고침 완료",
-    "refreshError": "새로고침 실패"
+    "refreshError": "새로고침 실패",
+    "hide": "숨기기",
+    "show": "표시",
+    "only": "만 표시",
+    "compact": "간략히"
   },
   "home": {
     "title": "Tesla 주문 및 통계",

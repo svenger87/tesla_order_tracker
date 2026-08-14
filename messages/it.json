@@ -41,7 +41,11 @@
     "projectSupport": "Sostieni questo progetto",
     "reset": "Reimposta",
     "ordersRefreshed": "{count} ordini aggiornati",
-    "refreshError": "Errore durante l'aggiornamento"
+    "refreshError": "Errore durante l'aggiornamento",
+    "hide": "Nascondi",
+    "show": "Mostra",
+    "only": "Solo",
+    "compact": "Compatto"
   },
   "home": {
     "title": "Ordini e statistiche Tesla",
