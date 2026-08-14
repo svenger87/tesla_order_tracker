@@ -1,0 +1,38 @@
+name: CI
+
+# The deploy workflow only runs on pushes to staging and master, so until now a
+# pull request was never checked at all — lint and build failures only surfaced
+# while deploying. ship.sh covers the maintainer's own pushes, not contributions.
+on:
+  pull_request:
+  push:
+    branches: [master, staging]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Validate translations
+        run: node scripts/validate-translations.mjs
+
+      - name: Build
+        run: npx next build
