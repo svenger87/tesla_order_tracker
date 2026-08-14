@@ -22,10 +22,10 @@ export function HeroSection({ onSearchOpen, onNewOrder }: HeroSectionProps) {
           </p>
           {/* Phones get the short variants — both translated, so no locale falls
               back to German the way the hardcoded strings here used to. */}
-          <h2 className="text-[30px] font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="text-[30px] font-semibold leading-tight tracking-tight sm:text-5xl">
             <span className="sm:hidden">{th('titleShort')}</span>
             <span className="hidden sm:inline">{t('title')}</span>
-          </h2>
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-3 sm:text-base">
             <span className="sm:hidden">{th('subtitle')}</span>
             <span className="hidden sm:inline">{t('subtitle')}</span>
