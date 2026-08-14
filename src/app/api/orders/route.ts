@@ -2,7 +2,8 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
-import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
+import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
 import { recordOrderChanges } from '@/lib/order-history'
 import {
   COLORS,
@@ -65,6 +66,42 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
     return bcrypt.compare(input, stored)
   }
   return input === stored
+}
+
+// Anyone may create and edit without an account, so these are the only brakes.
+const CREATE_RULE = { limit: 5, windowMs: 60 * 60 * 1000 }
+const WRITE_RULE = { limit: 60, windowMs: 15 * 60 * 1000 }
+
+function rateLimited(request: NextRequest, bucket: string, rule: { limit: number; windowMs: number }) {
+  const limit = checkRateLimit(clientKey(request, bucket), rule)
+  if (limit.allowed) return null
+  return NextResponse.json(
+    { error: 'Zu viele Anfragen. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+    { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+  )
+}
+
+/**
+ * Reject chronologically impossible dates. These fields are community-editable
+ * and feed the public wait-time medians, so this is the only defence the numbers
+ * on the front page have.
+ */
+function dateSequenceError(data: Record<string, unknown>) {
+  const code = findDateSequenceError(data)
+  if (!code) return null
+  const messages: Record<string, string> = {
+    ORDER_DATE_IN_FUTURE: 'Das Bestelldatum kann nicht in der Zukunft liegen.',
+    PRODUCTION_BEFORE_ORDER: 'Das Produktionsdatum kann nicht vor dem Bestelldatum liegen.',
+    PAPERS_BEFORE_ORDER: 'Das Papierdatum kann nicht vor dem Bestelldatum liegen.',
+    PAPERS_BEFORE_PRODUCTION: 'Das Papierdatum kann nicht vor dem Produktionsdatum liegen.',
+    DELIVERY_BEFORE_ORDER: 'Das Auslieferungsdatum kann nicht vor dem Bestelldatum liegen.',
+    DELIVERY_BEFORE_PRODUCTION: 'Das Auslieferungsdatum kann nicht vor dem Produktionsdatum liegen.',
+    DELIVERY_BEFORE_PAPERS: 'Das Auslieferungsdatum kann nicht vor dem Papierdatum liegen.',
+  }
+  return NextResponse.json(
+    { error: messages[code] ?? 'Die Datumsangaben sind nicht plausibel.', code },
+    { status: 400 }
+  )
 }
 
 /**
@@ -190,6 +227,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const throttled = rateLimited(request, 'orders-create', CREATE_RULE)
+    if (throttled) return throttled
+
     const body = await request.json()
 
     // Validate required fields for vehicle configuration
@@ -251,6 +291,9 @@ export async function POST(request: NextRequest) {
     // Normalize date fields (fix missing leading zeros, reject garbage)
     normalizeDateFields(normalizedBody)
 
+    const sequenceError = dateSequenceError(normalizedBody)
+    if (sequenceError) return sequenceError
+
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(normalizedBody)
 
@@ -302,6 +345,9 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
+    const throttled = rateLimited(request, 'orders-write', WRITE_RULE)
+    if (throttled) return throttled
+
     const { id, editCode, isLegacy, newEditCode, expectedUpdatedAt, ...rawData } = body
 
     // Normalize display labels → internal values
@@ -321,11 +367,13 @@ export async function PUT(request: NextRequest) {
       if (disallowedFields.length > 0) {
         return NextResponse.json({ error: 'This order is managed by TOST. Only order date, papers received date, type approval, and type variant can be edited.' }, { status: 403 })
       }
-      // Allow the edit — update only the allowed fields directly
+      // Allow the edit — update only the allowed fields directly.
+      // Read from `data`, not `rawData`: normalizeDateFields() ran on the copy,
+      // so taking raw values here wrote unnormalized dates straight to the DB.
       const updateData: Record<string, unknown> = {}
       for (const field of tostUserEditableFields) {
         if (field in rawData) {
-          updateData[field] = rawData[field] || null
+          updateData[field] = data[field] || null
         }
       }
       if (Object.keys(updateData).length > 0) {
@@ -334,6 +382,11 @@ export async function PUT(request: NextRequest) {
           where: { id },
           select: { orderDate: true, deliveryDate: true, vinReceivedDate: true, productionDate: true, papersReceivedDate: true },
         })
+
+        // Validate the merged chronology, not just the submitted fields — a
+        // single new date only becomes implausible next to the stored ones.
+        const tostSequenceError = dateSequenceError({ ...existingOrder, ...updateData })
+        if (tostSequenceError) return tostSequenceError
 
         // Recalculate papersToDelivery if papersReceivedDate changed
         if (updateData.papersReceivedDate) {
@@ -364,7 +417,10 @@ export async function PUT(request: NextRequest) {
         const updated = await prisma.$transaction(async (tx) => {
           const before = await tx.order.findUnique({ where: { id } })
           const u = await tx.order.update({ where: { id }, data: updateData })
-          await recordOrderChanges(id, before, u, { tx, source: 'tost' })
+          // 'web', not 'tost': this edit came from an anonymous visitor filling in
+          // fields TOST does not track. Logging it as 'tost' made a community
+          // entry look like it had been synced from the source system.
+          await recordOrderChanges(id, before, u, { tx, source: 'web' })
           return u
         })
         return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated' })
@@ -394,6 +450,9 @@ export async function PUT(request: NextRequest) {
         if (!/\d/.test(newEditCode)) {
           return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
         }
+
+        const legacySequenceError = dateSequenceError(data)
+        if (legacySequenceError) return legacySequenceError
 
         // Hash the new password
         const hashedPassword = await bcrypt.hash(newEditCode, 10)
@@ -455,6 +514,9 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid edit code' }, { status: 401 })
       }
     }
+
+    const putSequenceError = dateSequenceError(data)
+    if (putSequenceError) return putSequenceError
 
     // Optimistic locking: check if order was modified since user loaded it
     if (expectedUpdatedAt) {

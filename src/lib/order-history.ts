@@ -35,8 +35,16 @@ function normalize(v: unknown): string | null {
   return s.length === 0 ? null : s
 }
 
+/**
+ * Where a change came from.
+ * - 'tost'  — synced from the TOST system
+ * - 'web'   — typed in here, by an anonymous visitor or the order's owner
+ * - null    — the sheet import and older rows written before this was tracked
+ */
+export type ChangeSource = 'tost' | 'web' | null
+
 export interface RecordChangesOpts {
-  source?: 'tost' | null
+  source?: ChangeSource
   tx?: Prisma.TransactionClient
 }
 
