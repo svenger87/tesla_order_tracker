@@ -24,6 +24,14 @@ interface PersonalDataStepProps {
     locale?: Locale
   }>
   dateLocale: Locale
+  /**
+   * Container class for the fields. Defaults to the wizard's single column.
+   *
+   * The desktop form passes `contents`, which drops this wrapper out of the box
+   * tree so the fields below become items of *its* grid. That is what lets both
+   * layouts share one set of fields instead of keeping two copies that drift.
+   */
+  className?: string
 }
 
 export function PersonalDataStep({
@@ -33,9 +41,10 @@ export function PersonalDataStep({
   t,
   DatePickerField,
   dateLocale,
+  className = 'space-y-4',
 }: PersonalDataStepProps) {
   return (
-    <div className="space-y-4">
+    <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="name">{t('name')} *</Label>
         <Input

@@ -15,6 +15,8 @@ interface DeliveryStepProps {
   handleChange: (field: keyof OrderFormData, value: string | boolean) => void
   deliveryLocations: FormOption[]
   t: (key: string) => string
+  /** See PersonalDataStep — `contents` lets the desktop grid own these fields. */
+  className?: string
 }
 
 export function DeliveryStep({
@@ -22,9 +24,10 @@ export function DeliveryStep({
   handleChange,
   deliveryLocations,
   t,
+  className = 'space-y-4',
 }: DeliveryStepProps) {
   return (
-    <div className="space-y-4">
+    <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="deliveryWindow">{t('deliveryWindow')}</Label>
         <Input

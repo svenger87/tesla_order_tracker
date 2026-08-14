@@ -13,6 +13,18 @@ interface PasswordStepProps {
   confirmNewEditCode: string
   setConfirmNewEditCode: (value: string) => void
   t: (key: string) => string
+  /** Container class. Defaults to the wizard's single column. */
+  className?: string
+  /**
+   * Class for the two password fields alone, so the desktop form can lay them
+   * out side by side while the description and hint stay full width.
+   *
+   * This step is the one that cannot use the `contents` trick the other steps
+   * use: its heading and hint would become grid items too.
+   */
+  fieldsClassName?: string
+  /** The desktop form draws its own section heading, so it turns this off. */
+  showHeading?: boolean
 }
 
 export function PasswordStep({
@@ -25,11 +37,14 @@ export function PasswordStep({
   confirmNewEditCode,
   setConfirmNewEditCode,
   t,
+  className = 'space-y-4',
+  fieldsClassName = 'space-y-4',
+  showHeading = true,
 }: PasswordStepProps) {
   // Legacy order: needs new password
   if (order && isLegacy) {
     return (
-      <div className="space-y-4">
+      <div className={className}>
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-4">
           <h4 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <KeyRound className="h-4 w-4" />
@@ -71,15 +86,17 @@ export function PasswordStep({
   // New order: password fields (always required)
   if (!order) {
     return (
-      <div className="space-y-4">
-        <h4 className="font-medium flex items-center gap-2">
-          <KeyRound className="h-4 w-4" />
-          {t('password')}
-        </h4>
+      <div className={className}>
+        {showHeading && (
+          <h4 className="font-medium flex items-center gap-2">
+            <KeyRound className="h-4 w-4" />
+            {t('password')}
+          </h4>
+        )}
         <p className="text-sm text-muted-foreground">
           {t('passwordDescription')}
         </p>
-        <div className="space-y-4">
+        <div className={fieldsClassName}>
           <div className="space-y-2">
             <Label htmlFor="customPassword">{t('password')} *</Label>
             <Input
@@ -100,10 +117,12 @@ export function PasswordStep({
               placeholder={t('confirmPasswordPlaceholder')}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t('passwordHint')}
-          </p>
         </div>
+        {/* Outside the field container: in the desktop form that container is a
+            two-column grid, and the hint belongs under both columns. */}
+        <p className="text-xs text-muted-foreground">
+          {t('passwordHint')}
+        </p>
       </div>
     )
   }
