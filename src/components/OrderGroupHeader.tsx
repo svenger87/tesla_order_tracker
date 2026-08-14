@@ -31,13 +31,17 @@ export function OrderGroupHeader({ label, total, delivered, pending }: OrderGrou
           <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
           <span className="font-medium tabular-nums text-amber-600 dark:text-amber-400">{pending}</span>
         </div>
+        {/* A high delivery rate is good news; it used to be filled with the
+            brand red, so 51% of a quarter arriving read as an alarm — and above
+            75% it pulsed. It is a success figure and it is calm. */}
         {delivered > 0 && (
           <Badge
-            variant={deliveryRate >= 50 ? 'default' : 'outline'}
+            variant="outline"
             className={cn(
-              "ml-1 tabular-nums font-semibold rounded-md",
-              deliveryRate >= 75 && "animate-pulse-glow",
-              deliveryRate >= 50 && deliveryRate < 75 && "ring-1 ring-primary/50"
+              "ml-1 rounded-md font-semibold tabular-nums",
+              deliveryRate >= 50
+                ? "border-success/30 bg-success/15 text-success"
+                : "text-muted-foreground",
             )}
           >
             {deliveryRate}%

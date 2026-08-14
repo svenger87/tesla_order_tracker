@@ -14,7 +14,6 @@ import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { useApiError } from '@/hooks/useApiError'
-// CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
 import { UpdatesFeed } from '@/components/UpdatesFeed'

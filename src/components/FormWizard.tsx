@@ -112,8 +112,8 @@ export function FormWizard({
                   disabled={isFuture}
                   className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0",
-                    isCompleted && "bg-primary text-primary-foreground cursor-pointer",
-                    isCurrent && "border-2 border-primary text-primary bg-primary/10",
+                    isCompleted && "bg-success text-white cursor-pointer",
+                    isCurrent && "border-2 border-pending text-pending bg-pending/10",
                     isFuture && "border-2 border-muted-foreground/30 text-muted-foreground/50 cursor-not-allowed"
                   )}
                 >
@@ -128,7 +128,7 @@ export function FormWizard({
                   <div
                     className={cn(
                       "h-0.5 w-4 sm:w-6 transition-colors duration-200",
-                      index < currentVisibleIndex ? "bg-primary" : "bg-muted-foreground/20"
+                      index < currentVisibleIndex ? "bg-success" : "bg-muted-foreground/20"
                     )}
                   />
                 )}
