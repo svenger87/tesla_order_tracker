@@ -453,16 +453,33 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const resolvedOptions = optionsProp ?? fallbackOptions.options
   const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions, seats: seatsOptions } = resolvedOptions
 
-  // Helper to lookup label from value (falls back to hardcoded trims for model)
-  const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
+  // Label lookup, memoised per option list. This used to run two linear scans
+  // per cell — with up to a dozen labelled columns per visible row, on every
+  // render. Virtualisation kept it bounded, not cheap.
+  const labelMaps = useRef(new WeakMap<object, Map<string, string>>())
+
+  const trimFallbacks = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const t of [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]) {
+      map.set(t.value, t.label)
+      map.set(t.label, t.label)
+    }
+    return map
+  }, [])
+
+  const getLabel = useCallback((options: Array<{ value: string; label: string }>, value: string | null): string => {
     if (!value) return '-'
-    const option = options.find(o => o.value === value || o.label === value)
-    if (option) return option.label
-    // Fallback: check hardcoded model trims (in case API options don't include the value)
-    const trimFallback = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS].find(t => t.value === value || t.label === value)
-    if (trimFallback) return trimFallback.label
-    return value
-  }
+    let map = labelMaps.current.get(options)
+    if (!map) {
+      map = new Map<string, string>()
+      for (const o of options) {
+        map.set(o.value, o.label)
+        map.set(o.label, o.label)
+      }
+      labelMaps.current.set(options, map)
+    }
+    return map.get(value) ?? trimFallbacks.get(value) ?? value
+  }, [trimFallbacks])
 
   // Create a lookup map for country labels (for sorting)
   // Use COUNTRIES constant as fallback if API countries not loaded yet

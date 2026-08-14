@@ -8,6 +8,7 @@ import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } fro
 import { useOptions } from '@/hooks/useOptions'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { StatCard } from './StatCard'
+import { ChartCard } from './ChartCard'
 import { DeliveryTimeline } from './DeliveryTimeline'
 import { CountryDistributionChart } from './CountryDistributionChart'
 import { OrdersTimelineChart } from './OrdersTimelineChart'
@@ -18,7 +19,6 @@ import { MiniPieChart } from './ConfigDistributionCharts'
 import { EmptyState } from '@/components/EmptyState'
 import { DeliveryTrendChart } from './DeliveryTrendChart'
 import { VinActivityChart } from './VinActivityChart'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -337,52 +337,19 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             transition={{ duration: 0.2 }}
           >
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    <div className="rounded-lg bg-primary/10 p-1.5">
-                      <Globe className="h-4 w-4 text-primary" />
-                    </div>
-                    {t('countryDistribution')}
-                  </CardTitle>
-                  <CardDescription>{t('topCountries')}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                  <CountryDistributionChart data={localizedCountryDistribution} />
-                </CardContent>
-                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-              </Card>
-              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    <div className="rounded-lg bg-primary/10 p-1.5">
-                      <Package className="h-4 w-4 text-primary" />
-                    </div>
-                    {t('deliveryLocations')}
-                  </CardTitle>
-                  <CardDescription>{t('topLocations')}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                  <CountryDistributionChart data={stats.deliveryLocationDistribution.slice(0, 10)} />
-                </CardContent>
-                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-              </Card>
+              <ChartCard title={t('countryDistribution')} icon={Globe} description={t('topCountries')}>
+                    <CountryDistributionChart data={localizedCountryDistribution} />
+                  </ChartCard>
+              <ChartCard title={t('deliveryLocations')} icon={Package} description={t('topLocations')}>
+                    <CountryDistributionChart data={stats.deliveryLocationDistribution.slice(0, 10)} />
+                  </ChartCard>
             </div>
 
             {/* Country delivery speed ranking */}
             {stats.countryDeliveryStats.length > 0 && (() => {
               const total = stats.countryDeliveryStats.length
               return (
-                <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow mt-6">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                      <div className="rounded-lg bg-primary/10 p-1.5">
-                        <MapPin className="h-4 w-4 text-primary" />
-                      </div>
-                      {tcd('title')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                <ChartCard title={tcd('title')} icon={MapPin}>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -413,9 +380,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                         })}
                       </TableBody>
                     </Table>
-                  </CardContent>
-                  <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-                </Card>
+                  </ChartCard>
               )
             })()}
           </motion.div>
@@ -435,75 +400,27 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
 
             {/* Timeline charts */}
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    <div className="rounded-lg bg-primary/10 p-1.5">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                    </div>
-                    {t('ordersOverTime')}
-                  </CardTitle>
-                  <CardDescription>{t('ordersPerMonth')}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                  <OrdersTimelineChart data={stats.ordersOverTime} />
-                </CardContent>
-                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-              </Card>
+              <ChartCard title={t('ordersOverTime')} icon={TrendingUp} description={t('ordersPerMonth')}>
+                    <OrdersTimelineChart data={stats.ordersOverTime} />
+                  </ChartCard>
 
-              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    <div className="rounded-lg bg-success/10 p-1.5">
-                      <CheckCircle2 className="h-4 w-4 text-success" />
-                    </div>
-                    {t('deliveriesOverTime')}
-                  </CardTitle>
-                  <CardDescription>{t('deliveriesPerMonth')}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                  <DeliveryTimelineChart data={stats.deliveriesOverTime} />
-                </CardContent>
-                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-              </Card>
+              <ChartCard title={t('deliveriesOverTime')} icon={CheckCircle2} description={t('deliveriesPerMonth')} tone="success">
+                    <DeliveryTimelineChart data={stats.deliveriesOverTime} />
+                  </ChartCard>
             </div>
 
             {/* VIN weekday distribution */}
-            <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                  <div className="rounded-lg bg-primary/10 p-1.5">
-                    <Calendar className="h-4 w-4 text-primary" />
-                  </div>
-                  {t('vinWeekday')}
-                </CardTitle>
-                <CardDescription>{t('vinWeekdayDescription')}</CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                <VinWeekdayChart data={stats.vinWeekdayDistribution} />
-              </CardContent>
-              <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-            </Card>
+            <ChartCard title={t('vinWeekday')} icon={Calendar} description={t('vinWeekdayDescription')}>
+                    <VinWeekdayChart data={stats.vinWeekdayDistribution} />
+                  </ChartCard>
 
             {/* VIN Activity */}
             <VinActivityChart orders={orders} />
 
             {/* Wait time distribution */}
-            <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                  <div className="rounded-lg bg-primary/10 p-1.5">
-                    <Hourglass className="h-4 w-4 text-primary" />
-                  </div>
-                  {t('waitTimeDistribution')}
-                </CardTitle>
-                <CardDescription>{t('waitTimeDescription')}</CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-                <WaitTimeDistributionChart data={stats.waitTimeDistribution} />
-              </CardContent>
-              <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
-            </Card>
+            <ChartCard title={t('waitTimeDistribution')} icon={Hourglass} description={t('waitTimeDescription')}>
+                    <WaitTimeDistributionChart data={stats.waitTimeDistribution} />
+                  </ChartCard>
           </motion.div>
         </TabsContent>
 
