@@ -13,6 +13,7 @@ import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { OrderSearch } from '@/components/OrderSearch'
 import { EditCodeModal } from '@/components/EditCodeModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
+import { useApiError } from '@/hooks/useApiError'
 // CommunityPulse removed — its metrics are now in the Overview stats tab
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
@@ -49,6 +50,8 @@ export default function Home() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
   const tp = useTranslations('prediction')
+  const tv = useTranslations('form.validation')
+  const apiError = useApiError()
   const [orders, setOrders] = useState<Order[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -292,7 +295,7 @@ export default function Home() {
       })
       const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || t('errorGeneratingCode'))
+        throw new Error(apiError(data, t('errorGeneratingCode')))
       }
       setResetCodeDialog({
         open: true,
@@ -303,7 +306,7 @@ export default function Home() {
       console.error('Failed to generate reset code:', error)
       toast.error(error instanceof Error ? error.message : t('errorGeneratingCode'))
     }
-  }, [t])
+  }, [t, apiError])
 
   const [scrollToOrderId, setScrollToOrderId] = useState<string | null>(null)
 
@@ -532,7 +535,7 @@ export default function Home() {
           })
           if (!res.ok) {
             const err = await res.json()
-            throw new Error(err.error || 'Fehler beim Speichern')
+            throw new Error(apiError(err, tv('saveError')))
           }
           fetchOrders(false, true)
         }}

@@ -811,5 +811,17 @@
     "operatedBy": "Operated by Sven",
     "supportDevelopment": "Support hosting & development",
     "stats": "{orders} orders · {delivered} delivered"
+  },
+  "errors": {
+    "rateLimited": "Too many requests. Please try again later.",
+    "orderNotFound": "Order not found.",
+    "conflict": "Someone else changed this entry in the meantime. Reload the page and try again.",
+    "resetCodeInvalid": "Invalid or expired one-time code.",
+    "resetCodeRequired": "One-time code required.",
+    "tostFieldsRestricted": "This order is managed by TOST. Only order date, papers date, production date, type approval and type variant can be edited.",
+    "adminRequired": "Admin access required.",
+    "orderDateInFuture": "The order date cannot be in the future.",
+    "datesOutOfOrder": "These dates are not in a plausible order. Check the order, production, papers and delivery dates.",
+    "legacyPasswordRequired": "A new password is required for legacy entries."
   }
 }

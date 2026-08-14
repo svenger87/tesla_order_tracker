@@ -811,5 +811,17 @@
       "daysAgo": "il y a {n}j",
       "weeksAgo": "il y a {n} sem"
     }
+  },
+  "errors": {
+    "rateLimited": "Trop de requêtes. Réessayez plus tard.",
+    "orderNotFound": "Commande introuvable.",
+    "conflict": "Quelqu'un d'autre a modifié cette entrée entre-temps. Rechargez la page et réessayez.",
+    "resetCodeInvalid": "Code à usage unique invalide ou expiré.",
+    "resetCodeRequired": "Code à usage unique requis.",
+    "tostFieldsRestricted": "Cette commande est gérée par TOST. Seuls la date de commande, la date des documents, la date de production, l'homologation et la variante de type sont modifiables.",
+    "adminRequired": "Accès administrateur requis.",
+    "orderDateInFuture": "La date de commande ne peut pas être dans le futur.",
+    "datesOutOfOrder": "Ces dates ne suivent pas un ordre plausible. Vérifiez les dates de commande, production, documents et livraison.",
+    "legacyPasswordRequired": "Un nouveau mot de passe est requis pour les anciennes entrées."
   }
 }

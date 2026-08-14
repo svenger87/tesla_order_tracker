@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Demasiadas solicitudes. Inténtalo de nuevo más tarde.",
+    "orderNotFound": "Pedido no encontrado.",
+    "conflict": "Otra persona modificó esta entrada mientras tanto. Recarga la página e inténtalo de nuevo.",
+    "resetCodeInvalid": "Código de un solo uso no válido o caducado.",
+    "resetCodeRequired": "Se requiere un código de un solo uso.",
+    "tostFieldsRestricted": "Este pedido lo gestiona TOST. Solo se pueden editar la fecha del pedido, la fecha de los documentos, la fecha de producción, la homologación y la variante de tipo.",
+    "adminRequired": "Se requiere acceso de administrador.",
+    "orderDateInFuture": "La fecha del pedido no puede estar en el futuro.",
+    "datesOutOfOrder": "Las fechas no siguen un orden plausible. Revisa las fechas de pedido, producción, documentos y entrega.",
+    "legacyPasswordRequired": "Se requiere una nueva contraseña para las entradas antiguas."
   }
 }

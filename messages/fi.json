@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Liian monta pyyntöä. Yritä myöhemmin uudelleen.",
+    "orderNotFound": "Tilausta ei löytynyt.",
+    "conflict": "Joku muu muutti tätä merkintää välillä. Lataa sivu uudelleen ja yritä uudestaan.",
+    "resetCodeInvalid": "Virheellinen tai vanhentunut kertakoodi.",
+    "resetCodeRequired": "Kertakoodi vaaditaan.",
+    "tostFieldsRestricted": "Tätä tilausta hallinnoi TOST. Vain tilauspäivä, papereiden päivä, tuotantopäivä, tyyppihyväksyntä ja tyyppivariantti ovat muokattavissa.",
+    "adminRequired": "Vaatii järjestelmänvalvojan oikeudet.",
+    "orderDateInFuture": "Tilauspäivä ei voi olla tulevaisuudessa.",
+    "datesOutOfOrder": "Päivämäärät eivät ole uskottavassa järjestyksessä. Tarkista tilaus-, tuotanto-, paperi- ja toimituspäivä.",
+    "legacyPasswordRequired": "Vanhoille merkinnöille vaaditaan uusi salasana."
   }
 }

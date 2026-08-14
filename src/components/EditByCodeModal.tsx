@@ -17,6 +17,7 @@ import { AlertCircle, KeyRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { OrderForm } from './OrderForm'
+import { useApiError } from '@/hooks/useApiError'
 
 interface EditByCodeModalProps {
   open: boolean
@@ -27,6 +28,7 @@ interface EditByCodeModalProps {
 
 export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditByCodeModalProps) {
   const t = useTranslations('editByCode')
+  const apiError = useApiError()
   const tc = useTranslations('common')
   const tf = useTranslations('form')
   const tv = useTranslations('form.validation')
@@ -59,7 +61,7 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || t('invalidCode'))
+        throw new Error(apiError(data, t('invalidCode')))
       }
 
       // Find the order in the local list
@@ -130,7 +132,7 @@ export function EditByCodeModal({ open, onOpenChange, orders, onSuccess }: EditB
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || t('resetError'))
+        throw new Error(apiError(data, t('resetError')))
       }
 
       setResetSuccess(true)

@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Príliš veľa požiadaviek. Skúste to neskôr.",
+    "orderNotFound": "Objednávka sa nenašla.",
+    "conflict": "Medzitým tento záznam zmenil niekto iný. Znovu načítajte stránku a skúste to znova.",
+    "resetCodeInvalid": "Neplatný alebo expirovaný jednorazový kód.",
+    "resetCodeRequired": "Vyžaduje sa jednorazový kód.",
+    "tostFieldsRestricted": "Túto objednávku spravuje TOST. Upraviť možno len dátum objednávky, dátum dokladov, dátum výroby, schválenie typu a variant typu.",
+    "adminRequired": "Vyžaduje sa prístup správcu.",
+    "orderDateInFuture": "Dátum objednávky nemôže byť v budúcnosti.",
+    "datesOutOfOrder": "Dátumy nie sú v pravdepodobnom poradí. Skontrolujte dátum objednávky, výroby, dokladov a dodania.",
+    "legacyPasswordRequired": "Pre staršie záznamy sa vyžaduje nové heslo."
   }
 }

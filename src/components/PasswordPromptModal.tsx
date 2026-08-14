@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AlertCircle, ChevronDown, Info, KeyRound, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useApiError } from '@/hooks/useApiError'
 
 interface PasswordPromptModalProps {
   open: boolean
@@ -31,6 +32,7 @@ export function PasswordPromptModal({
   onSuccess,
 }: PasswordPromptModalProps) {
   const t = useTranslations('editByCode')
+  const apiError = useApiError()
   const tc = useTranslations('common')
   const tf = useTranslations('form')
   const tv = useTranslations('form.validation')
@@ -95,7 +97,7 @@ export function PasswordPromptModal({
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || t('invalidCode'))
+        throw new Error(apiError(data, t('invalidCode')))
       }
 
       onVerified(order, password, data.isLegacy || false)
@@ -142,7 +144,7 @@ export function PasswordPromptModal({
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || t('resetError'))
+        throw new Error(apiError(data, t('resetError')))
       }
 
       setResetSuccess(true)

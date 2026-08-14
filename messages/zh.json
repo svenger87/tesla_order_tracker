@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "请求过多，请稍后再试。",
+    "orderNotFound": "未找到订单。",
+    "conflict": "此条目已被他人修改。请刷新页面后重试。",
+    "resetCodeInvalid": "一次性代码无效或已过期。",
+    "resetCodeRequired": "需要一次性代码。",
+    "tostFieldsRestricted": "此订单由 TOST 管理。仅可编辑订购日期、文件日期、生产日期、型式认证和型式变体。",
+    "adminRequired": "需要管理员权限。",
+    "orderDateInFuture": "订购日期不能是将来的日期。",
+    "datesOutOfOrder": "日期顺序不合理。请检查订购、生产、文件和交付日期。",
+    "legacyPasswordRequired": "旧条目需要设置新密码。"
   }
 }

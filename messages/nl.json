@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Te veel verzoeken. Probeer het later opnieuw.",
+    "orderNotFound": "Bestelling niet gevonden.",
+    "conflict": "Iemand anders heeft dit item intussen gewijzigd. Herlaad de pagina en probeer het opnieuw.",
+    "resetCodeInvalid": "Ongeldige of verlopen eenmalige code.",
+    "resetCodeRequired": "Eenmalige code vereist.",
+    "tostFieldsRestricted": "Deze bestelling wordt beheerd door TOST. Alleen besteldatum, papierdatum, productiedatum, typegoedkeuring en typevariant kunnen worden bewerkt.",
+    "adminRequired": "Beheerderstoegang vereist.",
+    "orderDateInFuture": "De besteldatum kan niet in de toekomst liggen.",
+    "datesOutOfOrder": "Deze data staan niet in een plausibele volgorde. Controleer de bestel-, productie-, papier- en leverdatum.",
+    "legacyPasswordRequired": "Voor bestaande items is een nieuw wachtwoord vereist."
   }
 }

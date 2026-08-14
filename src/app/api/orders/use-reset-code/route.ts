@@ -21,16 +21,16 @@ export async function POST(request: NextRequest) {
     const { resetCode, newPassword } = await request.json()
 
     if (!resetCode) {
-      return NextResponse.json({ error: 'Einmalcode erforderlich' }, { status: 400 })
+      return NextResponse.json({ error: 'Einmalcode erforderlich', code: 'RESET_CODE_REQUIRED' }, { status: 400 })
     }
 
     if (!newPassword || newPassword.length < 6) {
-      return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
+      return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' }, { status: 400 })
     }
 
     // Check if password contains at least one number
     if (!/\d/.test(newPassword)) {
-      return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
+      return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' }, { status: 400 })
     }
 
     // Find order with this reset code
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json({ error: 'Ungültiger oder abgelaufener Einmalcode' }, { status: 400 })
+      return NextResponse.json({ error: 'Ungültiger oder abgelaufener Einmalcode', code: 'RESET_CODE_INVALID' }, { status: 400 })
     }
 
     // Hash the new password
@@ -67,6 +67,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Use reset code failed:', error)
-    return NextResponse.json({ error: 'Passwort-Reset fehlgeschlagen' }, { status: 500 })
+    return NextResponse.json({ error: 'Passwort-Reset fehlgeschlagen', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }

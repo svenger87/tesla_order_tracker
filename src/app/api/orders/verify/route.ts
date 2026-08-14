@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!order) {
-        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+        return NextResponse.json({ error: 'Bestellung nicht gefunden', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
       const hasPassword = !!(order.editCode && order.editCode !== '')
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!order) {
-        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+        return NextResponse.json({ error: 'Bestellung nicht gefunden', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
       // Legacy order (no editCode) — match by username
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
             message: 'Bestandseintrag gefunden. Bitte setze ein neues Passwort.',
           })
         }
-        return NextResponse.json({ error: 'Ungültiges Passwort oder Benutzername' }, { status: 401 })
+        return NextResponse.json({ error: 'Ungültiges Passwort oder Benutzername', code: 'INVALID_EDIT_CODE' }, { status: 401 })
       }
 
       // Compare password (bcrypt-aware)
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ orderId: order.id, isLegacy: false })
       }
 
-      return NextResponse.json({ error: 'Ungültiges Passwort' }, { status: 401 })
+      return NextResponse.json({ error: 'Ungültiges Passwort', code: 'INVALID_EDIT_CODE' }, { status: 401 })
     }
 
     // Legacy flow (no orderId): search by editCode directly (plain-text match via DB unique index)
@@ -112,9 +112,9 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ error: 'Ungültiger Code oder Benutzername' }, { status: 404 })
+    return NextResponse.json({ error: 'Ungültiger Code oder Benutzername', code: 'INVALID_EDIT_CODE' }, { status: 404 })
   } catch (error) {
     console.error('Failed to verify edit code:', error)
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Verification failed', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }

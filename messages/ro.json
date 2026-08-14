@@ -811,5 +811,17 @@
       "daysAgo": "{n} d ago",
       "weeksAgo": "{n} wk ago"
     }
+  },
+  "errors": {
+    "rateLimited": "Prea multe cereri. Încearcă din nou mai târziu.",
+    "orderNotFound": "Comanda nu a fost găsită.",
+    "conflict": "Între timp, altcineva a modificat această înregistrare. Reîncarcă pagina și încearcă din nou.",
+    "resetCodeInvalid": "Cod unic invalid sau expirat.",
+    "resetCodeRequired": "Este necesar un cod unic.",
+    "tostFieldsRestricted": "Această comandă este gestionată de TOST. Pot fi editate doar data comenzii, data documentelor, data producției, omologarea și varianta de tip.",
+    "adminRequired": "Este necesar acces de administrator.",
+    "orderDateInFuture": "Data comenzii nu poate fi în viitor.",
+    "datesOutOfOrder": "Datele nu sunt într-o ordine plauzibilă. Verifică datele de comandă, producție, documente și livrare.",
+    "legacyPasswordRequired": "Este necesară o parolă nouă pentru înregistrările vechi."
   }
 }

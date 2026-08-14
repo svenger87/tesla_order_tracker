@@ -49,6 +49,7 @@ import {
   TrackingStep,
   PasswordStep,
 } from '@/components/form-steps'
+import { useApiError } from '@/hooks/useApiError'
 
 type ValidationMessageKey = Parameters<ReturnType<typeof useTranslations<'form.validation'>>>[0]
 
@@ -158,6 +159,7 @@ const emptyFormData: OrderFormData = {
 export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess, mode = 'modal' }: OrderFormProps) {
   const t = useTranslations('form')
   const tv = useTranslations('form.validation')
+  const apiError = useApiError()
   const tc = useTranslations('common')
   const te = useTranslations('editCodeModal')
   const locale = useLocale()
@@ -456,7 +458,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || tv('saveError'))
+        throw new Error(apiError(data, tv('saveError')))
       }
 
       if (mode === 'page') {

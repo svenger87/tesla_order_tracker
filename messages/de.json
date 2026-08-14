@@ -811,5 +811,17 @@
     "operatedBy": "Betrieben von Sven",
     "supportDevelopment": "Hosting & Entwicklung unterstützen",
     "stats": "{orders} Bestellungen · {delivered} ausgeliefert"
+  },
+  "errors": {
+    "rateLimited": "Zu viele Anfragen. Bitte später erneut versuchen.",
+    "orderNotFound": "Bestellung nicht gefunden.",
+    "conflict": "Dieser Eintrag wurde zwischenzeitlich von jemand anderem geändert. Bitte lade die Seite neu und versuche es erneut.",
+    "resetCodeInvalid": "Ungültiger oder abgelaufener Einmalcode.",
+    "resetCodeRequired": "Einmalcode erforderlich.",
+    "tostFieldsRestricted": "Diese Bestellung wird von TOST verwaltet. Nur Bestelldatum, Papierdatum, Produktionsdatum, Typgenehmigung und Typ-Variante können bearbeitet werden.",
+    "adminRequired": "Admin-Zugriff erforderlich.",
+    "orderDateInFuture": "Das Bestelldatum kann nicht in der Zukunft liegen.",
+    "datesOutOfOrder": "Die Datumsangaben ergeben keine plausible Reihenfolge. Prüfe Bestell-, Produktions-, Papier- und Auslieferungsdatum.",
+    "legacyPasswordRequired": "Neues Passwort erforderlich für Bestandseinträge."
   }
 }
