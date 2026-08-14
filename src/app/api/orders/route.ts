@@ -4,6 +4,7 @@ import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
 import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+import { canClaimLegacyOrder } from '@/lib/legacy-claim'
 import { computeETag, isNotModified } from '@/lib/http-cache'
 import { fetchOrders } from '@/lib/orders-query'
 import { recordOrderChanges } from '@/lib/order-history'
@@ -366,8 +367,20 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Order not found', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
-      // Legacy order flow - user verified via username
+      // Legacy order flow — an imported order that nobody has claimed yet.
       if (isLegacy && order.editCode === null) {
+        // Re-check the claim here. /api/orders/verify performs the same check
+        // before the client ever gets here, but a request can be sent straight
+        // to this route, and trusting `isLegacy` from the body meant anyone
+        // holding an order id — which GET /api/orders hands out — could take
+        // over any unclaimed order and rewrite its fields in one call.
+        if (!canClaimLegacyOrder(editCode, order.name)) {
+          return NextResponse.json(
+            { error: 'Ungültiges Passwort oder Benutzername', code: 'INVALID_EDIT_CODE' },
+            { status: 401 }
+          )
+        }
+
         // For legacy orders, user must set a new password
         if (!newEditCode) {
           return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge', code: 'LEGACY_PASSWORD_REQUIRED' }, { status: 400 })
