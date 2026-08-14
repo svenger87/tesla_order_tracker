@@ -1,4 +1,5 @@
 import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
+import { CHART_COLORS } from './chart-colors'
 
 // Build code/label lookup tables from the canonical COUNTRIES constant.
 // CODE_SET stores ISO codes (uppercase) for fast membership checks.
@@ -188,21 +189,11 @@ function getModelColor(trimName: string, vehicleType?: VehicleType): string {
   return MODEL_Y_COLORS[trimName] || MODEL_3_COLORS[trimName] || 'var(--chart-4)'
 }
 
-const COUNTRY_COLORS = [
-  'var(--chart-1)',
-  'var(--chart-2)',
-  'var(--chart-3)',
-  'var(--chart-4)',
-  'var(--chart-5)',
-]
-
-const CONFIG_COLORS = [
-  'oklch(0.55 0.22 25)',   // Tesla Red
-  'oklch(0.65 0.15 220)',  // Blue
-  'oklch(0.70 0.12 160)',  // Teal
-  'oklch(0.75 0.15 80)',   // Yellow
-  'oklch(0.60 0.18 280)',  // Purple
-]
+// Both of these were separate copies of the categorical palette — one built
+// from tokens, one hardcoded in oklch with no dark-mode variant. There is now a
+// single validated palette; see lib/chart-colors.ts.
+const COUNTRY_COLORS = CHART_COLORS
+const CONFIG_COLORS = CHART_COLORS
 
 // Build a color lookup map for finding hex colors by label
 const COLOR_HEX_MAP = new Map<string, string>()
