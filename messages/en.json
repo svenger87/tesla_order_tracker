@@ -90,7 +90,9 @@
     "title": "Search Orders",
     "description": "Find an order across all quarters",
     "hint": "Navigate with arrow keys, select with Enter",
-    "openSearch": "Search"
+    "openSearch": "Search",
+    "results": "{count} results",
+    "noResultsHint": "Try a name, VIN, country or delivery location."
   },
   "form": {
     "personalData": "Personal data",

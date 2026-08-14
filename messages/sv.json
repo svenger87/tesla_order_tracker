@@ -90,7 +90,9 @@
     "title": "Sök beställningar",
     "description": "Hitta en beställning över alla kvartal",
     "hint": "Navigera med piltangenterna, välj med Enter",
-    "openSearch": "Sök"
+    "openSearch": "Sök",
+    "results": "{count} träffar",
+    "noResultsHint": "Prova ett namn, VIN, land eller leveransplats."
   },
   "form": {
     "personalData": "Personuppgifter",

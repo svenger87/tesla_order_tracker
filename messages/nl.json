@@ -90,7 +90,9 @@
     "title": "Bestellingen zoeken",
     "description": "Zoek een bestelling in alle kwartalen",
     "hint": "Navigeer met pijltjestoetsen, selecteer met Enter",
-    "openSearch": "Zoeken"
+    "openSearch": "Zoeken",
+    "results": "{count} resultaten",
+    "noResultsHint": "Probeer een naam, VIN, land of afhaallocatie."
   },
   "form": {
     "personalData": "Persoonlijke gegevens",

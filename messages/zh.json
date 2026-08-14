@@ -90,7 +90,9 @@
     "title": "搜索订单",
     "description": "在所有季度中查找订单",
     "hint": "使用方向键导航，按 Enter 选择",
-    "openSearch": "搜索"
+    "openSearch": "搜索",
+    "results": "{count} 条结果",
+    "noResultsHint": "试试姓名、VIN、国家或交付地点。"
   },
   "form": {
     "personalData": "个人信息",

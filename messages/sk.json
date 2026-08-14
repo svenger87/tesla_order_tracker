@@ -90,7 +90,9 @@
     "title": "Vyhľadávanie objednávok",
     "description": "Nájdite objednávku vo všetkých štvrťrokoch",
     "hint": "Navigujte šípkami, vyberte pomocou Enter",
-    "openSearch": "Hľadať"
+    "openSearch": "Hľadať",
+    "results": "{count} výsledkov",
+    "noResultsHint": "Skúste meno, VIN, krajinu alebo miesto odovzdania."
   },
   "form": {
     "personalData": "Osobné údaje",

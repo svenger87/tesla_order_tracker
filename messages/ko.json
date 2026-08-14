@@ -90,7 +90,9 @@
     "title": "주문 검색",
     "description": "모든 분기에서 주문 찾기",
     "hint": "화살표 키로 이동, Enter로 선택",
-    "openSearch": "검색"
+    "openSearch": "검색",
+    "results": "{count}개 결과",
+    "noResultsHint": "이름, VIN, 국가 또는 인도 장소로 검색해 보세요."
   },
   "form": {
     "personalData": "개인 정보",

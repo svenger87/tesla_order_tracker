@@ -90,7 +90,9 @@
     "title": "Buscar pedidos",
     "description": "Encontrar un pedido en todos los trimestres",
     "hint": "Navegue con las teclas de flecha, seleccione con Enter",
-    "openSearch": "Buscar"
+    "openSearch": "Buscar",
+    "results": "{count} resultados",
+    "noResultsHint": "Prueba con un nombre, VIN, país o punto de entrega."
   },
   "form": {
     "personalData": "Datos personales",

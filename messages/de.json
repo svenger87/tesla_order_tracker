@@ -90,7 +90,9 @@
     "title": "Bestellungen suchen",
     "description": "Finde eine Bestellung über alle Quartale",
     "hint": "Mit Pfeiltasten navigieren, mit Enter auswählen",
-    "openSearch": "Suche"
+    "openSearch": "Suche",
+    "results": "{count} Treffer",
+    "noResultsHint": "Versuch es mit Name, VIN, Land oder Abholort."
   },
   "form": {
     "personalData": "Persönliche Daten",

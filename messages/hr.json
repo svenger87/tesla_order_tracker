@@ -90,7 +90,9 @@
     "title": "Pretraživanje narudžbi",
     "description": "Pronađite narudžbu u svim kvartalima",
     "hint": "Navigirajte strelicama, odaberite s Enter",
-    "openSearch": "Pretraži"
+    "openSearch": "Pretraži",
+    "results": "{count} rezultata",
+    "noResultsHint": "Pokušajte s imenom, VIN-om, državom ili mjestom preuzimanja."
   },
   "form": {
     "personalData": "Osobni podaci",

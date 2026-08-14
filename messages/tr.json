@@ -90,7 +90,9 @@
     "title": "Sipariş Ara",
     "description": "Tüm çeyreklerde sipariş bulun",
     "hint": "Ok tuşlarıyla gezinin, Enter ile seçin",
-    "openSearch": "Ara"
+    "openSearch": "Ara",
+    "results": "{count} sonuç",
+    "noResultsHint": "Ad, VIN, ülke veya teslim yeri deneyin."
   },
   "form": {
     "personalData": "Kişisel bilgiler",

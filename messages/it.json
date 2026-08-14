@@ -90,7 +90,9 @@
     "title": "Cerca ordini",
     "description": "Trova un ordine in tutti i trimestri",
     "hint": "Navighi con i tasti freccia, selezioni con Invio",
-    "openSearch": "Cerca"
+    "openSearch": "Cerca",
+    "results": "{count} risultati",
+    "noResultsHint": "Prova con un nome, un VIN, un paese o un luogo di consegna."
   },
   "form": {
     "personalData": "Dati personali",

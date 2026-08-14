@@ -90,7 +90,9 @@
     "title": "Căutare comenzi",
     "description": "Găsiți o comandă în toate trimestrele",
     "hint": "Navigați cu tastele săgeți, selectați cu Enter",
-    "openSearch": "Căutare"
+    "openSearch": "Căutare",
+    "results": "{count} rezultate",
+    "noResultsHint": "Încearcă un nume, VIN, țară sau loc de livrare."
   },
   "form": {
     "personalData": "Date personale",

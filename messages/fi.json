@@ -90,7 +90,9 @@
     "title": "Hae tilauksia",
     "description": "Etsi tilaus kaikilta neljänneksiltä",
     "hint": "Navigoi nuolinäppäimillä, valitse Enterillä",
-    "openSearch": "Haku"
+    "openSearch": "Haku",
+    "results": "{count} tulosta",
+    "noResultsHint": "Kokeile nimeä, VIN-koodia, maata tai luovutuspaikkaa."
   },
   "form": {
     "personalData": "Henkilötiedot",
