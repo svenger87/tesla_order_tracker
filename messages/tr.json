@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla Siparişleri ve İstatistikleri",
     "subtitle": "Tesla teslimat zaman çizelgeleri için en büyük topluluk veritabanı. Model Y, Model 3 — dünya çapında.",
-    "findMyOrder": "Siparişimi bul"
+    "findMyOrder": "Siparişimi bul",
+    "claim": "Siparişten teslime <em>{days}</em> gün",
+    "claimSub": "Teslim edilen {delivered} siparişin medyanı. {waiting} hâlâ bekliyor — en uzunu {longest} gündür.",
+    "kicker": "Topluluk veritabanı · Model Y ve Model 3",
+    "ordersLabel": "Sipariş",
+    "deliveredLabel": "teslim edildi",
+    "withVin": "{count} VIN’li, bekliyor",
+    "withoutVin": "{count} VIN’siz"
   },
   "tracking": {
     "backToOverview": "Genel bakışa dön",

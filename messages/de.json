@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla Bestellungen und Statistiken",
     "subtitle": "Die größte Community-Datenbank für Tesla Lieferzeiten. Model Y, Model 3 — weltweit.",
-    "findMyOrder": "Meine Bestellung finden"
+    "findMyOrder": "Meine Bestellung finden",
+    "claim": "<em>{days}</em> Tage vom Bestellen bis zur Übergabe",
+    "claimSub": "Median aus {delivered} ausgelieferten Bestellungen. {waiting} warten noch — der längste seit {longest} Tagen.",
+    "kicker": "Community-Datenbank · Model Y & Model 3",
+    "ordersLabel": "Bestellungen",
+    "deliveredLabel": "ausgeliefert",
+    "withVin": "{count} mit VIN, wartet",
+    "withoutVin": "{count} ohne VIN"
   },
   "tracking": {
     "backToOverview": "Zurück zur Übersicht",

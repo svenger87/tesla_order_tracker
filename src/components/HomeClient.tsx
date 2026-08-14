@@ -335,7 +335,7 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
 
       <main className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
         {/* Hero Section */}
-        <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
+        <HeroSection orders={orders} onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
         {/* Global Filter Bar */}
         {!loading && (

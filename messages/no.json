@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla-bestillinger og statistikk",
     "subtitle": "Den største fellesskapsdatabasen for Tesla-leveringstider. Model Y, Model 3 — verdensomspennende.",
-    "findMyOrder": "Finn min bestilling"
+    "findMyOrder": "Finn min bestilling",
+    "claim": "<em>{days}</em> dager fra bestilling til overlevering",
+    "claimSub": "Median av {delivered} leverte bestillinger. {waiting} venter fortsatt — den lengste i {longest} dager.",
+    "kicker": "Fellesskapsdatabase · Model Y og Model 3",
+    "ordersLabel": "Bestillinger",
+    "deliveredLabel": "levert",
+    "withVin": "{count} med VIN, venter",
+    "withoutVin": "{count} uten VIN"
   },
   "tracking": {
     "backToOverview": "Tilbake til oversikt",

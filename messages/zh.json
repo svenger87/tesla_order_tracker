@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla 订单与统计",
     "subtitle": "最大的 Tesla 交付时间线社区数据库。Model Y、Model 3 — 全球范围。",
-    "findMyOrder": "查找我的订单"
+    "findMyOrder": "查找我的订单",
+    "claim": "从下单到交付 <em>{days}</em> 天",
+    "claimSub": "{delivered} 笔已交付订单的中位数。{waiting} 笔仍在等待 — 最久 {longest} 天。",
+    "kicker": "社区数据库 · Model Y 与 Model 3",
+    "ordersLabel": "订单",
+    "deliveredLabel": "已交付",
+    "withVin": "{count} 笔有 VIN，等待中",
+    "withoutVin": "{count} 笔无 VIN"
   },
   "tracking": {
     "backToOverview": "返回概览",

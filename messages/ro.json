@@ -711,7 +711,14 @@
   "hero": {
     "title": "Comenzi și statistici Tesla",
     "subtitle": "Cea mai mare bază de date comunitară pentru termenele de livrare Tesla. Model Y, Model 3 — la nivel mondial.",
-    "findMyOrder": "Găsește comanda mea"
+    "findMyOrder": "Găsește comanda mea",
+    "claim": "<em>{days}</em> zile de la comandă la predare",
+    "claimSub": "Mediana din {delivered} comenzi livrate. {waiting} încă așteaptă — cea mai lungă de {longest} zile.",
+    "kicker": "Bază de date a comunității · Model Y și Model 3",
+    "ordersLabel": "Comenzi",
+    "deliveredLabel": "livrate",
+    "withVin": "{count} cu VIN, așteaptă",
+    "withoutVin": "{count} fără VIN"
   },
   "tracking": {
     "backToOverview": "Înapoi la prezentare",

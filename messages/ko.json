@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla 주문 및 통계",
     "subtitle": "Tesla 인도 일정에 대한 최대 커뮤니티 데이터베이스. Model Y, Model 3 — 전 세계.",
-    "findMyOrder": "내 주문 찾기"
+    "findMyOrder": "내 주문 찾기",
+    "claim": "주문부터 인도까지 <em>{days}</em>일",
+    "claimSub": "인도 완료 {delivered}건의 중앙값. {waiting}건이 대기 중 — 최장 {longest}일.",
+    "kicker": "커뮤니티 데이터베이스 · Model Y & Model 3",
+    "ordersLabel": "주문",
+    "deliveredLabel": "인도 완료",
+    "withVin": "VIN 있음 {count}건 대기",
+    "withoutVin": "VIN 없음 {count}건"
   },
   "tracking": {
     "backToOverview": "개요로 돌아가기",

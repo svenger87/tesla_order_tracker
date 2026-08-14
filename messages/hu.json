@@ -711,7 +711,14 @@
   "hero": {
     "title": "Tesla rendelések és statisztikák",
     "subtitle": "A legnagyobb közösségi adatbázis a Tesla szállítási határidőkről. Model Y, Model 3 — világszerte.",
-    "findMyOrder": "Rendelésem keresése"
+    "findMyOrder": "Rendelésem keresése",
+    "claim": "<em>{days}</em> nap a rendeléstől az átadásig",
+    "claimSub": "{delivered} kiszállított rendelés mediánja. {waiting} még vár — a leghosszabb {longest} napja.",
+    "kicker": "Közösségi adatbázis · Model Y és Model 3",
+    "ordersLabel": "Rendelés",
+    "deliveredLabel": "kiszállítva",
+    "withVin": "{count} alvázszámmal, vár",
+    "withoutVin": "{count} alvázszám nélkül"
   },
   "tracking": {
     "backToOverview": "Vissza az áttekintéshez",

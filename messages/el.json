@@ -711,7 +711,14 @@
   "hero": {
     "title": "Παραγγελίες και Στατιστικά Tesla",
     "subtitle": "Η μεγαλύτερη κοινοτική βάση δεδομένων για χρονοδιαγράμματα παράδοσης Tesla. Model Y, Model 3 — παγκοσμίως.",
-    "findMyOrder": "Βρείτε την παραγγελία μου"
+    "findMyOrder": "Βρείτε την παραγγελία μου",
+    "claim": "<em>{days}</em> ημέρες από την παραγγελία έως την παράδοση",
+    "claimSub": "Διάμεσος από {delivered} παραδομένες παραγγελίες. {waiting} περιμένουν ακόμη — η μεγαλύτερη {longest} ημέρες.",
+    "kicker": "Βάση δεδομένων κοινότητας · Model Y & Model 3",
+    "ordersLabel": "Παραγγελίες",
+    "deliveredLabel": "παραδόθηκαν",
+    "withVin": "{count} με VIN, αναμονή",
+    "withoutVin": "{count} χωρίς VIN"
   },
   "tracking": {
     "backToOverview": "Πίσω στην επισκόπηση",
