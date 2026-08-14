@@ -161,10 +161,15 @@ wait_for_run() { # wait_for_run <branch> <sha> <url>
   [ "$NO_WAIT" -eq 1 ] && { info "not waiting for the run (--no-wait)"; return 0; }
   command -v python3 >/dev/null || { warn "python3 not found — cannot follow the run"; return 0; }
 
-  info "waiting for the '$branch' workflow run on ${sha:0:7}"
+  info "waiting for the deploy of ${sha:0:7} to $branch"
   local waited=0 status conclusion payload
   while [ "$waited" -lt 900 ]; do
-    payload=$(gh_api "actions/runs?branch=$branch&head_sha=$sha&per_page=1")
+    # Scoped to deploy.yml on purpose. This used to ask for any run on the
+    # commit and take the first one — which was fine while there was one
+    # workflow. With CI running alongside it, the answer became a coin flip, and
+    # a green CI run once reported "workflow succeeded" for a deploy that had
+    # failed and rolled back. The deploy is the only run this command is about.
+    payload=$(gh_api "actions/workflows/deploy.yml/runs?branch=$branch&head_sha=$sha&per_page=1")
     if [ -n "$payload" ]; then
       status=$(printf '%s' "$payload" | json_field "d['workflow_runs'][0]['status'] if d.get('workflow_runs') else ''")
       conclusion=$(printf '%s' "$payload" | json_field "d['workflow_runs'][0]['conclusion'] or '' if d.get('workflow_runs') else ''")
@@ -175,7 +180,9 @@ wait_for_run() { # wait_for_run <branch> <sha> <url>
             printf '  %s is %s\n' "$url" "$(health "$url")"
             return 0
           fi
-          die "workflow finished with: ${conclusion:-unknown} — see https://github.com/$SLUG/actions"
+          printf '  %s is %s\n' "$url" "$(health "$url")"
+          warn "the site above is whatever survived — a failed deploy rolls back to the previous image"
+          die "deploy finished with: ${conclusion:-unknown} — see https://github.com/$SLUG/actions"
           ;;
         in_progress|queued|waiting|requested|pending) printf '  %s… (%ss)\r' "$status" "$waited" ;;
       esac
