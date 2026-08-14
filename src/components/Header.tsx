@@ -90,7 +90,11 @@ export function Header({ isAdmin, settings }: HeaderProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Link href="/docs">
+            {/* No prefetch: this link sits in the viewport on every page, so the
+                router pulled the docs route eagerly — and that route's stylesheet
+                is the whole 175 KB Swagger sheet, fetched for every visitor who
+                never opens the API docs. */}
+            <Link href="/docs" prefetch={false}>
               <Button variant="ghost" size="icon" className="h-9 w-9" title={tn('apiDocs')}>
                 <Code2 className="h-4 w-4" />
                 <span className="sr-only">{tn('apiDocs')}</span>
@@ -179,7 +183,7 @@ export function Header({ isAdmin, settings }: HeaderProps) {
             <SheetDescription className="sr-only">{tn('navigationMenu')}</SheetDescription>
           </SheetHeader>
           <nav className="mt-6 flex flex-col gap-2">
-            <Link href="/docs" onClick={() => setMobileOpen(false)}>
+            <Link href="/docs" prefetch={false} onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full justify-start gap-2">
                 <Code2 className="h-4 w-4" />
                 {tn('apiDocs')}

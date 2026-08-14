@@ -31,8 +31,10 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
               <span>GitHub</span>
             </a>
             <span className="text-muted-foreground/40">·</span>
+            {/* See Header: prefetching this route drags in the Swagger stylesheet. */}
             <Link
               href="/docs"
+              prefetch={false}
               className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors hover:underline underline-offset-4"
             >
               <Code2 className="h-4 w-4" />
