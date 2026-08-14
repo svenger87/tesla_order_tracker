@@ -1,10 +1,21 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { comparePassword, signToken, hashPassword } from '@/lib/auth'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
 import { cookies } from 'next/headers'
+
+const LOGIN_RULE = { limit: 10, windowMs: 15 * 60 * 1000 }
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(clientKey(request, 'admin-login'), LOGIN_RULE)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Zu viele Anmeldeversuche. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+      )
+    }
+
     const { username, password } = await request.json()
 
     if (!username || !password) {
