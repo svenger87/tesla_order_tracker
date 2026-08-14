@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink } from 'lucide-react'
+import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink, Eye, EyeOff } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 
@@ -38,6 +38,7 @@ export function SettingsTab() {
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false)
   const [apiKeyCopied, setApiKeyCopied] = useState(false)
+  const [apiKeyVisible, setApiKeyVisible] = useState(false)
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -340,11 +341,24 @@ export function SettingsTab() {
                 <div className="space-y-2">
                   <Label>{t('apiKey')}</Label>
                   <div className="flex gap-2">
+                    {/* Hidden by default: the key was previously rendered in
+                        plaintext on a page that gets screenshotted and screen-
+                        shared. Copying still works without revealing it. */}
                     <Input
                       value={apiKey}
+                      type={apiKeyVisible ? 'text' : 'password'}
                       readOnly
                       className="font-mono text-sm"
                     />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setApiKeyVisible(v => !v)}
+                      title={apiKeyVisible ? tc('hide') : tc('show')}
+                      aria-label={apiKeyVisible ? tc('hide') : tc('show')}
+                    >
+                      {apiKeyVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
