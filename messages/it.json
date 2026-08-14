@@ -177,7 +177,9 @@
     "clickEditToChange": "Clicchi su \"Modifica\" e inserisca la Sua password per modificare i dati dell'ordine.",
     "saveCodeWarning": "Salvi questo codice per modificare il Suo ordine in seguito.",
     "codeShownOnce": "Questo codice viene mostrato una sola volta!",
-    "codeUsageHint": "Utilizzi questo codice sotto \"Modifica ordine\" per modificare i Suoi dati."
+    "codeUsageHint": "Utilizzi questo codice sotto \"Modifica ordine\" per modificare i Suoi dati.",
+    "backToOverview": "Torna alla panoramica",
+    "viewMyOrder": "Visualizza il mio ordine"
   },
   "editByCode": {
     "passwordPromptTitle": "Modifica ordine",
@@ -768,7 +770,9 @@
     "adminDashboard": "Pannello di amministrazione",
     "navigationMenu": "Menu di navigazione",
     "impressum": "Note legali",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Cambia tema",
+    "changeLanguage": "Cambia lingua"
   },
   "footer": {
     "operatedBy": "Gestito da Sven",

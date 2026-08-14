@@ -177,7 +177,9 @@
     "clickEditToChange": "Klikk på \"Rediger\" og skriv inn passordet for å endre bestillingsdataene.",
     "saveCodeWarning": "Lagre denne koden for å redigere bestillingen senere.",
     "codeShownOnce": "Denne koden vises bare én gang!",
-    "codeUsageHint": "Bruk denne koden under \"Rediger bestilling\" for å endre dataene."
+    "codeUsageHint": "Bruk denne koden under \"Rediger bestilling\" for å endre dataene.",
+    "backToOverview": "Tilbake til oversikten",
+    "viewMyOrder": "Se bestillingen min"
   },
   "editByCode": {
     "passwordPromptTitle": "Rediger bestilling",
@@ -768,7 +770,9 @@
     "adminDashboard": "Administrasjonspanel",
     "navigationMenu": "Navigasjonsmeny",
     "impressum": "Juridisk informasjon",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Bytt tema",
+    "changeLanguage": "Bytt språk"
   },
   "footer": {
     "operatedBy": "Driftet av Sven",

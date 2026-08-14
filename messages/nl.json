@@ -177,7 +177,9 @@
     "clickEditToChange": "Klik op \"Bewerken\" en voer uw wachtwoord in om uw bestelgegevens te wijzigen.",
     "saveCodeWarning": "Bewaar deze code om uw bestelling later te bewerken.",
     "codeShownOnce": "Deze code wordt slechts één keer getoond!",
-    "codeUsageHint": "Gebruik deze code onder \"Bestelling bewerken\" om uw gegevens te wijzigen."
+    "codeUsageHint": "Gebruik deze code onder \"Bestelling bewerken\" om uw gegevens te wijzigen.",
+    "backToOverview": "Terug naar overzicht",
+    "viewMyOrder": "Mijn bestelling bekijken"
   },
   "editByCode": {
     "passwordPromptTitle": "Bestelling bewerken",
@@ -768,7 +770,9 @@
     "adminDashboard": "Beheerdersdashboard",
     "navigationMenu": "Navigatiemenu",
     "impressum": "Juridische informatie",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Thema wisselen",
+    "changeLanguage": "Taal wijzigen"
   },
   "footer": {
     "operatedBy": "Beheerd door Sven",

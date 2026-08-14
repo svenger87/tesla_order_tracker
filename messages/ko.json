@@ -177,7 +177,9 @@
     "clickEditToChange": "\"편집\"을 클릭하고 비밀번호를 입력하여 주문 데이터를 변경하세요.",
     "saveCodeWarning": "나중에 주문을 편집하기 위해 이 코드를 저장하세요.",
     "codeShownOnce": "이 코드는 한 번만 표시됩니다!",
-    "codeUsageHint": "\"주문 편집\"에서 이 코드를 사용하여 데이터를 변경하세요."
+    "codeUsageHint": "\"주문 편집\"에서 이 코드를 사용하여 데이터를 변경하세요.",
+    "backToOverview": "목록으로 돌아가기",
+    "viewMyOrder": "내 주문 보기"
   },
   "editByCode": {
     "passwordPromptTitle": "주문 편집",
@@ -768,7 +770,9 @@
     "adminDashboard": "관리자 대시보드",
     "navigationMenu": "탐색 메뉴",
     "impressum": "법적 고지",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "테마 전환",
+    "changeLanguage": "언어 변경"
   },
   "footer": {
     "operatedBy": "Sven이 운영합니다",

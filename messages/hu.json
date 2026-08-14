@@ -177,7 +177,9 @@
     "clickEditToChange": "Kattintson a \"Szerkesztés\" gombra és adja meg jelszavát a rendelési adatok módosításához.",
     "saveCodeWarning": "Mentse el ezt a kódot a rendelés későbbi szerkesztéséhez.",
     "codeShownOnce": "Ez a kód csak egyszer jelenik meg!",
-    "codeUsageHint": "Használja ezt a kódot a \"Rendelés szerkesztése\" menüpontban az adatok módosításához."
+    "codeUsageHint": "Használja ezt a kódot a \"Rendelés szerkesztése\" menüpontban az adatok módosításához.",
+    "backToOverview": "Vissza az áttekintéshez",
+    "viewMyOrder": "Rendelésem megtekintése"
   },
   "editByCode": {
     "passwordPromptTitle": "Rendelés szerkesztése",
@@ -768,7 +770,9 @@
     "adminDashboard": "Rendszergazdai kezelőpanel",
     "navigationMenu": "Navigációs menü",
     "impressum": "Jogi nyilatkozat",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Téma váltása",
+    "changeLanguage": "Nyelv váltása"
   },
   "footer": {
     "operatedBy": "Üzemeltető: Sven",

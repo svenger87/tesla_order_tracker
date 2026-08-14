@@ -177,7 +177,9 @@
     "clickEditToChange": "Klikněte na \"Upravit\" a zadejte heslo pro změnu údajů objednávky.",
     "saveCodeWarning": "Uložte si tento kód pro pozdější úpravy objednávky.",
     "codeShownOnce": "Tento kód se zobrazí pouze jednou!",
-    "codeUsageHint": "Použijte tento kód v sekci \"Upravit objednávku\" pro změnu údajů."
+    "codeUsageHint": "Použijte tento kód v sekci \"Upravit objednávku\" pro změnu údajů.",
+    "backToOverview": "Zpět na přehled",
+    "viewMyOrder": "Zobrazit mou objednávku"
   },
   "editByCode": {
     "passwordPromptTitle": "Upravit objednávku",
@@ -768,7 +770,9 @@
     "adminDashboard": "Administrátorský panel",
     "navigationMenu": "Navigační menu",
     "impressum": "Právní informace",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Přepnout motiv",
+    "changeLanguage": "Změnit jazyk"
   },
   "footer": {
     "operatedBy": "Provozuje Sven",

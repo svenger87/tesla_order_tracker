@@ -177,7 +177,9 @@
     "clickEditToChange": "Klicka på \"Redigera\" och ange lösenordet för att ändra beställningsuppgifterna.",
     "saveCodeWarning": "Spara denna kod för att redigera beställningen senare.",
     "codeShownOnce": "Denna kod visas bara en gång!",
-    "codeUsageHint": "Använd denna kod under \"Redigera beställning\" för att ändra uppgifterna."
+    "codeUsageHint": "Använd denna kod under \"Redigera beställning\" för att ändra uppgifterna.",
+    "backToOverview": "Tillbaka till översikten",
+    "viewMyOrder": "Visa min beställning"
   },
   "editByCode": {
     "passwordPromptTitle": "Redigera beställning",
@@ -768,7 +770,9 @@
     "adminDashboard": "Administrationspanel",
     "navigationMenu": "Navigeringsmeny",
     "impressum": "Juridisk information",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Byt tema",
+    "changeLanguage": "Byt språk"
   },
   "footer": {
     "operatedBy": "Drivs av Sven",

@@ -680,10 +680,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href={`/${locale}`}>
-              <Button variant="outline">{locale === 'de' ? 'Zur Übersicht' : 'Back to overview'}</Button>
+              <Button variant="outline">{te('backToOverview')}</Button>
             </Link>
             <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
-              <Button>{locale === 'de' ? 'Meine Bestellung ansehen' : 'View my order'}</Button>
+              <Button>{te('viewMyOrder')}</Button>
             </Link>
           </div>
         </CardContent>

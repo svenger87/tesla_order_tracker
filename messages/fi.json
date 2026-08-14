@@ -177,7 +177,9 @@
     "clickEditToChange": "Napsauta \"Muokkaa\" ja syötä salasanasi muuttaaksesi tilaustietojasi.",
     "saveCodeWarning": "Tallenna tämä koodi muokataksesi tilaustasi myöhemmin.",
     "codeShownOnce": "Tämä koodi näytetään vain kerran!",
-    "codeUsageHint": "Käytä tätä koodia kohdassa \"Muokkaa tilausta\" tietojesi muuttamiseen."
+    "codeUsageHint": "Käytä tätä koodia kohdassa \"Muokkaa tilausta\" tietojesi muuttamiseen.",
+    "backToOverview": "Takaisin yleisnäkymään",
+    "viewMyOrder": "Näytä tilaukseni"
   },
   "editByCode": {
     "passwordPromptTitle": "Muokkaa tilausta",
@@ -768,7 +770,9 @@
     "adminDashboard": "Ylläpidon hallintapaneeli",
     "navigationMenu": "Navigointivalikko",
     "impressum": "Oikeudellinen ilmoitus",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Vaihda teemaa",
+    "changeLanguage": "Vaihda kieltä"
   },
   "footer": {
     "operatedBy": "Ylläpitäjä Sven",

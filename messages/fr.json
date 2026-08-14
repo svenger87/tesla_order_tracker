@@ -177,7 +177,9 @@
     "clickEditToChange": "Cliquez sur « Modifier » et saisissez votre mot de passe pour modifier les données de votre commande.",
     "saveCodeWarning": "Enregistrez ce code pour modifier votre commande ultérieurement.",
     "codeShownOnce": "Ce code n'est affiché qu'une seule fois !",
-    "codeUsageHint": "Utilisez ce code sous « Modifier la commande » pour changer vos données."
+    "codeUsageHint": "Utilisez ce code sous « Modifier la commande » pour changer vos données.",
+    "backToOverview": "Retour à l'aperçu",
+    "viewMyOrder": "Voir ma commande"
   },
   "editByCode": {
     "passwordPromptTitle": "Modifier la commande",
@@ -768,7 +770,9 @@
     "adminDashboard": "Tableau de bord administrateur",
     "navigationMenu": "Menu de navigation",
     "impressum": "Mentions légales",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "toggleTheme": "Changer de thème",
+    "changeLanguage": "Changer de langue"
   },
   "footer": {
     "operatedBy": "Géré par Sven",

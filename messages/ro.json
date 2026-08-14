@@ -177,7 +177,9 @@
     "clickEditToChange": "Apăsați \"Editează\" și introduceți parola pentru a modifica datele comenzii.",
     "saveCodeWarning": "Salvați acest cod pentru a putea edita comanda ulterior.",
     "codeShownOnce": "Acest cod este afișat o singură dată!",
-    "codeUsageHint": "Folosiți acest cod la \"Editare comandă\" pentru a vă modifica datele."
+    "codeUsageHint": "Folosiți acest cod la \"Editare comandă\" pentru a vă modifica datele.",
+    "backToOverview": "Înapoi la prezentare",
+    "viewMyOrder": "Vezi comanda mea"
   },
   "editByCode": {
     "passwordPromptTitle": "Editare comandă",
@@ -768,7 +770,9 @@
     "adminDashboard": "Panou de administrare",
     "navigationMenu": "Meniu de navigare",
     "impressum": "Mențiuni legale",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Schimbă tema",
+    "changeLanguage": "Schimbă limba"
   },
   "footer": {
     "operatedBy": "Operat de Sven",

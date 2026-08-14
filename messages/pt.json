@@ -177,7 +177,9 @@
     "clickEditToChange": "Clique em \"Editar\" e introduza a sua palavra-passe para alterar os dados da sua encomenda.",
     "saveCodeWarning": "Guarde este código para editar a sua encomenda mais tarde.",
     "codeShownOnce": "Este código só é mostrado uma vez!",
-    "codeUsageHint": "Utilize este código em \"Editar encomenda\" para alterar os seus dados."
+    "codeUsageHint": "Utilize este código em \"Editar encomenda\" para alterar os seus dados.",
+    "backToOverview": "Voltar à visão geral",
+    "viewMyOrder": "Ver o meu pedido"
   },
   "editByCode": {
     "passwordPromptTitle": "Editar encomenda",
@@ -768,7 +770,9 @@
     "adminDashboard": "Painel de administração",
     "navigationMenu": "Menu de navegação",
     "impressum": "Aviso legal",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Alternar tema",
+    "changeLanguage": "Mudar idioma"
   },
   "footer": {
     "operatedBy": "Operado por Sven",
