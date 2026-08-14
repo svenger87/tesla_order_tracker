@@ -16,6 +16,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface VinActivityChartProps {
   orders: Order[]
@@ -66,7 +67,8 @@ export function VinActivityChart({ orders }: VinActivityChartProps) {
               <XAxis dataKey="week" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip
-                contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
+                {...CHART_TOOLTIP_STYLE}
+                contentStyle={{ ...CHART_TOOLTIP_STYLE.contentStyle, fontSize: '12px' }}
                 formatter={(value) => [`${value} VINs`, t('assigned')]}
               />
               <Bar dataKey="count" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />

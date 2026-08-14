@@ -354,7 +354,6 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
 
             {/* Country delivery speed ranking */}
             {stats.countryDeliveryStats.length > 0 && (() => {
-              const total = stats.countryDeliveryStats.length
               return (
                 <ChartCard title={tcd('title')} icon={MapPin}>
                     <Table>
@@ -370,7 +369,12 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                         {stats.countryDeliveryStats.map((row, i) => {
                           const info = resolveCountry(row.country)
                           return (
-                            <TableRow key={row.country} style={{ borderLeft: `3px solid oklch(${0.55 + (i / total) * 0.15} ${0.16 - (i / total) * 0.06} ${145 - (i / total) * 70})` }}>
+                            // The left edge used to carry a green-to-yellow
+                            // stripe computed from the row index — a fourth way
+                            // of saying the rank the position, the number and
+                            // the medal already say, and one that repainted a
+                            // country the moment the list changed length.
+                            <TableRow key={row.country}>
                               <TableCell className="font-medium tabular-nums">
                                 {i === 0 ? '\u{1F947}' : i === 1 ? '\u{1F948}' : i === 2 ? '\u{1F949}' : i + 1}
                               </TableCell>
