@@ -454,8 +454,8 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
               <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    <div className="rounded-lg bg-green-500/10 p-1.5">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <div className="rounded-lg bg-success/10 p-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-success" />
                     </div>
                     {t('deliveriesOverTime')}
                   </CardTitle>

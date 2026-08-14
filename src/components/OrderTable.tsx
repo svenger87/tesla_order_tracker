@@ -1287,7 +1287,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                         <Badge
                           variant={isDelivered ? "default" : "outline"}
                           className={isDelivered
-                            ? "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white"
+                            ? "bg-success text-white hover:opacity-90"
                             : "text-muted-foreground"
                           }
                         >
