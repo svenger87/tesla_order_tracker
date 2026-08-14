@@ -283,7 +283,8 @@
     "papers": "文件",
     "production": "生产",
     "delivered": "已交付",
-    "deliveryScheduled": "交付已安排"
+    "deliveryScheduled": "交付已安排",
+    "stepOfTotal": "第 {current} / {total} 步"
   },
   "statistics": {
     "overview": "概览",

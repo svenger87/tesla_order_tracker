@@ -283,7 +283,8 @@
     "papers": "Documentos",
     "production": "Producción",
     "delivered": "Entregado",
-    "deliveryScheduled": "Entrega programada"
+    "deliveryScheduled": "Entrega programada",
+    "stepOfTotal": "Paso {current} de {total}"
   },
   "statistics": {
     "overview": "Resumen",

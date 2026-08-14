@@ -193,6 +193,66 @@
   }
 }
 
+/**
+ * The board.
+ *
+ * A departures board is a dark panel in a lit room — not a dark room. So this
+ * is a component, not a theme: the page around it stays light, and the board
+ * stays the board in either theme. That is also what makes it read as an
+ * instrument rather than as "dark mode happened here".
+ *
+ * The off-black is warmed toward the amber rather than being neutral, so the
+ * two state colours sit in the surface instead of on top of it.
+ *
+ * Everything inside is scoped by redefining the design tokens, which means the
+ * badges, muted text and borders that were already there adapt on their own —
+ * no parallel set of board-specific components.
+ */
+.board {
+  --board-bg: #16140f;
+  --board-surface: #1d1a15;
+  --board-line: #302b23;
+
+  background: var(--board-bg);
+  color: #f2ede3;
+
+  --background: var(--board-bg);
+  --foreground: #f2ede3;
+  --card: var(--board-surface);
+  --card-foreground: #f2ede3;
+  --muted: #24211b;
+  --muted-foreground: #a89c8a;
+  --border: var(--board-line);
+  --input: var(--board-line);
+  --secondary: #262219;
+  --secondary-foreground: #e8e0d2;
+
+  /* States carry meaning here; red goes back to being only the brand. */
+  --color-success: #5fbf7f;
+  --color-pending: #e2a338;
+  --color-data: #7fb4d8;
+}
+
+/* In dark mode the page drops toward black, so the board lifts a little to
+   stay a distinct object rather than dissolving into the page. */
+.dark .board {
+  --board-bg: #1b1813;
+  --board-surface: #221e18;
+  --board-line: #363028;
+}
+
+/* Striping and hover are defined globally on bare `table` selectors further
+   down; inside the board they have to follow the board's own surface. */
+.board table tbody tr:nth-child(even),
+.dark .board table tbody tr:nth-child(even) {
+  background-color: color-mix(in oklab, var(--board-surface) 70%, transparent);
+}
+
+.board table tbody tr:hover,
+.dark .board table tbody tr:hover {
+  background-color: color-mix(in oklab, #e2a338 8%, transparent);
+}
+
 .sticky-tabs {
   position: sticky;
   top: var(--header-height);

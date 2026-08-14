@@ -251,6 +251,9 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
     }
   }, [buildUrl, nextCursor])
 
+  // Selected chips are a selection state, not a brand moment. They were
+  // filled with the brand red and every one of them starts switched on, so
+  // the row read as seven alerts sitting under the table.
   const toggleEvent = useCallback((e: EventType) => {
     setEnabledEvents((prev) => {
       const next = new Set(prev)
@@ -292,7 +295,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                     onClick={() => toggleEvent(ev)}
                     aria-pressed={on}
                     aria-label={`${t('title')}: ${t(`event.${ev}`)}`}
-                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${on ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/40'}`}
                   >
                     {t(`event.${ev}`)}
                   </button>
@@ -303,7 +306,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                 onClick={() => setIncludeTost(v => !v)}
                 aria-pressed={includeTost}
                 aria-label={`${t('title')}: TOST`}
-                className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${includeTost ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${includeTost ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/40'}`}
               >
                 TOST
               </button>

@@ -283,7 +283,8 @@
     "papers": "서류",
     "production": "생산",
     "delivered": "인도 완료",
-    "deliveryScheduled": "인도 예정"
+    "deliveryScheduled": "인도 예정",
+    "stepOfTotal": "{total}단계 중 {current}단계"
   },
   "statistics": {
     "overview": "개요",

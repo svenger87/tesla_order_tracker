@@ -283,7 +283,8 @@
     "papers": "Belgeler",
     "production": "Üretim",
     "delivered": "Teslim edildi",
-    "deliveryScheduled": "Teslimat planlandı"
+    "deliveryScheduled": "Teslimat planlandı",
+    "stepOfTotal": "{total} adımdan {current}."
   },
   "statistics": {
     "overview": "Genel Bakış",

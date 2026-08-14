@@ -283,7 +283,8 @@
     "papers": "Dokumentumok",
     "production": "Gyártás",
     "delivered": "Kiszállítva",
-    "deliveryScheduled": "Szállítás ütemezve"
+    "deliveryScheduled": "Szállítás ütemezve",
+    "stepOfTotal": "{current}. lépés a(z) {total}-ból"
   },
   "statistics": {
     "overview": "Áttekintés",
