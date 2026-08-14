@@ -773,7 +773,14 @@
     "papersToDelivery": "Belgeler → Teslimat",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Beklenen",
+    "waitingLabel": "Bekliyor",
+    "daysUnit": "gün",
+    "fasterThanComparable": "Benzer siparişlerden {days} gün daha hızlı (medyan {median})",
+    "slowerThanComparable": "Benzer siparişlerden {days} gün daha yavaş (medyan {median})",
+    "matchesComparable": "Benzer siparişlerin medyanında ({median})",
+    "comparableTypically": "Benzer siparişler medyan {median} gün sürdü"
   },
   "support": {
     "communityMessage": "Bu veriler topluluk tarafından topluluk için korunmaktadır. Bu site size yardımcı oluyorsa, sunucu maliyetlerini destekleyebilirsiniz.",

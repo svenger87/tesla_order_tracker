@@ -773,7 +773,14 @@
     "papersToDelivery": "Dokumenti → Isporuka",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Čekanje",
+    "waitingLabel": "Čeka",
+    "daysUnit": "dana",
+    "fasterThanComparable": "{days} dana brže od usporedivih narudžbi (medijan {median})",
+    "slowerThanComparable": "{days} dana sporije od usporedivih narudžbi (medijan {median})",
+    "matchesComparable": "Točno na medijanu usporedivih narudžbi ({median})",
+    "comparableTypically": "Usporedive narudžbe trajale su medijan {median} dana"
   },
   "support": {
     "communityMessage": "Ove podatke održava zajednica za zajednicu. Ako vam ova stranica pomaže, možete podržati troškove poslužitelja.",

@@ -773,7 +773,14 @@
     "papersToDelivery": "Documente → Livrare",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Așteptare",
+    "waitingLabel": "Așteaptă",
+    "daysUnit": "zile",
+    "fasterThanComparable": "Cu {days} zile mai rapid decât comenzi comparabile (mediana {median})",
+    "slowerThanComparable": "Cu {days} zile mai lent decât comenzi comparabile (mediana {median})",
+    "matchesComparable": "Exact pe mediana comenzilor comparabile ({median})",
+    "comparableTypically": "Comenzile comparabile au durat o mediană de {median} zile"
   },
   "support": {
     "communityMessage": "Aceste date sunt întreținute de comunitate pentru comunitate. Dacă acest site vă ajută, puteți sprijini costurile serverului.",

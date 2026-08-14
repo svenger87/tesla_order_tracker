@@ -773,7 +773,14 @@
     "papersToDelivery": "文件 → 交付",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "已等待",
+    "waitingLabel": "等待中",
+    "daysUnit": "天",
+    "fasterThanComparable": "比同类订单快 {days} 天（中位数 {median}）",
+    "slowerThanComparable": "比同类订单慢 {days} 天（中位数 {median}）",
+    "matchesComparable": "正好处于同类订单的中位数（{median}）",
+    "comparableTypically": "同类订单的中位数为 {median} 天"
   },
   "support": {
     "communityMessage": "这些数据由社区为社区维护。如果本站对您有帮助，您可以支持服务器费用。",

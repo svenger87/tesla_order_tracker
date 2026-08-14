@@ -773,7 +773,14 @@
     "papersToDelivery": "Документи → Доставка",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Изчаквано",
+    "waitingLabel": "Изчаква",
+    "daysUnit": "дни",
+    "fasterThanComparable": "{days} дни по-бързо от сравними поръчки (медиана {median})",
+    "slowerThanComparable": "{days} дни по-бавно от сравними поръчки (медиана {median})",
+    "matchesComparable": "Точно колкото сравними поръчки (медиана {median})",
+    "comparableTypically": "Сравними поръчки са отнели медиана от {median} дни"
   },
   "support": {
     "communityMessage": "Тези данни се поддържат от общността за общността. Ако този сайт Ви помага, можете да подкрепите разходите за сървъра.",

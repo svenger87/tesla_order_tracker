@@ -773,7 +773,14 @@
     "papersToDelivery": "Documenten → Levering",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Gewacht",
+    "waitingLabel": "Wacht",
+    "daysUnit": "dagen",
+    "fasterThanComparable": "{days} dagen sneller dan vergelijkbare bestellingen (mediaan {median})",
+    "slowerThanComparable": "{days} dagen langzamer dan vergelijkbare bestellingen (mediaan {median})",
+    "matchesComparable": "Precies op de mediaan van vergelijkbare bestellingen ({median})",
+    "comparableTypically": "Vergelijkbare bestellingen duurden mediaan {median} dagen"
   },
   "support": {
     "communityMessage": "Deze gegevens worden door de community voor de community onderhouden. Als deze site u helpt, kunt u de serverkosten ondersteunen.",

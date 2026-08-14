@@ -74,21 +74,27 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
           const Icon = isScheduledDelivery ? Calendar : step.icon
           const dateValue = order[step.dateField]
 
+          /* A step that is behind you and the step you are on must not look
+             the same. Taking the brand red off these flattened both into one
+             amber; passed steps are quiet green now, the step you are actually
+             waiting on carries the amber and the ring. */
+          const isPassed = isCompleted && !isCurrent
+
           const circleColor = isScheduledDelivery
             ? 'bg-pending text-white'
             : isLastStep && isDelivered
               ? 'bg-success text-white'
-              : isCompleted
-                ? 'bg-pending text-white'
-                : 'bg-muted text-muted-foreground'
+              : isPassed
+                ? 'bg-success/85 text-white'
+                : isCurrent
+                  ? 'bg-pending text-white'
+                  : 'bg-muted text-muted-foreground'
 
-          const ringStyle = isCurrent && !isScheduledDelivery && !isDelivered
-            ? 'ring-2 ring-pending/50 ring-offset-2 ring-offset-background'
-            : isScheduledDelivery
-              ? 'ring-2 ring-amber-500/50 ring-offset-2 ring-offset-background'
-              : isDelivered && isLastStep
-                ? 'ring-2 ring-green-500/50 ring-offset-2 ring-offset-background'
-                : ''
+          const ringStyle = isScheduledDelivery || (isCurrent && !isDelivered)
+            ? 'ring-2 ring-pending/40 ring-offset-2 ring-offset-background'
+            : isDelivered && isLastStep
+              ? 'ring-2 ring-success/40 ring-offset-2 ring-offset-background'
+              : ''
 
           return (
             <div key={step.key} className="flex flex-col items-center flex-1 relative z-10">

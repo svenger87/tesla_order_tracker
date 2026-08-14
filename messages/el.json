@@ -773,7 +773,14 @@
     "papersToDelivery": "Έγγραφα → Παράδοση",
     "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
     "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "waitedLabel": "Αναμονή",
+    "waitingLabel": "Περιμένει",
+    "daysUnit": "ημέρες",
+    "fasterThanComparable": "{days} ημέρες ταχύτερα από συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "slowerThanComparable": "{days} ημέρες πιο αργά από συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "matchesComparable": "Ακριβώς όπως συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "comparableTypically": "Συγκρίσιμες παραγγελίες χρειάστηκαν διάμεσο {median} ημερών"
   },
   "support": {
     "communityMessage": "Αυτά τα δεδομένα διατηρούνται από την κοινότητα για την κοινότητα. Εάν αυτός ο ιστότοπος σας βοηθά, μπορείτε να υποστηρίξετε τα έξοδα του διακομιστή.",
