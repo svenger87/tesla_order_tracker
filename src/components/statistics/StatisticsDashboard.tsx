@@ -7,6 +7,7 @@ import { Order, VehicleType } from '@/lib/types'
 import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } from '@/lib/statistics'
 import { useOptions } from '@/hooks/useOptions'
 import { TwemojiEmoji } from '@/components/TwemojiText'
+import { CHART_COLORS } from '@/lib/chart-colors'
 import { StatCard } from './StatCard'
 import { ChartCard } from './ChartCard'
 import { DeliveryTimeline } from './DeliveryTimeline'
@@ -264,21 +265,27 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                       <>
                         <div className="flex h-4 w-full overflow-hidden rounded-full">
                           <div
-                            className="bg-primary transition-all"
-                            style={{ width: `${Math.round((stats.manualOrders / stats.totalOrders) * 100)}%` }}
+                            className="transition-all"
+                            style={{
+                              width: `${Math.round((stats.manualOrders / stats.totalOrders) * 100)}%`,
+                              backgroundColor: CHART_COLORS[1],
+                            }}
                           />
                           <div
-                            className="bg-primary/40 transition-all"
-                            style={{ width: `${Math.round((stats.tostOrders / stats.totalOrders) * 100)}%` }}
+                            className="transition-all"
+                            style={{
+                              width: `${Math.round((stats.tostOrders / stats.totalOrders) * 100)}%`,
+                              backgroundColor: CHART_COLORS[2],
+                            }}
                           />
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[1] }} />
                             {t('manualOrders')} {stats.manualOrders} ({Math.round((stats.manualOrders / stats.totalOrders) * 100)}%)
                           </span>
                           <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary/40" />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[2] }} />
                             {t('tostOrders')} {stats.tostOrders} ({Math.round((stats.tostOrders / stats.totalOrders) * 100)}%)
                           </span>
                         </div>
