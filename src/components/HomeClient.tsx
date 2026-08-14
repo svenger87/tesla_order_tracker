@@ -640,6 +640,7 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
                 ) : (
                   <Copy className="h-4 w-4" />
                 )}
+                <span className="sr-only">{tc('copy')}</span>
               </Button>
             </div>
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3 text-sm text-amber-700 dark:text-amber-400">

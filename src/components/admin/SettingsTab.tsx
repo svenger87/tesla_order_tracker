@@ -374,6 +374,7 @@ export function SettingsTab() {
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
+                      <span className="sr-only">{tc('copy')}</span>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">

@@ -782,6 +782,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           title={t('editTostFields')}
         >
           <FileText className="h-4 w-4" />
+          <span className="sr-only">{t('editTostFields')}</span>
         </Button>
       )
     }

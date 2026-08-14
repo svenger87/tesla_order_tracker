@@ -95,6 +95,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground">
           <MoreVertical className="h-4 w-4" />
+          <span className="sr-only">{tc('actions')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

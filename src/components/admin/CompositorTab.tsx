@@ -417,9 +417,11 @@ export function CompositorTab() {
                         <div className="flex justify-end gap-1">
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(code)}>
                             <Pencil className="h-3.5 w-3.5" />
+                            <span className="sr-only">{tc('edit')}</span>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(code)}>
                             <Trash2 className="h-3.5 w-3.5" />
+                            <span className="sr-only">{tc('delete')}</span>
                           </Button>
                         </div>
                       </td>
