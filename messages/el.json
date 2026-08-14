@@ -283,7 +283,8 @@
     "papers": "Έγγραφα",
     "production": "Παραγωγή",
     "delivered": "Παραδόθηκε",
-    "deliveryScheduled": "Παράδοση προγραμματισμένη"
+    "deliveryScheduled": "Παράδοση προγραμματισμένη",
+    "stepOfTotal": "Βήμα {current} από {total}"
   },
   "statistics": {
     "overview": "Επισκόπηση",

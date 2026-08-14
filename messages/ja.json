@@ -283,7 +283,8 @@
     "papers": "書類",
     "production": "生産",
     "delivered": "納車済み",
-    "deliveryScheduled": "納車予定"
+    "deliveryScheduled": "納車予定",
+    "stepOfTotal": "{total} 段階中 {current}"
   },
   "statistics": {
     "overview": "概要",

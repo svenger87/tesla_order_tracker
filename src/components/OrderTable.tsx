@@ -1044,7 +1044,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       <div className="hidden md:block"><div
         ref={tableContainerRef}
         onScroll={handleTableScroll}
-        className="bg-card dark:bg-card w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
+        className="board w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
       >
         <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
@@ -1172,7 +1172,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') ? (
                       <button
                         type="button"
-                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                        /* Tesla's compositor bakes a white background into the
+                           PNG, which on the board turned the column into a
+                           strip of bleeding white rectangles. Framing it as a
+                           small mounted tile makes that read as a product
+                           photo instead — and needs no change to the image URL,
+                           which would have invalidated the whole server cache. */
+                        className="flex cursor-pointer items-center justify-center rounded-[3px] bg-white/95 px-1 ring-1 ring-black/10 transition-opacity hover:opacity-80"
                         onClick={() => setImageModalOrder(order)}
                       >
                         <TeslaCarImage
@@ -1195,12 +1201,20 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('country') && (
                   <CountryCell country={order.country} countries={countries} />
                 )}
+                {/* Performance used to use the `destructive` variant, so a trim
+                    level wore the same red as errors, the primary button and —
+                    until now — "step completed". On the board it was the only
+                    red left and read as an alarm. It is a trim: it gets weight,
+                    not a warning colour. */}
                 {isColumnVisible('model') && (
                   <TableCell className="whitespace-nowrap">
                     {order.model ? (
                       <Badge
-                        variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
-                        className="font-medium"
+                        variant="secondary"
+                        className={cn(
+                          'font-medium',
+                          order.model.toLowerCase().includes('performance') && 'font-bold tracking-wide',
+                        )}
                       >
                         {getLabel(models, order.model)}
                       </Badge>
@@ -1346,8 +1360,12 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   </TableCell>
                 )}
                 {isColumnVisible('waitingDays') && (
-                  <TableCell className="whitespace-nowrap text-center font-mono">
-                    {(() => { const v = getWaitingDays(order); return v !== null ? v : '-' })()}
+                  /* The days waited is the reason most people open this page at
+                     all, and it was set in the same size as every other cell.
+                     It gets the weight now — still one column, just legible
+                     from a distance. */
+                  <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold tabular-nums">
+                    {(() => { const v = getWaitingDays(order); return v !== null ? v : '–' })()}
                   </TableCell>
                 )}
                 {isColumnVisible('updatedAt') && (

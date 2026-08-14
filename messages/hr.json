@@ -283,7 +283,8 @@
     "papers": "Dokumenti",
     "production": "Proizvodnja",
     "delivered": "Isporučeno",
-    "deliveryScheduled": "Isporuka zakazana"
+    "deliveryScheduled": "Isporuka zakazana",
+    "stepOfTotal": "Korak {current} od {total}"
   },
   "statistics": {
     "overview": "Pregled",

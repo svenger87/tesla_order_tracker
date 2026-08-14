@@ -283,7 +283,8 @@
     "papers": "Documenten",
     "production": "Productie",
     "delivered": "Geleverd",
-    "deliveryScheduled": "Levering gepland"
+    "deliveryScheduled": "Levering gepland",
+    "stepOfTotal": "Stap {current} van {total}"
   },
   "statistics": {
     "overview": "Overzicht",

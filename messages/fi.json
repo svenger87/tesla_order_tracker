@@ -283,7 +283,8 @@
     "papers": "Asiakirjat",
     "production": "Tuotanto",
     "delivered": "Toimitettu",
-    "deliveryScheduled": "Toimitus sovittu"
+    "deliveryScheduled": "Toimitus sovittu",
+    "stepOfTotal": "Vaihe {current}/{total}"
   },
   "statistics": {
     "overview": "Yleiskatsaus",

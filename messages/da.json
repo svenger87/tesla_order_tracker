@@ -283,7 +283,8 @@
     "papers": "Dokumenter",
     "production": "Produktion",
     "delivered": "Leveret",
-    "deliveryScheduled": "Levering planlagt"
+    "deliveryScheduled": "Levering planlagt",
+    "stepOfTotal": "Trin {current} af {total}"
   },
   "statistics": {
     "overview": "Oversigt",

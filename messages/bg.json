@@ -283,7 +283,8 @@
     "papers": "Документи",
     "production": "Производство",
     "delivered": "Доставено",
-    "deliveryScheduled": "Доставка насрочена"
+    "deliveryScheduled": "Доставка насрочена",
+    "stepOfTotal": "Стъпка {current} от {total}"
   },
   "statistics": {
     "overview": "Общ преглед",

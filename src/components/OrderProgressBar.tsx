@@ -34,71 +34,76 @@ const STEP_INDEX: Record<StepKey, number> = {
   delivered: 4,
 }
 
-// Memoized compact progress bar — no animations, pure CSS
+/** Which token a stage's colour comes from. Red is not among them. */
+const STATE_TONE: Record<StepKey, 'done' | 'moving' | 'waiting'> = {
+  ordered: 'waiting',
+  vin_received: 'moving',
+  production: 'moving',
+  papers_received: 'moving',
+  delivery_scheduled: 'done',
+  delivered: 'done',
+}
+
+const TONE_TEXT = {
+  done: 'text-success',
+  moving: 'text-pending',
+  waiting: 'text-muted-foreground',
+} as const
+
+const TONE_FILL = {
+  done: 'bg-success',
+  moving: 'bg-pending',
+  waiting: 'bg-muted-foreground/50',
+} as const
+
+/**
+ * Status for the table: the stage as a word, with a five-segment track under it.
+ *
+ * It used to be five circles, and completed steps were painted in the brand red
+ * — so the column read as a row of identical red dots you had to decode, while
+ * red simultaneously meant "brand", "primary action" and "Performance trim"
+ * elsewhere. A word is legible at a glance and across a room; the track keeps
+ * the "how far along" reading that the dots were there for.
+ */
 const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: Order }) {
   const t = useTranslations('progress')
   const currentStatus = getOrderStatus(order)
   const currentIndex = STEP_INDEX[currentStatus]
-  const isScheduled = currentStatus === 'delivery_scheduled'
+  const tone = STATE_TONE[currentStatus]
+
+  const label = currentStatus === 'delivery_scheduled'
+    ? t('deliveryScheduled')
+    : t(STEPS[currentIndex].labelKey)
+
+  const reached = STEPS.filter((_, i) => i <= currentIndex).length
 
   return (
-    <div className="flex items-center gap-0">
-      {STEPS.map((step, index) => {
-        const isCompleted = index <= currentIndex
-        const isCurrent = index === currentIndex
-        const isLastStep = index === STEPS.length - 1
-        const isScheduledDelivery = isLastStep && isScheduled
-        const Icon = isScheduledDelivery ? Calendar : step.icon
-        const dateValue = order[step.dateField]
-
-        return (
-          <Fragment key={step.key}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={cn(
-                    'relative flex items-center justify-center rounded-full transition-colors shrink-0',
-                    'h-6 w-6',
-                    isScheduledDelivery
-                      ? 'bg-amber-500 text-white'
-                      : isLastStep && isCompleted && !isScheduled
-                        ? 'bg-green-500 text-white'
-                        : isCompleted
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground',
-                    isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
-                    isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
-                  )}
-                >
-                  {isCompleted && index < currentIndex && !isScheduledDelivery ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    <Icon className="h-3 w-3" />
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="font-medium">
-                  {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
-                </p>
-                {dateValue && (
-                  <p className="text-xs opacity-80">{dateValue}</p>
-                )}
-              </TooltipContent>
-            </Tooltip>
-
-            {index < STEPS.length - 1 && (
-              <div
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex flex-col gap-1 leading-none">
+          <span className={cn('truncate text-[11px] font-semibold uppercase tracking-[0.08em]', TONE_TEXT[tone])}>
+            {label}
+          </span>
+          <span className="flex gap-[3px]" aria-hidden>
+            {STEPS.map((step, index) => (
+              <span
+                key={step.key}
                 className={cn(
-                  'h-px w-1 shrink-0',
-                  index < currentIndex ? 'bg-primary' : 'bg-muted'
+                  'h-[3px] w-3 rounded-[1px]',
+                  index <= currentIndex ? TONE_FILL[tone] : 'bg-muted-foreground/20',
                 )}
               />
-            )}
-          </Fragment>
-        )
-      })}
-    </div>
+            ))}
+          </span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p className="font-medium">{label}</p>
+        <p className="text-xs opacity-80">
+          {t('stepOfTotal', { current: reached, total: STEPS.length })}
+        </p>
+      </TooltipContent>
+    </Tooltip>
   )
 })
 
@@ -110,25 +115,18 @@ export function OrderProgressBar({ order, compact = false, barOnly = false }: Or
 
   const isScheduled = currentStatus === 'delivery_scheduled'
 
-  // Simple colored bar for card view
+  // Simple bar for the mobile card view.
+  // This carried six hand-picked gradients — green, amber, blue, purple, cyan,
+  // grey — which was a seventh palette in the project and meant the same stage
+  // looked different here than in the table. Same three tones as the table now.
   if (barOnly) {
     const progress = ((currentIndex + 1) / STEPS.length) * 100
-    const barColor = currentStatus === 'delivered'
-      ? 'bg-gradient-to-r from-green-500 to-green-400'
-      : currentStatus === 'delivery_scheduled'
-        ? 'bg-gradient-to-r from-amber-500 to-amber-400'
-        : currentStatus === 'papers_received'
-          ? 'bg-gradient-to-r from-blue-500 to-blue-400'
-          : currentStatus === 'production'
-            ? 'bg-gradient-to-r from-purple-500 to-purple-400'
-            : currentStatus === 'vin_received'
-              ? 'bg-gradient-to-r from-cyan-500 to-cyan-400'
-              : 'bg-gradient-to-r from-gray-400 to-gray-300'
+    const tone = STATE_TONE[currentStatus]
 
     return (
       <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
         <div
-          className={cn('h-full rounded-full transition-[width] duration-500 ease-out', barColor)}
+          className={cn('h-full rounded-full transition-[width] duration-500 ease-out', TONE_FILL[tone])}
           style={{ width: `${progress}%` }}
         />
       </div>

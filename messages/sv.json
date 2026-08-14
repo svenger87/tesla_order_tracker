@@ -283,7 +283,8 @@
     "papers": "Dokument",
     "production": "Produktion",
     "delivered": "Levererad",
-    "deliveryScheduled": "Leverans planerad"
+    "deliveryScheduled": "Leverans planerad",
+    "stepOfTotal": "Steg {current} av {total}"
   },
   "statistics": {
     "overview": "Översikt",

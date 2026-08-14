@@ -283,7 +283,8 @@
     "papers": "Dokumenty",
     "production": "Výroba",
     "delivered": "Dodáno",
-    "deliveryScheduled": "Dodání naplánováno"
+    "deliveryScheduled": "Dodání naplánováno",
+    "stepOfTotal": "Krok {current} z {total}"
   },
   "statistics": {
     "overview": "Přehled",

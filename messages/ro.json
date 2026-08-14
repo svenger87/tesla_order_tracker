@@ -283,7 +283,8 @@
     "papers": "Documente",
     "production": "Producție",
     "delivered": "Livrat",
-    "deliveryScheduled": "Livrare programată"
+    "deliveryScheduled": "Livrare programată",
+    "stepOfTotal": "Pasul {current} din {total}"
   },
   "statistics": {
     "overview": "Prezentare generală",
