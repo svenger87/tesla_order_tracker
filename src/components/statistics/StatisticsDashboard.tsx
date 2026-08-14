@@ -237,7 +237,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     hint={t('hintPending')}
                     semanticColor="pending"
                     minimal
-                    delay={0.2}
+                    delay={0.03}
                   />
                   <StatCard
                     label={t('deliveryRate')}
@@ -247,13 +247,13 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     hint={t('hintDeliveryRate')}
                     semanticColor="success"
                     minimal
-                    delay={0.7}
+                    delay={0.06}
                   />
                   {/* Order Sources: Webapp + TOST stacked bar */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.8 }}
+                    transition={{ duration: 0.3, delay: 0.09 }}
                     className="rounded-xl border bg-card p-4 space-y-2"
                   >
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -316,12 +316,14 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Five charts in a four-column grid left the last one stranded on
+                its own row; three columns splits them 3 + 2. */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} />
-              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
-              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
-              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} />
-              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
+              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.03} />
+              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.06} />
+              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.09} />
+              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.12} />
             </div>
           </motion.div>
         </TabsContent>
