@@ -168,7 +168,7 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
                 "rounded-lg border bg-green-50 dark:bg-green-900/10 p-3 text-center",
                 isPast(prediction.optimisticDays, prediction.daysElapsedFromReference) && "opacity-50",
               )}>
-                <Zap className="h-4 w-4 text-green-600 dark:text-green-400 mx-auto mb-1" />
+                <Zap className="h-4 w-4 text-success mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
                 <p className={cn(
                   "text-lg font-bold tabular-nums",

@@ -36,7 +36,7 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const TrendIcon = trendIcon
 
   const trendColor = trend.currentTrend === 'accelerating'
-    ? 'text-green-600 dark:text-green-400'
+    ? 'text-success'
     : trend.currentTrend === 'decelerating'
       ? 'text-red-600 dark:text-red-400'
       : 'text-muted-foreground'

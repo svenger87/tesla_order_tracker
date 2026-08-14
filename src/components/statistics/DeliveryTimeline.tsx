@@ -136,7 +136,7 @@ export function DeliveryTimeline({ stats }: DeliveryTimelineProps) {
                   >
                     <span className="text-xs text-muted-foreground truncate">{item.label}</span>
                     <span className="text-xs tabular-nums text-right text-foreground">{formatDaysShort(item.segment.avg)}</span>
-                    <span className="text-xs tabular-nums text-right text-green-600 dark:text-green-400">{formatDaysShort(item.segment.min)}</span>
+                    <span className="text-xs tabular-nums text-right text-success">{formatDaysShort(item.segment.min)}</span>
                     <span className="text-xs tabular-nums text-right text-red-500 dark:text-red-400">{formatDaysShort(item.segment.max)}</span>
                   </div>
                 )
