@@ -63,21 +63,21 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
-              color: 'hsl(var(--foreground))',
+              color: 'var(--foreground)',
             }}
             itemStyle={{
-              color: 'hsl(var(--foreground))',
+              color: 'var(--foreground)',
             }}
             labelStyle={{
-              color: 'hsl(var(--foreground))',
+              color: 'var(--foreground)',
               fontWeight: 600,
             }}
             formatter={(value) => [t('vinWeekdayCount', { value: String(value) }), t('count')]}
             labelFormatter={(label) => formatWeekday(label as number)}
-            cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
+            cursor={{ fill: 'var(--muted)', opacity: 0.3 }}
           />
           <Bar
             dataKey="count"
