@@ -155,7 +155,7 @@ export function OrderSearch({
       className="sm:max-w-2xl"
     >
       <CommandInput placeholder={t('placeholder')} />
-      <CommandList className="max-h-[60vh]">
+      <CommandList className="max-h-[60vh] px-2 pb-2">
         <CommandEmpty>
           <div className="py-6 text-center">
             <p className="text-sm font-medium">{t('noResults')}</p>
@@ -178,7 +178,7 @@ export function OrderSearch({
                   key={order.id}
                   value={haystack(order)}
                   onSelect={() => handleSelect(order.id)}
-                  className="grid grid-cols-[14px_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 py-2.5"
+                  className="grid grid-cols-[14px_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 rounded-md py-2.5"
                 >
                   {/* The paint colour anchors the row — people recognise their
                       own car before they finish reading their own name. */}
@@ -228,7 +228,7 @@ export function OrderSearch({
         ))}
       </CommandList>
 
-      <div className="flex items-center justify-between border-t px-3 py-2 text-[11px] text-muted-foreground">
+      <div className="flex items-center justify-between border-t px-4 py-2.5 text-[11px] text-muted-foreground">
         <span>{t('hint')}</span>
         <span className="tabular-nums">{t('results', { count: totalOrders })}</span>
       </div>

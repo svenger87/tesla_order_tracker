@@ -10,6 +10,7 @@ import { SimilarOrders } from '@/components/SimilarOrders'
 import { SupportCard } from '@/components/SupportCard'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
 import { OrderForm } from '@/components/OrderForm'
+import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -74,7 +75,15 @@ export function TrackingPageClient({
   const router = useRouter()
   const t = useTranslations('tracking')
   const tc = useTranslations('common')
+  const tt = useTranslations('table')
+  const tv = useTranslations('form.validation')
   const [copied, setCopied] = useState(false)
+  // An admin reaches Edit without knowing the order's password, exactly as in
+  // the table on the overview. Until now this page offered only the
+  // password-verified path, so an admin had to know someone else's password to
+  // correct their entry.
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [tostFieldsOpen, setTostFieldsOpen] = useState(false)
   const [editPromptOpen, setEditPromptOpen] = useState(false)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [editPassword, setEditPassword] = useState('')
@@ -116,6 +125,15 @@ export function TrackingPageClient({
     }
   }
 
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/auth/check')
+      .then(r => r.json())
+      .then(d => { if (!cancelled) setIsAdmin(Boolean(d.authenticated)) })
+      .catch(() => { /* not an admin, which is the normal case */ })
+    return () => { cancelled = true }
+  }, [])
+
   const handleEditVerified = (verifiedOrder: Order, password: string, isLegacy: boolean) => {
     setEditPassword(password)
     setEditIsLegacy(isLegacy)
@@ -147,11 +165,26 @@ export function TrackingPageClient({
             {t('backToOverview')}
           </Link>
           <div className="flex items-center gap-2">
-            {order.source !== 'tost' && (
+            {order.source === 'tost' ? (
+              /* TOST orders had no way to edit here at all, although the table
+                 offers their five community-maintained fields. */
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setEditPromptOpen(true)}
+                onClick={() => setTostFieldsOpen(true)}
+                className="gap-2"
+                /* The full field list is the dropdown label from the table; as a
+                   standalone button it is a paragraph, so it becomes the hint. */
+                title={tt('editTostFields')}
+              >
+                <Pencil className="h-4 w-4" />
+                {tc('edit')}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (isAdmin ? setEditingOrder(order) : setEditPromptOpen(true))}
                 className="gap-2"
               >
                 <Pencil className="h-4 w-4" />
@@ -481,6 +514,23 @@ export function TrackingPageClient({
           </Card>
         </motion.div>
       </div>
+
+      <TostFieldsModal
+        order={tostFieldsOpen ? order : null}
+        onClose={() => setTostFieldsOpen(false)}
+        onSave={async (orderId, data) => {
+          const res = await fetch('/api/orders', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: orderId, ...data }),
+          })
+          if (!res.ok) {
+            const err = await res.json().catch(() => null)
+            throw new Error(err?.error || tv('saveError'))
+          }
+          router.refresh()
+        }}
+      />
 
       {order.source !== 'tost' && (
         <PasswordPromptModal
