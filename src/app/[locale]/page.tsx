@@ -388,7 +388,7 @@ export default function Home() {
                   <Collapsible>
                     <Card className="overflow-hidden shadow-none">
                       <CollapsibleTrigger asChild>
-                        <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
+                        <CardHeader className="pb-2 cursor-pointer hover:surface-subtle transition-colors rounded-t-xl">
                           <CardTitle className="flex items-center gap-2 text-base">
                             <Medal className="h-4 w-4 text-yellow-500" />
                             {t('veterans')}

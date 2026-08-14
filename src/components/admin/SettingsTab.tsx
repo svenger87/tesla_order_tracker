@@ -485,7 +485,7 @@ export function SettingsTab() {
               </div>
 
               {archiveInfo && (
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-md">
+                <div className="grid grid-cols-2 gap-4 p-4 surface-subtle rounded-md">
                   <div>
                     <p className="text-sm text-muted-foreground">{t('inactiveOrders')}</p>
                     <p className="text-2xl font-bold text-amber-600">{archiveInfo.staleCount}</p>

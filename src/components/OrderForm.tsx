@@ -763,7 +763,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           )}
 
           {/* Section 1: Persönliche Daten */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <User className="h-4 w-4 text-primary" />
               {t('personalData')}
@@ -812,7 +812,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           </div>
 
           {/* Section 2: Fahrzeugkonfiguration */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <Car className="h-4 w-4 text-primary" />
               {t('vehicleConfig')}
@@ -1090,7 +1090,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           </div>
 
           {/* Section 3: Lieferung */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <MapPin className="h-4 w-4 text-primary" />
               {t('delivery')}
@@ -1125,7 +1125,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           </div>
 
           {/* Section 4: Status & Tracking (collapsible) */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
             <button
               type="button"
               onClick={() => setTrackingOpen(!trackingOpen)}
@@ -1217,7 +1217,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           {order && (
             <div className={cn(
               'mt-4 space-y-3 rounded-lg border p-4 transition-colors',
-              formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'bg-muted/30'
+              formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'surface-subtle'
             )}>
               <h4 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
                 <Ban className={cn('h-4 w-4', formData.cancelled ? 'text-destructive' : 'text-muted-foreground')} />
@@ -1284,7 +1284,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           {/* Password - only for new orders */}
           {!order && (
-            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <div className="space-y-3 rounded-lg border surface-subtle p-4">
               <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
                 <KeyRound className="h-4 w-4 text-primary" />
                 {t('password')}

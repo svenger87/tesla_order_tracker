@@ -402,7 +402,7 @@ export function CompositorTab() {
                 </thead>
                 <tbody>
                   {filteredCodes.map((code) => (
-                    <tr key={`${code.category}_${code.vehicleType}_${code.lookupKey}`} className="border-b last:border-0 hover:bg-muted/30">
+                    <tr key={`${code.category}_${code.vehicleType}_${code.lookupKey}`} className="border-b last:border-0 hover:surface-subtle">
                       <td className="p-3">
                         <Badge variant="outline" className="text-xs">
                           {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[code.vehicleType] || code.vehicleType}
@@ -620,7 +620,7 @@ export function CompositorTab() {
               </div>
             </div>
 
-            <div className="flex justify-center p-4 bg-muted/30 rounded-lg">
+            <div className="flex justify-center p-4 surface-subtle rounded-lg">
               <TeslaCarImage
                 vehicleType={previewVehicle}
                 color={previewColor}
