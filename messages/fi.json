@@ -275,7 +275,9 @@
     "staleFilter": "Vanhentunut",
     "staleTooltip": "Vaihda suodatin: kaikki / piilota vanhentuneet / vain vanhentuneet (≥60 päivää ilman päivitystä avoimissa tilauksissa)",
     "cancelledFilter": "Peruutetut",
-    "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut"
+    "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut",
+    "incompleteBadge": "puutteellinen",
+    "incompleteHint": "Tästä tilauksesta puuttuu tilauspäivä, vaikka myöhempi päivä on kirjattu. Kaikki odotusajat mitataan tilauspäivästä — ilman sitä merkintää ei voi sijoittaa aikaan eikä se sisälly tilastoihin."
   },
   "progress": {
     "ordered": "Tilattu",

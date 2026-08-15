@@ -17,7 +17,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface DeliveryTrendChartProps {
   orders: Order[]
@@ -37,7 +36,7 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const TrendIcon = trendIcon
 
   const trendColor = trend.currentTrend === 'accelerating'
-    ? 'text-success'
+    ? 'text-green-600 dark:text-green-400'
     : trend.currentTrend === 'decelerating'
       ? 'text-red-600 dark:text-red-400'
       : 'text-muted-foreground'
@@ -81,8 +80,7 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
               <XAxis dataKey="monthKey" tick={{ fontSize: 11 }} tickFormatter={formatMonth} />
               <YAxis tick={{ fontSize: 11 }} label={{ value: tc('days'), angle: -90, position: 'insideLeft', style: { fontSize: 11 } }} />
               <Tooltip
-                {...CHART_TOOLTIP_STYLE}
-                contentStyle={{ ...CHART_TOOLTIP_STYLE.contentStyle, fontSize: '12px' }}
+                contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 formatter={(value) => [`${value} ${tc('days')}`, t('avgDeliveryTime')]}
                 labelFormatter={(label) => formatMonth(label as string)}
               />

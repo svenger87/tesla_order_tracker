@@ -3,16 +3,9 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Github, Code2, ExternalLink } from 'lucide-react'
-import { TransparencyBar } from '@/components/TransparencyBar'
 
 interface FooterProps {
-  settings: {
-    showDonation?: boolean
-    donationUrl?: string
-    paypalUrl?: string
-    yearlyGoal?: number | null
-    yearlyRaised?: number | null
-  } | null
+  settings: { showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null
   orderCount?: number
   deliveredCount?: number
 }
@@ -38,10 +31,8 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
               <span>GitHub</span>
             </a>
             <span className="text-muted-foreground/40">·</span>
-            {/* See Header: prefetching this route drags in the Swagger stylesheet. */}
             <Link
               href="/docs"
-              prefetch={false}
               className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors hover:underline underline-offset-4"
             >
               <Code2 className="h-4 w-4" />
@@ -99,16 +90,6 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
               </>
             )}
           </p>
-
-          {/* Only when an amount is actually configured. A bar reading "0 of 0"
-              would be worse than no bar. */}
-          {settings?.yearlyGoal ? (
-            <TransparencyBar
-              goal={settings.yearlyGoal}
-              raised={settings.yearlyRaised ?? 0}
-              year={new Date().getFullYear()}
-            />
-          ) : null}
 
           {/* Stats line */}
           {orderCount !== undefined && deliveredCount !== undefined && orderCount > 0 && (

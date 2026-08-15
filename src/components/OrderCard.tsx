@@ -43,7 +43,6 @@ interface OrderCardProps {
 export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, onImageClick, options }: OrderCardProps) {
   const [nowMs] = useState(() => Date.now())
   const tc = useTranslations('common')
-  const tt = useTranslations('table')
   const th = useTranslations('home')
   const to = useTranslations('options')
   const tp = useTranslations('progress')
@@ -95,7 +94,6 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground">
           <MoreVertical className="h-4 w-4" />
-          <span className="sr-only">{tc('actions')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -132,10 +130,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       size="icon"
       className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
       onClick={() => onEditTostFields(order)}
-      // Was a hardcoded German string in an app that ships 23 languages, and
-      // the same action in the table already had a name — use that one.
-      title={tt('editTostFields')}
-      aria-label={tt('editTostFields')}
+      title="TOST Felder"
     >
       <FileText className="h-4 w-4" />
     </Button>
@@ -146,7 +141,6 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
       className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
       onClick={() => onEditByCode?.(order)}
       title={tc('edit')}
-      aria-label={tc('edit')}
     >
       <Pencil className="h-4 w-4" />
     </Button>

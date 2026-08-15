@@ -1,17 +1,18 @@
 'use client'
 
-import { memo } from 'react'
+import { Fragment, memo } from 'react'
 import { useTranslations } from 'next-intl'
+import { motion } from 'framer-motion'
 import { Order } from '@/lib/types'
 import { getOrderStatus } from '@/lib/statistics'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ShoppingCart, Hash, Factory, FileText, Car } from 'lucide-react'
+import { ShoppingCart, Hash, Factory, FileText, Car, Check, Calendar } from 'lucide-react'
 
 interface OrderProgressBarProps {
   order: Order
-  /** Kept so the single call site reads as before; there is only one form now. */
   compact?: boolean
+  barOnly?: boolean // Simple colored bar instead of step icons (for card view)
 }
 
 const STEPS = [
@@ -33,88 +34,186 @@ const STEP_INDEX: Record<StepKey, number> = {
   delivered: 4,
 }
 
-/** Which token a stage's colour comes from. Red is not among them. */
-const STATE_TONE: Record<StepKey, 'done' | 'moving' | 'waiting'> = {
-  ordered: 'waiting',
-  vin_received: 'moving',
-  production: 'moving',
-  papers_received: 'moving',
-  delivery_scheduled: 'done',
-  delivered: 'done',
-}
-
-const TONE_TEXT = {
-  done: 'text-success',
-  moving: 'text-pending',
-  waiting: 'text-muted-foreground',
-} as const
-
-const TONE_FILL = {
-  done: 'bg-success',
-  moving: 'bg-pending',
-  waiting: 'bg-muted-foreground/50',
-} as const
-
-/**
- * Status for the table: the stage as a word, with a five-segment track under it.
- *
- * It used to be five circles, and completed steps were painted in the brand red
- * — so the column read as a row of identical red dots you had to decode, while
- * red simultaneously meant "brand", "primary action" and "Performance trim"
- * elsewhere. A word is legible at a glance and across a room; the track keeps
- * the "how far along" reading that the dots were there for.
- */
+// Memoized compact progress bar — no animations, pure CSS
 const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: Order }) {
   const t = useTranslations('progress')
   const currentStatus = getOrderStatus(order)
   const currentIndex = STEP_INDEX[currentStatus]
-  const tone = STATE_TONE[currentStatus]
-
-  const label = currentStatus === 'delivery_scheduled'
-    ? t('deliveryScheduled')
-    : t(STEPS[currentIndex].labelKey)
-
-  const reached = STEPS.filter((_, i) => i <= currentIndex).length
+  const isScheduled = currentStatus === 'delivery_scheduled'
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex flex-col gap-1 leading-none">
-          <span className={cn('truncate text-[11px] font-semibold uppercase tracking-[0.08em]', TONE_TEXT[tone])}>
-            {label}
-          </span>
-          <span className="flex gap-[3px]" aria-hidden>
-            {STEPS.map((step, index) => (
-              <span
-                key={step.key}
+    <div className="flex items-center gap-0">
+      {STEPS.map((step, index) => {
+        const isCompleted = index <= currentIndex
+        const isCurrent = index === currentIndex
+        const isLastStep = index === STEPS.length - 1
+        const isScheduledDelivery = isLastStep && isScheduled
+        const Icon = isScheduledDelivery ? Calendar : step.icon
+        const dateValue = order[step.dateField]
+
+        return (
+          <Fragment key={step.key}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className={cn(
+                    'relative flex items-center justify-center rounded-full transition-colors shrink-0',
+                    'h-6 w-6',
+                    isScheduledDelivery
+                      ? 'bg-amber-500 text-white'
+                      : isLastStep && isCompleted && !isScheduled
+                        ? 'bg-green-500 text-white'
+                        : isCompleted
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground',
+                    isCurrent && !isScheduledDelivery && !isLastStep && 'ring-1.5 ring-primary/50',
+                    isScheduledDelivery && 'ring-1.5 ring-amber-500/50'
+                  )}
+                >
+                  {isCompleted && index < currentIndex && !isScheduledDelivery ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Icon className="h-3 w-3" />
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-medium">
+                  {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
+                </p>
+                {dateValue && (
+                  <p className="text-xs opacity-80">{dateValue}</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+
+            {index < STEPS.length - 1 && (
+              <div
                 className={cn(
-                  'h-[3px] w-3 rounded-[1px]',
-                  index <= currentIndex ? TONE_FILL[tone] : 'bg-muted-foreground/20',
+                  'h-px w-1 shrink-0',
+                  index < currentIndex ? 'bg-primary' : 'bg-muted'
                 )}
               />
-            ))}
-          </span>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p className="font-medium">{label}</p>
-        <p className="text-xs opacity-80">
-          {t('stepOfTotal', { current: reached, total: STEPS.length })}
-        </p>
-      </TooltipContent>
-    </Tooltip>
+            )}
+          </Fragment>
+        )
+      })}
+    </div>
   )
 })
 
-/**
- * Order status for the table.
- *
- * This file used to carry three variants. The `barOnly` bar and the full
- * icon-step timeline were both unreachable — the only call site anywhere passes
- * `compact` — so they went, along with their two extra colour scales and a pair
- * of infinite pulse animations that ignored the reduced-motion setting. The
- * detail page has its own ProgressTimeline.
- */
-export function OrderProgressBar({ order }: OrderProgressBarProps) {
-  return <CompactProgressBar order={order} />
+export function OrderProgressBar({ order, compact = false, barOnly = false }: OrderProgressBarProps) {
+  const t = useTranslations('progress')
+
+  const currentStatus = getOrderStatus(order)
+  const currentIndex = STEP_INDEX[currentStatus]
+
+  const isScheduled = currentStatus === 'delivery_scheduled'
+
+  // Simple colored bar for card view
+  if (barOnly) {
+    const progress = ((currentIndex + 1) / STEPS.length) * 100
+    const barColor = currentStatus === 'delivered'
+      ? 'bg-gradient-to-r from-green-500 to-green-400'
+      : currentStatus === 'delivery_scheduled'
+        ? 'bg-gradient-to-r from-amber-500 to-amber-400'
+        : currentStatus === 'papers_received'
+          ? 'bg-gradient-to-r from-blue-500 to-blue-400'
+          : currentStatus === 'production'
+            ? 'bg-gradient-to-r from-purple-500 to-purple-400'
+            : currentStatus === 'vin_received'
+              ? 'bg-gradient-to-r from-cyan-500 to-cyan-400'
+              : 'bg-gradient-to-r from-gray-400 to-gray-300'
+
+    return (
+      <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
+        <div
+          className={cn('h-full rounded-full transition-[width] duration-500 ease-out', barColor)}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    )
+  }
+
+  // Compact circle progress bar for table view — memoized, no Framer Motion
+  if (compact) {
+    return <CompactProgressBar order={order} />
+  }
+
+  // Full progress bar with step icons (only used in detail views, not in tables)
+  return (
+    <div className="flex items-center gap-2">
+      {STEPS.map((step, index) => {
+        const isCompleted = index <= currentIndex
+        const isCurrent = index === currentIndex
+        const isLastStep = index === STEPS.length - 1
+        const isScheduledDelivery = isLastStep && isScheduled
+        const Icon = isScheduledDelivery ? Calendar : step.icon
+        const dateValue = order[step.dateField]
+
+        return (
+          <Fragment key={step.key}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={cn(
+                    'relative flex items-center justify-center rounded-full transition-all h-8 w-8',
+                    isScheduledDelivery
+                      ? 'bg-amber-500 text-white'
+                      : isCompleted
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground',
+                    isCurrent && !isScheduledDelivery && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+                    isScheduledDelivery && 'ring-2 ring-amber-500 ring-offset-2 ring-offset-background'
+                  )}
+                >
+                  {isCompleted && index < currentIndex && !isScheduledDelivery ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
+                  {isCurrent && !isScheduledDelivery && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-primary"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                      style={{ opacity: 0.3 }}
+                    />
+                  )}
+                  {isScheduledDelivery && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-amber-500"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                      style={{ opacity: 0.3 }}
+                    />
+                  )}
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-medium">
+                  {isScheduledDelivery ? t('deliveryScheduled') : t(step.labelKey)}
+                </p>
+                {dateValue && (
+                  <p className="text-xs opacity-80">{dateValue}</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+
+            {index < STEPS.length - 1 && (
+              <div
+                className={cn(
+                  'h-0.5 flex-1 transition-colors min-w-4',
+                  index < currentIndex ? 'bg-primary' : 'bg-muted'
+                )}
+              />
+            )}
+          </Fragment>
+        )
+      })}
+    </div>
+  )
 }

@@ -59,16 +59,16 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'var(--card)',
-              border: '1px solid var(--border)',
+              backgroundColor: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
             }}
             itemStyle={{
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
             }}
             labelStyle={{
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
               fontWeight: 600,
             }}
             formatter={(value, _name, props) => {

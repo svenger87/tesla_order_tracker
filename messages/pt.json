@@ -275,7 +275,9 @@
     "staleFilter": "Desatualizado",
     "staleTooltip": "Alternar filtro: todos / ocultar desatualizados / só desatualizados (≥60 dias sem atualização em encomendas abertas)",
     "cancelledFilter": "Canceladas",
-    "cancelledTooltip": "Alternar filtro: ocultar canceladas / incluir / apenas canceladas"
+    "cancelledTooltip": "Alternar filtro: ocultar canceladas / incluir / apenas canceladas",
+    "incompleteBadge": "incompleto",
+    "incompleteHint": "A esta encomenda falta a data de encomenda embora exista uma data posterior. Todos os tempos de espera são medidos a partir dela — sem a data, a entrada não pode ser situada no tempo e não conta em nenhuma estatística."
   },
   "progress": {
     "ordered": "Encomendado",

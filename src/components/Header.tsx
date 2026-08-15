@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
@@ -90,26 +90,22 @@ export function Header({ isAdmin, settings }: HeaderProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            {/* No prefetch: this link sits in the viewport on every page, so the
-                router pulled the docs route eagerly — and that route's stylesheet
-                is the whole 175 KB Swagger sheet, fetched for every visitor who
-                never opens the API docs. */}
-            <Button variant="ghost" size="icon" className="h-9 w-9" title={tn('apiDocs')} asChild>
-              <Link href="/docs" prefetch={false}>
+            <Link href="/docs">
+              <Button variant="ghost" size="icon" className="h-9 w-9" title={tn('apiDocs')}>
                 <Code2 className="h-4 w-4" />
                 <span className="sr-only">{tn('apiDocs')}</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
-              <a
-                href="https://github.com/svenger87/tesla_order_tracker"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              </Button>
+            </Link>
+            <a
+              href="https://github.com/svenger87/tesla_order_tracker"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="ghost" size="icon" className="h-9 w-9">
                 <Github className="h-4 w-4" />
                 <span className="sr-only">GitHub</span>
-              </a>
-            </Button>
+              </Button>
+            </a>
 
             <div className="w-px h-5 bg-border mx-2" />
 
@@ -118,18 +114,18 @@ export function Header({ isAdmin, settings }: HeaderProps) {
 
             {/* Admin */}
             {isAdmin ? (
-              <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5" asChild>
-                <Link href="/admin">
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5">
                   Admin
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : (
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/login">
+              <Link href="/admin/login">
+                <Button variant="ghost" size="sm">
                   <LogIn className="h-4 w-4 mr-1.5" />
                   Admin
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             )}
           </nav>
 
@@ -139,22 +135,17 @@ export function Header({ isAdmin, settings }: HeaderProps) {
             <ThemeToggle />
 
             {isAdmin ? (
-              <Button variant="outline" size="icon" className="h-9 w-9 border-primary/30 text-primary" title="Admin" asChild>
-                <Link href="/admin">
+              <Link href="/admin">
+                <Button variant="outline" size="icon" className="h-9 w-9 border-primary/30 text-primary" title="Admin">
                   <LogIn className="h-4 w-4" />
-                  {/* The icon-only buttons above carry one of these; these two
-                      were left without a name, and a title alone is not one a
-                      touch device ever shows. */}
-                  <span className="sr-only">Admin</span>
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : (
-              <Button variant="ghost" size="icon" className="h-9 w-9" title="Admin" asChild>
-                <Link href="/admin/login">
+              <Link href="/admin/login">
+                <Button variant="ghost" size="icon" className="h-9 w-9" title="Admin">
                   <LogIn className="h-4 w-4" />
-                  <span className="sr-only">Admin</span>
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             )}
           </nav>
 
@@ -183,7 +174,7 @@ export function Header({ isAdmin, settings }: HeaderProps) {
             <SheetDescription className="sr-only">{tn('navigationMenu')}</SheetDescription>
           </SheetHeader>
           <nav className="mt-6 flex flex-col gap-2">
-            <Link href="/docs" prefetch={false} onClick={() => setMobileOpen(false)}>
+            <Link href="/docs" onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full justify-start gap-2">
                 <Code2 className="h-4 w-4" />
                 {tn('apiDocs')}
@@ -248,5 +239,46 @@ export function Header({ isAdmin, settings }: HeaderProps) {
         </SheetContent>
       </Sheet>
     </header>
+  )
+}
+
+/**
+ * Self-contained header wrapper that fetches its own data.
+ * Used in layout.tsx (server component) to avoid prop drilling.
+ */
+export function HeaderWithData() {
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [settings, setSettings] = useState<{ showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    void Promise.all([
+      fetch('/api/auth/check'),
+      fetch('/api/settings'),
+    ])
+      .then(async ([authRes, settingsRes]) => {
+        const [authData, settingsData] = await Promise.all([
+          authRes.json(),
+          settingsRes.json(),
+        ])
+        if (cancelled) return
+        setIsAdmin(authData.authenticated)
+        setSettings(settingsData)
+      })
+      .catch(() => {
+        // Silently handle; header renders fine without admin/settings.
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return (
+    <Header
+      isAdmin={isAdmin}
+      settings={settings}
+    />
   )
 }

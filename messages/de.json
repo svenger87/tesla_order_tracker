@@ -275,7 +275,9 @@
     "productionDate": "Produktionsdatum",
     "saveError": "Fehler beim Speichern",
     "cancelledFilter": "Storniert",
-    "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte"
+    "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte",
+    "incompleteBadge": "unvollständig",
+    "incompleteHint": "Bei dieser Bestellung fehlt das Bestelldatum, obwohl ein späteres Datum eingetragen ist. Alle Wartezeiten werden ab dem Bestelldatum gemessen — ohne es lässt sich dieser Eintrag zeitlich nicht einordnen und fließt in keine Wartezeit-Statistik ein."
   },
   "progress": {
     "ordered": "Bestellt",

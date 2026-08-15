@@ -275,7 +275,9 @@
     "staleFilter": "Elavult",
     "staleTooltip": "Szűrő váltása: mind / elavultak elrejtése / csak elavultak (≥60 nap frissítés nélkül nyitott rendeléseknél)",
     "cancelledFilter": "Töröltek",
-    "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek"
+    "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek",
+    "incompleteBadge": "hiányos",
+    "incompleteHint": "Ennél a rendelésnél hiányzik a rendelés dátuma, pedig szerepel egy későbbi dátum. Minden várakozási időt ettől mérünk — nélküle a bejegyzés időben nem helyezhető el, és egyetlen statisztikába sem számít bele."
   },
   "progress": {
     "ordered": "Megrendelve",

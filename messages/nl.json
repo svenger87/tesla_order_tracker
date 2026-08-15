@@ -275,7 +275,9 @@
     "staleFilter": "Verouderd",
     "staleTooltip": "Filter wisselen: alle / verouderde verbergen / alleen verouderde (≥60 dagen zonder update bij open bestellingen)",
     "cancelledFilter": "Geannuleerd",
-    "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde"
+    "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde",
+    "incompleteBadge": "onvolledig",
+    "incompleteHint": "Bij deze bestelling ontbreekt de besteldatum terwijl er een latere datum is ingevuld. Alle wachttijden worden vanaf die datum gemeten — zonder haar is de invoer niet in de tijd te plaatsen en telt niet mee in enige statistiek."
   },
   "progress": {
     "ordered": "Besteld",

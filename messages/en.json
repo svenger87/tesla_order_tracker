@@ -275,7 +275,9 @@
     "productionDate": "Production date",
     "saveError": "Error saving",
     "cancelledFilter": "Cancelled",
-    "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled"
+    "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled",
+    "incompleteBadge": "incomplete",
+    "incompleteHint": "This order has no order date although a later date is recorded. Every waiting time is measured from the order date — without it the entry cannot be placed in time and counts towards no wait statistic."
   },
   "progress": {
     "ordered": "Ordered",

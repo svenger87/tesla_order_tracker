@@ -275,7 +275,9 @@
     "staleFilter": "Nieaktualne",
     "staleTooltip": "Przełącz filtr: wszystkie / ukryj nieaktualne / tylko nieaktualne (≥60 dni bez aktualizacji przy otwartych zamówieniach)",
     "cancelledFilter": "Anulowane",
-    "cancelledTooltip": "Przełącz filtr: ukryj anulowane / pokaż je / tylko anulowane"
+    "cancelledTooltip": "Przełącz filtr: ukryj anulowane / pokaż je / tylko anulowane",
+    "incompleteBadge": "niekompletne",
+    "incompleteHint": "W tym zamówieniu brakuje daty zamówienia, choć wpisano datę późniejszą. Wszystkie czasy oczekiwania liczone są od niej — bez tej daty wpisu nie da się umiejscowić w czasie i nie wchodzi do statystyk."
   },
   "progress": {
     "ordered": "Zamówiono",

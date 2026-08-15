@@ -1,139 +1,78 @@
 'use client'
 
-import { useMemo } from 'react'
 import { Order } from '@/lib/types'
 import { useTranslations } from 'next-intl'
-import { parseGermanDate } from '@/lib/date-utils'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 import { Info } from 'lucide-react'
 
 interface SimilarOrdersProps {
   orders: Order[]
   currentOrderId: string
-  /** The wait this list is being compared against, so it can be marked. */
-  ownWaitDays?: number | null
-  /** Name of the order being viewed, so its row can be found in the ranking. */
-  ownName?: string
-  /** Whether the viewed order's wait has ended, or is still running. */
-  ownDelivered?: boolean
 }
 
-/**
- * Comparable orders, as a comparison.
- *
- * This was eight cards each carrying a vehicle badge and a trim badge — both
- * identical on every card, because the orders are comparable by definition, so
- * the badges said nothing and the brand red said it eight times. What actually
- * differs is the wait, and that was the smallest thing on the row.
- *
- * It became a ranked list with a bar, which is the only reason to show these at
- * all: to see where your own wait sits among them. That last part was still
- * missing — the own wait was passed in and used only to scale the bars, never
- * drawn — so the list ranked eight strangers and left the reader to find their
- * own place in it. The viewed order now takes its position in the ranking.
- */
-export function SimilarOrders({
-  orders,
-  currentOrderId,
-  ownWaitDays,
-  ownName,
-  ownDelivered,
-}: SimilarOrdersProps) {
+export function SimilarOrders({ orders, currentOrderId }: SimilarOrdersProps) {
   const t = useTranslations('tracking')
 
-  const rows = useMemo(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+  const filtered = orders.filter(o => o.id !== currentOrderId)
 
-    const comparable = orders
-      .filter(o => o.id !== currentOrderId)
-      .map(o => {
-        const from = parseGermanDate(o.orderDate)
-        const to = parseGermanDate(o.deliveryDate)
-        const delivered = Boolean(to && to.getTime() <= today.getTime())
-        return {
-          id: o.id,
-          name: o.name,
-          note: o.orderDate,
-          isOwn: false,
-          delivered,
-          waitDays: from ? Math.round(((delivered && to ? to : today).getTime() - from.getTime()) / 86_400_000) : null,
-        }
-      })
-
-    const own = ownWaitDays !== null && ownWaitDays !== undefined && ownName
-      ? [{
-          id: currentOrderId,
-          name: ownName,
-          note: ownDelivered ? t('waitedLabel') : t('waitingLabel'),
-          isOwn: true,
-          delivered: Boolean(ownDelivered),
-          waitDays: ownWaitDays,
-        }]
-      : []
-
-    return [...comparable, ...own].sort(
-      (a, b) => (a.waitDays ?? Infinity) - (b.waitDays ?? Infinity),
-    )
-  }, [orders, currentOrderId, ownWaitDays, ownName, ownDelivered, t])
-
-  if (rows.length === 0) return null
-
-  const longest = Math.max(...rows.map(r => r.waitDays ?? 0), 1)
+  if (filtered.length === 0) return null
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{t('similarOrders')}</CardTitle>
-        {rows.length < 3 && (
-          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        {filtered.length < 3 && (
+          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
             <Info className="h-3.5 w-3.5 shrink-0" />
             {t('fewSimilar')}
           </p>
         )}
       </CardHeader>
       <CardContent>
-        <ul className="grid gap-px overflow-hidden rounded-lg border bg-border">
-          {rows.map(row => (
-            <li
-              key={row.id}
-              className={cn(
-                'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 px-3 py-2.5',
-                row.isOwn ? 'bg-primary/5' : 'bg-card',
-              )}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {filtered.map((order) => (
+            <div
+              key={order.id}
+              className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
             >
-              <span className={cn('min-w-0 truncate text-sm', row.isOwn ? 'font-semibold text-primary' : 'font-medium')}>
-                {row.name}
-              </span>
-              <span className="text-right text-sm font-semibold tabular-nums">
-                {row.waitDays !== null ? (
-                  <>
-                    {row.waitDays}
-                    <span className="ml-1 text-[10px] font-normal uppercase tracking-wide text-muted-foreground">
-                      {t('daysUnit')}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-xs font-normal text-muted-foreground">–</span>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-sm truncate">{order.name}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <Badge variant="default" className="text-[10px] px-1.5 py-0">
+                    {order.vehicleType === 'Model Y' ? 'MY' : order.vehicleType === 'Model 3' ? 'M3' : order.vehicleType}
+                  </Badge>
+                  {order.model && (
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                      {order.model}
+                    </Badge>
+                  )}
+                </div>
+                {order.orderDate && (
+                  <p className="text-xs text-muted-foreground mt-1">{order.orderDate}</p>
                 )}
-              </span>
-
-              <span className="col-span-2 flex items-center gap-2">
-                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                  <span
-                    className={cn(
-                      'block h-full rounded-full',
-                      row.isOwn ? 'bg-primary' : row.delivered ? 'bg-success' : 'bg-pending',
+              </div>
+              <div className="text-right shrink-0">
+                {order.deliveryDate ? (
+                  <div>
+                    <Badge variant="default" className="bg-green-600 text-white text-[10px] px-1.5 py-0">
+                      {order.deliveryDate}
+                    </Badge>
+                    {order.orderToDelivery != null && (
+                      <p className="text-[11px] text-muted-foreground mt-1 font-mono">
+                        {order.orderToDelivery}d
+                      </p>
                     )}
-                    style={{ width: `${Math.round(((row.waitDays ?? 0) / longest) * 100)}%` }}
-                  />
-                </span>
-                <span className="shrink-0 text-[11px] text-muted-foreground">{row.note}</span>
-              </span>
-            </li>
+                  </div>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                    {t('pending')}
+                  </Badge>
+                )}
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       </CardContent>
     </Card>
   )

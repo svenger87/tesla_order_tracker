@@ -59,7 +59,7 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
               className={cn(
                 'flex-1 h-1 rounded-full transition-colors duration-500',
                 index < currentIndex
-                  ? isDelivered ? 'bg-success' : 'bg-pending'
+                  ? isDelivered ? 'bg-green-500' : 'bg-primary'
                   : 'bg-muted'
               )}
             />
@@ -74,27 +74,21 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
           const Icon = isScheduledDelivery ? Calendar : step.icon
           const dateValue = order[step.dateField]
 
-          /* A step that is behind you and the step you are on must not look
-             the same. Taking the brand red off these flattened both into one
-             amber; passed steps are quiet green now, the step you are actually
-             waiting on carries the amber and the ring. */
-          const isPassed = isCompleted && !isCurrent
-
           const circleColor = isScheduledDelivery
-            ? 'bg-pending text-white'
+            ? 'bg-amber-500 text-white'
             : isLastStep && isDelivered
-              ? 'bg-success text-white'
-              : isPassed
-                ? 'bg-success/85 text-white'
-                : isCurrent
-                  ? 'bg-pending text-white'
-                  : 'bg-muted text-muted-foreground'
+              ? 'bg-green-500 text-white'
+              : isCompleted
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground'
 
-          const ringStyle = isScheduledDelivery || (isCurrent && !isDelivered)
-            ? 'ring-2 ring-pending/40 ring-offset-2 ring-offset-background'
-            : isDelivered && isLastStep
-              ? 'ring-2 ring-success/40 ring-offset-2 ring-offset-background'
-              : ''
+          const ringStyle = isCurrent && !isScheduledDelivery && !isDelivered
+            ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-background'
+            : isScheduledDelivery
+              ? 'ring-2 ring-amber-500/50 ring-offset-2 ring-offset-background'
+              : isDelivered && isLastStep
+                ? 'ring-2 ring-green-500/50 ring-offset-2 ring-offset-background'
+                : ''
 
           return (
             <div key={step.key} className="flex flex-col items-center flex-1 relative z-10">
@@ -119,10 +113,10 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
                     className={cn(
                       'absolute inset-0 rounded-full',
                       isScheduledDelivery
-                        ? 'bg-pending'
+                        ? 'bg-amber-500'
                         : isDelivered
-                          ? 'bg-success'
-                          : 'bg-pending'
+                          ? 'bg-green-500'
+                          : 'bg-primary'
                     )}
                     animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
                     transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}

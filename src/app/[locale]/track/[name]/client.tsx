@@ -10,7 +10,6 @@ import { SimilarOrders } from '@/components/SimilarOrders'
 import { SupportCard } from '@/components/SupportCard'
 import { TeslaCarImage } from '@/components/TeslaCarImage'
 import { OrderForm } from '@/components/OrderForm'
-import { TostFieldsModal } from '@/components/TostFieldsModal'
 import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,12 +37,6 @@ interface TrackingPageClientProps {
     daysElapsedFromReference: number
   } | null
   fasterPercent: number | null
-  waitComparison: {
-    waitedDays: number
-    isDelivered: boolean
-    comparableMedian: number | null
-    differenceDays: number | null
-  } | null
   detailFields: { label: string; value: string | null }[]
   durationFields: { label: string; value: number | null }[]
   colorInfo: { hex: string; border: boolean; label: string } | null
@@ -63,7 +56,6 @@ export function TrackingPageClient({
   similar,
   prediction,
   fasterPercent,
-  waitComparison,
   detailFields,
   durationFields,
   colorInfo,
@@ -75,15 +67,7 @@ export function TrackingPageClient({
   const router = useRouter()
   const t = useTranslations('tracking')
   const tc = useTranslations('common')
-  const tt = useTranslations('table')
-  const tv = useTranslations('form.validation')
   const [copied, setCopied] = useState(false)
-  // An admin reaches Edit without knowing the order's password, exactly as in
-  // the table on the overview. Until now this page offered only the
-  // password-verified path, so an admin had to know someone else's password to
-  // correct their entry.
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [tostFieldsOpen, setTostFieldsOpen] = useState(false)
   const [editPromptOpen, setEditPromptOpen] = useState(false)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [editPassword, setEditPassword] = useState('')
@@ -125,15 +109,6 @@ export function TrackingPageClient({
     }
   }
 
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/auth/check')
-      .then(r => r.json())
-      .then(d => { if (!cancelled) setIsAdmin(Boolean(d.authenticated)) })
-      .catch(() => { /* not an admin, which is the normal case */ })
-    return () => { cancelled = true }
-  }, [])
-
   const handleEditVerified = (verifiedOrder: Order, password: string, isLegacy: boolean) => {
     setEditPassword(password)
     setEditIsLegacy(isLegacy)
@@ -156,7 +131,7 @@ export function TrackingPageClient({
       : 'text-red-600 dark:text-red-400'
 
   return (
-    <div>
+    <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* Back link + actions */}
         <div className="flex items-center justify-between">
@@ -165,26 +140,11 @@ export function TrackingPageClient({
             {t('backToOverview')}
           </Link>
           <div className="flex items-center gap-2">
-            {order.source === 'tost' ? (
-              /* TOST orders had no way to edit here at all, although the table
-                 offers their five community-maintained fields. */
+            {order.source !== 'tost' && (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setTostFieldsOpen(true)}
-                className="gap-2"
-                /* The full field list is the dropdown label from the table; as a
-                   standalone button it is a paragraph, so it becomes the hint. */
-                title={tt('editTostFields')}
-              >
-                <Pencil className="h-4 w-4" />
-                {tc('edit')}
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => (isAdmin ? setEditingOrder(order) : setEditPromptOpen(true))}
+                onClick={() => setEditPromptOpen(true)}
                 className="gap-2"
               >
                 <Pencil className="h-4 w-4" />
@@ -214,12 +174,7 @@ export function TrackingPageClient({
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 {/* Car image */}
                 {isKnownVehicle && (
-                  /* Tesla's compositor bakes a light backdrop into the image, so
-                     on a dark card it read as a white hole. Framing it as a photo
-                     plate — the same treatment the table thumbnails already use —
-                     makes that lightness deliberate, and needs no change to the
-                     image URL, which would have invalidated the server cache. */
-                  <div className="shrink-0 rounded-lg bg-white/95 p-2 ring-1 ring-black/10">
+                  <div className="shrink-0">
                     <TeslaCarImage
                       vehicleType={order.vehicleType as VehicleType}
                       color={order.color}
@@ -296,55 +251,13 @@ export function TrackingPageClient({
                     )}
                   </div>
 
-                  {/* The wait is what this page is about, so it is the largest
-                      thing on it after the name — and it says straight away
-                      whether that number is normal. The comparable orders were
-                      already on the page as a list of cards; now they answer a
-                      question instead of just being present. */}
-                  {waitComparison && (
-                    <div className="flex flex-col items-center gap-1 sm:items-start">
-                      <div className="flex items-baseline gap-2">
-                        <span className={cn(
-                          'text-4xl font-extrabold tabular-nums tracking-tight sm:text-5xl',
-                          waitComparison.isDelivered ? 'text-success' : 'text-pending',
-                        )}>
-                          {waitComparison.waitedDays}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {t('daysUnit')} · {waitComparison.isDelivered ? t('waitedLabel') : t('waitingLabel')}
-                        </span>
-                      </div>
-
-                      {waitComparison.differenceDays !== null && waitComparison.comparableMedian !== null && (
-                        <p className="text-xs text-muted-foreground">
-                          {/* A verdict only makes sense once the wait has
-                              ended. Calling someone "44 days faster" while they
-                              are on day 25 of an open wait would tell everyone
-                              who ordered last week that they are winning. Until
-                              handover, the comparable figure is stated and left
-                              at that. */}
-                          {!waitComparison.isDelivered
-                            ? t('comparableTypically', { median: waitComparison.comparableMedian })
-                            : waitComparison.differenceDays! < 0
-                              ? t('fasterThanComparable', {
-                                  days: Math.abs(waitComparison.differenceDays!),
-                                  median: waitComparison.comparableMedian,
-                                })
-                              : waitComparison.differenceDays! > 0
-                                ? t('slowerThanComparable', {
-                                    days: waitComparison.differenceDays!,
-                                    median: waitComparison.comparableMedian,
-                                  })
-                                : t('matchesComparable', { median: waitComparison.comparableMedian })}
-                        </p>
-                      )}
-
-                      {fasterPercent !== null && fasterPercent > 0 && (
-                        <Badge variant="outline" className="mt-1 gap-1 border-success/30 bg-success/10 text-success">
-                          <TrendingUp className="h-3 w-3" />
-                          {t('deliveredFaster', { percent: fasterPercent })}
-                        </Badge>
-                      )}
+                  {/* Faster percent badge */}
+                  {fasterPercent !== null && fasterPercent > 0 && (
+                    <div className="flex justify-center sm:justify-start">
+                      <Badge variant="outline" className="text-green-700 border-green-200 bg-green-50 dark:text-green-400 dark:border-green-800 dark:bg-green-900/30 gap-1">
+                        <TrendingUp className="h-3 w-3" />
+                        {t('deliveredFaster', { percent: fasterPercent })}
+                      </Badge>
                     </div>
                   )}
                 </div>
@@ -381,111 +294,6 @@ export function TrackingPageClient({
             </CardContent>
           </Card>
         </motion.div>
-
-        {/* Delivery prediction (only for non-delivered orders) */}
-        {prediction && !order.deliveryDate && (() => {
-          const elapsed = prediction.daysElapsedFromReference
-          const past = (n: number) => n < elapsed
-          const exceedsPessimistic = elapsed > prediction.pessimisticDays
-          return (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.15 }}
-          >
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  {t('yourDelivery')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {exceedsPessimistic && (
-                  <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 p-2.5">
-                    <p className="text-xs text-destructive flex items-start gap-1.5">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                      <span>{t('exceedsPessimisticHint', { days: elapsed })}</span>
-                    </p>
-                  </div>
-                )}
-
-                {/* One interval, drawn as one interval.
-                    This was three equally sized boxes — green, brand, amber —
-                    which read as good, normal and bad. None of that is true: a
-                    delivery at the 75th percentile is not a warning, it is the
-                    slower end of the same ordinary range, and splitting it into
-                    three cards hid that the three numbers are one distribution.
-                    The band is that range, the line inside it is the median, and
-                    the marker is where this order stands today — which is the
-                    thing the reader came to find out and was not shown at all. */}
-                {(() => {
-                  const span = Math.max(prediction.pessimisticDays, elapsed) * 1.15 || 1
-                  const at = (d: number) => `${Math.min(100, Math.max(0, (d / span) * 100))}%`
-                  return (
-                    <div className="pt-5 pb-1">
-                      <div className="relative">
-                        <div
-                          className="absolute -top-5 z-10 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-foreground"
-                          style={{ left: at(elapsed) }}
-                        >
-                          {t('today')}
-                        </div>
-                        <div className="relative h-2 rounded-full bg-muted">
-                          <div
-                            className="absolute inset-y-0 rounded-full bg-primary/25"
-                            style={{ left: at(prediction.optimisticDays), right: `calc(100% - ${at(prediction.pessimisticDays)})` }}
-                          />
-                          <div
-                            className="absolute inset-y-0 w-0.5 -translate-x-1/2 rounded-full bg-primary"
-                            style={{ left: at(prediction.expectedDays) }}
-                          />
-                          <div
-                            className="absolute -inset-y-1 w-0.5 -translate-x-1/2 rounded-full bg-foreground"
-                            style={{ left: at(elapsed) }}
-                          />
-                        </div>
-                      </div>
-
-                      <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
-                        {[
-                          { label: t('optimistic'), date: prediction.optimisticDate, days: prediction.optimisticDays },
-                          { label: t('expected'), date: prediction.expectedDate, days: prediction.expectedDays },
-                          { label: t('pessimistic'), date: prediction.pessimisticDate, days: prediction.pessimisticDays },
-                        ].map((c, i) => (
-                          <div key={c.label} className={cn(past(c.days) && 'opacity-45')}>
-                            <dt className="text-xs text-muted-foreground">{c.label}</dt>
-                            <dd className={cn(
-                              'mt-0.5 font-semibold tabular-nums',
-                              i === 1 ? 'text-primary' : 'text-foreground',
-                            )}>
-                              {c.date}
-                            </dd>
-                            <dd className="text-xs tabular-nums text-muted-foreground">
-                              {c.days} {tc('days')}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  )
-                })()}
-
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
-                  <span className={confidenceColor}>
-                    {t('predictionConfidence', { level: t(`confidence_${prediction.confidence}`) })}
-                  </span>
-                  <span>
-                    {prediction.recencyWindowDays
-                      ? t('predictionSampleRecent', { count: prediction.sampleSize, days: prediction.recencyWindowDays })
-                      : t('predictionSample', { count: prediction.sampleSize })}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          )
-        })()}
 
         {/* Duration stats (for delivered orders) */}
         {durationFields.some(f => f.value != null) && (
@@ -528,13 +336,7 @@ export function TrackingPageClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <SimilarOrders
-              orders={similar}
-              currentOrderId={order.id}
-              ownWaitDays={waitComparison?.waitedDays ?? null}
-              ownName={order.name}
-              ownDelivered={waitComparison?.isDelivered}
-            />
+            <SimilarOrders orders={similar} currentOrderId={order.id} />
           </motion.div>
         )}
 
@@ -560,24 +362,82 @@ export function TrackingPageClient({
             </CardContent>
           </Card>
         </motion.div>
-      </div>
 
-      <TostFieldsModal
-        order={tostFieldsOpen ? order : null}
-        onClose={() => setTostFieldsOpen(false)}
-        onSave={async (orderId, data) => {
-          const res = await fetch('/api/orders', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: orderId, ...data }),
-          })
-          if (!res.ok) {
-            const err = await res.json().catch(() => null)
-            throw new Error(err?.error || tv('saveError'))
-          }
-          router.refresh()
-        }}
-      />
+        {/* Last, deliberately. The forum asked for hard facts in front and
+           fewer forecasts — a prediction sitting above the recorded dates
+           reads as the headline of the page, and the same complaint is made
+           about BOT. Everything above this point is something that happened;
+           this is the only thing that has not. */}
+        {/* Delivery prediction (only for non-delivered orders) */}
+        {prediction && !order.deliveryDate && (() => {
+          const elapsed = prediction.daysElapsedFromReference
+          const past = (n: number) => n < elapsed
+          const exceedsPessimistic = elapsed > prediction.pessimisticDays
+          return (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+          >
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {t('yourDelivery')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {exceedsPessimistic && (
+                  <div className="mb-4 rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20 p-2.5">
+                    <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                      <span>{t('exceedsPessimisticHint', { days: elapsed })}</span>
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800",
+                    past(prediction.optimisticDays) && "opacity-50",
+                  )}>
+                    <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
+                    <p className={cn("font-bold text-green-700 dark:text-green-400", past(prediction.optimisticDays) && "line-through")}>{prediction.optimisticDate}</p>
+                    <p className="text-xs text-muted-foreground">{prediction.optimisticDays}d</p>
+                  </div>
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-primary/5 border border-primary/20",
+                    past(prediction.expectedDays) && "opacity-50",
+                  )}>
+                    <p className="text-xs text-muted-foreground mb-1">{t('expected')}</p>
+                    <p className={cn("font-bold text-primary", past(prediction.expectedDays) && "line-through")}>{prediction.expectedDate}</p>
+                    <p className="text-xs text-muted-foreground">{prediction.expectedDays}d</p>
+                  </div>
+                  <div className={cn(
+                    "text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800",
+                    past(prediction.pessimisticDays) && "opacity-50",
+                  )}>
+                    <p className="text-xs text-muted-foreground mb-1">{t('pessimistic')}</p>
+                    <p className={cn("font-bold text-amber-700 dark:text-amber-400", past(prediction.pessimisticDays) && "line-through")}>{prediction.pessimisticDate}</p>
+                    <p className="text-xs text-muted-foreground">{prediction.pessimisticDays}d</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span className={confidenceColor}>
+                    {t('predictionConfidence', { level: t(`confidence_${prediction.confidence}`) })}
+                  </span>
+                  <span>
+                    {prediction.recencyWindowDays
+                      ? t('predictionSampleRecent', { count: prediction.sampleSize, days: prediction.recencyWindowDays })
+                      : t('predictionSample', { count: prediction.sampleSize })}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          )
+        })()}
+
+      </div>
 
       {order.source !== 'tost' && (
         <PasswordPromptModal

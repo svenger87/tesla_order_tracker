@@ -275,7 +275,9 @@
     "staleFilter": "Obsolète",
     "staleTooltip": "Basculer le filtre : toutes / masquer stale / seulement stale (≥60 jours sans mise à jour pour les commandes ouvertes)",
     "cancelledFilter": "Annulées",
-    "cancelledTooltip": "Changer le filtre : masquer les annulées / les inclure / uniquement les annulées"
+    "cancelledTooltip": "Changer le filtre : masquer les annulées / les inclure / uniquement les annulées",
+    "incompleteBadge": "incomplet",
+    "incompleteHint": "Cette commande n'a pas de date de commande alors qu'une date ultérieure est renseignée. Tous les délais sont mesurés à partir d'elle : sans cette date, l'entrée ne peut être située dans le temps et n'entre dans aucune statistique."
   },
   "progress": {
     "ordered": "Commandé",

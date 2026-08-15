@@ -275,7 +275,9 @@
     "staleFilter": "Obsoleto",
     "staleTooltip": "Cambia filtro: tutti / nascondi obsoleti / solo obsoleti (≥60 giorni senza aggiornamento sugli ordini aperti)",
     "cancelledFilter": "Annullati",
-    "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati"
+    "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati",
+    "incompleteBadge": "incompleto",
+    "incompleteHint": "A questo ordine manca la data d'ordine benché sia registrata una data successiva. Ogni attesa si misura da quella data: senza, la voce non è collocabile nel tempo e non entra in alcuna statistica."
   },
   "progress": {
     "ordered": "Ordinato",

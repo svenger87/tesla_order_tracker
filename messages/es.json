@@ -275,7 +275,9 @@
     "staleFilter": "Desactualizado",
     "staleTooltip": "Alternar filtro: todos / ocultar desactualizados / solo desactualizados (≥60 días sin actualizar en pedidos abiertos)",
     "cancelledFilter": "Cancelados",
-    "cancelledTooltip": "Cambiar filtro: ocultar cancelados / incluirlos / solo cancelados"
+    "cancelledTooltip": "Cambiar filtro: ocultar cancelados / incluirlos / solo cancelados",
+    "incompleteBadge": "incompleto",
+    "incompleteHint": "A este pedido le falta la fecha de pedido aunque hay una fecha posterior registrada. Todos los tiempos de espera se miden desde ella: sin la fecha, la entrada no puede situarse en el tiempo y no cuenta en ninguna estadística."
   },
   "progress": {
     "ordered": "Pedido realizado",

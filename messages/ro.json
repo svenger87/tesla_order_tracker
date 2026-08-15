@@ -275,7 +275,9 @@
     "staleFilter": "Învechit",
     "staleTooltip": "Comută filtrul: toate / ascunde învechite / doar învechite (≥60 de zile fără actualizare la comenzi deschise)",
     "cancelledFilter": "Anulate",
-    "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele"
+    "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele",
+    "incompleteBadge": "incomplet",
+    "incompleteHint": "Acestei comenzi îi lipsește data comenzii, deși există o dată ulterioară. Toți timpii de așteptare se măsoară de la ea — fără această dată intrarea nu poate fi plasată în timp și nu intră în nicio statistică."
   },
   "progress": {
     "ordered": "Comandat",

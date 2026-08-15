@@ -3,7 +3,6 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
 import { Order, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
 import { findColorInfo } from '@/lib/color-lookup'
-import { getWaitComparison } from '@/lib/wait-comparison'
 import { isHandedOver, startOfToday } from '@/lib/order-state'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
@@ -232,7 +231,6 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // in — the same order showed 30 days on the page and 87 when the selection
   // was rebuilt from the same data in a different sequence. For Model 3
   // Standard the honest median across all 26 delivered ones is 50.
-  const waitComparison = getWaitComparison(order, comparable)
 
   const similar = comparable.slice(0, 8)
 
@@ -345,7 +343,6 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
       similar={similar}
       prediction={predictionData}
       fasterPercent={fasterPercent}
-      waitComparison={waitComparison}
       detailFields={detailFields}
       durationFields={durationFields}
       colorInfo={colorInfo ? { hex: colorInfo.hex, border: colorInfo.border, label: colorInfo.label } : null}

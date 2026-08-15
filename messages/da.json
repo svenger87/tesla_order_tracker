@@ -275,7 +275,9 @@
     "staleFilter": "Forældet",
     "staleTooltip": "Skift filter: alle / skjul forældede / kun forældede (≥60 dage uden opdatering på åbne ordrer)",
     "cancelledFilter": "Annulleret",
-    "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede"
+    "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede",
+    "incompleteBadge": "ufuldstændig",
+    "incompleteHint": "Denne ordre mangler bestillingsdatoen, selvom en senere dato er angivet. Al ventetid måles fra bestillingsdatoen — uden den kan posten ikke placeres i tid og indgår ikke i nogen ventetidsstatistik."
   },
   "progress": {
     "ordered": "Bestilt",

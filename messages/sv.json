@@ -275,7 +275,9 @@
     "staleFilter": "Inaktuell",
     "staleTooltip": "Växla filter: alla / dölj inaktuella / endast inaktuella (≥60 dagar utan uppdatering på öppna ordrar)",
     "cancelledFilter": "Avbeställda",
-    "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda"
+    "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda",
+    "incompleteBadge": "ofullständig",
+    "incompleteHint": "Denna order saknar beställningsdatum trots att ett senare datum är ifyllt. All väntetid mäts från det — utan datumet kan posten inte placeras i tiden och räknas inte in i någon statistik."
   },
   "progress": {
     "ordered": "Beställd",

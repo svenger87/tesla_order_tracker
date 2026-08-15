@@ -9,10 +9,10 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
+import { isStaleOrder } from '@/lib/statistics'
+import { isUnreliable } from '@/lib/order-completeness'
 import { compareNullable, compareDateStrings } from '@/lib/order-sort'
 import { parseDeliveryWindowStart } from '@/lib/delivery-window'
-import { findColorInfo } from '@/lib/color-lookup'
-import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { useOptions, type FormOption } from '@/hooks/useOptions'
 
@@ -44,6 +44,30 @@ import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
 import { TeslaCarImage } from './TeslaCarImage'
 import { cn } from '@/lib/utils'
+
+// Pre-build color lookup map for O(1) access
+const colorMap = new Map<string, typeof COLORS[0]>()
+COLORS.forEach(c => {
+  colorMap.set(c.label.toLowerCase(), c)
+  // Also add internal code format (with underscores)
+  colorMap.set(c.label.toLowerCase().replace(/\s+/g, '_'), c)
+  // Also add partial matches
+  c.label.toLowerCase().split(' ').forEach(word => {
+    if (word.length > 3) colorMap.set(word, c)
+  })
+})
+
+function findColorInfo(colorLabel: string | null) {
+  if (!colorLabel) return null
+  const key = colorLabel.toLowerCase().trim()
+  // Try exact match first
+  if (colorMap.has(key)) return colorMap.get(key)
+  // Try finding by partial
+  for (const [k, v] of colorMap) {
+    if (key.includes(k) || k.includes(key)) return v
+  }
+  return null
+}
 
 // Memoized color cell to avoid re-renders
 const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
@@ -232,8 +256,8 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
   // The delivery window is free text — 265 distinct shapes across the data, in
   // several languages — so sorting it as a string put "29.08" after "04.10".
   // Ordered by the day the window starts; anything unreadable or ambiguous
-  // sorts last rather than being guessed at. The cell still shows the text
-  // exactly as it was stored.
+  // sorts last rather than being guessed at. The cell still shows the stored
+  // text exactly as it was entered.
   if (field === 'deliveryWindow') {
     const ms = (o: Order) => {
       const d = parseDeliveryWindowStart(o.deliveryWindow, o.orderDate)
@@ -310,17 +334,11 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
   const isActive = currentField === field
 
   return (
-    // A real button rather than a click handler on the cell: sorting used to be
-    // mouse-only, and aria-sort gives screen readers the current direction.
     <TableHead
-      aria-sort={isActive ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}
-      className={cn("font-bold whitespace-nowrap select-none bg-muted dark:bg-muted p-0", className)}
+      className={cn("font-bold whitespace-nowrap cursor-pointer select-none hover:bg-muted/80 transition-colors bg-muted dark:bg-muted", className)}
+      onClick={() => onSort(field)}
     >
-      <button
-        type="button"
-        onClick={() => onSort(field)}
-        className="flex w-full items-center gap-1 px-2 py-1 text-left transition-colors hover:bg-muted/80 focus-visible:outline-2 focus-visible:-outline-offset-2"
-      >
+      <div className="flex items-center gap-1">
         <span className="truncate">{children}</span>
         <span className="ml-1 shrink-0">
           {isActive ? (
@@ -333,7 +351,7 @@ function SortableHeader({ field, currentField, direction, onSort, children, clas
             <ArrowUpDown className="h-3 w-3 opacity-30" />
           )}
         </span>
-      </button>
+      </div>
     </TableHead>
   )
 }
@@ -367,9 +385,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'seats',              label: 'seats',              group: 'configuration', width: 80  },
   { key: 'autopilot',          label: 'autopilot',          group: 'configuration', width: 130 },
   // Status & Delivery
-  // 150 cut the last characters off a full date range ("02/06/2026 - 30/06/2026")
-  // by 10 to 19 pixels — measured on three of 155 cells, all of them this column.
-  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 172 },
+  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 150 },
   { key: 'deliveryLocation',   label: 'deliveryLocation',   group: 'configuration', width: 150 },
   { key: 'vin',                label: 'vin',                group: 'configuration', width: 170 },
   { key: 'vinReceivedDate',    label: 'vinDate',            group: 'configuration', width: 120 },
@@ -388,30 +404,12 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
-/**
- * Column presets.
- *
- * Everything used to be on by default, which put the table at roughly 3,900px
- * of minimum width — horizontal scrolling from the first second, on every
- * screen. "Compact" is what someone checking on their own order needs; the
- * other two are one click away.
- */
-const ESSENTIAL_KEYS = COLUMN_DEFS.filter(c => c.group === 'essential').map(c => c.key)
+// All columns visible by default
+const DEFAULT_VISIBLE_COLUMNS = new Set(
+  COLUMN_DEFS.map(c => c.key)
+)
 
-const COLUMN_PRESETS = {
-  compact: [...ESSENTIAL_KEYS, 'carImage', 'country', 'model', 'deliveryWindow', 'deliveryDate', 'waitingDays'],
-  configuration: [...ESSENTIAL_KEYS, ...COLUMN_DEFS.filter(c => c.group === 'configuration').map(c => c.key)],
-  all: COLUMN_DEFS.map(c => c.key),
-} as const
-
-type PresetName = keyof typeof COLUMN_PRESETS
-
-const DEFAULT_VISIBLE_COLUMNS = new Set<string>(COLUMN_PRESETS.compact)
-
-// v3: the default changed from "everything" to the compact preset. Bumping the
-// key lets existing visitors see the new default once instead of keeping a
-// stored set that predates it; their own later choices persist as before.
-const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v3'
+const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
 const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
 const COLUMNS_SCHEMA = COLUMN_DEFS.map(c => c.key).sort().join(',')
 
@@ -420,7 +418,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const t = useTranslations('table')
   const tc = useTranslations('common')
   const th = useTranslations('home')
-  const to = useTranslations('options')
 
   // Default sort: orderDate ascending (oldest first, newest at bottom)
   const [sortField, setSortField] = useState<SortField>('orderDate')
@@ -439,33 +436,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const resolvedOptions = optionsProp ?? fallbackOptions.options
   const { countries, models, ranges, drives, interiors, wheels, autopilot: autopilotOptions, towHitch: towHitchOptions, seats: seatsOptions } = resolvedOptions
 
-  // Label lookup, memoised per option list. This used to run two linear scans
-  // per cell — with up to a dozen labelled columns per visible row, on every
-  // render. Virtualisation kept it bounded, not cheap.
-  const labelMaps = useRef(new WeakMap<object, Map<string, string>>())
-
-  const trimFallbacks = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const t of [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS]) {
-      map.set(t.value, t.label)
-      map.set(t.label, t.label)
-    }
-    return map
-  }, [])
-
-  const getLabel = useCallback((options: Array<{ value: string; label: string }>, value: string | null): string => {
+  // Helper to lookup label from value (falls back to hardcoded trims for model)
+  const getLabel = (options: Array<{ value: string; label: string }>, value: string | null): string => {
     if (!value) return '-'
-    let map = labelMaps.current.get(options)
-    if (!map) {
-      map = new Map<string, string>()
-      for (const o of options) {
-        map.set(o.value, o.label)
-        map.set(o.label, o.label)
-      }
-      labelMaps.current.set(options, map)
-    }
-    return map.get(value) ?? trimFallbacks.get(value) ?? value
-  }, [trimFallbacks])
+    const option = options.find(o => o.value === value || o.label === value)
+    if (option) return option.label
+    // Fallback: check hardcoded model trims (in case API options don't include the value)
+    const trimFallback = [...MODEL_Y_TRIMS, ...MODEL_3_TRIMS].find(t => t.value === value || t.label === value)
+    if (trimFallback) return trimFallback.label
+    return value
+  }
 
   // Create a lookup map for country labels (for sorting)
   // Use COUNTRIES constant as fallback if API countries not loaded yet
@@ -547,11 +527,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   }, [visibleColumns, isHydrated])
 
   const isColumnVisible = useCallback((key: string) => visibleColumns.has(key), [visibleColumns])
-
-  const isPresetActive = useCallback((preset: PresetName) => {
-    const keys = COLUMN_PRESETS[preset]
-    return keys.length === visibleColumns.size && keys.every(k => visibleColumns.has(k))
-  }, [visibleColumns])
 
   const toggleColumn = useCallback((key: string) => {
     setVisibleColumns(prev => {
@@ -683,9 +658,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   )
 
   // Virtualizer for desktop table rows
-  // Estimate only — the virtualizer remeasures each rendered row. Nudged up
-  // with the body text going from 11px to 12px so the first paint is closer.
-  const ROW_HEIGHT = 40
+  const ROW_HEIGHT = 38
   // TanStack Virtual intentionally returns imperative functions; keep this hook outside compiler memoization.
   // eslint-disable-next-line react-hooks/incompatible-library
   const tableVirtualizer = useVirtualizer({
@@ -724,7 +697,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className={buttonClassName} title={tc('actions')}>
               <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">{tc('actions')}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -768,7 +740,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           title={t('editTostFields')}
         >
           <FileText className="h-4 w-4" />
-          <span className="sr-only">{t('editTostFields')}</span>
         </Button>
       )
     }
@@ -783,7 +754,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           title={tc('edit')}
         >
           <Pencil className="h-4 w-4" />
-          <span className="sr-only">{tc('edit')}</span>
         </Button>
       )
     }
@@ -827,9 +797,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             </button>
           )}
         </div>
-        {/* Each pill cycles and names the state it is in. They used to read
-            "VIN ✓" / "VIN ✗", which said neither what the symbol meant nor what
-            pressing again would do — and announced nothing to a screen reader. */}
+        {/* VIN pill toggle */}
         <Button
           variant={localFilters.hasVin === 'yes' ? 'default' : localFilters.hasVin === 'no' ? 'secondary' : 'outline'}
           size="sm"
@@ -839,7 +807,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             hasVin: f.hasVin === '' ? 'yes' : f.hasVin === 'yes' ? 'no' : ''
           }))}
         >
-          {t('vin')}: {localFilters.hasVin === 'yes' ? tc('yes') : localFilters.hasVin === 'no' ? tc('no') : tc('all')}
+          VIN {localFilters.hasVin === 'yes' ? '\u2713' : localFilters.hasVin === 'no' ? '\u2717' : ''}
         </Button>
         {/* Delivery pill toggle */}
         <Button
@@ -851,7 +819,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             hasDelivery: f.hasDelivery === '' ? 'yes' : f.hasDelivery === 'yes' ? 'no' : ''
           }))}
         >
-          {t('deliveredFilter')}: {localFilters.hasDelivery === 'yes' ? tc('yes') : localFilters.hasDelivery === 'no' ? tc('no') : tc('all')}
+          {t('deliveredFilter')} {localFilters.hasDelivery === 'yes' ? '\u2713' : localFilters.hasDelivery === 'no' ? '\u2717' : ''}
         </Button>
         {/* Stale pill toggle: '' (all) \u2192 'hide' (hide stale) \u2192 'only' (only stale) \u2192 '' */}
         <Button
@@ -864,7 +832,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             staleness: f.staleness === '' ? 'hide' : f.staleness === 'hide' ? 'only' : ''
           }))}
         >
-          {t('staleFilter')}: {localFilters.staleness === 'hide' ? tc('hide') : localFilters.staleness === 'only' ? tc('only') : tc('all')}
+          {t('staleFilter')} {localFilters.staleness === 'hide' ? '\u2717' : localFilters.staleness === 'only' ? '\u2713' : ''}
         </Button>
         {/* Cancelled pill: '' (hidden) → 'show' (mixed in) → 'only' → '' */}
         <Button
@@ -877,7 +845,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             cancelled: f.cancelled === '' ? 'show' : f.cancelled === 'show' ? 'only' : ''
           }))}
         >
-          {t('cancelledFilter')}: {localFilters.cancelled === 'show' ? tc('show') : localFilters.cancelled === 'only' ? tc('only') : tc('hide')}
+          {t('cancelledFilter')} {localFilters.cancelled === 'show' ? '+' : localFilters.cancelled === 'only' ? '✓' : ''}
         </Button>
         {/* Column visibility only applies to the desktop table */}
         <Popover>
@@ -890,19 +858,6 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <PopoverContent className="w-[240px] p-3" align="start">
             <div className="space-y-3">
               <p className="text-sm font-medium">{tc('visibleColumns')}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {(['compact', 'configuration', 'all'] as PresetName[]).map(preset => (
-                  <Button
-                    key={preset}
-                    variant={isPresetActive(preset) ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-7 flex-1 text-xs"
-                    onClick={() => setVisibleColumns(new Set(COLUMN_PRESETS[preset]))}
-                  >
-                    {tc(preset)}
-                  </Button>
-                ))}
-              </div>
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tc('configuration')}</p>
                 {COLUMN_DEFS.filter(c => c.group === 'configuration').map(col => (
@@ -938,13 +893,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       </div>
 
       {/* Mobile Card View - only rendered on small screens */}
-      {/* Both views are always in the DOM and switched with CSS. Branching on a
-          JS media query meant the server always emitted the desktop table, so
-          every phone painted it once and then swapped to cards — a visible jump
-          on each page load, and more obvious now that the page ships with its
-          data. The hidden container measures zero, so its virtualizer keeps
-          only the overscan rows. */}
-      <div className="md:hidden">{
+      {isMobile ? (
         filteredAndSortedOrders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
@@ -954,7 +903,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {/* Track widths must stay in sync with OrderCard's grid, or the
                 labels sit over the wrong column (they used to: "Wartezeit"
                 landed above the car image and "Bild" above the chevron). */}
-            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b surface-subtle px-3 py-2 text-xs font-medium text-muted-foreground">
+            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b bg-muted/30 px-3 py-2 text-[11px] font-medium text-muted-foreground">
               <span />
               <span className="truncate">{t('name')}</span>
               <button
@@ -972,7 +921,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     <ArrowUpDown className="h-3 w-3 shrink-0" />
                   )}
                 </span>
-                <span className="truncate text-[11px] font-normal opacity-70">{t('waitingDays')}</span>
+                <span className="truncate text-[10px] font-normal opacity-70">{t('waitingDays')}</span>
               </button>
               <span className="sr-only">{t('image')}</span>
               <span className="sr-only">{tc('actions')}</span>
@@ -1027,15 +976,15 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             </div>
           </div>
         )
-      }</div>
+      ) : null}
 
       {/* Desktop Table View - only rendered on medium+ screens */}
-      <div className="hidden md:block"><div
+      {!isMobile ? (<><div
         ref={tableContainerRef}
         onScroll={handleTableScroll}
-        className="board w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
+        className="bg-card dark:bg-card w-full max-h-[72vh] overflow-auto scrollbar-hide-horizontal"
       >
-        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-xs [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
+        <table style={{ minWidth: tableMinWidth }} className="table-fixed w-full caption-bottom text-[11px] [&_td:not(:last-child):not([data-noclip])]:overflow-hidden [&_th:not(:last-child):not([data-noclip])]:overflow-hidden">
           <colgroup>
             <col style={{ width: 42 }} />
             {COLUMN_DEFS.filter(c => isColumnVisible(c.key)).map(c => (
@@ -1139,6 +1088,20 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                           {th('cancelledBadge')}
                         </span>
                       )}
+                      {isUnreliable(order) && (
+                        /* Deliberately rare. The rule was measured against the live data
+                           before it was written: flagging every gap would have marked 60%
+                           of delivered orders, and papers alone go unrecorded on a fifth of
+                           them — that is how the form is used, not a fault. This is the 1%
+                           whose order date is missing beneath a later one, so every duration
+                           on the entry is unmeasurable. */
+                        <span
+                          className="shrink-0 rounded-sm border border-pending/40 bg-pending/10 px-1 py-px text-[10px] font-medium text-pending"
+                          title={th('incompleteHint')}
+                        >
+                          {th('incompleteBadge')}
+                        </span>
+                      )}
                       {order.source === 'tost' && (
                         <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="shrink-0 inline-block align-middle hover:opacity-70 transition-opacity">
                           <Image src="/tost-badge.svg" alt="TOST" width={64} height={32} className="h-8 w-auto" />
@@ -1161,13 +1124,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                     {order.vehicleType && (order.vehicleType === 'Model Y' || order.vehicleType === 'Model 3') ? (
                       <button
                         type="button"
-                        /* Tesla's compositor bakes a white background into the
-                           PNG, which on the board turned the column into a
-                           strip of bleeding white rectangles. Framing it as a
-                           small mounted tile makes that read as a product
-                           photo instead — and needs no change to the image URL,
-                           which would have invalidated the whole server cache. */
-                        className="flex cursor-pointer items-center justify-center rounded-[3px] bg-white/95 px-1 ring-1 ring-black/10 transition-opacity hover:opacity-80"
+                        className="cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => setImageModalOrder(order)}
                       >
                         <TeslaCarImage
@@ -1190,20 +1147,12 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('country') && (
                   <CountryCell country={order.country} countries={countries} />
                 )}
-                {/* Performance used to use the `destructive` variant, so a trim
-                    level wore the same red as errors, the primary button and —
-                    until now — "step completed". On the board it was the only
-                    red left and read as an alarm. It is a trim: it gets weight,
-                    not a warning colour. */}
                 {isColumnVisible('model') && (
                   <TableCell className="whitespace-nowrap">
                     {order.model ? (
                       <Badge
-                        variant="secondary"
-                        className={cn(
-                          'font-medium',
-                          order.model.toLowerCase().includes('performance') && 'font-bold tracking-wide',
-                        )}
+                        variant={order.model.toLowerCase().includes('performance') ? 'destructive' : 'secondary'}
+                        className="font-medium"
                       >
                         {getLabel(models, order.model)}
                       </Badge>
@@ -1214,12 +1163,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   <TableCell className="whitespace-nowrap">
                     {order.range ? (
                       <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">
-                        {/* Compare the stable value, not the label: matching on the
-                            German string meant the abbreviation never kicked in
-                            anywhere else, and the column overflowed instead. */}
-                        {order.range === 'maximale_reichweite'
-                          ? to('range.maxRangeShort')
-                          : getLabel(ranges, order.range)}
+                        {getLabel(ranges, order.range) === 'Maximale Reichweite' ? 'Max. RW' : getLabel(ranges, order.range)}
                       </Badge>
                     ) : '-'}
                   </TableCell>
@@ -1260,7 +1204,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 )}
                 {isColumnVisible('seats') && (
                   <TableCell className="whitespace-nowrap">
-                    {order.seats ? getLabel(seatsOptions, order.seats) : to('seats.5')}
+                    {order.seats ? getLabel(seatsOptions, order.seats) : '5-Sitzer'}
                   </TableCell>
                 )}
                 {isColumnVisible('autopilot') && (
@@ -1311,13 +1255,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       const isDelivered = deliveryParsed && deliveryParsed <= new Date()
                       return (
                         <Badge
-                          /* Always `outline`: the `default` variant brings its
-                             own bg-primary, so a delivered badge carried both
-                             that and bg-success and the winner came down to
-                             stylesheet order. */
-                          variant="outline"
+                          variant={isDelivered ? "default" : "outline"}
                           className={isDelivered
-                            ? "border-success/30 bg-success/15 text-success"
+                            ? "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white"
                             : "text-muted-foreground"
                           }
                         >
@@ -1353,12 +1293,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                   </TableCell>
                 )}
                 {isColumnVisible('waitingDays') && (
-                  /* The days waited is the reason most people open this page at
-                     all, and it was set in the same size as every other cell.
-                     It gets the weight now — still one column, just legible
-                     from a distance. */
-                  <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold tabular-nums">
-                    {(() => { const v = getWaitingDays(order); return v !== null ? v : '–' })()}
+                  <TableCell className="whitespace-nowrap text-center font-mono">
+                    {(() => { const v = getWaitingDays(order); return v !== null ? v : '-' })()}
                   </TableCell>
                 )}
                 {isColumnVisible('updatedAt') && (
@@ -1400,7 +1336,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           <div style={{ width: scrollWidth, height: '1px' }} />
         </div>
       )}
-      </div>
+      </>) : null}
 
       {/* Car image modal */}
       <Dialog open={!!imageModalOrder} onOpenChange={(open) => { if (!open) setImageModalOrder(null) }}>
@@ -1410,8 +1346,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </VisuallyHidden>
           {imageModalOrder && imageModalOrder.vehicleType && (imageModalOrder.vehicleType === 'Model Y' || imageModalOrder.vehicleType === 'Model 3') && (
             <div className="space-y-3">
-              {/* Same photo plate as the thumbnail this modal opens from. */}
-              <div className="flex justify-center rounded-lg bg-white/95 p-3 ring-1 ring-black/10">
+              <div className="flex justify-center">
                 <TeslaCarImage
                   vehicleType={imageModalOrder.vehicleType as VehicleType}
                   color={imageModalOrder.color}

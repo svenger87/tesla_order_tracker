@@ -275,7 +275,9 @@
     "staleFilter": "Güncel değil",
     "staleTooltip": "Filtreyi değiştir: tümü / güncel olmayanları gizle / yalnızca güncel olmayanlar (açık siparişlerde ≥60 gün güncelleme yok)",
     "cancelledFilter": "İptal edilenler",
-    "cancelledTooltip": "Filtreyi değiştir: iptal edilenleri gizle / göster / yalnızca iptal edilenler"
+    "cancelledTooltip": "Filtreyi değiştir: iptal edilenleri gizle / göster / yalnızca iptal edilenler",
+    "incompleteBadge": "eksik",
+    "incompleteHint": "Bu siparişte daha sonraki bir tarih girilmiş olmasına rağmen sipariş tarihi yok. Tüm bekleme süreleri sipariş tarihinden ölçülür — o olmadan kayıt zamana yerleştirilemez ve hiçbir istatistiğe girmez."
   },
   "progress": {
     "ordered": "Sipariş verildi",

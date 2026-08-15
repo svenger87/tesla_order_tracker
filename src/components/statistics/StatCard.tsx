@@ -24,20 +24,11 @@ interface StatCardProps {
   allowZero?: boolean
 }
 
-/**
- * Semantic colours come from the tokens, not from the Tailwind palette.
- *
- * --color-success / --color-data / --color-pending were defined in globals.css
- * with light and dark steps and then used almost nowhere: this map reached for
- * green-500, blue-500 and amber-500 instead, each with a hand-written dark:
- * counterpart. That meant three separate decisions about what "success" looks
- * like, and green meant a different green here than in the table.
- */
 const colorMap = {
   brand: { bg: 'bg-primary/10', text: 'text-primary', bar: 'from-primary/60 to-primary/20', hoverBg: 'group-hover:bg-primary/15' },
-  success: { bg: 'bg-success/10', text: 'text-success', bar: 'from-success/60 to-success/20', hoverBg: 'group-hover:bg-success/15' },
-  data: { bg: 'bg-data/10', text: 'text-data', bar: 'from-data/60 to-data/20', hoverBg: 'group-hover:bg-data/15' },
-  pending: { bg: 'bg-pending/10', text: 'text-pending', bar: 'from-pending/60 to-pending/20', hoverBg: 'group-hover:bg-pending/15' },
+  success: { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', bar: 'from-green-500/60 to-green-500/20', hoverBg: 'group-hover:bg-green-500/15' },
+  data: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', bar: 'from-blue-500/60 to-blue-500/20', hoverBg: 'group-hover:bg-blue-500/15' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', bar: 'from-amber-500/60 to-amber-500/20', hoverBg: 'group-hover:bg-amber-500/15' },
 }
 
 export function StatCard({ label, value, icon: Icon, description, hint, variant = 'default', semanticColor = 'brand', minimal = false, delay = 0, watermark = false, allowZero = false }: StatCardProps) {

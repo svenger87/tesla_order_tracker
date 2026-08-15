@@ -275,7 +275,9 @@
     "staleFilter": "Neaktuálne",
     "staleTooltip": "Prepnúť filter: všetko / skryť neaktuálne / len neaktuálne (≥60 dní bez aktualizácie pri otvorených objednávkach)",
     "cancelledFilter": "Zrušené",
-    "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené"
+    "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené",
+    "incompleteBadge": "neúplné",
+    "incompleteHint": "Pri tejto objednávke chýba dátum objednania, hoci je vyplnený neskorší dátum. Všetky čakacie doby sa merajú od neho — bez neho záznam nemožno zaradiť v čase a nevstupuje do žiadnej štatistiky."
   },
   "progress": {
     "ordered": "Objednané",

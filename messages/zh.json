@@ -275,7 +275,9 @@
     "staleFilter": "过期",
     "staleTooltip": "切换筛选：全部 / 隐藏过期 / 仅过期（未交付订单超过 60 天未更新）",
     "cancelledFilter": "已取消",
-    "cancelledTooltip": "切换筛选：隐藏已取消 / 一并显示 / 仅显示已取消"
+    "cancelledTooltip": "切换筛选：隐藏已取消 / 一并显示 / 仅显示已取消",
+    "incompleteBadge": "不完整",
+    "incompleteHint": "此订单虽有后续日期，却没有订单日期。所有等待时间都从订单日期起算 — 没有它，该记录无法在时间上定位，也不计入任何等待时间统计。"
   },
   "progress": {
     "ordered": "已下单",

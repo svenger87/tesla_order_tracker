@@ -1,16 +1,13 @@
 'use client'
 
 import { useCallback, useMemo, useRef } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType } from '@/lib/types'
-import { countryNameFromCode, flagFromCode } from '@/lib/country-display'
 import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } from '@/lib/statistics'
 import { useOptions } from '@/hooks/useOptions'
 import { TwemojiEmoji } from '@/components/TwemojiText'
-import { CHART_COLORS } from '@/lib/chart-colors'
 import { StatCard } from './StatCard'
-import { ChartCard } from './ChartCard'
 import { DeliveryTimeline } from './DeliveryTimeline'
 import { CountryDistributionChart } from './CountryDistributionChart'
 import { OrdersTimelineChart } from './OrdersTimelineChart'
@@ -18,10 +15,10 @@ import { DeliveryTimelineChart } from './DeliveryTimelineChart'
 import { WaitTimeDistributionChart } from './WaitTimeDistributionChart'
 import { VinWeekdayChart } from './VinWeekdayChart'
 import { MiniPieChart } from './ConfigDistributionCharts'
-import { ConfigDeliveryInsights } from './ConfigDeliveryInsights'
 import { EmptyState } from '@/components/EmptyState'
 import { DeliveryTrendChart } from './DeliveryTrendChart'
 import { VinActivityChart } from './VinActivityChart'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -48,7 +45,6 @@ interface StatisticsDashboardProps {
 }
 
 export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }: StatisticsDashboardProps) {
-  const locale = useLocale()
   const t = useTranslations('statistics')
   const tcd = useTranslations('countryDelivery')
   const tCommon = useTranslations('common')
@@ -77,20 +73,9 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const resolveCountry = useCallback(
     (value: string): { label: string; flag?: string } => {
       if (value === UNKNOWN_COUNTRY) return { label: tCommon('unknown') }
-
-      const known = countryByKey.get(value.toLowerCase())
-      if (known) return known
-
-      // Not in the options, which happens because the orders arrive from a sync
-      // that has never seen that list: us, ca and tw are all in the live data and
-      // in nobody's options. They showed as a bare "us" with no flag, beside every
-      // other country having one. Both are derivable from the code itself.
-      return {
-        label: countryNameFromCode(value, locale) ?? value,
-        flag: flagFromCode(value) ?? undefined,
-      }
+      return countryByKey.get(value.toLowerCase()) ?? { label: value }
     },
-    [countryByKey, tCommon, locale]
+    [countryByKey, tCommon]
   )
 
   const localizedCountryDistribution = useMemo(
@@ -252,7 +237,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     hint={t('hintPending')}
                     semanticColor="pending"
                     minimal
-                    delay={0.03}
+                    delay={0.2}
                   />
                   <StatCard
                     label={t('deliveryRate')}
@@ -262,13 +247,13 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     hint={t('hintDeliveryRate')}
                     semanticColor="success"
                     minimal
-                    delay={0.06}
+                    delay={0.7}
                   />
                   {/* Order Sources: Webapp + TOST stacked bar */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.09 }}
+                    transition={{ duration: 0.3, delay: 0.8 }}
                     className="rounded-xl border bg-card p-4 space-y-2"
                   >
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -279,27 +264,21 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                       <>
                         <div className="flex h-4 w-full overflow-hidden rounded-full">
                           <div
-                            className="transition-all"
-                            style={{
-                              width: `${Math.round((stats.manualOrders / stats.totalOrders) * 100)}%`,
-                              backgroundColor: CHART_COLORS[1],
-                            }}
+                            className="bg-primary transition-all"
+                            style={{ width: `${Math.round((stats.manualOrders / stats.totalOrders) * 100)}%` }}
                           />
                           <div
-                            className="transition-all"
-                            style={{
-                              width: `${Math.round((stats.tostOrders / stats.totalOrders) * 100)}%`,
-                              backgroundColor: CHART_COLORS[2],
-                            }}
+                            className="bg-primary/40 transition-all"
+                            style={{ width: `${Math.round((stats.tostOrders / stats.totalOrders) * 100)}%` }}
                           />
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[1] }} />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" />
                             {t('manualOrders')} {stats.manualOrders} ({Math.round((stats.manualOrders / stats.totalOrders) * 100)}%)
                           </span>
                           <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[2] }} />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary/40" />
                             {t('tostOrders')} {stats.tostOrders} ({Math.round((stats.tostOrders / stats.totalOrders) * 100)}%)
                           </span>
                         </div>
@@ -326,14 +305,6 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
               <MiniPieChart data={localizedRangeDistribution} title={t('rangeDistribution')} delay={0.1} />
               <MiniPieChart data={localizedColorDistribution} title={t('colorDistribution')} delay={0.15} />
             </div>
-
-            {/* The pies above say how the fleet is configured; this says what
-                each configuration costs in waiting time. It was built and then
-                never mounted anywhere, so the answer existed and no one could
-                see it. */}
-            <div className="mt-6">
-              <ConfigDeliveryInsights orders={orders} />
-            </div>
           </motion.div>
         </TabsContent>
 
@@ -345,14 +316,12 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Five charts in a four-column grid left the last one stranded on
-                its own row; three columns splits them 3 + 2. */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} />
-              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.03} />
-              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.06} />
-              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.09} />
-              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.12} />
+              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
+              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
+              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} />
+              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
             </div>
           </motion.div>
         </TabsContent>
@@ -366,18 +335,52 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             transition={{ duration: 0.2 }}
           >
             <div className="grid md:grid-cols-2 gap-6">
-              <ChartCard title={t('countryDistribution')} icon={Globe} description={t('topCountries')}>
-                    <CountryDistributionChart data={localizedCountryDistribution} />
-                  </ChartCard>
-              <ChartCard title={t('deliveryLocations')} icon={Package} description={t('topLocations')}>
-                    <CountryDistributionChart data={stats.deliveryLocationDistribution.slice(0, 10)} />
-                  </ChartCard>
+              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                    <div className="rounded-lg bg-primary/10 p-1.5">
+                      <Globe className="h-4 w-4 text-primary" />
+                    </div>
+                    {t('countryDistribution')}
+                  </CardTitle>
+                  <CardDescription>{t('topCountries')}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                  <CountryDistributionChart data={localizedCountryDistribution} />
+                </CardContent>
+                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+              </Card>
+              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                    <div className="rounded-lg bg-primary/10 p-1.5">
+                      <Package className="h-4 w-4 text-primary" />
+                    </div>
+                    {t('deliveryLocations')}
+                  </CardTitle>
+                  <CardDescription>{t('topLocations')}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                  <CountryDistributionChart data={stats.deliveryLocationDistribution.slice(0, 10)} />
+                </CardContent>
+                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+              </Card>
             </div>
 
             {/* Country delivery speed ranking */}
             {stats.countryDeliveryStats.length > 0 && (() => {
+              const total = stats.countryDeliveryStats.length
               return (
-                <ChartCard title={tcd('title')} icon={MapPin}>
+                <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow mt-6">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                      <div className="rounded-lg bg-primary/10 p-1.5">
+                        <MapPin className="h-4 w-4 text-primary" />
+                      </div>
+                      {tcd('title')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -391,12 +394,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                         {stats.countryDeliveryStats.map((row, i) => {
                           const info = resolveCountry(row.country)
                           return (
-                            // The left edge used to carry a green-to-yellow
-                            // stripe computed from the row index — a fourth way
-                            // of saying the rank the position, the number and
-                            // the medal already say, and one that repainted a
-                            // country the moment the list changed length.
-                            <TableRow key={row.country}>
+                            <TableRow key={row.country} style={{ borderLeft: `3px solid oklch(${0.55 + (i / total) * 0.15} ${0.16 - (i / total) * 0.06} ${145 - (i / total) * 70})` }}>
                               <TableCell className="font-medium tabular-nums">
                                 {i === 0 ? '\u{1F947}' : i === 1 ? '\u{1F948}' : i === 2 ? '\u{1F949}' : i + 1}
                               </TableCell>
@@ -413,7 +411,9 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                         })}
                       </TableBody>
                     </Table>
-                  </ChartCard>
+                  </CardContent>
+                  <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+                </Card>
               )
             })()}
           </motion.div>
@@ -433,27 +433,75 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
 
             {/* Timeline charts */}
             <div className="grid md:grid-cols-2 gap-6">
-              <ChartCard title={t('ordersOverTime')} icon={TrendingUp} description={t('ordersPerMonth')}>
-                    <OrdersTimelineChart data={stats.ordersOverTime} />
-                  </ChartCard>
+              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                    <div className="rounded-lg bg-primary/10 p-1.5">
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                    </div>
+                    {t('ordersOverTime')}
+                  </CardTitle>
+                  <CardDescription>{t('ordersPerMonth')}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                  <OrdersTimelineChart data={stats.ordersOverTime} />
+                </CardContent>
+                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+              </Card>
 
-              <ChartCard title={t('deliveriesOverTime')} icon={CheckCircle2} description={t('deliveriesPerMonth')} tone="success">
-                    <DeliveryTimelineChart data={stats.deliveriesOverTime} />
-                  </ChartCard>
+              <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                    <div className="rounded-lg bg-green-500/10 p-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    </div>
+                    {t('deliveriesOverTime')}
+                  </CardTitle>
+                  <CardDescription>{t('deliveriesPerMonth')}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                  <DeliveryTimelineChart data={stats.deliveriesOverTime} />
+                </CardContent>
+                <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+              </Card>
             </div>
 
             {/* VIN weekday distribution */}
-            <ChartCard title={t('vinWeekday')} icon={Calendar} description={t('vinWeekdayDescription')}>
-                    <VinWeekdayChart data={stats.vinWeekdayDistribution} />
-                  </ChartCard>
+            <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <div className="rounded-lg bg-primary/10 p-1.5">
+                    <Calendar className="h-4 w-4 text-primary" />
+                  </div>
+                  {t('vinWeekday')}
+                </CardTitle>
+                <CardDescription>{t('vinWeekdayDescription')}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                <VinWeekdayChart data={stats.vinWeekdayDistribution} />
+              </CardContent>
+              <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+            </Card>
 
             {/* VIN Activity */}
             <VinActivityChart orders={orders} />
 
             {/* Wait time distribution */}
-            <ChartCard title={t('waitTimeDistribution')} icon={Hourglass} description={t('waitTimeDescription')}>
-                    <WaitTimeDistributionChart data={stats.waitTimeDistribution} />
-                  </ChartCard>
+            <Card className="relative shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <div className="rounded-lg bg-primary/10 p-1.5">
+                    <Hourglass className="h-4 w-4 text-primary" />
+                  </div>
+                  {t('waitTimeDistribution')}
+                </CardTitle>
+                <CardDescription>{t('waitTimeDescription')}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
+                <WaitTimeDistributionChart data={stats.waitTimeDistribution} />
+              </CardContent>
+              <span className="absolute bottom-2 right-3 text-[9px] opacity-[0.15] text-foreground select-none pointer-events-none">tff-order-stats.de</span>
+            </Card>
           </motion.div>
         </TabsContent>
 

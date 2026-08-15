@@ -22,11 +22,19 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from 'recharts'
-import { CHART_SERIES_COLOR, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface ConfigDeliveryInsightsProps {
   orders: Order[]
+}
+
+function getDaysColor(days: number, min: number, max: number): string {
+  if (max === min) return 'oklch(0.65 0.15 160)'
+  const ratio = (days - min) / (max - min)
+  if (ratio < 0.33) return 'oklch(0.65 0.15 160)' // green-ish
+  if (ratio < 0.66) return 'oklch(0.7 0.15 80)' // yellow-ish
+  return 'oklch(0.55 0.22 25)' // red (primary)
 }
 
 export function ConfigDeliveryInsights({ orders }: ConfigDeliveryInsightsProps) {
@@ -45,6 +53,9 @@ export function ConfigDeliveryInsights({ orders }: ConfigDeliveryInsightsProps) 
       </Card>
     )
   }
+
+  const minDays = Math.min(...insight.values.map(v => v.medianDays))
+  const maxDays = Math.max(...insight.values.map(v => v.medianDays))
 
   return (
     <div className="space-y-6">
@@ -85,12 +96,14 @@ export function ConfigDeliveryInsights({ orders }: ConfigDeliveryInsightsProps) 
             <XAxis type="number" tick={{ fontSize: 11 }} label={{ value: tc('days'), position: 'insideBottom', style: { fontSize: 11 } }} />
             <YAxis dataKey="name" type="category" width={140} tick={{ fontSize: 11 }} />
             <Tooltip
-              {...CHART_TOOLTIP_STYLE}
+              contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
               formatter={(value) => [`${value} ${tc('days')}`, t('medianWait')]}
             />
-            {/* One colour: the bar length already carries the wait, and the row
-                label already says which config it belongs to. */}
-            <Bar dataKey="medianDays" radius={[0, 4, 4, 0]} fill={CHART_SERIES_COLOR} />
+            <Bar dataKey="medianDays" radius={[0, 4, 4, 0]}>
+              {insight.values.map((entry, index) => (
+                <Cell key={index} fill={getDaysColor(entry.medianDays, minDays, maxDays)} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

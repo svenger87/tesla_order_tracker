@@ -2,12 +2,25 @@
 
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
-import { CHART_SERIES_COLOR } from '@/lib/chart-colors'
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts'
 
 interface CountryDistributionChartProps {
   data: { name: string; count: number; fill: string }[]
 }
+
+// 10 unique colors to avoid repeats in Top 10
+const COLORS = [
+  'oklch(0.6 0.2 25)',    // Red
+  'oklch(0.7 0.15 220)',  // Blue
+  'oklch(0.72 0.12 160)', // Teal
+  'oklch(0.78 0.15 80)',  // Yellow
+  'oklch(0.65 0.18 280)', // Purple
+  'oklch(0.70 0.18 140)', // Green
+  'oklch(0.65 0.20 40)',  // Orange
+  'oklch(0.58 0.20 340)', // Pink
+  'oklch(0.72 0.14 200)', // Light Blue
+  'oklch(0.68 0.16 120)', // Lime
+]
 
 export function CountryDistributionChart({ data }: CountryDistributionChartProps) {
   const t = useTranslations('statistics')
@@ -63,24 +76,25 @@ export function CountryDistributionChart({ data }: CountryDistributionChartProps
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'var(--card)',
-              border: '1px solid var(--border)',
+              backgroundColor: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
             }}
             itemStyle={{
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
             }}
             labelStyle={{
-              color: 'var(--foreground)',
+              color: 'hsl(var(--foreground))',
               fontWeight: 600,
             }}
             formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
           />
-          {/* One colour on purpose: every bar already carries its name on the
-              y-axis, so a second hue per row encodes nothing and would spend
-              the categorical palette on decoration. */}
-          <Bar dataKey="count" radius={[0, 4, 4, 0]} fill={CHART_SERIES_COLOR} animationDuration={400} animationEasing="ease-out" />
+          <Bar dataKey="count" radius={[0, 4, 4, 0]} animationDuration={400} animationEasing="ease-out">
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </motion.div>
