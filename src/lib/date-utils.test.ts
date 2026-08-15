@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest'
-import { normalizeDate, findDateSequenceError } from './date-utils'
+import { describe, test, expect, it } from 'vitest'
+import { normalizeDate, findDateSequenceError, parseGermanDate } from './date-utils'
 
 describe('normalizeDate', () => {
   test('accepts a valid German date', () => {
@@ -110,5 +110,30 @@ describe('normalizeDate — formats the TOST sync actually sends', () => {
   test('applies the same calendar check as the dot format', () => {
     expect(normalizeDate('31/02/2027')).toBeNull()
     expect(normalizeDate('29/02/2028')).toBe('29.02.2028')
+  })
+})
+
+describe('parseGermanDate — the year has to be plausible', () => {
+  it('reads an ordinary date', () => {
+    expect(parseGermanDate('15.08.2026')?.getFullYear()).toBe(2026)
+  })
+
+  it('rejects a two-digit year instead of guessing the century', () => {
+    // "1.1.26" was read as the year 26 AD, which made one order's VIN-to-
+    // production span 730490 days and dragged that average from 8 days to 865.
+    expect(parseGermanDate('1.1.26')).toBeNull()
+    expect(parseGermanDate('11.12.25')).toBeNull()
+  })
+
+  it('rejects a year that is a typo', () => {
+    // 26.08.0205 is 26.08.2025 with a slipped digit. Read literally it put a
+    // production date in the third century and made one segment average 1019.
+    expect(parseGermanDate('26.08.0205')).toBeNull()
+  })
+
+  it('accepts dates across the whole window the app works in', () => {
+    const year = new Date().getFullYear()
+    expect(parseGermanDate(`01.03.${year + 5}`)).not.toBeNull()
+    expect(parseGermanDate(`01.03.${year - 5}`)).not.toBeNull()
   })
 })

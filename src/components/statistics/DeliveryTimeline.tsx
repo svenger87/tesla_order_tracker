@@ -93,11 +93,14 @@ export function DeliveryTimeline({ stats }: DeliveryTimelineProps) {
         ))}
       </div>
 
-      {/* Total waiting time — sum of segment averages for consistency */}
+      {/* The measured order-to-delivery average, not the four segment averages
+          added up. Each segment is measured over the orders that carry its two
+          dates, and those are four different groups of people — adding them
+          described a journey nobody took, and gave 74 days on a page that says
+          64 days a few centimetres further up. */}
       {(() => {
-        const segmentAvgs = segments.map(s => s.days).filter((d): d is number => d !== null)
-        if (segmentAvgs.length === 0) return null
-        const total = segmentAvgs.reduce((sum, d) => sum + d, 0)
+        const total = stats.avgOrderToDelivery
+        if (total === null) return null
         return (
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">{t('totalWaitTime')}</span>

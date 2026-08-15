@@ -153,11 +153,32 @@ export function normalizeDateFields<T extends object>(data: T): T {
 
 // Re-export shared date utilities (canonical implementations)
 
+/**
+ * Read a stored DD.MM.YYYY date, or null if it cannot be one.
+ *
+ * The year window matters as much as the format. date-fns will happily read
+ * "1.1.26" as the year 26 and "26.08.0205" as the third century, and both of
+ * those are in the live data — a two-digit year somebody typed, and 26.08.2025
+ * with a slipped digit. Each is a single record, and each was enough on its own
+ * to move a pipeline average by two orders of magnitude: VIN to production went
+ * from 8 days to 865, production to papers from 7 to 1019.
+ *
+ * The same window normalizeDate enforces on input, applied to values that were
+ * stored before it did. It moves with the current year, so it cannot expire.
+ */
 export function parseGermanDate(dateStr: string | null | undefined): Date | null {
   if (!dateStr) return null
   // Use fixed reference date to avoid timezone issues around midnight
   const parsed = parse(dateStr, 'dd.MM.yyyy', new Date(2000, 0, 1))
-  return isValid(parsed) ? parsed : null
+  if (!isValid(parsed)) return null
+
+  const currentYear = new Date().getFullYear()
+  const year = parsed.getFullYear()
+  if (year < currentYear - MAX_YEARS_PAST || year > currentYear + MAX_YEARS_FUTURE) {
+    return null
+  }
+
+  return parsed
 }
 
 export function calculateDaysBetween(
