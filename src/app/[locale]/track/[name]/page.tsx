@@ -289,14 +289,23 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   ]
 
   // Duration stats
+  // A duration below zero is not a duration. 78 orders carry one, almost all a
+  // production date entered ahead of the order date, and the figures are now
+  // derived from those dates rather than copied from the sheet — so the page
+  // would faithfully render "order to VIN: -14 days". The statistics already
+  // drop negatives; the page has to as well, and staying silent is the honest
+  // option when the underlying dates contradict each other.
+  const duration = (value: number | null | undefined) =>
+    value != null && value >= 0 ? value : null
+
   const durationFields: { label: string; value: number | null }[] = [
-    { label: t('orderToVin'), value: order.orderToVin },
-    { label: t('orderToPapers'), value: order.orderToPapers },
+    { label: t('orderToVin'), value: duration(order.orderToVin) },
+    { label: t('orderToPapers'), value: duration(order.orderToPapers) },
     // Hidden until the handover: the stored value counts to the booked date, so
     // the page was showing "order to delivery: 57 days" beside "waiting for 51
     // days" for the same order.
-    { label: t('orderToDelivery'), value: handedOver(order) ? order.orderToDelivery : null },
-    { label: t('papersToDelivery'), value: handedOver(order) ? order.papersToDelivery : null },
+    { label: t('orderToDelivery'), value: handedOver(order) ? duration(order.orderToDelivery) : null },
+    { label: t('papersToDelivery'), value: handedOver(order) ? duration(order.papersToDelivery) : null },
   ]
 
   const predictionData = prediction ? {
