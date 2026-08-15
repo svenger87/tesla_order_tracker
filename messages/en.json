@@ -537,7 +537,10 @@
     "selectValue": "Select value...",
     "archiveConfirmTitle": "Archive {count} orders?",
     "archiveConfirmDescription": "Archived orders disappear from the public statistics but stay in the database. Undoing this is only possible one order at a time.",
-    "archiveConfirmAction": "Archive"
+    "archiveConfirmAction": "Archive",
+    "yearlyGoal": "Server costs per year (€)",
+    "yearlyRaised": "Covered so far (€)",
+    "yearlyGoalHint": "Leave empty to hide the cost bar."
   },
   "options": {
     "country": {
@@ -831,7 +834,9 @@
   "footer": {
     "operatedBy": "Operated by Sven",
     "supportDevelopment": "Support hosting & development",
-    "stats": "{orders} orders · {delivered} delivered"
+    "stats": "{orders} orders · {delivered} delivered",
+    "serverCostsTitle": "Server costs {year}",
+    "serverCostsProgress": "{raised} of {goal} € covered"
   },
   "errors": {
     "rateLimited": "Too many requests. Please try again later.",

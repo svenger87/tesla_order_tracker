@@ -100,6 +100,10 @@ export interface Settings {
   lastSyncCount: number | null
   archiveEnabled: boolean
   archiveThreshold: number
+  /** Server costs for the year, in euro. Null hides the transparency bar. */
+  yearlyGoal: number | null
+  /** Of those costs, how much donations have covered so far. */
+  yearlyRaised: number | null
 }
 
 export interface SyncResult {

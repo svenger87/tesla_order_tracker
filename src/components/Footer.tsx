@@ -3,9 +3,16 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Github, Code2, ExternalLink } from 'lucide-react'
+import { TransparencyBar } from '@/components/TransparencyBar'
 
 interface FooterProps {
-  settings: { showDonation?: boolean; donationUrl?: string; paypalUrl?: string } | null
+  settings: {
+    showDonation?: boolean
+    donationUrl?: string
+    paypalUrl?: string
+    yearlyGoal?: number | null
+    yearlyRaised?: number | null
+  } | null
   orderCount?: number
   deliveredCount?: number
 }
@@ -92,6 +99,16 @@ export function Footer({ settings, orderCount, deliveredCount }: FooterProps) {
               </>
             )}
           </p>
+
+          {/* Only when an amount is actually configured. A bar reading "0 of 0"
+              would be worse than no bar. */}
+          {settings?.yearlyGoal ? (
+            <TransparencyBar
+              goal={settings.yearlyGoal}
+              raised={settings.yearlyRaised ?? 0}
+              year={new Date().getFullYear()}
+            />
+          ) : null}
 
           {/* Stats line */}
           {orderCount !== undefined && deliveredCount !== undefined && orderCount > 0 && (

@@ -51,16 +51,30 @@ export async function PUT(request: NextRequest) {
 
     await getOrCreateSettings()
 
+    // Only what the request actually carries. This used to fall back to a
+    // default for every absent field, so a partial update silently reset the
+    // rest — a request that meant to change one thing wiped the others back to
+    // "Support this project" and 180 days.
+    const data: Record<string, unknown> = {}
+    if (body.showDonation !== undefined) data.showDonation = Boolean(body.showDonation)
+    if (body.donationUrl !== undefined) data.donationUrl = String(body.donationUrl)
+    if (body.paypalUrl !== undefined) data.paypalUrl = String(body.paypalUrl)
+    if (body.donationText !== undefined) data.donationText = String(body.donationText)
+    if (body.archiveEnabled !== undefined) data.archiveEnabled = Boolean(body.archiveEnabled)
+    if (body.archiveThreshold !== undefined) data.archiveThreshold = Number(body.archiveThreshold)
+
+    // An empty field means "not set" and clears the bar, so null has to survive
+    // the trip rather than being read as "absent".
+    if (body.yearlyGoal !== undefined) {
+      data.yearlyGoal = body.yearlyGoal === null || body.yearlyGoal === '' ? null : Number(body.yearlyGoal)
+    }
+    if (body.yearlyRaised !== undefined) {
+      data.yearlyRaised = body.yearlyRaised === null || body.yearlyRaised === '' ? null : Number(body.yearlyRaised)
+    }
+
     const settings = await prisma.settings.update({
       where: { id: 'default' },
-      data: {
-        showDonation: body.showDonation ?? true,
-        donationUrl: body.donationUrl || 'https://buymeacoffee.com',
-        paypalUrl: body.paypalUrl ?? '',
-        donationText: body.donationText || 'Support this project',
-        archiveEnabled: body.archiveEnabled ?? true,
-        archiveThreshold: body.archiveThreshold ?? 180,
-      },
+      data,
     })
 
     return NextResponse.json(settings)

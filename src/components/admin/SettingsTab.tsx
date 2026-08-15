@@ -293,6 +293,39 @@ export function SettingsTab() {
               />
             </div>
 
+            {/* These two feed the cost bar in the footer. The columns existed in
+                the database for months with nothing reading or writing them, so
+                the bar could never be switched on. Empty means off. */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="yearlyGoal">{t('yearlyGoal')}</Label>
+                <Input
+                  id="yearlyGoal"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={settings?.yearlyGoal ?? ''}
+                  onChange={(e) =>
+                    setSettings((s) => s ? { ...s, yearlyGoal: e.target.value === '' ? null : Number(e.target.value) } : null)
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="yearlyRaised">{t('yearlyRaised')}</Label>
+                <Input
+                  id="yearlyRaised"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={settings?.yearlyRaised ?? ''}
+                  onChange={(e) =>
+                    setSettings((s) => s ? { ...s, yearlyRaised: e.target.value === '' ? null : Number(e.target.value) } : null)
+                  }
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{t('yearlyGoalHint')}</p>
+
             <Button onClick={handleSaveSettings} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
               {saving ? tc('saving') : tc('save')}

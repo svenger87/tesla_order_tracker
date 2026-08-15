@@ -44,8 +44,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Production only. Baking the id into the staging image made that
+          # build render the analytics script, and staging has no /u/ proxy —
+          # so every page there fetched /u/script.js and got a 404. Proxying it
+          # instead would have mixed staging traffic into the production
+          # numbers, which is worse than not measuring staging at all.
           build-args: |
-            UMAMI_WEBSITE_ID=${{ vars.UMAMI_WEBSITE_ID }}
+            UMAMI_WEBSITE_ID=${{ github.ref_name == 'master' && vars.UMAMI_WEBSITE_ID || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

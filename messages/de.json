@@ -537,7 +537,10 @@
     "selectValue": "Wert wählen...",
     "archiveConfirmTitle": "{count} Bestellungen archivieren?",
     "archiveConfirmDescription": "Archivierte Bestellungen verschwinden aus den öffentlichen Statistiken, bleiben aber in der Datenbank. Rückgängig machen lässt sich das nur einzeln pro Bestellung.",
-    "archiveConfirmAction": "Archivieren"
+    "archiveConfirmAction": "Archivieren",
+    "yearlyGoal": "Serverkosten pro Jahr (€)",
+    "yearlyRaised": "Davon gedeckt (€)",
+    "yearlyGoalHint": "Leer lassen, um den Kostenbalken auszublenden."
   },
   "options": {
     "country": {
@@ -831,7 +834,9 @@
   "footer": {
     "operatedBy": "Betrieben von Sven",
     "supportDevelopment": "Hosting & Entwicklung unterstützen",
-    "stats": "{orders} Bestellungen · {delivered} ausgeliefert"
+    "stats": "{orders} Bestellungen · {delivered} ausgeliefert",
+    "serverCostsTitle": "Serverkosten {year}",
+    "serverCostsProgress": "{raised} von {goal} € gedeckt"
   },
   "errors": {
     "rateLimited": "Zu viele Anfragen. Bitte später erneut versuchen.",

@@ -11,6 +11,8 @@ interface Settings {
   showDonation?: boolean
   donationUrl?: string
   paypalUrl?: string
+  yearlyGoal?: number | null
+  yearlyRaised?: number | null
 }
 
 /**
