@@ -47,6 +47,7 @@ export function SettingsTab() {
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false)
   const [apiKeyCopied, setApiKeyCopied] = useState(false)
   const [apiKeyVisible, setApiKeyVisible] = useState(false)
+  const [endpoints, setEndpoints] = useState<{ method: string; path: string }[]>([])
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -83,6 +84,37 @@ export function SettingsTab() {
     }
   }, [])
 
+  /**
+   * The endpoints this key unlocks, taken from the OpenAPI document.
+   *
+   * Reading them here means the card cannot fall out of step with the API the
+   * way a hand-kept list did. A failure is not worth reporting: the list is
+   * supporting detail beside a link to the full documentation, so it simply
+   * does not render.
+   */
+  const fetchEndpoints = useCallback(async () => {
+    try {
+      const res = await fetch('/api/api-docs')
+      if (!res.ok) return
+      const spec = await res.json()
+      const base = '/api/v1'
+      const rows: { method: string; path: string }[] = []
+      for (const [path, ops] of Object.entries(spec.paths ?? {})) {
+        // The /tost/ routes are in the same document but behind a different
+        // secret (TOST_API_KEY, not EXTERNAL_API_KEY). Listing them under this
+        // key would promise access it does not grant.
+        if (path.startsWith('/tost/')) continue
+        for (const method of Object.keys(ops as object)) {
+          if (!['get', 'post', 'put', 'delete', 'patch'].includes(method)) continue
+          rows.push({ method: method.toUpperCase(), path: base + path })
+        }
+      }
+      setEndpoints(rows.sort((a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method)))
+    } catch {
+      // leaves the list empty, which hides it
+    }
+  }, [])
+
   useEffect(() => {
     fetchSettings().then((settingsData) => {
       if (settingsData) {
@@ -90,6 +122,7 @@ export function SettingsTab() {
       }
     }).finally(() => setLoading(false))
     fetchApiKey()
+    fetchEndpoints()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -400,16 +433,22 @@ export function SettingsTab() {
                   </Button>
                 </div>
 
-                <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                  <p><strong>{t('apiEndpoints')}</strong></p>
-                  <ul className="list-disc list-inside ml-2 font-mono">
-                    <li>GET /api/v1/orders - Alle Bestellungen</li>
-                    <li>GET /api/v1/orders/by-name/:name - Nach Name</li>
-                    <li>POST /api/v1/orders - Neue Bestellung</li>
-                    <li>PUT /api/v1/orders/:id - Bestellung aktualisieren</li>
-                    <li>GET /api/v1/options - Dropdown-Optionen</li>
-                  </ul>
-                </div>
+                {endpoints.length > 0 && (
+                  <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                    <p><strong>{t('apiEndpoints')}</strong></p>
+                    {/* Read from the OpenAPI document the docs page already
+                        serves, rather than a copy kept by hand. The copy had
+                        drifted — it was missing GET /orders/:id — and carried
+                        German descriptions in an app that ships 23 languages.
+                        Method and path need no translation; what each one does
+                        is one click away in the docs linked above. */}
+                    <ul className="list-disc list-inside ml-2 font-mono">
+                      {endpoints.map(e => (
+                        <li key={`${e.method} ${e.path}`}>{e.method} {e.path}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-sm text-muted-foreground">
