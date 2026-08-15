@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
- * Copy the production database over the staging one.
+ * Copy one SQLite database over another, and check the result.
  *
- * Runs inside a container that has both volumes mounted, so the data never
- * leaves the host.
+ * Used both to back a database up and to replace staging with production.
  *
  * Uses SQLite's own backup API rather than `cp`. A plain file copy of a
  * database that is being written to can capture a torn page — the file looks
@@ -12,7 +11,11 @@
  *
  * Production is opened read-only. Nothing in here can write to it.
  *
- * Usage: node copy-prod-to-staging.mjs <prod.db> <staging.db>
+ * Matters here because these databases run in WAL mode: recent writes live in
+ * a -wal file beside the database, so copying only the .db leaves them behind.
+ * The backup API folds them in; cp does not.
+ *
+ * Usage: node copy-sqlite.mjs <source.db> <target.db>
  */
 import Database from 'better-sqlite3'
 import { existsSync, copyFileSync, statSync } from 'node:fs'
@@ -20,12 +23,12 @@ import { existsSync, copyFileSync, statSync } from 'node:fs'
 const [, , prodPath, stagingPath] = process.argv
 
 if (!prodPath || !stagingPath) {
-  console.error('Usage: copy-prod-to-staging.mjs <prod.db> <staging.db>')
+  console.error('Usage: copy-sqlite.mjs <source.db> <target.db>')
   process.exit(1)
 }
 
 if (!existsSync(prodPath)) {
-  console.error(`>>> Production database not found at ${prodPath}`)
+  console.error(`>>> Source database not found at ${prodPath}`)
   process.exit(1)
 }
 
@@ -37,12 +40,12 @@ if (existsSync(stagingPath)) {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-')
   const backup = `${stagingPath}.replaced-${stamp}`
   copyFileSync(stagingPath, backup)
-  console.log(`>>> Previous staging database kept at ${backup} (${mb(backup)} MB)`)
+  console.log(`>>> Existing target kept at ${backup} (${mb(backup)} MB)`)
 }
 
 const source = new Database(prodPath, { readonly: true, fileMustExist: true })
 const before = source.prepare('SELECT COUNT(*) AS n FROM "Order"').get().n
-console.log(`>>> Production holds ${before} orders (${mb(prodPath)} MB)`)
+console.log(`>>> Source holds ${before} orders (${mb(prodPath)} MB)`)
 
 await source.backup(stagingPath)
 source.close()
@@ -53,10 +56,10 @@ const after = copied.prepare('SELECT COUNT(*) AS n FROM "Order"').get().n
 const integrity = copied.pragma('integrity_check', { simple: true })
 copied.close()
 
-console.log(`>>> Staging now holds ${after} orders (${mb(stagingPath)} MB), integrity: ${integrity}`)
+console.log(`>>> Target now holds ${after} orders (${mb(stagingPath)} MB), integrity: ${integrity}`)
 
 if (after !== before || integrity !== 'ok') {
-  console.error('>>> Copy does not match the source — staging left as written, previous file kept alongside')
+  console.error('>>> Copy does not match the source — target left as written, previous file kept alongside')
   process.exit(1)
 }
 

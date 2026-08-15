@@ -62,20 +62,23 @@ jobs:
             MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
 
             git fetch origin staging
-            git checkout origin/staging -- scripts/copy-prod-to-staging.mjs scripts/delete-order.mjs
+            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs
 
+            # Through the backup API, not cp: these databases run in WAL mode, so
+            # the newest writes sit in prod.db-wal and a file copy would leave
+            # them behind — a backup quietly missing whatever happened last.
             echo ">>> Backing up production before touching anything"
-            docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
-              sh -c "cp /prod/prod.db /prod/prod.db.before-$STAMP && ls -la /prod"
+            docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+              node /app/ops/copy-sqlite.mjs /prod/prod.db /prod/prod.db.before-$STAMP
 
             if [ -n "$DELETE_ID" ]; then
               echo ">>> Dry run of the delete"
-              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
-                node /scripts/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME"
+              docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                node /app/ops/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME"
 
               echo ">>> Applying"
-              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
-                node /scripts/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME" --apply
+              docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                node /app/ops/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME" --apply
 
               # Production caches the order list in memory per process; a restart
               # is the honest way to make the change visible.
@@ -86,8 +89,8 @@ jobs:
 
             if [ "$COPY" = "true" ]; then
               echo ">>> Copying production over staging"
-              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
-                node /scripts/copy-prod-to-staging.mjs /prod/prod.db /staging/staging.db
+              docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                node /app/ops/copy-sqlite.mjs /prod/prod.db /staging/staging.db
 
               # Staging runs the schema migration on start, which is what brings
               # a production-shaped database up to whatever staging expects.
