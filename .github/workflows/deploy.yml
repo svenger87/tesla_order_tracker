@@ -3,6 +3,13 @@ name: Build & Deploy
 on:
   push:
     branches: [master, staging]
+    # A change to a workflow file or a document does not change the image, and
+    # rebuilding production to deploy identical code is a restart nobody asked
+    # for. scripts/ is deliberately NOT ignored: migrate-schema.mjs runs when the
+    # container starts, so those do ship.
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
   workflow_dispatch:
 
 env:

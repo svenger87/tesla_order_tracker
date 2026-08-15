@@ -4,8 +4,14 @@ name: Staging data
 on:
   workflow_dispatch:
     inputs:
+      target:
+        description: 'Which database the repair, archive and delete steps act on'
+        type: choice
+        required: true
+        default: staging
+        options: [staging, production]
       repair_data:
-        description: 'Repair unreadable dates and the gb country code on production'
+        description: 'Repair dates, the gb country code, and durations that contradict their dates'
         type: boolean
         required: true
         default: false
@@ -34,6 +40,7 @@ jobs:
       - name: Run on the VPS
         uses: appleboy/ssh-action@v1
         env:
+          TARGET: ${{ inputs.target }}
           REPAIR: ${{ inputs.repair_data }}
           ARCHIVE_PAIRS: ${{ inputs.archive_pairs }}
           DELETE_PAIRS: ${{ inputs.delete_pairs }}
@@ -42,7 +49,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
+          envs: TARGET,REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
           script: |
             set -e
             cd /opt/tesla-order-tracker
@@ -67,15 +74,29 @@ jobs:
             echo ">>> Staging volume:    $STAGING_VOL"
             MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
 
+            # Everything below writes to $DB. Staging is the default so a repair
+            # can be seen on the site before it reaches anyone's real data.
+            if [ "$TARGET" = "production" ]; then
+              DB=/prod/prod.db
+              APP=app
+            else
+              DB=/staging/staging.db
+              APP=app-staging
+            fi
+            echo ">>> Acting on: $TARGET ($DB)"
+
             git fetch origin staging
             git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs
 
             # Through the backup API, not cp: these databases run in WAL mode, so
             # the newest writes sit in prod.db-wal and a file copy would leave
             # them behind — a backup quietly missing whatever happened last.
-            echo ">>> Backing up production before touching anything"
+            # Back up whatever is about to be written, through the backup API
+            # rather than cp: these databases run in WAL mode, so the newest
+            # writes sit in a -wal file that a file copy leaves behind.
+            echo ">>> Backing up $DB before touching anything"
             docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-              node /app/ops/copy-sqlite.mjs /prod/prod.db /prod/prod.db.before-$STAMP
+              node /app/ops/copy-sqlite.mjs "$DB" "$DB.before-$STAMP"
 
             TOUCHED=0
 
@@ -85,11 +106,11 @@ jobs:
             if [ "$REPAIR" = "true" ]; then
               echo ">>> Dry run of the repair"
               docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/repair-orders.mjs /prod/prod.db
+                node /app/ops/repair-orders.mjs "$DB"
 
               echo ">>> Applying repair"
               docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/repair-orders.mjs /prod/prod.db --apply
+                node /app/ops/repair-orders.mjs "$DB" --apply
               TOUCHED=1
             else
               echo ">>> No repair requested"
@@ -112,7 +133,7 @@ jobs:
                 NAME="${pair#*=}"
                 echo ">>> Dry run ($SCRIPT): $ID"
                 if ! docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                     node "/app/ops/$SCRIPT" /prod/prod.db "$ID" --expect-name "$NAME"; then
+                     node "/app/ops/$SCRIPT" "$DB" "$ID" --expect-name "$NAME"; then
                   echo ">>> REFUSED: $ID — left alone"
                   FAILED="$FAILED $ID"
                   IFS=','
@@ -120,7 +141,7 @@ jobs:
                 fi
                 echo ">>> Applying ($SCRIPT): $ID"
                 docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                  node "/app/ops/$SCRIPT" /prod/prod.db "$ID" --expect-name "$NAME" --apply
+                  node "/app/ops/$SCRIPT" "$DB" "$ID" --expect-name "$NAME" --apply
                 TOUCHED=1
                 IFS=','
               done
@@ -146,7 +167,16 @@ jobs:
             # Production caches the order list in memory per process; a restart
             # is the honest way to make a data change visible.
             if [ "$TOUCHED" = "1" ]; then
-              docker compose restart app
+              docker compose restart "$APP"
+            fi
+
+            # Refuses rather than guesses: copying production over staging after
+            # repairing staging would throw the repair away, and the person who
+            # ticked both boxes did not mean that.
+            if [ "$COPY" = "true" ] && [ "$TARGET" = "staging" ] && [ "$TOUCHED" = "1" ]; then
+              echo ">>> Refusing to copy production over the staging changes just made"
+              echo ">>> Run the copy on its own if that is what you want"
+              exit 1
             fi
 
             if [ "$COPY" = "true" ]; then
