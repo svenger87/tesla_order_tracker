@@ -99,9 +99,14 @@ describe('normalizeDate — formats the TOST sync actually sends', () => {
     expect(normalizeDate('17/04/2026')).toBe('17.04.2026')
   })
 
+  test('reads a short year in the slash form too', () => {
+    // This used to be listed below as "not a date". It is one — 27.03.2026 —
+    // and treating it as junk stored nothing at all.
+    expect(normalizeDate('27/03/26')).toBe('27.03.2026')
+  })
+
   test('still rejects what is not a date', () => {
     expect(normalizeDate('12.')).toBeNull()
-    expect(normalizeDate('27/03/26')).toBeNull()
     expect(normalizeDate('2703202')).toBeNull()
     expect(normalizeDate('32/01/2026')).toBeNull()
     expect(normalizeDate('17/13/2026')).toBeNull()
@@ -135,5 +140,26 @@ describe('parseGermanDate — the year has to be plausible', () => {
     const year = new Date().getFullYear()
     expect(parseGermanDate(`01.03.${year + 5}`)).not.toBeNull()
     expect(parseGermanDate(`01.03.${year - 5}`)).not.toBeNull()
+  })
+})
+
+describe('normalizeDate — two-digit years', () => {
+  it('reads a two-digit year as this century', () => {
+    // Both live examples confirm the reading: Silithium ordered 13.11.2025 and
+    // has a VIN date of 11.12.25, Andre74 ordered 16.11.2025 and has 1.1.26
+    // with production on 06.01.2026. Discarding them stored nothing at all.
+    expect(normalizeDate('11.12.25')).toBe('11.12.2025')
+    expect(normalizeDate('1.1.26')).toBe('01.01.2026')
+  })
+
+  it('still applies the plausibility window to the expanded year', () => {
+    expect(normalizeDate('01.01.99')).toBeNull()
+  })
+
+  it('does not treat a four-digit year as if it were short', () => {
+    // 26.08.0205 is 26.08.2025 with a slipped digit, but adding 2000 gives
+    // 2205, which is not a repair — it is a different wrong answer. Input
+    // refuses it; the repair script resolves it from the order's own timeline.
+    expect(normalizeDate('26.08.0205')).toBeNull()
   })
 })

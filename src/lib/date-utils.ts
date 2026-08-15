@@ -29,12 +29,18 @@ export function normalizeDate(input: string | null | undefined): string | null {
   //
   // Read day first. Both live examples put a number above twelve in front, so
   // that is what the sender means, and it matches every other format here.
-  const germanMatch = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/)
+  const germanMatch = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2}|\d{4})$/)
   const compactMatch = trimmed.match(/^(\d{2})(\d{2})(\d{4})$/)
   if (germanMatch) {
     day = parseInt(germanMatch[1], 10)
     month = parseInt(germanMatch[2], 10)
     year = parseInt(germanMatch[3], 10)
+    // A two-digit year means this century. Both live examples confirm it:
+    // 11.12.25 on an order placed 13.11.2025, and 1.1.26 on one whose car went
+    // into production on 06.01.2026. They used to be discarded outright, so the
+    // date somebody sent was stored as nothing. The window below still applies
+    // to the result, so an implausible expansion is still refused.
+    if (germanMatch[3].length === 2) year += 2000
   } else if (compactMatch) {
     // DDMMYYYY, no separators — 27032026 is in the data too.
     day = parseInt(compactMatch[1], 10)

@@ -38,16 +38,21 @@ function normalizeDate(input) {
   if (!trimmed) return null
 
   let day, month, year
-  const dotted = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/)
+  const dotted = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2}|\d{4})$/)
   const compact = trimmed.match(/^(\d{2})(\d{2})(\d{4})$/)
   const iso = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
 
-  if (dotted) [, day, month, year] = dotted.map(Number)
+  if (dotted) {
+    [, day, month, year] = dotted.map(Number)
+    // A two-digit year means this century, matching normalizeDate in the app.
+    if (dotted[3].length === 2) year += 2000
+  }
   else if (compact) [, day, month, year] = compact.map(Number)
   else if (iso) [, year, month, day] = iso.map(Number)
   else return null
 
   if (day < 1 || day > 31 || month < 1 || month > 12) return null
+  if (year < YEAR_MIN || year > YEAR_MAX) return null
 
   // Reject a date the calendar does not have, the way the app does.
   const probe = new Date(year, month - 1, day)
@@ -94,6 +99,50 @@ const DURATIONS = {
   papersToDelivery: (r) => daysBetween(r.papersReceivedDate, r.deliveryDate),
 }
 
+/**
+ * Recover a date whose year cannot be right — 26.08.0205 — by asking which year
+ * would place it inside the order it belongs to.
+ *
+ * Not a guess: the day and month are taken as written, and a candidate is only
+ * accepted when exactly one year in the plausible window puts the date between
+ * the order's own start and end. 26.08.0205 sits on an order placed 05.08.2025
+ * and delivered 20.09.2025, so 2025 is the only year that fits and the digit
+ * slip is decidable. Where more than one year fits, or none, the value is left
+ * alone and reported.
+ */
+function recoverYearFromTimeline(value, row) {
+  const m = String(value || '').trim().match(/^(\d{1,2})[./](\d{1,2})[./]\d{4}$/)
+  if (!m) return null
+  const day = Number(m[1])
+  const month = Number(m[2])
+
+  const asMs = (v) => {
+    const d = String(v || '').trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+    if (!d) return null
+    const y = Number(d[3])
+    if (y < YEAR_MIN || y > YEAR_MAX) return null
+    return Date.UTC(y, Number(d[2]) - 1, Number(d[1]))
+  }
+
+  const lower = asMs(row.orderDate)
+  const upper = asMs(row.deliveryDate)
+  if (lower === null && upper === null) return null
+
+  const fits = []
+  for (let y = YEAR_MIN; y <= YEAR_MAX; y++) {
+    const probe = new Date(Date.UTC(y, month - 1, day))
+    if (probe.getUTCDate() !== day || probe.getUTCMonth() !== month - 1) continue
+    const t = probe.getTime()
+    if (lower !== null && t < lower) continue
+    if (upper !== null && t > upper) continue
+    fits.push(y)
+  }
+
+  if (fits.length !== 1) return null
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(day)}.${pad(month)}.${fits[0]}`
+}
+
 const db = new Database(dbPath, { fileMustExist: true })
 const rows = db.prepare('SELECT * FROM "Order"').all()
 
@@ -104,8 +153,12 @@ const durationFixes = []
 for (const row of rows) {
   for (const field of DATE_FIELDS) {
     const value = row[field]
-    if (!value || READABLE.test(String(value).trim())) continue
-    const fixed = normalizeDate(value)
+    // Readable is not the same as right: 26.08.0205 has the right shape and a
+    // year in the third century, so skipping everything that merely looks like a
+    // date left it in place. It has to be readable AND plausible to be left alone.
+    if (!value) continue
+    if (READABLE.test(String(value).trim()) && usable(value) !== null) continue
+    const fixed = normalizeDate(value) || recoverYearFromTimeline(value, row)
     if (fixed) dateFixes.push({ id: row.id, name: row.name, field, from: value, to: fixed })
     else console.log(`>>> Cannot read ${field} ${JSON.stringify(value)} on "${row.name}" — left alone`)
   }
