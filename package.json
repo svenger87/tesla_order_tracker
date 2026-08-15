@@ -32,6 +32,7 @@
     "dotenv": "^17.2.4",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.34.0",
+    "geist": "^1.7.2",
     "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.563.0",
