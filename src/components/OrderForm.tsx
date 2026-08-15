@@ -676,7 +676,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       <Card>
         <CardContent className="flex flex-col items-center gap-6 py-10 px-6 text-center">
           <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-4">
-            <CheckCircle2 className="h-10 w-10 text-green-500" />
+            <CheckCircle2 className="h-10 w-10 text-success" />
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">{te('orderCreated')}</h2>

@@ -45,7 +45,7 @@ export function PasswordStep({
   if (order && isLegacy) {
     return (
       <div className={className}>
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-4">
+        <div className="bg-pending/10 border border-pending/20 rounded-md p-4">
           <h4 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <KeyRound className="h-4 w-4" />
             {t('legacyPasswordTitle')}

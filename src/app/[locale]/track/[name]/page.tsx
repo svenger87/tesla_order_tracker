@@ -150,7 +150,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
                       </div>
                       <div className="shrink-0">
                         {order.deliveryDate ? (
-                          <Badge variant="default" className="bg-green-600 text-white text-xs">
+                          <Badge variant="default" className="bg-success text-white text-xs">
                             {order.deliveryDate}
                           </Badge>
                         ) : (

@@ -194,7 +194,7 @@ export function SettingsTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             {message && (
-              <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+              <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                 {message}
               </div>
             )}
@@ -272,7 +272,7 @@ export function SettingsTab() {
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               {passwordMessage && (
-                <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+                <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                   {passwordMessage}
                 </div>
               )}
@@ -370,7 +370,7 @@ export function SettingsTab() {
                       title={tc('copy')}
                     >
                       {apiKeyCopied ? (
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-success" />
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
@@ -449,8 +449,8 @@ export function SettingsTab() {
 
           {settings?.archiveEnabled && (
             <>
-              <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md">
-                <AlertTriangle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 p-3 bg-data/10 border border-data/20 rounded-md">
+                <AlertTriangle className="h-5 w-5 text-data shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-700 dark:text-blue-400">
                   <p className="font-medium">Info</p>
                   <p dangerouslySetInnerHTML={{ __html: t.raw('archiveInfo') as string }} />
@@ -458,7 +458,7 @@ export function SettingsTab() {
               </div>
 
               {archiveMessage && (
-                <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+                <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                   {archiveMessage}
                 </div>
               )}
@@ -503,7 +503,7 @@ export function SettingsTab() {
                 <div className="grid grid-cols-2 gap-4 p-4 surface-subtle rounded-md">
                   <div>
                     <p className="text-sm text-muted-foreground">{t('inactiveOrders')}</p>
-                    <p className="text-2xl font-bold text-amber-600">{archiveInfo.staleCount}</p>
+                    <p className="text-2xl font-bold text-pending">{archiveInfo.staleCount}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t('alreadyArchived')}</p>

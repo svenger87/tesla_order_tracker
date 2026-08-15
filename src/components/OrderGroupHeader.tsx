@@ -24,11 +24,11 @@ export function OrderGroupHeader({ label, total, delivered, pending }: OrderGrou
       </div>
       <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
         <div className="flex items-center gap-1 sm:gap-1.5">
-          <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
+          <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success" />
           <span className="font-medium tabular-nums text-green-600 dark:text-green-400">{delivered}</span>
         </div>
         <div className="flex items-center gap-1 sm:gap-1.5">
-          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
+          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-pending" />
           <span className="font-medium tabular-nums text-amber-600 dark:text-amber-400">{pending}</span>
         </div>
         {/* A high delivery rate is good news; it used to be filled with the

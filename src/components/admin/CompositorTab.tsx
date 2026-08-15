@@ -328,7 +328,7 @@ export function CompositorTab() {
           </div>
 
           {seedMessage && (
-            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith(tc('error')) ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-600'}`}>
+            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith(tc('error')) ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}>
               {seedMessage}
             </div>
           )}

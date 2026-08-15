@@ -214,7 +214,12 @@ export function TrackingPageClient({
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 {/* Car image */}
                 {isKnownVehicle && (
-                  <div className="shrink-0">
+                  /* Tesla's compositor bakes a light backdrop into the image, so
+                     on a dark card it read as a white hole. Framing it as a photo
+                     plate — the same treatment the table thumbnails already use —
+                     makes that lightness deliberate, and needs no change to the
+                     image URL, which would have invalidated the server cache. */
+                  <div className="shrink-0 rounded-lg bg-white/95 p-2 ring-1 ring-black/10">
                     <TeslaCarImage
                       vehicleType={order.vehicleType as VehicleType}
                       color={order.color}

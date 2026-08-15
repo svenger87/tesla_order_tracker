@@ -1424,7 +1424,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </VisuallyHidden>
           {imageModalOrder && imageModalOrder.vehicleType && (imageModalOrder.vehicleType === 'Model Y' || imageModalOrder.vehicleType === 'Model 3') && (
             <div className="space-y-3">
-              <div className="flex justify-center">
+              {/* Same photo plate as the thumbnail this modal opens from. */}
+              <div className="flex justify-center rounded-lg bg-white/95 p-3 ring-1 ring-black/10">
                 <TeslaCarImage
                   vehicleType={imageModalOrder.vehicleType as VehicleType}
                   color={imageModalOrder.color}
