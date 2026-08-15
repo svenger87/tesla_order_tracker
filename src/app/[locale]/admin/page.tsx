@@ -4,17 +4,19 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image as ImageIcon } from 'lucide-react'
+import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image as ImageIcon, Archive } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { SettingsTab } from '@/components/admin/SettingsTab'
 import { ImportExportTab } from '@/components/admin/ImportExportTab'
 import { OptionsTab } from '@/components/admin/OptionsTab'
 import { CompositorTab } from '@/components/admin/CompositorTab'
+import { BackupsTab } from '@/components/admin/BackupsTab'
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('admin')
   const tc = useTranslations('common')
 
@@ -99,6 +101,10 @@ export default function AdminDashboard() {
               <ImageIcon className="h-4 w-4 mr-2" />
               {t('compositor')}
             </TabsTrigger>
+            <TabsTrigger value="backups">
+              <Archive className="h-4 w-4 mr-2" />
+              {t('backups')}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="settings">
@@ -115,6 +121,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="compositor">
             <CompositorTab />
+          </TabsContent>
+
+          <TabsContent value="backups">
+            <BackupsTab locale={locale} />
           </TabsContent>
         </Tabs>
       </div>

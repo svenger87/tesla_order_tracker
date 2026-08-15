@@ -41,7 +41,12 @@ function normalize(v: unknown): string | null {
  * - 'web'   — typed in here, by an anonymous visitor or the order's owner
  * - null    — the sheet import and older rows written before this was tracked
  */
-export type ChangeSource = 'tost' | 'web' | null
+/**
+ * Who made a change. 'restore' is an admin putting one order back from a
+ * backup — a real edit to the data, so it belongs in the history and in the
+ * public feed like any other, rather than appearing as if nobody did it.
+ */
+export type ChangeSource = 'tost' | 'web' | 'restore' | null
 
 export interface RecordChangesOpts {
   source?: ChangeSource
