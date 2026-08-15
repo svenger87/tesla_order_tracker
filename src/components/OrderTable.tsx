@@ -9,6 +9,8 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
+import { compareNullable, compareDateStrings } from '@/lib/order-sort'
+import { parseDeliveryWindowStart } from '@/lib/delivery-window'
 import { findColorInfo } from '@/lib/color-lookup'
 import { isStaleOrder } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -173,16 +175,6 @@ const emptyLocalFilters: TableLocalFilters = {
 }
 
 // Parse date string (DD.MM.YYYY format) to Date for sorting
-function parseDate(dateStr: string | null): Date | null {
-  if (!dateStr) return null
-  const parts = dateStr.split('.')
-  if (parts.length === 3) {
-    const [day, month, year] = parts.map(Number)
-    return new Date(year, month - 1, day)
-  }
-  return null
-}
-
 // Normalize German umlauts for sorting (Ö→O, Ä→A, Ü→U)
 function normalizeForSort(str: string): string {
   return str
@@ -216,22 +208,12 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
 
   // Computed segment fields (not stored on Order)
   if (field === 'vinToProduction' || field === 'productionToPapers') {
-    const aNum = getSegmentValue(a, field)
-    const bNum = getSegmentValue(b, field)
-    if (aNum === null && bNum === null) return 0
-    if (aNum === null) return direction === 'asc' ? 1 : -1
-    if (bNum === null) return direction === 'asc' ? -1 : 1
-    return direction === 'asc' ? aNum - bNum : bNum - aNum
+    return compareNullable(getSegmentValue(a, field), getSegmentValue(b, field), direction)
   }
 
   // Computed waiting-days field (orderDate → delivery|today)
   if (field === 'waitingDays') {
-    const aNum = getWaitingDays(a)
-    const bNum = getWaitingDays(b)
-    if (aNum === null && bNum === null) return 0
-    if (aNum === null) return direction === 'asc' ? 1 : -1
-    if (bNum === null) return direction === 'asc' ? -1 : 1
-    return direction === 'asc' ? aNum - bNum : bNum - aNum
+    return compareNullable(getWaitingDays(a), getWaitingDays(b), direction)
   }
 
   const aVal = a[field as keyof Order]
@@ -247,36 +229,38 @@ function compareValues(a: Order, b: Order, field: SortField, direction: SortDire
     return direction === 'asc' ? cmp : -cmp
   }
 
+  // The delivery window is free text — 265 distinct shapes across the data, in
+  // several languages — so sorting it as a string put "29.08" after "04.10".
+  // Ordered by the day the window starts; anything unreadable or ambiguous
+  // sorts last rather than being guessed at. The cell still shows the text
+  // exactly as it was stored.
+  if (field === 'deliveryWindow') {
+    const ms = (o: Order) => {
+      const d = parseDeliveryWindowStart(o.deliveryWindow, o.orderDate)
+      return d ? d.getTime() : null
+    }
+    return compareNullable(ms(a), ms(b), direction)
+  }
+
   // Handle date fields
   const dateFields = ['orderDate', 'vinReceivedDate', 'papersReceivedDate', 'productionDate', 'deliveryDate']
   if (dateFields.includes(field)) {
-    const aDate = parseDate(aVal as string | null)
-    const bDate = parseDate(bVal as string | null)
-    if (!aDate && !bDate) return 0
-    if (!aDate) return direction === 'asc' ? 1 : -1
-    if (!bDate) return direction === 'asc' ? -1 : 1
-    return direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+    return compareDateStrings(aVal as string | null, bVal as string | null, direction)
   }
 
   // Handle ISO date fields (updatedAt)
   if (field === 'updatedAt') {
-    const aDate = aVal ? new Date(aVal as string) : null
-    const bDate = bVal ? new Date(bVal as string) : null
-    if (!aDate && !bDate) return 0
-    if (!aDate) return direction === 'asc' ? 1 : -1
-    if (!bDate) return direction === 'asc' ? -1 : 1
-    return direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+    const ms = (v: unknown) => {
+      const t = v ? new Date(v as string).getTime() : NaN
+      return Number.isNaN(t) ? null : t
+    }
+    return compareNullable(ms(aVal), ms(bVal), direction)
   }
 
   // Handle numeric fields (including computed segment fields)
   const numericFields = ['orderToVin', 'vinToProduction', 'productionToPapers', 'papersToDelivery', 'orderToDelivery']
   if (numericFields.includes(field)) {
-    const aNum = aVal as number | null
-    const bNum = bVal as number | null
-    if (aNum === null && bNum === null) return 0
-    if (aNum === null) return direction === 'asc' ? 1 : -1
-    if (bNum === null) return direction === 'asc' ? -1 : 1
-    return direction === 'asc' ? aNum - bNum : bNum - aNum
+    return compareNullable(aVal as number | null, bVal as number | null, direction)
   }
 
   // Handle string fields - normalize umlauts for proper alphabetical sorting (Ö = O, Ä = A, Ü = U)
@@ -1323,7 +1307,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 {isColumnVisible('deliveryDate') && (
                   <TableCell className="whitespace-nowrap">
                     {order.deliveryDate ? (() => {
-                      const deliveryParsed = parseDate(order.deliveryDate)
+                      const deliveryParsed = parseGermanDate(order.deliveryDate)
                       const isDelivered = deliveryParsed && deliveryParsed <= new Date()
                       return (
                         <Badge
