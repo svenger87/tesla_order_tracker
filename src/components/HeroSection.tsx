@@ -41,7 +41,7 @@ export function HeroSection({ orders, onSearchOpen, onNewOrder }: HeroSectionPro
     <section className="py-4 sm:py-7">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-kicker">
             {t('kicker')}
           </p>
 

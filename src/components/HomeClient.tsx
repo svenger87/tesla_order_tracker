@@ -374,7 +374,7 @@ export function HomeClient({ initialOrders }: HomeClientProps) {
             >
               <ChevronUp className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
               <span className="min-w-0">
-                <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</span>
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-kicker">{t('statsTitle')}</span>
                 <span className="block truncate text-base font-semibold tracking-tight">{t('statsSubtitle')}</span>
               </span>
             </button>

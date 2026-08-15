@@ -45,6 +45,7 @@
   --color-data-light: var(--color-data-light);
   --color-pending: var(--color-pending);
   --color-pending-light: var(--color-pending-light);
+  --color-kicker: var(--color-kicker);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -126,6 +127,10 @@
   --color-data-light: oklch(0.92 0.05 245);
   --color-pending: oklch(0.65 0.15 75);
   --color-pending-light: oklch(0.92 0.06 75);
+  /* The small uppercase eyebrow that sits above a section heading. Brand red
+     here, where it measures well clear of the contrast threshold; the dark
+     theme needs it a touch lighter — see below. */
+  --color-kicker: oklch(0.55 0.22 25);
 
   /* Layout */
   --header-height: 56px;
@@ -181,6 +186,11 @@
   --color-data-light: oklch(0.25 0.05 245);
   --color-pending: oklch(0.72 0.15 75);
   --color-pending-light: oklch(0.25 0.06 75);
+  /* At --primary it measured 4.44:1 on the dark card — the only text anywhere
+     in either theme that came in under the threshold. Lifting lightness by 0.04
+     (chroma unchanged, so the hue is the same red) puts it at 5.25:1, with room
+     to spare rather than sitting on the line. */
+  --color-kicker: oklch(0.64 0.2 25);
 }
 
 @media (min-width: 640px) {
