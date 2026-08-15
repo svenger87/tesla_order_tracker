@@ -77,8 +77,8 @@
     "vehicleImage": "Slika vozila",
     "delivered": "Isporučeno: {date}",
     "errorGeneratingCode": "Greška pri generiranju koda",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "zastarjelo",
+    "staleHint": "Ova narudžba nije ažurirana više od 60 dana — podaci možda nisu točni.",
     "statsTitle": "Statistike",
     "statsSubtitle": "Vremena isporuke, konfiguracije i trendovi",
     "cancelledBadge": "Otkazano",
@@ -240,10 +240,10 @@
     "deliveryDate": "Datum isporuke",
     "orderToVin": "N→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Dok",
     "papersToDelivery": "Dok→I",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Čekanje",
     "updatedAt": "Ažurirano",
     "country": "Država",
     "allVehicles": "Sva vozila",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Ova polja se mogu ručno uređivati, čak i za narudžbe kojima upravlja TOST.",
     "papersReceivedDate": "Dokumenti primljeni dana",
     "saveError": "Greška pri spremanju",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Datum proizvodnje",
+    "staleFilter": "Zastarjelo",
+    "staleTooltip": "Promjena filtra: sve / sakrij zastarjele / samo zastarjele (≥60 dana bez ažuriranja kod otvorenih narudžbi)",
     "cancelledFilter": "Otkazane",
     "cancelledTooltip": "Promijeni filtar: sakrij otkazane / prikaži ih / samo otkazane"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Dokumenti",
     "timelineDelivery": "Isporuka",
     "totalWaitTime": "Ukupno vrijeme čekanja",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detalji (min / maks)",
+    "pipelineSegment": "Dionica",
     "cancelledExcluded": "{count} otkazano (nije uračunato)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Na temelju {count} narudžbi",
     "notEnoughData": "Nedovoljno podataka za prognozu. Odaberite tip vozila.",
     "lowDataHint": "Malo podataka — prognoza može biti netočna. Više narudžbi poboljšat će točnost.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Na temelju {count} isporuka u posljednjih {days} dana",
+    "exceedsPessimisticHint": "Vaše dosadašnje čekanje ({days} dana) već premašuje pesimističnu procjenu (75 % usporedivih isporuka). Trenutna čekanja dulja su od povijesne raspodjele — uzmite prognozu s oprezom."
   },
   "trend": {
     "title": "Trend isporuka",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Narudžba → Isporuka",
     "orderToPapers": "Narudžba → Dokumenti",
     "papersToDelivery": "Dokumenti → Isporuka",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Na temelju {count} isporuka u posljednjih {days} dana",
+    "exceedsPessimisticHint": "Vaše dosadašnje čekanje ({days} dana) već premašuje pesimističnu procjenu. Prognoza se temelji na povijesnim rokovima i u ovoj situaciji više nije pouzdana — oslonite se na službeni Teslin rok isporuke.",
+    "staleHint": "Ova narudžba nije ažurirana više od 60 dana. Podaci u nastavku možda više nisu točni.",
     "waitedLabel": "Čekanje",
     "waitingLabel": "Čeka",
     "daysUnit": "dana",
@@ -800,7 +800,7 @@
     "adminDashboard": "Administratorska ploča",
     "navigationMenu": "Navigacijski izbornik",
     "impressum": "Pravna obavijest",
-    "privacy": "Privacy",
+    "privacy": "Privatnost",
     "toggleTheme": "Promijeni temu",
     "changeLanguage": "Promijeni jezik",
     "skipToContent": "Prijeđi na sadržaj"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Troškovi poslužitelja {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Najnovije promjene",
+    "entries": "unosa",
+    "loading": "Učitavanje…",
+    "loadMore": "Učitaj više",
+    "empty": "Još nema promjena.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Danas",
+      "yesterday": "Jučer",
+      "week": "Ovaj tjedan",
+      "older": "Starije"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN dodijeljen",
+      "production": "U proizvodnji",
+      "papers": "Dokumenti primljeni",
+      "delivery": "Isporučeno",
+      "window": "Promijenjen rok isporuke",
+      "created": "Nova narudžba"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "prije {n} min",
+      "hoursAgo": "prije {n} h",
+      "yesterday": "jučer",
+      "daysAgo": "prije {n} d",
+      "weeksAgo": "prije {n} tj."
     }
   },
   "errors": {

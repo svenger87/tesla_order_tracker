@@ -77,8 +77,8 @@
     "vehicleImage": "Kjøretøybilde",
     "delivered": "Levert: {date}",
     "errorGeneratingCode": "Feil ved generering av kode",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "utdatert",
+    "staleHint": "Denne bestillingen er ikke oppdatert på over 60 dager — dataene kan være utdaterte.",
     "statsTitle": "Statistikk",
     "statsSubtitle": "Leveringstider, konfigurasjoner og trender",
     "cancelledBadge": "Kansellert",
@@ -240,10 +240,10 @@
     "deliveryDate": "Leveringsdato",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pap",
     "papersToDelivery": "Dok→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Ventetid",
     "updatedAt": "Oppdatert",
     "country": "Land",
     "allVehicles": "Alle kjøretøy",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Disse feltene kan redigeres manuelt, selv for TOST-administrerte bestillinger.",
     "papersReceivedDate": "Dokumenter mottatt den",
     "saveError": "Feil ved lagring",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Produksjonsdato",
+    "staleFilter": "Utdatert",
+    "staleTooltip": "Bytt filter: alle / skjul utdaterte / kun utdaterte (≥60 dager uten oppdatering på åpne bestillinger)",
     "cancelledFilter": "Kansellert",
     "cancelledTooltip": "Bytt filter: skjul kansellerte / vis dem / kun kansellerte"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Papirer",
     "timelineDelivery": "Levering",
     "totalWaitTime": "Total ventetid",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaljer (min / maks)",
+    "pipelineSegment": "Etappe",
     "cancelledExcluded": "{count} kansellert (ikke medregnet)"
   },
   "admin": {
@@ -454,7 +454,7 @@
     "importModel3": "Importer Model 3",
     "syncingModel3": "Synkroniserer Model 3...",
     "model3Hint": "Importerer Model 3-data fra det separate Google-regnearket.",
-    "debugSheets": "Debug Sheets",
+    "debugSheets": "Feilsøk ark",
     "debugChecking": "Sjekker...",
     "dataExport": "Dataeksport",
     "dataExportDescription": "Eksporter alle data og statistikk som Excel-fil (reserveplan)",
@@ -678,8 +678,8 @@
     "basedOn": "Basert på {count} bestillinger",
     "notEnoughData": "Ikke nok data for prediksjon. Velg en kjøretøytype.",
     "lowDataHint": "Få datapunkter — prognosen kan være unøyaktig. Flere bestillinger vil forbedre nøyaktigheten.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Basert på {count} leveringer fra de siste {days} dagene",
+    "exceedsPessimisticHint": "Ventetiden din ({days} dager) overstiger allerede det pessimistiske anslaget (75 % av sammenlignbare leveringer). Dagens ventetider er lengre enn den historiske fordelingen — ta prognosen med forbehold."
   },
   "trend": {
     "title": "Leveringstrend",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Bestilling → Levering",
     "orderToPapers": "Bestilling → Dokumenter",
     "papersToDelivery": "Dokumenter → Levering",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Basert på {count} leveringer fra de siste {days} dagene",
+    "exceedsPessimisticHint": "Ventetiden din ({days} dager) overstiger allerede det pessimistiske anslaget. Prognosen bygger på historiske leveringstider og er ikke lenger pålitelig her — forhold deg til Teslas offisielle leveringsvindu.",
+    "staleHint": "Denne bestillingen er ikke oppdatert på over 60 dager. Dataene nedenfor er kanskje ikke aktuelle.",
     "waitedLabel": "Ventet",
     "waitingLabel": "Venter",
     "daysUnit": "dager",
@@ -800,7 +800,7 @@
     "adminDashboard": "Administrasjonspanel",
     "navigationMenu": "Navigasjonsmeny",
     "impressum": "Juridisk informasjon",
-    "privacy": "Privacy",
+    "privacy": "Personvern",
     "toggleTheme": "Bytt tema",
     "changeLanguage": "Bytt språk",
     "skipToContent": "Gå til innhold"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Serverkostnader {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Siste oppdateringer",
+    "entries": "oppføringer",
+    "loading": "Laster…",
+    "loadMore": "Last inn mer",
+    "empty": "Ingen oppdateringer ennå.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "I dag",
+      "yesterday": "I går",
+      "week": "Denne uken",
+      "older": "Eldre"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN tildelt",
+      "production": "I produksjon",
+      "papers": "Papirer mottatt",
+      "delivery": "Levert",
+      "window": "Leveringsvindu endret",
+      "created": "Ny bestilling"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "for {n} min siden",
+      "hoursAgo": "for {n} t siden",
+      "yesterday": "i går",
+      "daysAgo": "for {n} dager siden",
+      "weeksAgo": "for {n} uker siden"
     }
   },
   "errors": {

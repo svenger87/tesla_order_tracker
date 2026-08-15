@@ -77,8 +77,8 @@
     "vehicleImage": "Εικόνα οχήματος",
     "delivered": "Παραδόθηκε: {date}",
     "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "παλιά",
+    "staleHint": "Αυτή η παραγγελία δεν έχει ενημερωθεί πάνω από 60 ημέρες — τα δεδομένα ίσως είναι παλιά.",
     "statsTitle": "Στατιστικά",
     "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις",
     "cancelledBadge": "Ακυρώθηκε",
@@ -239,11 +239,11 @@
     "typeVariant": "Παρ. τύπου",
     "deliveryDate": "Ημ. παράδοσης",
     "orderToVin": "Π→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Πρ",
+    "productionToPapers": "Πρ→Ε",
     "papersToDelivery": "Έγγρ→Πρ",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Αναμονή",
     "updatedAt": "Ενημερώθηκε",
     "country": "Χώρα",
     "allVehicles": "Όλα τα οχήματα",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Αυτά τα πεδία μπορούν να επεξεργαστούν χειροκίνητα, ακόμα και για παραγγελίες που διαχειρίζεται το TOST.",
     "papersReceivedDate": "Έγγραφα λήφθηκαν στις",
     "saveError": "Σφάλμα αποθήκευσης",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Ημερομηνία παραγωγής",
+    "staleFilter": "Παλιά",
+    "staleTooltip": "Εναλλαγή φίλτρου: όλα / απόκρυψη παλιών / μόνο παλιά (≥60 ημέρες χωρίς ενημέρωση σε ανοιχτές παραγγελίες)",
     "cancelledFilter": "Ακυρωμένες",
     "cancelledTooltip": "Εναλλαγή φίλτρου: απόκρυψη ακυρωμένων / εμφάνιση / μόνο ακυρωμένες"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Έγγραφα",
     "timelineDelivery": "Παράδοση",
     "totalWaitTime": "Συνολικός χρόνος αναμονής",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Λεπτομέρειες (ελάχ. / μέγ.)",
+    "pipelineSegment": "Τμήμα",
     "cancelledExcluded": "{count} ακυρωμένες (δεν μετρούν)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Βάσει {count} παραγγελιών",
     "notEnoughData": "Δεν υπάρχουν αρκετά δεδομένα για πρόβλεψη. Επιλέξτε τύπο οχήματος.",
     "lowDataHint": "Λίγα δεδομένα — η πρόβλεψη μπορεί να είναι ανακριβής. Περισσότερες παραγγελίες θα βελτιώσουν την ακρίβεια.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Βάσει {count} παραδόσεων των τελευταίων {days} ημερών",
+    "exceedsPessimisticHint": "Ο χρόνος αναμονής σας ({days} ημέρες) ξεπερνά ήδη τη δυσμενή εκτίμηση (75% των συγκρίσιμων παραδόσεων). Οι τρέχοντες χρόνοι είναι μεγαλύτεροι από την ιστορική κατανομή — αντιμετωπίστε την πρόβλεψη με επιφύλαξη."
   },
   "trend": {
     "title": "Τάση Παράδοσης",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Παραγγελία → Παράδοση",
     "orderToPapers": "Παραγγελία → Έγγραφα",
     "papersToDelivery": "Έγγραφα → Παράδοση",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Βάσει {count} παραδόσεων των τελευταίων {days} ημερών",
+    "exceedsPessimisticHint": "Ο χρόνος αναμονής σας ({days} ημέρες) ξεπερνά ήδη τη δυσμενή εκτίμηση. Η πρόβλεψη βασίζεται σε ιστορικούς χρόνους και δεν είναι πλέον αξιόπιστη εδώ — βασιστείτε στο επίσημο παράθυρο παράδοσης της Tesla.",
+    "staleHint": "Αυτή η παραγγελία δεν έχει ενημερωθεί πάνω από 60 ημέρες. Τα παρακάτω δεδομένα ίσως δεν ισχύουν.",
     "waitedLabel": "Αναμονή",
     "waitingLabel": "Περιμένει",
     "daysUnit": "ημέρες",
@@ -800,7 +800,7 @@
     "adminDashboard": "Πίνακας Ελέγχου Διαχειριστή",
     "navigationMenu": "Μενού πλοήγησης",
     "impressum": "Νομικές Πληροφορίες",
-    "privacy": "Privacy",
+    "privacy": "Απόρρητο",
     "toggleTheme": "Εναλλαγή θέματος",
     "changeLanguage": "Αλλαγή γλώσσας",
     "skipToContent": "Μετάβαση στο περιεχόμενο"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Κόστος διακομιστή {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Πρόσφατες ενημερώσεις",
+    "entries": "καταχωρίσεις",
+    "loading": "Φόρτωση…",
+    "loadMore": "Φόρτωση περισσότερων",
+    "empty": "Δεν υπάρχουν ενημερώσεις ακόμη.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Σήμερα",
+      "yesterday": "Χθες",
+      "week": "Αυτή την εβδομάδα",
+      "older": "Παλαιότερα"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "Εκχωρήθηκε VIN",
+      "production": "Σε παραγωγή",
+      "papers": "Παραλήφθηκαν έγγραφα",
+      "delivery": "Παραδόθηκε",
+      "window": "Άλλαξε το παράθυρο παράδοσης",
+      "created": "Νέα παραγγελία"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "πριν {n} λεπτά",
+      "hoursAgo": "πριν {n} ώρες",
+      "yesterday": "χθες",
+      "daysAgo": "πριν {n} ημέρες",
+      "weeksAgo": "πριν {n} εβδ."
     }
   },
   "errors": {

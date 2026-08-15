@@ -77,8 +77,8 @@
     "vehicleImage": "Изображение на превозното средство",
     "delivered": "Доставено: {date}",
     "errorGeneratingCode": "Грешка при генериране на кода",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "остаряла",
+    "staleHint": "Тази поръчка не е обновявана над 60 дни — данните може да са остарели.",
     "statsTitle": "Статистики",
     "statsSubtitle": "Време за доставка, конфигурации и тенденции",
     "cancelledBadge": "Отказана",
@@ -239,11 +239,11 @@
     "typeVariant": "Вар. тип",
     "deliveryDate": "Дата на доставка",
     "orderToVin": "П→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Пр",
+    "productionToPapers": "Пр→Д",
     "papersToDelivery": "Док→Д",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Изчакване",
     "updatedAt": "Актуализирано",
     "country": "Държава",
     "allVehicles": "Всички превозни средства",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Тези полета могат да се редактират ръчно, дори за поръчки, управлявани от TOST.",
     "papersReceivedDate": "Документи получени на",
     "saveError": "Грешка при запазване",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Дата на производство",
+    "staleFilter": "Остаряли",
+    "staleTooltip": "Превключване: всички / скрий остарелите / само остарели (≥60 дни без обновяване при отворени поръчки)",
     "cancelledFilter": "Отказани",
     "cancelledTooltip": "Превключване на филтъра: скрий отказаните / покажи ги / само отказани"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Документи",
     "timelineDelivery": "Доставка",
     "totalWaitTime": "Общо време на чакане",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Детайли (мин. / макс.)",
+    "pipelineSegment": "Отсечка",
     "cancelledExcluded": "{count} отказани (не се броят)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "На базата на {count} поръчки",
     "notEnoughData": "Недостатъчно данни за прогноза. Изберете тип превозно средство.",
     "lowDataHint": "Малко данни — прогнозата може да е неточна. Повече поръчки ще подобрят точността.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Въз основа на {count} доставки от последните {days} дни",
+    "exceedsPessimisticHint": "Досегашното ви изчакване ({days} дни) вече надхвърля песимистичната оценка (75% от сравнимите доставки). Текущите срокове са по-дълги от историческото разпределение — приемете прогнозата с уговорки."
   },
   "trend": {
     "title": "Тенденция на доставките",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Поръчка → Доставка",
     "orderToPapers": "Поръчка → Документи",
     "papersToDelivery": "Документи → Доставка",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Въз основа на {count} доставки от последните {days} дни",
+    "exceedsPessimisticHint": "Досегашното ви изчакване ({days} дни) вече надхвърля песимистичната оценка. Прогнозата се основава на исторически срокове и в този случай не е надеждна — придържайте се към официалния период на доставка на Tesla.",
+    "staleHint": "Тази поръчка не е обновявана над 60 дни. Данните по-долу може вече да не са актуални.",
     "waitedLabel": "Изчаквано",
     "waitingLabel": "Изчаква",
     "daysUnit": "дни",
@@ -800,7 +800,7 @@
     "adminDashboard": "Административен панел",
     "navigationMenu": "Навигационно меню",
     "impressum": "Правна информация",
-    "privacy": "Privacy",
+    "privacy": "Поверителност",
     "toggleTheme": "Смяна на темата",
     "changeLanguage": "Смяна на езика",
     "skipToContent": "Към съдържанието"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Разходи за сървър {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Последни промени",
+    "entries": "записа",
+    "loading": "Зареждане…",
+    "loadMore": "Зареди още",
+    "empty": "Все още няма промени.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Днес",
+      "yesterday": "Вчера",
+      "week": "Тази седмица",
+      "older": "По-стари"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "Присвоен VIN",
+      "production": "В производство",
+      "papers": "Получени документи",
+      "delivery": "Доставена",
+      "window": "Промяна на периода на доставка",
+      "created": "Нова поръчка"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "преди {n} мин",
+      "hoursAgo": "преди {n} ч",
+      "yesterday": "вчера",
+      "daysAgo": "преди {n} дни",
+      "weeksAgo": "преди {n} седм."
     }
   },
   "errors": {

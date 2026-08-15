@@ -77,8 +77,8 @@
     "vehicleImage": "車両画像",
     "delivered": "納車済み：{date}",
     "errorGeneratingCode": "コード生成エラー",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "更新なし",
+    "staleHint": "この注文は60日以上更新されていません。データが古い可能性があります。",
     "statsTitle": "統計",
     "statsSubtitle": "納期、構成、トレンド",
     "cancelledBadge": "キャンセル済み",
@@ -239,11 +239,11 @@
     "typeVariant": "型式バリ",
     "deliveryDate": "納車日",
     "orderToVin": "注→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→生産",
+    "productionToPapers": "生産→書類",
     "papersToDelivery": "書類→納",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "待機日数",
     "updatedAt": "更新日",
     "country": "国",
     "allVehicles": "すべての車両",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "TOST 管理の注文でも、これらのフィールドは手動で編集できます。",
     "papersReceivedDate": "書類受信日",
     "saveError": "保存エラー",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "生産日",
+    "staleFilter": "更新なし",
+    "staleTooltip": "フィルター切替：すべて / 更新なしを非表示 / 更新なしのみ（未納車で60日以上更新なし）",
     "cancelledFilter": "キャンセル済み",
     "cancelledTooltip": "フィルター切替: キャンセル済みを隠す / 表示する / キャンセル済みのみ"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "書類",
     "timelineDelivery": "納車",
     "totalWaitTime": "合計待ち時間",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "詳細（最小 / 最大）",
+    "pipelineSegment": "区間",
     "cancelledExcluded": "{count} 件キャンセル済み（集計対象外）"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "{count} 件の注文に基づく",
     "notEnoughData": "予測に十分なデータがありません。車両タイプを選択してください。",
     "lowDataHint": "データが少ないため、予測が不正確な場合があります。注文が増えると精度が向上します。",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "過去{days}日間の{count}件の納車に基づく",
+    "exceedsPessimisticHint": "現在の待機日数（{days}日）はすでに悲観的な見込み（同等の納車の75%）を超えています。現在の待機期間は過去の分布より長く、この予測は参考程度にお考えください。"
   },
   "trend": {
     "title": "納車トレンド",
@@ -778,9 +778,9 @@
     "orderToDelivery": "注文 → 納車",
     "orderToPapers": "注文 → 書類",
     "papersToDelivery": "書類 → 納車",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "過去{days}日間の{count}件の納車に基づく",
+    "exceedsPessimisticHint": "現在の待機日数（{days}日）はすでに悲観的な見込みを超えています。この予測は過去の納車実績に基づくもので、この状況では信頼できません。Tesla公式の納車時期をご確認ください。",
+    "staleHint": "この注文は60日以上更新されていません。以下のデータは最新ではない可能性があります。",
     "waitedLabel": "待機",
     "waitingLabel": "待機中",
     "daysUnit": "日",
@@ -800,7 +800,7 @@
     "adminDashboard": "管理者ダッシュボード",
     "navigationMenu": "ナビゲーションメニュー",
     "impressum": "法的情報",
-    "privacy": "Privacy",
+    "privacy": "プライバシー",
     "toggleTheme": "テーマを切り替える",
     "changeLanguage": "言語を変更",
     "skipToContent": "本文へスキップ"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "{year} 年のサーバー費用"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "最近の更新",
+    "entries": "件",
+    "loading": "読み込み中…",
+    "loadMore": "もっと見る",
+    "empty": "まだ更新はありません。",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "今日",
+      "yesterday": "昨日",
+      "week": "今週",
+      "older": "それ以前"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN割当",
+      "production": "生産中",
+      "papers": "書類受領",
+      "delivery": "納車済み",
+      "window": "納車時期が変更",
+      "created": "新規注文"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n}分前",
+      "hoursAgo": "{n}時間前",
+      "yesterday": "昨日",
+      "daysAgo": "{n}日前",
+      "weeksAgo": "{n}週間前"
     }
   },
   "errors": {

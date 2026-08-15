@@ -77,7 +77,7 @@
     "vehicleImage": "Image du véhicule",
     "delivered": "Livré : {date}",
     "errorGeneratingCode": "Erreur lors de la génération du code",
-    "staleBadge": "stale",
+    "staleBadge": "obsolète",
     "staleHint": "Cette commande n'a pas été mise à jour depuis plus de 60 jours — les données peuvent être obsolètes.",
     "statsTitle": "Statistiques",
     "statsSubtitle": "Délais de livraison, configurations et tendances",
@@ -243,7 +243,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Attente",
     "updatedAt": "Mis à jour",
     "country": "Pays",
     "allVehicles": "Tous les véhicules",
@@ -272,7 +272,7 @@
     "papersReceivedDate": "Documents reçus le",
     "saveError": "Erreur lors de l'enregistrement",
     "productionDate": "Date de production",
-    "staleFilter": "Stale",
+    "staleFilter": "Obsolète",
     "staleTooltip": "Basculer le filtre : toutes / masquer stale / seulement stale (≥60 jours sans mise à jour pour les commandes ouvertes)",
     "cancelledFilter": "Annulées",
     "cancelledTooltip": "Changer le filtre : masquer les annulées / les inclure / uniquement les annulées"
@@ -290,9 +290,9 @@
     "overview": "Vue d'ensemble",
     "overviewShort": "Stats",
     "configuration": "Configuration",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Équipement",
-    "equipmentShort": "Extras",
+    "equipmentShort": "Options",
     "geo": "Géo",
     "timeline": "Chronologie",
     "timelineShort": "Chrono",
@@ -375,8 +375,8 @@
     "timelinePapers": "Documents",
     "timelineDelivery": "Livraison",
     "totalWaitTime": "Temps d'attente total",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Détail (min / max)",
+    "pipelineSegment": "Étape",
     "cancelledExcluded": "{count} annulée(s) (non comptée(s))"
   },
   "admin": {
@@ -686,7 +686,7 @@
     "description": "Les livraisons sont {percent}% plus {direction} qu'il y a 3 mois",
     "accelerating": "rapides",
     "decelerating": "lentes",
-    "stable": "stable",
+    "stable": "stables",
     "avgDeliveryTime": "Délai de livraison moy."
   },
   "speed": {

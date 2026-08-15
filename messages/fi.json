@@ -77,8 +77,8 @@
     "vehicleImage": "Ajoneuvon kuva",
     "delivered": "Toimitettu: {date}",
     "errorGeneratingCode": "Virhe koodin luomisessa",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "vanhentunut",
+    "staleHint": "Tätä tilausta ei ole päivitetty yli 60 päivään — tiedot voivat olla vanhentuneita.",
     "statsTitle": "Tilastot",
     "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit",
     "cancelledBadge": "Peruutettu",
@@ -239,11 +239,11 @@
     "typeVariant": "Tyyppivar.",
     "deliveryDate": "Toimituspäivä",
     "orderToVin": "T→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Tu",
+    "productionToPapers": "Tu→Pa",
     "papersToDelivery": "As→To",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Odotus",
     "updatedAt": "Päivitetty",
     "country": "Maa",
     "allVehicles": "Kaikki ajoneuvot",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Näitä kenttiä voi muokata manuaalisesti, myös TOST-hallinnoiduissa tilauksissa.",
     "papersReceivedDate": "Asiakirjat vastaanotettu",
     "saveError": "Virhe tallennettaessa",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Tuotantopäivä",
+    "staleFilter": "Vanhentunut",
+    "staleTooltip": "Vaihda suodatin: kaikki / piilota vanhentuneet / vain vanhentuneet (≥60 päivää ilman päivitystä avoimissa tilauksissa)",
     "cancelledFilter": "Peruutetut",
     "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Asiakirjat",
     "timelineDelivery": "Toimitus",
     "totalWaitTime": "Kokonaisodotusaika",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Tiedot (min / maks)",
+    "pipelineSegment": "Vaihe",
     "cancelledExcluded": "{count} peruutettu (ei laskettu mukaan)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Perustuu {count} tilaukseen",
     "notEnoughData": "Ei riittävästi dataa ennustetta varten. Valitse ajoneuvotyyppi.",
     "lowDataHint": "Vähän datapisteitä — ennuste voi olla epätarkka. Lisää tilauksia parantaa tarkkuutta.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Perustuu {count} toimitukseen viimeisten {days} päivän ajalta",
+    "exceedsPessimisticHint": "Nykyinen odotusaikasi ({days} päivää) ylittää jo pessimistisen arvion (75 % vertailukelpoisista toimituksista). Nykyiset odotusajat ovat pidempiä kuin historiallinen jakauma — suhtaudu ennusteeseen varauksella."
   },
   "trend": {
     "title": "Toimitustrendi",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Tilaus → toimitus",
     "orderToPapers": "Tilaus → asiakirjat",
     "papersToDelivery": "Asiakirjat → toimitus",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Perustuu {count} toimitukseen viimeisten {days} päivän ajalta",
+    "exceedsPessimisticHint": "Nykyinen odotusaikasi ({days} päivää) ylittää jo pessimistisen arvion. Ennuste perustuu aiempiin toimitusaikoihin eikä ole tässä tilanteessa enää luotettava — luota Teslan viralliseen toimitusikkunaan.",
+    "staleHint": "Tätä tilausta ei ole päivitetty yli 60 päivään. Alla olevat tiedot eivät ehkä ole ajan tasalla.",
     "waitedLabel": "Odotettu",
     "waitingLabel": "Odottaa",
     "daysUnit": "päivää",
@@ -800,7 +800,7 @@
     "adminDashboard": "Ylläpidon hallintapaneeli",
     "navigationMenu": "Navigointivalikko",
     "impressum": "Oikeudellinen ilmoitus",
-    "privacy": "Privacy",
+    "privacy": "Tietosuoja",
     "toggleTheme": "Vaihda teemaa",
     "changeLanguage": "Vaihda kieltä",
     "skipToContent": "Siirry sisältöön"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Palvelinkulut {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Viimeisimmät päivitykset",
+    "entries": "merkintää",
+    "loading": "Ladataan…",
+    "loadMore": "Lataa lisää",
+    "empty": "Ei vielä päivityksiä.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Tänään",
+      "yesterday": "Eilen",
+      "week": "Tällä viikolla",
+      "older": "Vanhemmat"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN annettu",
+      "production": "Tuotannossa",
+      "papers": "Paperit saatu",
+      "delivery": "Toimitettu",
+      "window": "Toimitusikkuna muuttui",
+      "created": "Uusi tilaus"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min sitten",
+      "hoursAgo": "{n} t sitten",
+      "yesterday": "eilen",
+      "daysAgo": "{n} pv sitten",
+      "weeksAgo": "{n} vk sitten"
     }
   },
   "errors": {

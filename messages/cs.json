@@ -17,7 +17,7 @@
     "close": "Zavřít",
     "copy": "Kopírovat",
     "support": "Podpora",
-    "menu": "Menu",
+    "menu": "Nabídka",
     "refresh": "Obnovit",
     "allGood": "Vše v pořádku!",
     "understood": "Rozumím, kód uložen",
@@ -77,8 +77,8 @@
     "vehicleImage": "Obrázek vozidla",
     "delivered": "Dodáno: {date}",
     "errorGeneratingCode": "Chyba při generování kódu",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "neaktuální",
+    "staleHint": "Tato objednávka nebyla aktualizována více než 60 dní — údaje mohou být neaktuální.",
     "statsTitle": "Statistiky",
     "statsSubtitle": "Dodací lhůty, konfigurace a trendy",
     "cancelledBadge": "Zrušeno",
@@ -239,11 +239,11 @@
     "typeVariant": "Typ. var.",
     "deliveryDate": "Datum dodání",
     "orderToVin": "O→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→V",
+    "productionToPapers": "V→D",
     "papersToDelivery": "Dok→D",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Čekání",
     "updatedAt": "Aktualizováno",
     "country": "Země",
     "allVehicles": "Všechna vozidla",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Tato pole lze upravovat ručně, i u objednávek spravovaných přes TOST.",
     "papersReceivedDate": "Dokumenty přijaty dne",
     "saveError": "Chyba při ukládání",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Datum výroby",
+    "staleFilter": "Neaktuální",
+    "staleTooltip": "Přepnout filtr: vše / skrýt neaktuální / jen neaktuální (≥60 dní bez aktualizace u otevřených objednávek)",
     "cancelledFilter": "Zrušené",
     "cancelledTooltip": "Přepnout filtr: skrýt zrušené / zobrazit je / pouze zrušené"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Dokumenty",
     "timelineDelivery": "Dodání",
     "totalWaitTime": "Celková čekací doba",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detail (min / max)",
+    "pipelineSegment": "Úsek",
     "cancelledExcluded": "{count} zrušeno (nezapočítáno)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Na základě {count} objednávek",
     "notEnoughData": "Nedostatek dat pro predikci. Vyberte typ vozidla.",
     "lowDataHint": "Málo dat — předpověď může být nepřesná. Více objednávek zlepší přesnost.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Na základě {count} dodání za posledních {days} dní",
+    "exceedsPessimisticHint": "Vaše dosavadní čekání ({days} dní) už překračuje pesimistický odhad (75 % srovnatelných dodání). Současné čekací doby jsou delší než historické rozdělení — berte prognózu s rezervou."
   },
   "trend": {
     "title": "Trend dodání",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Objednávka → dodání",
     "orderToPapers": "Objednávka → dokumenty",
     "papersToDelivery": "Dokumenty → dodání",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Na základě {count} dodání za posledních {days} dní",
+    "exceedsPessimisticHint": "Vaše dosavadní čekání ({days} dní) už překračuje pesimistický odhad. Prognóza vychází z historických dodacích lhůt a v této situaci již není spolehlivá — řiďte se oficiálním termínem dodání od Tesly.",
+    "staleHint": "Tato objednávka nebyla aktualizována více než 60 dní. Údaje níže už nemusí být aktuální.",
     "waitedLabel": "Čekání",
     "waitingLabel": "Čeká",
     "daysUnit": "dní",
@@ -800,7 +800,7 @@
     "adminDashboard": "Administrátorský panel",
     "navigationMenu": "Navigační menu",
     "impressum": "Právní informace",
-    "privacy": "Privacy",
+    "privacy": "Ochrana údajů",
     "toggleTheme": "Přepnout motiv",
     "changeLanguage": "Změnit jazyk",
     "skipToContent": "Přejít na obsah"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Náklady na server {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Poslední změny",
+    "entries": "záznamů",
+    "loading": "Načítání…",
+    "loadMore": "Načíst další",
+    "empty": "Zatím žádné změny.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Dnes",
+      "yesterday": "Včera",
+      "week": "Tento týden",
+      "older": "Starší"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN přiděleno",
+      "production": "Ve výrobě",
+      "papers": "Doklady přijaty",
+      "delivery": "Doručeno",
+      "window": "Změna termínu dodání",
+      "created": "Nová objednávka"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "před {n} min",
+      "hoursAgo": "před {n} h",
+      "yesterday": "včera",
+      "daysAgo": "před {n} dny",
+      "weeksAgo": "před {n} týdny"
     }
   },
   "errors": {

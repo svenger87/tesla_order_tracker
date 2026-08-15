@@ -77,8 +77,8 @@
     "vehicleImage": "Voertuigafbeelding",
     "delivered": "Geleverd: {date}",
     "errorGeneratingCode": "Fout bij het genereren van de code",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "verouderd",
+    "staleHint": "Deze bestelling is al meer dan 60 dagen niet bijgewerkt — de gegevens kunnen verouderd zijn.",
     "statsTitle": "Statistieken",
     "statsSubtitle": "Levertijden, configuraties en trends",
     "cancelledBadge": "Geannuleerd",
@@ -240,10 +240,10 @@
     "deliveryDate": "Leverdatum",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pap",
     "papersToDelivery": "Doc→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Wachttijd",
     "updatedAt": "Bijgewerkt",
     "country": "Land",
     "allVehicles": "Alle voertuigen",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Deze velden kunnen handmatig worden bewerkt, ook voor door TOST beheerde bestellingen.",
     "papersReceivedDate": "Documenten ontvangen op",
     "saveError": "Fout bij opslaan",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Productiedatum",
+    "staleFilter": "Verouderd",
+    "staleTooltip": "Filter wisselen: alle / verouderde verbergen / alleen verouderde (≥60 dagen zonder update bij open bestellingen)",
     "cancelledFilter": "Geannuleerd",
     "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde"
   },
@@ -290,7 +290,7 @@
     "overview": "Overzicht",
     "overviewShort": "Stats",
     "configuration": "Configuratie",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Uitrusting",
     "equipmentShort": "Extra's",
     "geo": "Geo",
@@ -375,8 +375,8 @@
     "timelinePapers": "Papieren",
     "timelineDelivery": "Levering",
     "totalWaitTime": "Totale wachttijd",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detail (min / max)",
+    "pipelineSegment": "Traject",
     "cancelledExcluded": "{count} geannuleerd (niet meegeteld)"
   },
   "admin": {
@@ -484,7 +484,7 @@
     "noCodes": "Geen codes gevonden.",
     "noCodesHint": "Gebruik \"Ontbrekende codes toevoegen\" om standaardcodes te laden.",
     "lookupKey": "Zoeksleutel",
-    "teslaCode": "Tesla Code",
+    "teslaCode": "Tesla-code",
     "label": "Label",
     "sortOrder": "Sorteervolgorde",
     "editCode": "Code bewerken",
@@ -678,8 +678,8 @@
     "basedOn": "Gebaseerd op {count} bestellingen",
     "notEnoughData": "Onvoldoende gegevens voor voorspelling. Selecteer een voertuigtype.",
     "lowDataHint": "Weinig gegevens — de voorspelling kan onnauwkeurig zijn. Meer bestellingen verbeteren de nauwkeurigheid.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Op basis van {count} leveringen uit de laatste {days} dagen",
+    "exceedsPessimisticHint": "Je huidige wachttijd ({days} dagen) overschrijdt al de pessimistische schatting (75% van vergelijkbare leveringen). De huidige wachttijden zijn langer dan de historische verdeling — neem deze voorspelling met een slag om de arm."
   },
   "trend": {
     "title": "Leveringstrend",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Bestelling → Levering",
     "orderToPapers": "Bestelling → Documenten",
     "papersToDelivery": "Documenten → Levering",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Op basis van {count} leveringen uit de laatste {days} dagen",
+    "exceedsPessimisticHint": "Je huidige wachttijd ({days} dagen) overschrijdt al de pessimistische schatting. De voorspelling is gebaseerd op historische levertijden en is hier niet meer betrouwbaar — ga uit van de officiële leverperiode van Tesla.",
+    "staleHint": "Deze bestelling is al meer dan 60 dagen niet bijgewerkt. De gegevens hieronder zijn mogelijk niet actueel.",
     "waitedLabel": "Gewacht",
     "waitingLabel": "Wacht",
     "daysUnit": "dagen",
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Serverkosten {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Laatste updates",
+    "entries": "items",
+    "loading": "Laden…",
+    "loadMore": "Meer laden",
+    "empty": "Nog geen updates.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "week": "Deze week",
+      "older": "Ouder"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN toegewezen",
+      "production": "In productie",
+      "papers": "Papieren ontvangen",
+      "delivery": "Geleverd",
+      "window": "Leverperiode gewijzigd",
+      "created": "Nieuwe bestelling"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min geleden",
+      "hoursAgo": "{n} u geleden",
+      "yesterday": "gisteren",
+      "daysAgo": "{n} d geleden",
+      "weeksAgo": "{n} wk geleden"
     }
   },
   "errors": {

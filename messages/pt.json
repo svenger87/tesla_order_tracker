@@ -77,8 +77,8 @@
     "vehicleImage": "Imagem do veículo",
     "delivered": "Entregue: {date}",
     "errorGeneratingCode": "Erro ao gerar o código",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "desatualizado",
+    "staleHint": "Esta encomenda não é atualizada há mais de 60 dias — os dados podem estar desatualizados.",
     "statsTitle": "Estatísticas",
     "statsSubtitle": "Prazos de entrega, configurações e tendências",
     "cancelledBadge": "Cancelada",
@@ -243,7 +243,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→Ent",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Espera",
     "updatedAt": "Atualizado",
     "country": "País",
     "allVehicles": "Todos os veículos",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Estes campos podem ser editados manualmente, mesmo para encomendas geridas pelo TOST.",
     "papersReceivedDate": "Documentos recebidos em",
     "saveError": "Erro ao guardar",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Data de produção",
+    "staleFilter": "Desatualizado",
+    "staleTooltip": "Alternar filtro: todos / ocultar desatualizados / só desatualizados (≥60 dias sem atualização em encomendas abertas)",
     "cancelledFilter": "Canceladas",
     "cancelledTooltip": "Alternar filtro: ocultar canceladas / incluir / apenas canceladas"
   },
@@ -288,9 +288,9 @@
   },
   "statistics": {
     "overview": "Visão geral",
-    "overviewShort": "Stats",
+    "overviewShort": "Estat.",
     "configuration": "Configuração",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Equipamento",
     "equipmentShort": "Extras",
     "geo": "Geo",
@@ -375,8 +375,8 @@
     "timelinePapers": "Documentos",
     "timelineDelivery": "Entrega",
     "totalWaitTime": "Tempo total de espera",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detalhe (mín. / máx.)",
+    "pipelineSegment": "Etapa",
     "cancelledExcluded": "{count} canceladas (não contabilizadas)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Com base em {count} encomendas",
     "notEnoughData": "Dados insuficientes para previsão. Selecione um tipo de veículo.",
     "lowDataHint": "Poucos dados — a previsão pode ser imprecisa. Mais encomendas melhorarão a precisão.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Com base em {count} entregas dos últimos {days} dias",
+    "exceedsPessimisticHint": "O seu tempo de espera atual ({days} dias) já ultrapassa a estimativa pessimista (75% das entregas comparáveis). Os tempos atuais são mais longos do que a distribuição histórica — encare esta previsão com cautela."
   },
   "trend": {
     "title": "Tendência de entrega",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Encomenda → Entrega",
     "orderToPapers": "Encomenda → Documentos",
     "papersToDelivery": "Documentos → Entrega",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Com base em {count} entregas dos últimos {days} dias",
+    "exceedsPessimisticHint": "O seu tempo de espera atual ({days} dias) já ultrapassa a estimativa pessimista. A previsão baseia-se em prazos históricos e deixa de ser fiável nesta situação — oriente-se pela janela de entrega oficial da Tesla.",
+    "staleHint": "Esta encomenda não é atualizada há mais de 60 dias. Os dados abaixo podem já não estar atuais.",
     "waitedLabel": "Espera",
     "waitingLabel": "A aguardar",
     "daysUnit": "dias",
@@ -800,7 +800,7 @@
     "adminDashboard": "Painel de administração",
     "navigationMenu": "Menu de navegação",
     "impressum": "Aviso legal",
-    "privacy": "Privacy",
+    "privacy": "Privacidade",
     "toggleTheme": "Alternar tema",
     "changeLanguage": "Mudar idioma",
     "skipToContent": "Ir para o conteúdo"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Custos do servidor {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Últimas atualizações",
+    "entries": "entradas",
+    "loading": "A carregar…",
+    "loadMore": "Carregar mais",
+    "empty": "Ainda não há atualizações.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "week": "Esta semana",
+      "older": "Mais antigos"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN atribuído",
+      "production": "Em produção",
+      "papers": "Documentos recebidos",
+      "delivery": "Entregue",
+      "window": "Janela de entrega alterada",
+      "created": "Nova encomenda"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "há {n} min",
+      "hoursAgo": "há {n} h",
+      "yesterday": "ontem",
+      "daysAgo": "há {n} d",
+      "weeksAgo": "há {n} sem"
     }
   },
   "errors": {

@@ -77,8 +77,8 @@
     "vehicleImage": "Araç resmi",
     "delivered": "Teslim edildi: {date}",
     "errorGeneratingCode": "Kod oluşturma hatası",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "güncel değil",
+    "staleHint": "Bu sipariş 60 günden uzun süredir güncellenmedi — veriler güncel olmayabilir.",
     "statsTitle": "İstatistikler",
     "statsSubtitle": "Teslimat süreleri, konfigürasyonlar ve trendler",
     "cancelledBadge": "İptal edildi",
@@ -239,11 +239,11 @@
     "typeVariant": "Tip var.",
     "deliveryDate": "Teslimat tarihi",
     "orderToVin": "S→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Ü",
+    "productionToPapers": "Ü→Blg",
     "papersToDelivery": "Belge→T",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Bekleme",
     "updatedAt": "Güncellendi",
     "country": "Ülke",
     "allVehicles": "Tüm araçlar",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Bu alanlar, TOST tarafından yönetilen siparişler için bile manuel olarak düzenlenebilir.",
     "papersReceivedDate": "Belgeler alındığı tarih",
     "saveError": "Kaydetme hatası",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Üretim tarihi",
+    "staleFilter": "Güncel değil",
+    "staleTooltip": "Filtreyi değiştir: tümü / güncel olmayanları gizle / yalnızca güncel olmayanlar (açık siparişlerde ≥60 gün güncelleme yok)",
     "cancelledFilter": "İptal edilenler",
     "cancelledTooltip": "Filtreyi değiştir: iptal edilenleri gizle / göster / yalnızca iptal edilenler"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Belgeler",
     "timelineDelivery": "Teslimat",
     "totalWaitTime": "Toplam bekleme süresi",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Ayrıntı (min / maks)",
+    "pipelineSegment": "Aşama",
     "cancelledExcluded": "{count} iptal edildi (sayılmadı)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "{count} siparişe dayalı",
     "notEnoughData": "Tahmin için yeterli veri yok. Bir araç tipi seçin.",
     "lowDataHint": "Az veri — tahmin yanlış olabilir. Daha fazla sipariş doğruluğu artıracaktır.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Son {days} gündeki {count} teslimata göre",
+    "exceedsPessimisticHint": "Mevcut bekleme süreniz ({days} gün) kötümser tahmini (benzer teslimatların %75'i) şimdiden aşıyor. Güncel bekleme süreleri geçmiş dağılımdan uzun — bu tahmini temkinli değerlendirin."
   },
   "trend": {
     "title": "Teslimat Trendi",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Sipariş → Teslimat",
     "orderToPapers": "Sipariş → Belgeler",
     "papersToDelivery": "Belgeler → Teslimat",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Son {days} gündeki {count} teslimata göre",
+    "exceedsPessimisticHint": "Mevcut bekleme süreniz ({days} gün) kötümser tahmini şimdiden aşıyor. Tahmin geçmiş teslimat sürelerine dayanır ve bu durumda güvenilir değildir — Tesla'nın resmi teslimat aralığını esas alın.",
+    "staleHint": "Bu sipariş 60 günden uzun süredir güncellenmedi. Aşağıdaki veriler güncel olmayabilir.",
     "waitedLabel": "Beklenen",
     "waitingLabel": "Bekliyor",
     "daysUnit": "gün",
@@ -800,7 +800,7 @@
     "adminDashboard": "Yönetici Paneli",
     "navigationMenu": "Gezinme menüsü",
     "impressum": "Yasal Bildirim",
-    "privacy": "Privacy",
+    "privacy": "Gizlilik",
     "toggleTheme": "Temayı değiştir",
     "changeLanguage": "Dili değiştir",
     "skipToContent": "İçeriğe geç"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "{year} sunucu maliyeti"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Son güncellemeler",
+    "entries": "kayıt",
+    "loading": "Yükleniyor…",
+    "loadMore": "Daha fazla yükle",
+    "empty": "Henüz güncelleme yok.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Bugün",
+      "yesterday": "Dün",
+      "week": "Bu hafta",
+      "older": "Daha eski"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN atandı",
+      "production": "Üretimde",
+      "papers": "Belgeler alındı",
+      "delivery": "Teslim edildi",
+      "window": "Teslimat aralığı değişti",
+      "created": "Yeni sipariş"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} dk önce",
+      "hoursAgo": "{n} sa önce",
+      "yesterday": "dün",
+      "daysAgo": "{n} gün önce",
+      "weeksAgo": "{n} hf önce"
     }
   },
   "errors": {

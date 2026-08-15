@@ -77,8 +77,8 @@
     "vehicleImage": "차량 이미지",
     "delivered": "인도 완료: {date}",
     "errorGeneratingCode": "코드 생성 오류",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "오래됨",
+    "staleHint": "이 주문은 60일 넘게 업데이트되지 않았습니다 — 데이터가 오래되었을 수 있습니다.",
     "statsTitle": "통계",
     "statsSubtitle": "배송 시간, 구성 및 트렌드",
     "cancelledBadge": "취소됨",
@@ -239,11 +239,11 @@
     "typeVariant": "형식 변형",
     "deliveryDate": "인도일",
     "orderToVin": "주→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→생산",
+    "productionToPapers": "생산→서류",
     "papersToDelivery": "서류→인",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "대기",
     "updatedAt": "업데이트",
     "country": "국가",
     "allVehicles": "모든 차량",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "TOST 관리 주문의 경우에도 이 필드는 수동으로 편집할 수 있습니다.",
     "papersReceivedDate": "서류 수신일",
     "saveError": "저장 오류",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "생산일",
+    "staleFilter": "오래됨",
+    "staleTooltip": "필터 전환: 전체 / 오래된 항목 숨기기 / 오래된 항목만 (미완료 주문이 60일 이상 미갱신)",
     "cancelledFilter": "취소됨",
     "cancelledTooltip": "필터 전환: 취소된 주문 숨기기 / 표시 / 취소된 주문만"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "서류",
     "timelineDelivery": "배송",
     "totalWaitTime": "총 대기 시간",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "상세 (최소 / 최대)",
+    "pipelineSegment": "구간",
     "cancelledExcluded": "{count}건 취소됨 (집계 제외)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "{count}건의 주문 기준",
     "notEnoughData": "예측에 충분한 데이터가 없습니다. 차량 유형을 선택하세요.",
     "lowDataHint": "데이터가 적어 예측이 부정확할 수 있습니다. 더 많은 주문이 정확도를 높입니다.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "최근 {days}일간 {count}건의 인도 기준",
+    "exceedsPessimisticHint": "현재 대기 기간({days}일)이 이미 비관적 추정치(비교 가능한 인도의 75%)를 넘었습니다. 현재 대기 기간은 과거 분포보다 길어 이 예측은 참고용으로만 보세요."
   },
   "trend": {
     "title": "인도 추세",
@@ -778,9 +778,9 @@
     "orderToDelivery": "주문 → 인도",
     "orderToPapers": "주문 → 서류",
     "papersToDelivery": "서류 → 인도",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "최근 {days}일간 {count}건의 인도 기준",
+    "exceedsPessimisticHint": "현재 대기 기간({days}일)이 이미 비관적 추정치를 넘었습니다. 이 예측은 과거 인도 기간을 기반으로 하며 이런 상황에서는 신뢰할 수 없습니다 — Tesla 공식 인도 기간을 참고하세요.",
+    "staleHint": "이 주문은 60일 넘게 업데이트되지 않았습니다. 아래 데이터는 최신이 아닐 수 있습니다.",
     "waitedLabel": "대기",
     "waitingLabel": "대기 중",
     "daysUnit": "일",
@@ -800,7 +800,7 @@
     "adminDashboard": "관리자 대시보드",
     "navigationMenu": "탐색 메뉴",
     "impressum": "법적 고지",
-    "privacy": "Privacy",
+    "privacy": "개인정보",
     "toggleTheme": "테마 전환",
     "changeLanguage": "언어 변경",
     "skipToContent": "본문으로 건너뛰기"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "{year}년 서버 비용"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "최근 업데이트",
+    "entries": "건",
+    "loading": "불러오는 중…",
+    "loadMore": "더 보기",
+    "empty": "아직 업데이트가 없습니다.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "오늘",
+      "yesterday": "어제",
+      "week": "이번 주",
+      "older": "이전"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN 배정",
+      "production": "생산 중",
+      "papers": "서류 수령",
+      "delivery": "인도 완료",
+      "window": "인도 기간 변경",
+      "created": "새 주문"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n}분 전",
+      "hoursAgo": "{n}시간 전",
+      "yesterday": "어제",
+      "daysAgo": "{n}일 전",
+      "weeksAgo": "{n}주 전"
     }
   },
   "errors": {

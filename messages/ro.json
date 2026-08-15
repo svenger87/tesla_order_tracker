@@ -77,8 +77,8 @@
     "vehicleImage": "Imagine vehicul",
     "delivered": "Livrat: {date}",
     "errorGeneratingCode": "Eroare la generarea codului",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "învechit",
+    "staleHint": "Această comandă nu a fost actualizată de peste 60 de zile — datele pot fi învechite.",
     "statsTitle": "Statistici",
     "statsSubtitle": "Termene de livrare, configurații și tendințe",
     "cancelledBadge": "Anulată",
@@ -215,7 +215,7 @@
     "passwordNeedsNumber": "Parola trebuie să conțină cel puțin o cifră"
   },
   "table": {
-    "status": "Status",
+    "status": "Stare",
     "name": "Nume",
     "vehicle": "Vehicul",
     "image": "Imagine",
@@ -243,7 +243,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Așteptare",
     "updatedAt": "Actualizat",
     "country": "Țară",
     "allVehicles": "Toate vehiculele",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Aceste câmpuri pot fi editate manual, chiar și pentru comenzile gestionate de TOST.",
     "papersReceivedDate": "Documente primite pe",
     "saveError": "Eroare la salvare",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Data producției",
+    "staleFilter": "Învechit",
+    "staleTooltip": "Comută filtrul: toate / ascunde învechite / doar învechite (≥60 de zile fără actualizare la comenzi deschise)",
     "cancelledFilter": "Anulate",
     "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele"
   },
@@ -290,9 +290,9 @@
     "overview": "Prezentare generală",
     "overviewShort": "Statistici",
     "configuration": "Configurație",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Echipament",
-    "equipmentShort": "Extras",
+    "equipmentShort": "Extraopțiuni",
     "geo": "Geo",
     "timeline": "Cronologie",
     "timelineShort": "Timp",
@@ -375,8 +375,8 @@
     "timelinePapers": "Documente",
     "timelineDelivery": "Livrare",
     "totalWaitTime": "Timp total de așteptare",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaliu (min / max)",
+    "pipelineSegment": "Etapă",
     "cancelledExcluded": "{count} anulate (necontorizate)"
   },
   "admin": {
@@ -612,7 +612,7 @@
     "title": "Mențiuni legale",
     "legalInfo": "Informații conform § 5 TMG",
     "contact": "Contact",
-    "email": "Email",
+    "email": "E-mail",
     "disclaimer": "Declinarea responsabilității",
     "disclaimerText": "Acesta este un proiect comunitar privat, fără scop comercial.",
     "backToHome": "Înapoi la pagina principală",
@@ -678,8 +678,8 @@
     "basedOn": "Pe baza a {count} comenzi",
     "notEnoughData": "Date insuficiente pentru predicție. Selectați un tip de vehicul.",
     "lowDataHint": "Puține date — prognoza poate fi inexactă. Mai multe comenzi vor îmbunătăți precizia.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Pe baza a {count} livrări din ultimele {days} zile",
+    "exceedsPessimisticHint": "Timpul dvs. de așteptare ({days} zile) depășește deja estimarea pesimistă (75% dintre livrările comparabile). Timpii actuali sunt mai mari decât distribuția istorică — priviți această estimare cu prudență."
   },
   "trend": {
     "title": "Tendința livrărilor",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Comandă → Livrare",
     "orderToPapers": "Comandă → Documente",
     "papersToDelivery": "Documente → Livrare",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Pe baza a {count} livrări din ultimele {days} zile",
+    "exceedsPessimisticHint": "Timpul dvs. de așteptare ({days} zile) depășește deja estimarea pesimistă. Estimarea se bazează pe timpi istorici și nu mai este de încredere aici — consultați intervalul oficial de livrare Tesla.",
+    "staleHint": "Această comandă nu a fost actualizată de peste 60 de zile. Datele de mai jos pot fi depășite.",
     "waitedLabel": "Așteptare",
     "waitingLabel": "Așteaptă",
     "daysUnit": "zile",
@@ -800,7 +800,7 @@
     "adminDashboard": "Panou de administrare",
     "navigationMenu": "Meniu de navigare",
     "impressum": "Mențiuni legale",
-    "privacy": "Privacy",
+    "privacy": "Confidențialitate",
     "toggleTheme": "Schimbă tema",
     "changeLanguage": "Schimbă limba",
     "skipToContent": "Sari la conținut"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Costuri server {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Ultimele actualizări",
+    "entries": "intrări",
+    "loading": "Se încarcă…",
+    "loadMore": "Încarcă mai multe",
+    "empty": "Încă nu există actualizări.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Azi",
+      "yesterday": "Ieri",
+      "week": "Săptămâna aceasta",
+      "older": "Mai vechi"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN atribuit",
+      "production": "În producție",
+      "papers": "Documente primite",
+      "delivery": "Livrat",
+      "window": "Interval de livrare modificat",
+      "created": "Comandă nouă"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "acum {n} min",
+      "hoursAgo": "acum {n} h",
+      "yesterday": "ieri",
+      "daysAgo": "acum {n} z",
+      "weeksAgo": "acum {n} săpt."
     }
   },
   "errors": {

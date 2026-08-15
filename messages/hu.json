@@ -77,8 +77,8 @@
     "vehicleImage": "Jármű képe",
     "delivered": "Kiszállítva: {date}",
     "errorGeneratingCode": "Hiba a kód generálásakor",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "elavult",
+    "staleHint": "Ezt a rendelést több mint 60 napja nem frissítették — az adatok elavultak lehetnek.",
     "statsTitle": "Statisztikák",
     "statsSubtitle": "Szállítási idők, konfigurációk és trendek",
     "cancelledBadge": "Törölve",
@@ -239,11 +239,11 @@
     "typeVariant": "Típ. vált.",
     "deliveryDate": "Szállítási dátum",
     "orderToVin": "R→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Gy",
+    "productionToPapers": "Gy→Pa",
     "papersToDelivery": "Dok→Sz",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Várakozás",
     "updatedAt": "Frissítve",
     "country": "Ország",
     "allVehicles": "Összes jármű",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Ezek a mezők manuálisan szerkeszthetők, még TOST által kezelt rendeléseknél is.",
     "papersReceivedDate": "Dokumentumok beérkezése",
     "saveError": "Mentési hiba",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Gyártás dátuma",
+    "staleFilter": "Elavult",
+    "staleTooltip": "Szűrő váltása: mind / elavultak elrejtése / csak elavultak (≥60 nap frissítés nélkül nyitott rendeléseknél)",
     "cancelledFilter": "Töröltek",
     "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Dokumentumok",
     "timelineDelivery": "Kiszállítás",
     "totalWaitTime": "Teljes várakozási idő",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Részletek (min / max)",
+    "pipelineSegment": "Szakasz",
     "cancelledExcluded": "{count} törölve (nincs beszámítva)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "{count} rendelés alapján",
     "notEnoughData": "Nincs elegendő adat az előrejelzéshez. Válasszon járműtípust.",
     "lowDataHint": "Kevés adat — az előrejelzés pontatlan lehet. Több rendelés javítja a pontosságot.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "{count} szállítás alapján az elmúlt {days} napból",
+    "exceedsPessimisticHint": "A jelenlegi várakozási ideje ({days} nap) már meghaladja a pesszimista becslést (az összehasonlítható szállítások 75%-a). A mostani várakozási idők hosszabbak a korábbi eloszlásnál — kezelje fenntartással az előrejelzést."
   },
   "trend": {
     "title": "Szállítási trend",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Rendelés → szállítás",
     "orderToPapers": "Rendelés → dokumentumok",
     "papersToDelivery": "Dokumentumok → szállítás",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "{count} szállítás alapján az elmúlt {days} napból",
+    "exceedsPessimisticHint": "A jelenlegi várakozási ideje ({days} nap) már meghaladja a pesszimista becslést. Az előrejelzés korábbi szállítási időkön alapul, és ebben a helyzetben már nem megbízható — tájékozódjon a Tesla hivatalos szállítási időablakából.",
+    "staleHint": "Ezt a rendelést több mint 60 napja nem frissítették. Az alábbi adatok már nem feltétlenül aktuálisak.",
     "waitedLabel": "Várakozás",
     "waitingLabel": "Vár",
     "daysUnit": "nap",
@@ -800,7 +800,7 @@
     "adminDashboard": "Rendszergazdai kezelőpanel",
     "navigationMenu": "Navigációs menü",
     "impressum": "Jogi nyilatkozat",
-    "privacy": "Privacy",
+    "privacy": "Adatvédelem",
     "toggleTheme": "Téma váltása",
     "changeLanguage": "Nyelv váltása",
     "skipToContent": "Ugrás a tartalomra"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Szerverköltség {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Legutóbbi frissítések",
+    "entries": "bejegyzés",
+    "loading": "Betöltés…",
+    "loadMore": "Több betöltése",
+    "empty": "Még nincsenek frissítések.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Ma",
+      "yesterday": "Tegnap",
+      "week": "Ezen a héten",
+      "older": "Régebbi"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN kiosztva",
+      "production": "Gyártásban",
+      "papers": "Papírok megérkeztek",
+      "delivery": "Kiszállítva",
+      "window": "Szállítási időablak módosult",
+      "created": "Új rendelés"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} perce",
+      "hoursAgo": "{n} órája",
+      "yesterday": "tegnap",
+      "daysAgo": "{n} napja",
+      "weeksAgo": "{n} hete"
     }
   },
   "errors": {

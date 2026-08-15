@@ -77,8 +77,8 @@
     "vehicleImage": "Zdjęcie pojazdu",
     "delivered": "Dostarczono: {date}",
     "errorGeneratingCode": "Błąd generowania kodu",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "nieaktualne",
+    "staleHint": "To zamówienie nie było aktualizowane od ponad 60 dni — dane mogą być nieaktualne.",
     "statsTitle": "Statystyki",
     "statsSubtitle": "Czasy dostaw, konfiguracje i trendy",
     "cancelledBadge": "Anulowane",
@@ -240,10 +240,10 @@
     "deliveryDate": "Data dostawy",
     "orderToVin": "Z→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Dok",
     "papersToDelivery": "Dok→D",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Oczekiwanie",
     "updatedAt": "Zaktualizowano",
     "country": "Kraj",
     "allVehicles": "Wszystkie pojazdy",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Te pola można edytować ręcznie, nawet dla zamówień zarządzanych przez TOST.",
     "papersReceivedDate": "Dokumenty otrzymano dnia",
     "saveError": "Błąd zapisu",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Data produkcji",
+    "staleFilter": "Nieaktualne",
+    "staleTooltip": "Przełącz filtr: wszystkie / ukryj nieaktualne / tylko nieaktualne (≥60 dni bez aktualizacji przy otwartych zamówieniach)",
     "cancelledFilter": "Anulowane",
     "cancelledTooltip": "Przełącz filtr: ukryj anulowane / pokaż je / tylko anulowane"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Dokumenty",
     "timelineDelivery": "Dostawa",
     "totalWaitTime": "Całkowity czas oczekiwania",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Szczegóły (min / maks)",
+    "pipelineSegment": "Etap",
     "cancelledExcluded": "{count} anulowanych (nie wliczono)"
   },
   "admin": {
@@ -678,8 +678,8 @@
     "basedOn": "Na podstawie {count} zamówień",
     "notEnoughData": "Niewystarczająca ilość danych do prognozy. Wybierz typ pojazdu.",
     "lowDataHint": "Mało danych — prognoza może być niedokładna. Więcej zamówień poprawi dokładność.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Na podstawie {count} dostaw z ostatnich {days} dni",
+    "exceedsPessimisticHint": "Twój dotychczasowy czas oczekiwania ({days} dni) przekracza już szacunek pesymistyczny (75% porównywalnych dostaw). Obecne czasy oczekiwania są dłuższe niż rozkład historyczny — traktuj prognozę ostrożnie."
   },
   "trend": {
     "title": "Trend dostaw",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Zamówienie → dostawa",
     "orderToPapers": "Zamówienie → dokumenty",
     "papersToDelivery": "Dokumenty → dostawa",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Na podstawie {count} dostaw z ostatnich {days} dni",
+    "exceedsPessimisticHint": "Twój dotychczasowy czas oczekiwania ({days} dni) przekracza już szacunek pesymistyczny. Prognoza opiera się na historycznych czasach dostaw i w tej sytuacji nie jest wiarygodna — kieruj się oficjalnym terminem dostawy Tesli.",
+    "staleHint": "To zamówienie nie było aktualizowane od ponad 60 dni. Poniższe dane mogą być nieaktualne.",
     "waitedLabel": "Oczekiwanie",
     "waitingLabel": "Czeka",
     "daysUnit": "dni",
@@ -800,7 +800,7 @@
     "adminDashboard": "Panel administratora",
     "navigationMenu": "Menu nawigacji",
     "impressum": "Nota prawna",
-    "privacy": "Privacy",
+    "privacy": "Prywatność",
     "toggleTheme": "Zmień motyw",
     "changeLanguage": "Zmień język",
     "skipToContent": "Przejdź do treści"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Koszty serwera {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Ostatnie zmiany",
+    "entries": "wpisów",
+    "loading": "Ładowanie…",
+    "loadMore": "Załaduj więcej",
+    "empty": "Brak zmian.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Dziś",
+      "yesterday": "Wczoraj",
+      "week": "W tym tygodniu",
+      "older": "Starsze"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "Przydzielono VIN",
+      "production": "W produkcji",
+      "papers": "Otrzymano dokumenty",
+      "delivery": "Dostarczone",
+      "window": "Zmieniono termin dostawy",
+      "created": "Nowe zamówienie"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min temu",
+      "hoursAgo": "{n} godz. temu",
+      "yesterday": "wczoraj",
+      "daysAgo": "{n} dni temu",
+      "weeksAgo": "{n} tyg. temu"
     }
   },
   "errors": {

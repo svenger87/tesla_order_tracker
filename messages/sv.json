@@ -16,7 +16,7 @@
     "back": "Tillbaka",
     "close": "Stäng",
     "copy": "Kopiera",
-    "support": "Support",
+    "support": "Stötta",
     "menu": "Meny",
     "refresh": "Uppdatera",
     "allGood": "Allt i ordning!",
@@ -77,8 +77,8 @@
     "vehicleImage": "Fordonsbild",
     "delivered": "Levererad: {date}",
     "errorGeneratingCode": "Fel vid generering av kod",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "inaktuell",
+    "staleHint": "Denna order har inte uppdaterats på över 60 dagar — uppgifterna kan vara inaktuella.",
     "statsTitle": "Statistik",
     "statsSubtitle": "Leveranstider, konfigurationer och trender",
     "cancelledBadge": "Avbeställd",
@@ -240,10 +240,10 @@
     "deliveryDate": "Leveransdatum",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pap",
     "papersToDelivery": "Dok→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Väntetid",
     "updatedAt": "Uppdaterad",
     "country": "Land",
     "allVehicles": "Alla fordon",
@@ -271,9 +271,9 @@
     "editTostFieldsDescription": "Dessa fält kan redigeras manuellt, även för TOST-hanterade beställningar.",
     "papersReceivedDate": "Dokument mottagna den",
     "saveError": "Fel vid sparande",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Produktionsdatum",
+    "staleFilter": "Inaktuell",
+    "staleTooltip": "Växla filter: alla / dölj inaktuella / endast inaktuella (≥60 dagar utan uppdatering på öppna ordrar)",
     "cancelledFilter": "Avbeställda",
     "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda"
   },
@@ -375,8 +375,8 @@
     "timelinePapers": "Dokument",
     "timelineDelivery": "Leverans",
     "totalWaitTime": "Total väntetid",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaljer (min / max)",
+    "pipelineSegment": "Sträcka",
     "cancelledExcluded": "{count} avbeställda (ej medräknade)"
   },
   "admin": {
@@ -454,7 +454,7 @@
     "importModel3": "Importera Model 3",
     "syncingModel3": "Synkroniserar Model 3...",
     "model3Hint": "Importerar Model 3-data från det separata Google-kalkylbladet.",
-    "debugSheets": "Debug Sheets",
+    "debugSheets": "Felsök blad",
     "debugChecking": "Kontrollerar...",
     "dataExport": "Dataexport",
     "dataExportDescription": "Exportera all data och statistik som Excel-fil (exitplan)",
@@ -678,8 +678,8 @@
     "basedOn": "Baserad på {count} beställningar",
     "notEnoughData": "Inte tillräckligt med data för prognos. Välj en fordonstyp.",
     "lowDataHint": "Få datapunkter — prognosen kan vara felaktig. Fler beställningar förbättrar noggrannheten.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Baserat på {count} leveranser från de senaste {days} dagarna",
+    "exceedsPessimisticHint": "Din nuvarande väntetid ({days} dagar) överstiger redan den pessimistiska uppskattningen (75 % av jämförbara leveranser). Dagens väntetider är längre än den historiska fördelningen — ta prognosen med en nypa salt."
   },
   "trend": {
     "title": "Leveranstrend",
@@ -778,9 +778,9 @@
     "orderToDelivery": "Beställning → Leverans",
     "orderToPapers": "Beställning → Dokument",
     "papersToDelivery": "Dokument → Leverans",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current.",
+    "predictionSampleRecent": "Baserat på {count} leveranser från de senaste {days} dagarna",
+    "exceedsPessimisticHint": "Din nuvarande väntetid ({days} dagar) överstiger redan den pessimistiska uppskattningen. Prognosen bygger på historiska leveranstider och är inte längre tillförlitlig här — utgå från Teslas officiella leveransfönster.",
+    "staleHint": "Denna order har inte uppdaterats på över 60 dagar. Uppgifterna nedan kanske inte är aktuella.",
     "waitedLabel": "Väntat",
     "waitingLabel": "Väntar",
     "daysUnit": "dagar",
@@ -800,7 +800,7 @@
     "adminDashboard": "Administrationspanel",
     "navigationMenu": "Navigeringsmeny",
     "impressum": "Juridisk information",
-    "privacy": "Privacy",
+    "privacy": "Integritet",
     "toggleTheme": "Byt tema",
     "changeLanguage": "Byt språk",
     "skipToContent": "Hoppa till innehåll"
@@ -813,31 +813,31 @@
     "serverCostsTitle": "Serverkostnader {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Senaste uppdateringar",
+    "entries": "poster",
+    "loading": "Laddar…",
+    "loadMore": "Ladda mer",
+    "empty": "Inga uppdateringar än.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Idag",
+      "yesterday": "Igår",
+      "week": "Denna vecka",
+      "older": "Äldre"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN tilldelat",
+      "production": "I produktion",
+      "papers": "Papper mottagna",
+      "delivery": "Levererad",
+      "window": "Leveransfönster ändrat",
+      "created": "Ny order"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min sedan",
+      "hoursAgo": "{n} tim sedan",
+      "yesterday": "igår",
+      "daysAgo": "{n} dgr sedan",
+      "weeksAgo": "{n} v sedan"
     }
   },
   "errors": {
