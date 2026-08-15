@@ -1,8 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
-import { prisma } from '@/lib/db'
 import { fetchOrders } from '@/lib/orders-query'
 import { HomeClient } from '@/components/HomeClient'
-import type { Settings } from '@/lib/types'
 
 /**
  * The home page renders with its data already in the HTML.
@@ -32,15 +30,10 @@ export default async function Home({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [orders, settings] = await Promise.all([
-    fetchOrders(),
-    prisma.settings.findUnique({ where: { id: 'default' } }).catch(() => null),
-  ])
+  const orders = await fetchOrders()
 
-  return (
-    <HomeClient
-      initialOrders={orders}
-      initialSettings={settings as unknown as Settings | null}
-    />
-  )
+  // Settings are no longer read here: they only ever fed the donation links in
+  // the header and footer, and those now live in SiteShell, which every page
+  // gets from the layout.
+  return <HomeClient initialOrders={orders} />
 }

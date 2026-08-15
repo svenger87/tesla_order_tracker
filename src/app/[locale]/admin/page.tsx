@@ -47,14 +47,14 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex items-center justify-center px-4 py-16">
         <p className="text-muted-foreground">{tc('loading')}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div>
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">

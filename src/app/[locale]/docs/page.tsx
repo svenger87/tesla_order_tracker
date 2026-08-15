@@ -7,7 +7,7 @@ import 'swagger-ui-react/swagger-ui.css'
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center py-32">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   ),
@@ -15,7 +15,7 @@ const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
 
 export default function ApiDocsPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div>
       <style jsx global>{`
         /* Swagger UI customizations */
         .swagger-ui .topbar {

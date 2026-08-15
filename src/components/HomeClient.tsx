@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
-import { Order, Settings } from '@/lib/types'
+import { Order } from '@/lib/types'
 import { filterOrdersByPeriod } from '@/lib/statistics'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
 import { useOptions } from '@/hooks/useOptions'
@@ -17,8 +17,6 @@ import { useApiError } from '@/hooks/useApiError'
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
 import { UpdatesFeed } from '@/components/UpdatesFeed'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
 
 const StatisticsDashboard = dynamic(
@@ -47,21 +45,17 @@ import { toast } from 'sonner'
 
 interface HomeClientProps {
   initialOrders: Order[]
-  initialSettings: Settings | null
 }
 
-export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) {
+export function HomeClient({ initialOrders }: HomeClientProps) {
   const t = useTranslations('home')
   const tc = useTranslations('common')
   const tp = useTranslations('prediction')
   const tv = useTranslations('form.validation')
   const apiError = useApiError()
   const [orders, setOrders] = useState<Order[]>(initialOrders)
-  // Settings come from the server render and only an admin can change them, on
-  // a different page — there is nothing here that would make them go stale.
-  const settings = initialSettings
   const [isAdmin, setIsAdmin] = useState(false)
-  // Orders and settings arrive with the HTML, so there is no initial loading
+  // Orders arrive with the HTML, so there is no initial loading
   // state left to show — the refresh path has its own spinner.
   const loading = false
   const [showAddForm, setShowAddForm] = useState(false)
@@ -349,12 +343,10 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
   }, [searchTarget])
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header
-        isAdmin={isAdmin}
-        settings={settings}
-      />
-
+    <div>
+      {/* Header and footer moved into SiteShell, which the layout wraps around
+          every page — they used to exist only here, so this was the one page in
+          the app with navigation. */}
       <main className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
         {/* Hero Section */}
         <HeroSection orders={orders} onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
@@ -494,12 +486,6 @@ export function HomeClient({ initialOrders, initialSettings }: HomeClientProps) 
           }}
         />
       </main>
-
-      <Footer
-        settings={settings}
-        orderCount={orders.length}
-        deliveredCount={orders.filter(o => o.deliveryDate).length}
-      />
 
       {/* Delivery Prediction Dialog */}
       <Dialog open={showPrediction} onOpenChange={setShowPrediction}>

@@ -66,7 +66,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // 0 matches: not found
   if (matches.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div>
         <div className="max-w-2xl mx-auto px-4 py-12">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
             <ArrowLeft className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // Multiple matches: disambiguation
   if (matches.length > 1) {
     return (
-      <div className="min-h-screen bg-background">
+      <div>
         <div className="max-w-2xl mx-auto px-4 py-12">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
             <ArrowLeft className="h-4 w-4" />

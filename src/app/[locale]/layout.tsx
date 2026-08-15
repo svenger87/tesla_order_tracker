@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CompositorCodesProvider } from "@/lib/CompositorCodesContext";
+import { SiteShell } from "@/components/SiteShell";
 import { routing } from '@/i18n/routing';
 import { OG_LOCALE_MAP, type Locale } from '@/i18n/locales';
 
@@ -148,7 +149,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider>
             <CompositorCodesProvider>
               <TooltipProvider>
-                {children}
+                <SiteShell>{children}</SiteShell>
                 <Toaster />
               </TooltipProvider>
             </CompositorCodesProvider>
