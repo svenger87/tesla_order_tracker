@@ -66,19 +66,22 @@ export function BackupDiff({
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">{t('restoreHint')}</p>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative min-w-[12rem] flex-1">
+      {/* A grid on a phone, a wrapping row from sm up. As a flex row the three
+          selects shrank to 42px each — flex-1 with min-w-0 lets a control
+          collapse below its own label, and all three did. */}
+      <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
+        <div className="relative col-span-2 sm:min-w-[12rem] sm:flex-1">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={tc('searchName')}
-            className="h-8 pl-8 text-sm"
+            className="h-9 pl-8 text-sm sm:h-8"
           />
         </div>
 
         <Select value={kind} onValueChange={v => setKind(v as DiffKind | 'all')}>
-          <SelectTrigger className="h-8 w-auto min-w-[9rem] text-sm">
+          <SelectTrigger className="h-9 w-full text-sm sm:h-8 sm:w-auto sm:min-w-[9rem]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -91,7 +94,7 @@ export function BackupDiff({
 
         {fields.length > 0 && (
           <Select value={field} onValueChange={setField}>
-            <SelectTrigger className="h-8 w-auto min-w-[11rem] text-sm">
+            <SelectTrigger className="h-9 w-full text-sm sm:h-8 sm:w-auto sm:min-w-[11rem]">
               <SelectValue placeholder={t('backupAllFields')} />
             </SelectTrigger>
             <SelectContent>
@@ -104,7 +107,7 @@ export function BackupDiff({
         )}
 
         <Select value={sort} onValueChange={v => setSort(v as SortKey)}>
-          <SelectTrigger className="h-8 w-auto min-w-[10rem] text-sm">
+          <SelectTrigger className="h-9 w-full text-sm sm:h-8 sm:w-auto sm:min-w-[10rem]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -117,7 +120,7 @@ export function BackupDiff({
           <Button
             variant="ghost"
             size="sm"
-            className="h-8"
+            className="col-span-2 h-9 sm:col-span-1 sm:h-8"
             onClick={() => { setQuery(''); setKind('all'); setField('all') }}
           >
             {tc('resetFilters')}
@@ -166,11 +169,18 @@ export function BackupDiff({
               </div>
 
               {row.fields.length > 0 && (
-                <dl className="mt-1.5 grid gap-0.5 text-xs">
+                /* Stacked on a phone, two columns from sm up. Side by side at
+                   390px the field name took a fixed 9rem and left 163px for the
+                   values, so "01.11.2026 - 31.12.2026" wrapped mid-date against
+                   a column of names that had room to spare. */
+                <dl className="mt-1.5 grid gap-1.5 text-xs sm:gap-0.5">
                   {row.fields.map(f => (
-                    <div key={f.field} className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-2">
+                    <div
+                      key={f.field}
+                      className="grid gap-0.5 sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)] sm:gap-2"
+                    >
                       <dt className="truncate text-muted-foreground">{f.field}</dt>
-                      <dd className="min-w-0">
+                      <dd className="min-w-0 break-words">
                         <span className="text-muted-foreground line-through">{show(f.from)}</span>
                         <span className="mx-1.5 text-muted-foreground">→</span>
                         <span className="font-medium">{show(f.to)}</span>
