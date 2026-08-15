@@ -1,0 +1,99 @@
+name: Staging data
+
+# Manual only. Nothing here should ever run because a branch moved.
+on:
+  workflow_dispatch:
+    inputs:
+      delete_order_id:
+        description: 'Order id to delete from production first (leave empty to skip)'
+        required: false
+        default: ''
+      delete_order_name:
+        description: 'Name that id must have, as a guard against a mistyped id'
+        required: false
+        default: ''
+      copy_to_staging:
+        description: 'Copy production over the staging database'
+        type: boolean
+        required: true
+        default: true
+
+concurrency:
+  group: staging-data
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run on the VPS
+        uses: appleboy/ssh-action@v1
+        env:
+          DELETE_ID: ${{ inputs.delete_order_id }}
+          DELETE_NAME: ${{ inputs.delete_order_name }}
+          COPY: ${{ inputs.copy_to_staging }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: DELETE_ID,DELETE_NAME,COPY
+          script: |
+            set -e
+            cd /opt/tesla-order-tracker
+
+            # Both databases live in named volumes on this host. Everything below
+            # runs in a throwaway container with those volumes mounted, so the
+            # data never leaves the machine.
+            IMAGE=ghcr.io/svenger87/tesla_order_tracker:staging
+            STAMP=$(date -u +%Y-%m-%dT%H-%M-%SZ)
+
+            # Resolved rather than assumed. Mounting a volume name that does not
+            # exist does not fail — Docker creates an empty one — so a wrong
+            # guess here would look like a database with no orders in it.
+            PROD_VOL=$(docker volume ls --format '{{.Name}}' | grep -E '_sqlite_data$' | head -1)
+            STAGING_VOL=$(docker volume ls --format '{{.Name}}' | grep -E '_sqlite_data_staging$' | head -1)
+            if [ -z "$PROD_VOL" ] || [ -z "$STAGING_VOL" ]; then
+              echo ">>> Could not find both database volumes:"
+              docker volume ls --format '  {{.Name}}'
+              exit 1
+            fi
+            echo ">>> Production volume: $PROD_VOL"
+            echo ">>> Staging volume:    $STAGING_VOL"
+            MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
+
+            git fetch origin staging
+            git checkout origin/staging -- scripts/copy-prod-to-staging.mjs scripts/delete-order.mjs
+
+            echo ">>> Backing up production before touching anything"
+            docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
+              sh -c "cp /prod/prod.db /prod/prod.db.before-$STAMP && ls -la /prod"
+
+            if [ -n "$DELETE_ID" ]; then
+              echo ">>> Dry run of the delete"
+              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
+                node /scripts/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME"
+
+              echo ">>> Applying"
+              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
+                node /scripts/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME" --apply
+
+              # Production caches the order list in memory per process; a restart
+              # is the honest way to make the change visible.
+              docker compose restart app
+            else
+              echo ">>> No delete requested"
+            fi
+
+            if [ "$COPY" = "true" ]; then
+              echo ">>> Copying production over staging"
+              docker run --rm $MOUNTS -v "$PWD/scripts:/scripts:ro" "$IMAGE" \
+                node /scripts/copy-prod-to-staging.mjs /prod/prod.db /staging/staging.db
+
+              # Staging runs the schema migration on start, which is what brings
+              # a production-shaped database up to whatever staging expects.
+              docker compose restart app-staging
+            else
+              echo ">>> Staging left alone"
+            fi
+
+            echo ">>> Done"
