@@ -1,5 +1,6 @@
 import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
 import { CHART_COLORS } from './chart-colors'
+import { isHandedOver, startOfToday } from './order-state'
 
 // Build code/label lookup tables from the canonical COUNTRIES constant.
 // CODE_SET stores ISO codes (uppercase) for fast membership checks.
@@ -350,12 +351,14 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   filteredOrders = filteredOrders.filter(o => !o.cancelled)
 
   const totalOrders = filteredOrders.length
-  const deliveredOrders = filteredOrders.filter(o => o.deliveryDate).length
+  // Handed over, not merely dated: a delivery date in the future is an
+  // appointment. Counting those as delivered reported people who were still
+  // waiting as finished, and measured their wait to a day that had not come.
+  const today = startOfToday()
+  const deliveredOrdersList = filteredOrders.filter(o => isHandedOver(o, today))
+  const deliveredOrders = deliveredOrdersList.length
   const pendingOrders = totalOrders - deliveredOrders
   const ordersWithoutDate = filteredOrders.filter(o => !parseGermanDate(o.orderDate)).length
-
-  // Calculate averages from delivered orders
-  const deliveredOrdersList = filteredOrders.filter(o => o.deliveryDate)
 
   // Total delivery time: all delivered orders
   const avgOrderToDelivery = calculateAverage(

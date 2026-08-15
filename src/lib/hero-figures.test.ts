@@ -30,10 +30,13 @@ describe('getHeroFigures', () => {
 
   test('takes the median wait, not the mean', () => {
     // 10, 20, 300 — a mean of 110 would describe none of these three.
+    // Dated 2025 on purpose: the long one used to be 28.10.2026, a date in the
+    // future, which only counted as delivered because of the bug this file now
+    // guards against.
     const f = getHeroFigures([
-      order({ orderDate: '01.01.2026', deliveryDate: '11.01.2026' }),
-      order({ orderDate: '01.01.2026', deliveryDate: '21.01.2026' }),
-      order({ orderDate: '01.01.2026', deliveryDate: '28.10.2026' }),
+      order({ orderDate: '01.01.2025', deliveryDate: '11.01.2025' }),
+      order({ orderDate: '01.01.2025', deliveryDate: '21.01.2025' }),
+      order({ orderDate: '01.01.2025', deliveryDate: '28.10.2025' }),
     ])
     expect(f.medianWaitDays).toBe(20)
   })
@@ -88,5 +91,79 @@ describe('getHeroFigures', () => {
     ])
     expect(f.total).toBe(2)
     expect(f.medianWaitDays).toBe(10)
+  })
+})
+
+describe('getHeroFigures — what the front page may claim', () => {
+  const isoDaysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+
+  test('an appointment still to come is not a delivery', () => {
+    // 24 live orders sat in this state and were counted as handed over, with
+    // their wait measured to a date that had not arrived.
+    const f = getHeroFigures([
+      order({ orderDate: '01.01.2026', deliveryDate: daysAgo(-30), updatedAt: isoDaysAgo(1) }),
+    ])
+    expect(f.delivered).toBe(0)
+    expect(f.medianWaitDays).toBeNull()
+  })
+
+  test('an order nobody has touched for months is not someone still waiting', () => {
+    const f = getHeroFigures([
+      order({ orderDate: daysAgo(900), updatedAt: isoDaysAgo(300) }),
+      order({ orderDate: daysAgo(60), updatedAt: isoDaysAgo(2) }),
+    ])
+    expect(f.waitingWithoutVin).toBe(1)
+    expect(f.stale).toBe(1)
+  })
+
+  test('the longest wait comes from an order that is still being kept up to date', () => {
+    // The live figure was 957 days, from a placeholder named "blank" that was
+    // ordered on the first of January and never edited again.
+    const f = getHeroFigures([
+      order({ orderDate: daysAgo(957), updatedAt: isoDaysAgo(200) }),
+      order({ orderDate: daysAgo(120), updatedAt: isoDaysAgo(1) }),
+    ])
+    expect(f.longestOpenWaitDays).toBe(120)
+  })
+
+  test('total still counts every live order, stale ones included', () => {
+    // The count of what is in the database is a fact; hiding rows from it would
+    // trade one wrong number for another.
+    const f = getHeroFigures([
+      order({ orderDate: daysAgo(400), updatedAt: isoDaysAgo(300) }),
+      order({ orderDate: daysAgo(30), updatedAt: isoDaysAgo(1) }),
+    ])
+    expect(f.total).toBe(2)
+  })
+})
+
+describe('getHeroFigures — the long-wait headline', () => {
+  const isoDaysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+  const kept = (waitDays: number) =>
+    order({ orderDate: daysAgo(waitDays), updatedAt: isoDaysAgo(1) })
+
+  test('one extreme record does not set the figure the page leads with', () => {
+    // Live shape: the top of the distribution ran 269, 269, 279, 292, 440 — and
+    // then 957, from a single entry. A maximum hands the headline to that one
+    // record; a high percentile describes the group at the top instead.
+    const orders = [
+      ...Array.from({ length: 100 }, () => kept(100)),
+      kept(957),
+    ]
+    const f = getHeroFigures(orders)
+    expect(f.longOpenWaitDays).toBeLessThan(957)
+    expect(f.longOpenWaitDays).toBe(100)
+  })
+
+  test('a genuinely long tail still moves it', () => {
+    const orders = [
+      ...Array.from({ length: 50 }, () => kept(100)),
+      ...Array.from({ length: 50 }, () => kept(400)),
+    ]
+    expect(getHeroFigures(orders).longOpenWaitDays).toBe(400)
+  })
+
+  test('is null when nothing is open', () => {
+    expect(getHeroFigures([order({ orderDate: '01.01.2025', deliveryDate: '01.02.2025' })]).longOpenWaitDays).toBeNull()
   })
 })

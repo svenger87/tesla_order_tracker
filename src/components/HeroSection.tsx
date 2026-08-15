@@ -32,7 +32,7 @@ export function HeroSection({ orders, onSearchOpen, onNewOrder }: HeroSectionPro
   const format = useFormatter()
 
   const figures = useMemo(() => getHeroFigures(orders), [orders])
-  const { total, delivered, waitingWithVin, waitingWithoutVin, medianWaitDays, longestOpenWaitDays } = figures
+  const { total, delivered, waitingWithVin, waitingWithoutVin, stale, medianWaitDays, longOpenWaitDays } = figures
   const waiting = waitingWithVin + waitingWithoutVin
   const deliveredShare = total > 0 ? Math.round((delivered / total) * 100) : 0
   const n = (value: number) => format.number(value)
@@ -65,7 +65,7 @@ export function HeroSection({ orders, onSearchOpen, onNewOrder }: HeroSectionPro
               {t('claimSub', {
                 delivered: n(delivered),
                 waiting: n(waiting),
-                longest: longestOpenWaitDays ?? 0,
+                longest: longOpenWaitDays ?? 0,
               })}
             </p>
           )}
@@ -111,6 +111,9 @@ export function HeroSection({ orders, onSearchOpen, onNewOrder }: HeroSectionPro
             <span className="bg-success" style={{ flex: delivered || 0.0001 }} />
             <span className="bg-pending" style={{ flex: waitingWithVin || 0.0001 }} />
             <span className="bg-muted-foreground/25" style={{ flex: waitingWithoutVin || 0.0001 }} />
+            {/* Shown rather than dropped: without this segment the bar covers
+                fewer orders than the count above it claims, and quietly. */}
+            {stale > 0 && <span className="bg-muted-foreground/10" style={{ flex: stale }} />}
           </div>
           <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
@@ -125,6 +128,12 @@ export function HeroSection({ orders, onSearchOpen, onNewOrder }: HeroSectionPro
               <span className="h-2 w-2 rounded-[2px] bg-muted-foreground/25" />
               {t('withoutVin', { count: n(waitingWithoutVin) })}
             </span>
+            {stale > 0 && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-[2px] bg-muted-foreground/10" />
+                {t('stale', { count: n(stale) })}
+              </span>
+            )}
           </div>
         </div>
       )}
