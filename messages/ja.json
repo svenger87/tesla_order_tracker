@@ -534,7 +534,13 @@
     "selectModelHint": "制約を設定するには車両とモデルを選択してください",
     "loadingOptions": "オプションを読み込み中...",
     "loadingConstraints": "制約を読み込み中...",
-    "selectValue": "値を選択..."
+    "selectValue": "値を選択...",
+    "archiveConfirmAction": "アーカイブ",
+    "archiveConfirmDescription": "アーカイブした注文は公開統計から消えますが、データベースには残ります。元に戻せるのは1件ずつです。",
+    "archiveConfirmTitle": "{count} 件の注文をアーカイブしますか？",
+    "yearlyGoal": "年間サーバー費用（€）",
+    "yearlyGoalHint": "空欄にすると費用バーを非表示にします。",
+    "yearlyRaised": "これまでの充当額（€）"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "注文",
     "deliveredLabel": "納車済み",
     "withVin": "VIN あり {count} 件が待機",
-    "withoutVin": "VIN なし {count} 件"
+    "withoutVin": "VIN なし {count} 件",
+    "stale": "更新なし {count} 件"
   },
   "tracking": {
     "backToOverview": "概要に戻る",
@@ -794,12 +801,15 @@
     "impressum": "法的情報",
     "privacy": "Privacy",
     "toggleTheme": "テーマを切り替える",
-    "changeLanguage": "言語を変更"
+    "changeLanguage": "言語を変更",
+    "skipToContent": "本文へスキップ"
   },
   "footer": {
     "operatedBy": "Sven が運営",
     "supportDevelopment": "ホスティングと開発を支援",
-    "stats": "{orders} 件の注文 · {delivered} 件納車済み"
+    "stats": "{orders} 件の注文 · {delivered} 件納車済み",
+    "serverCostsProgress": "{goal} € のうち {raised} € を充当",
+    "serverCostsTitle": "{year} 年のサーバー費用"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "管理者権限が必要です。",
     "orderDateInFuture": "注文日を未来の日付にすることはできません。",
     "datesOutOfOrder": "日付の順序が正しくありません。注文日、生産日、書類日、納車日をご確認ください。",
-    "legacyPasswordRequired": "既存の登録には新しいパスワードが必要です。"
+    "legacyPasswordRequired": "既存の登録には新しいパスワードが必要です。",
+    "backHome": "トップページへ",
+    "pageErrorBody": "ページを読み込めませんでした。もう一度試すと解決することがあります。",
+    "pageErrorTitle": "問題が発生しました",
+    "pageNotFoundBody": "このアドレスは存在しません。リンクが古いか、入力に誤りがある可能性があります。",
+    "pageNotFoundTitle": "ページが見つかりません",
+    "retry": "再試行"
   }
 }

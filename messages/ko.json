@@ -534,7 +534,13 @@
     "selectModelHint": "제약을 설정하려면 차량과 모델을 선택하세요",
     "loadingOptions": "옵션 로딩 중...",
     "loadingConstraints": "제약 로딩 중...",
-    "selectValue": "값 선택..."
+    "selectValue": "값 선택...",
+    "archiveConfirmAction": "보관",
+    "archiveConfirmDescription": "보관한 주문은 공개 통계에서 사라지지만 데이터베이스에는 남습니다. 되돌리는 것은 주문 하나씩만 가능합니다.",
+    "archiveConfirmTitle": "주문 {count}건을 보관할까요?",
+    "yearlyGoal": "연간 서버 비용 (€)",
+    "yearlyGoalHint": "비워 두면 비용 막대를 숨깁니다.",
+    "yearlyRaised": "현재까지 충당액 (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "주문",
     "deliveredLabel": "인도 완료",
     "withVin": "VIN 있음 {count}건 대기",
-    "withoutVin": "VIN 없음 {count}건"
+    "withoutVin": "VIN 없음 {count}건",
+    "stale": "업데이트 없음 {count}건"
   },
   "tracking": {
     "backToOverview": "개요로 돌아가기",
@@ -794,12 +801,15 @@
     "impressum": "법적 고지",
     "privacy": "Privacy",
     "toggleTheme": "테마 전환",
-    "changeLanguage": "언어 변경"
+    "changeLanguage": "언어 변경",
+    "skipToContent": "본문으로 건너뛰기"
   },
   "footer": {
     "operatedBy": "Sven이 운영합니다",
     "supportDevelopment": "호스팅 및 개발 지원",
-    "stats": "{orders}건 주문 · {delivered}건 인도 완료"
+    "stats": "{orders}건 주문 · {delivered}건 인도 완료",
+    "serverCostsProgress": "{goal} € 중 {raised} € 충당",
+    "serverCostsTitle": "{year}년 서버 비용"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "관리자 권한이 필요합니다.",
     "orderDateInFuture": "주문일은 미래일 수 없습니다.",
     "datesOutOfOrder": "날짜 순서가 올바르지 않습니다. 주문일, 생산일, 서류일, 인도일을 확인해 주세요.",
-    "legacyPasswordRequired": "기존 항목에는 새 비밀번호가 필요합니다."
+    "legacyPasswordRequired": "기존 항목에는 새 비밀번호가 필요합니다.",
+    "backHome": "시작 페이지로",
+    "pageErrorBody": "페이지를 불러오지 못했습니다. 다시 시도하면 해결되는 경우가 많습니다.",
+    "pageErrorTitle": "문제가 발생했습니다",
+    "pageNotFoundBody": "이 주소는 존재하지 않습니다. 링크가 오래되었거나 잘못 입력되었을 수 있습니다.",
+    "pageNotFoundTitle": "페이지를 찾을 수 없습니다",
+    "retry": "다시 시도"
   }
 }

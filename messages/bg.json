@@ -534,7 +534,13 @@
     "selectModelHint": "Изберете превозно средство и модел, за да конфигурирате ограниченията",
     "loadingOptions": "Зареждане на опциите...",
     "loadingConstraints": "Зареждане на ограниченията...",
-    "selectValue": "Изберете стойност..."
+    "selectValue": "Изберете стойност...",
+    "archiveConfirmAction": "Архивиране",
+    "archiveConfirmDescription": "Архивираните поръчки изчезват от публичната статистика, но остават в базата данни. Връщането е възможно само поръчка по поръчка.",
+    "archiveConfirmTitle": "Архивиране на {count} поръчки?",
+    "yearlyGoal": "Разходи за сървър годишно (€)",
+    "yearlyGoalHint": "Оставете празно, за да скриете лентата с разходите.",
+    "yearlyRaised": "Покрито досега (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Поръчки",
     "deliveredLabel": "предадени",
     "withVin": "{count} с VIN, чакат",
-    "withoutVin": "{count} без VIN"
+    "withoutVin": "{count} без VIN",
+    "stale": "{count} без актуализация"
   },
   "tracking": {
     "backToOverview": "Назад към прегледа",
@@ -794,12 +801,15 @@
     "impressum": "Правна информация",
     "privacy": "Privacy",
     "toggleTheme": "Смяна на темата",
-    "changeLanguage": "Смяна на езика"
+    "changeLanguage": "Смяна на езика",
+    "skipToContent": "Към съдържанието"
   },
   "footer": {
     "operatedBy": "Поддържан от Sven",
     "supportDevelopment": "Подкрепете хостинга и разработката",
-    "stats": "{orders} поръчки · {delivered} доставени"
+    "stats": "{orders} поръчки · {delivered} доставени",
+    "serverCostsProgress": "{raised} от {goal} € покрити",
+    "serverCostsTitle": "Разходи за сървър {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Необходими са администраторски права.",
     "orderDateInFuture": "Датата на поръчката не може да е в бъдещето.",
     "datesOutOfOrder": "Датите не са в правдоподобен ред. Проверете датата на поръчката, производството, документите и доставката.",
-    "legacyPasswordRequired": "За стари записи е необходима нова парола."
+    "legacyPasswordRequired": "За стари записи е необходима нова парола.",
+    "backHome": "Към началната страница",
+    "pageErrorBody": "Страницата не можа да се зареди. Нов опит често помага.",
+    "pageErrorTitle": "Нещо се обърка",
+    "pageNotFoundBody": "Този адрес не съществува. Връзката може да е остаряла или сгрешена.",
+    "pageNotFoundTitle": "Страницата не е намерена",
+    "retry": "Опитайте отново"
   }
 }

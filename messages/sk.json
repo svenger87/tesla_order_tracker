@@ -534,7 +534,13 @@
     "selectModelHint": "Vyberte vozidlo a model na konfiguráciu obmedzení",
     "loadingOptions": "Načítavanie možností...",
     "loadingConstraints": "Načítavanie obmedzení...",
-    "selectValue": "Vyberte hodnotu..."
+    "selectValue": "Vyberte hodnotu...",
+    "archiveConfirmAction": "Archivovať",
+    "archiveConfirmDescription": "Archivované objednávky zmiznú z verejných štatistík, ale zostanú v databáze. Vrátiť sa to dá len po jednej objednávke.",
+    "archiveConfirmTitle": "Archivovať {count} objednávok?",
+    "yearlyGoal": "Náklady na server za rok (€)",
+    "yearlyGoalHint": "Nechajte prázdne, ak chcete lištu nákladov skryť.",
+    "yearlyRaised": "Doteraz pokryté (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Objednávky",
     "deliveredLabel": "doručené",
     "withVin": "{count} s VIN, čaká",
-    "withoutVin": "{count} bez VIN"
+    "withoutVin": "{count} bez VIN",
+    "stale": "{count} bez aktualizácie"
   },
   "tracking": {
     "backToOverview": "Späť na prehľad",
@@ -794,12 +801,15 @@
     "impressum": "Právne informácie",
     "privacy": "Privacy",
     "toggleTheme": "Prepnúť motív",
-    "changeLanguage": "Zmeniť jazyk"
+    "changeLanguage": "Zmeniť jazyk",
+    "skipToContent": "Prejsť na obsah"
   },
   "footer": {
     "operatedBy": "Prevádzkuje Sven",
     "supportDevelopment": "Podporte hosting a vývoj",
-    "stats": "{orders} objednávok · {delivered} dodaných"
+    "stats": "{orders} objednávok · {delivered} dodaných",
+    "serverCostsProgress": "{raised} z {goal} € pokryté",
+    "serverCostsTitle": "Náklady na server {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Vyžaduje sa prístup správcu.",
     "orderDateInFuture": "Dátum objednávky nemôže byť v budúcnosti.",
     "datesOutOfOrder": "Dátumy nie sú v pravdepodobnom poradí. Skontrolujte dátum objednávky, výroby, dokladov a dodania.",
-    "legacyPasswordRequired": "Pre staršie záznamy sa vyžaduje nové heslo."
+    "legacyPasswordRequired": "Pre staršie záznamy sa vyžaduje nové heslo.",
+    "backHome": "Na úvodnú stránku",
+    "pageErrorBody": "Stránku sa nepodarilo načítať. Ďalší pokus často pomôže.",
+    "pageErrorTitle": "Niečo sa pokazilo",
+    "pageNotFoundBody": "Táto adresa neexistuje. Odkaz môže byť zastaraný alebo zle napísaný.",
+    "pageNotFoundTitle": "Stránka sa nenašla",
+    "retry": "Skúsiť znova"
   }
 }

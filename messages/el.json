@@ -534,7 +534,13 @@
     "selectModelHint": "Επιλέξτε όχημα και μοντέλο για να διαμορφώσετε περιορισμούς",
     "loadingOptions": "Φόρτωση επιλογών...",
     "loadingConstraints": "Φόρτωση περιορισμών...",
-    "selectValue": "Επιλέξτε τιμή..."
+    "selectValue": "Επιλέξτε τιμή...",
+    "archiveConfirmAction": "Αρχειοθέτηση",
+    "archiveConfirmDescription": "Οι αρχειοθετημένες παραγγελίες εξαφανίζονται από τα δημόσια στατιστικά, αλλά παραμένουν στη βάση δεδομένων. Η αναίρεση γίνεται μόνο μία παραγγελία τη φορά.",
+    "archiveConfirmTitle": "Αρχειοθέτηση {count} παραγγελιών;",
+    "yearlyGoal": "Κόστος διακομιστή ανά έτος (€)",
+    "yearlyGoalHint": "Αφήστε το κενό για να κρύψετε τη μπάρα κόστους.",
+    "yearlyRaised": "Καλυμμένο μέχρι τώρα (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Παραγγελίες",
     "deliveredLabel": "παραδόθηκαν",
     "withVin": "{count} με VIN, αναμονή",
-    "withoutVin": "{count} χωρίς VIN"
+    "withoutVin": "{count} χωρίς VIN",
+    "stale": "{count} χωρίς ενημέρωση"
   },
   "tracking": {
     "backToOverview": "Πίσω στην επισκόπηση",
@@ -794,12 +801,15 @@
     "impressum": "Νομικές Πληροφορίες",
     "privacy": "Privacy",
     "toggleTheme": "Εναλλαγή θέματος",
-    "changeLanguage": "Αλλαγή γλώσσας"
+    "changeLanguage": "Αλλαγή γλώσσας",
+    "skipToContent": "Μετάβαση στο περιεχόμενο"
   },
   "footer": {
     "operatedBy": "Λειτουργεί από τον Sven",
     "supportDevelopment": "Υποστήριξη φιλοξενίας & ανάπτυξης",
-    "stats": "{orders} παραγγελίες · {delivered} παραδοθείσες"
+    "stats": "{orders} παραγγελίες · {delivered} παραδοθείσες",
+    "serverCostsProgress": "{raised} από {goal} € καλυμμένα",
+    "serverCostsTitle": "Κόστος διακομιστή {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Απαιτείται πρόσβαση διαχειριστή.",
     "orderDateInFuture": "Η ημερομηνία παραγγελίας δεν μπορεί να είναι στο μέλλον.",
     "datesOutOfOrder": "Οι ημερομηνίες δεν έχουν εύλογη σειρά. Ελέγξτε τις ημερομηνίες παραγγελίας, παραγωγής, εγγράφων και παράδοσης.",
-    "legacyPasswordRequired": "Απαιτείται νέος κωδικός για παλαιότερες καταχωρίσεις."
+    "legacyPasswordRequired": "Απαιτείται νέος κωδικός για παλαιότερες καταχωρίσεις.",
+    "backHome": "Στην αρχική σελίδα",
+    "pageErrorBody": "Η σελίδα δεν φορτώθηκε. Μια νέα προσπάθεια συχνά βοηθά.",
+    "pageErrorTitle": "Κάτι πήγε στραβά",
+    "pageNotFoundBody": "Αυτή η διεύθυνση δεν υπάρχει. Ο σύνδεσμος μπορεί να είναι παλιός ή λάθος γραμμένος.",
+    "pageNotFoundTitle": "Η σελίδα δεν βρέθηκε",
+    "retry": "Δοκιμάστε ξανά"
   }
 }

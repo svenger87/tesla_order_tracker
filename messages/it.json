@@ -534,7 +534,13 @@
     "selectModelHint": "Selezioni un veicolo e un modello per configurare i vincoli",
     "loadingOptions": "Caricamento opzioni...",
     "loadingConstraints": "Caricamento vincoli...",
-    "selectValue": "Seleziona valore..."
+    "selectValue": "Seleziona valore...",
+    "archiveConfirmAction": "Archivia",
+    "archiveConfirmDescription": "Gli ordini archiviati spariscono dalle statistiche pubbliche ma restano nel database. Annullare è possibile solo un ordine alla volta.",
+    "archiveConfirmTitle": "Archiviare {count} ordini?",
+    "yearlyGoal": "Costi del server all’anno (€)",
+    "yearlyGoalHint": "Lascia vuoto per nascondere la barra dei costi.",
+    "yearlyRaised": "Coperto finora (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Ordini",
     "deliveredLabel": "consegnati",
     "withVin": "{count} con VIN, in attesa",
-    "withoutVin": "{count} senza VIN"
+    "withoutVin": "{count} senza VIN",
+    "stale": "{count} senza aggiornamento"
   },
   "tracking": {
     "backToOverview": "Torna alla panoramica",
@@ -794,12 +801,15 @@
     "impressum": "Note legali",
     "privacy": "Privacy",
     "toggleTheme": "Cambia tema",
-    "changeLanguage": "Cambia lingua"
+    "changeLanguage": "Cambia lingua",
+    "skipToContent": "Vai al contenuto"
   },
   "footer": {
     "operatedBy": "Gestito da Sven",
     "supportDevelopment": "Sostieni hosting e sviluppo",
-    "stats": "{orders} ordini · {delivered} consegnati"
+    "stats": "{orders} ordini · {delivered} consegnati",
+    "serverCostsProgress": "{raised} di {goal} € coperti",
+    "serverCostsTitle": "Costi del server {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "È richiesto l'accesso amministratore.",
     "orderDateInFuture": "La data dell'ordine non può essere nel futuro.",
     "datesOutOfOrder": "Queste date non seguono un ordine plausibile. Controlla le date di ordine, produzione, documenti e consegna.",
-    "legacyPasswordRequired": "È richiesta una nuova password per le voci preesistenti."
+    "legacyPasswordRequired": "È richiesta una nuova password per le voci preesistenti.",
+    "backHome": "Vai alla pagina iniziale",
+    "pageErrorBody": "Non è stato possibile caricare la pagina. Spesso basta riprovare.",
+    "pageErrorTitle": "Qualcosa è andato storto",
+    "pageNotFoundBody": "Questo indirizzo non esiste. Il link potrebbe essere vecchio o digitato male.",
+    "pageNotFoundTitle": "Pagina non trovata",
+    "retry": "Riprova"
   }
 }

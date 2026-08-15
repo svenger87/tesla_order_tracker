@@ -534,7 +534,13 @@
     "selectModelHint": "Seleccione un vehículo y modelo para configurar las restricciones",
     "loadingOptions": "Cargando opciones...",
     "loadingConstraints": "Cargando restricciones...",
-    "selectValue": "Seleccionar valor..."
+    "selectValue": "Seleccionar valor...",
+    "archiveConfirmAction": "Archivar",
+    "archiveConfirmDescription": "Los pedidos archivados desaparecen de las estadísticas públicas, pero permanecen en la base de datos. Deshacerlo solo es posible pedido a pedido.",
+    "archiveConfirmTitle": "¿Archivar {count} pedidos?",
+    "yearlyGoal": "Costes del servidor por año (€)",
+    "yearlyGoalHint": "Déjalo vacío para ocultar la barra de costes.",
+    "yearlyRaised": "Cubierto hasta ahora (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Pedidos",
     "deliveredLabel": "entregados",
     "withVin": "{count} con VIN, esperando",
-    "withoutVin": "{count} sin VIN"
+    "withoutVin": "{count} sin VIN",
+    "stale": "{count} sin actualizar"
   },
   "tracking": {
     "backToOverview": "Volver al resumen",
@@ -794,12 +801,15 @@
     "impressum": "Aviso legal",
     "privacy": "Privacy",
     "toggleTheme": "Cambiar tema",
-    "changeLanguage": "Cambiar idioma"
+    "changeLanguage": "Cambiar idioma",
+    "skipToContent": "Ir al contenido"
   },
   "footer": {
     "operatedBy": "Operado por Sven",
     "supportDevelopment": "Apoyar el alojamiento y desarrollo",
-    "stats": "{orders} pedidos · {delivered} entregados"
+    "stats": "{orders} pedidos · {delivered} entregados",
+    "serverCostsProgress": "{raised} de {goal} € cubiertos",
+    "serverCostsTitle": "Costes del servidor {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Se requiere acceso de administrador.",
     "orderDateInFuture": "La fecha del pedido no puede estar en el futuro.",
     "datesOutOfOrder": "Las fechas no siguen un orden plausible. Revisa las fechas de pedido, producción, documentos y entrega.",
-    "legacyPasswordRequired": "Se requiere una nueva contraseña para las entradas antiguas."
+    "legacyPasswordRequired": "Se requiere una nueva contraseña para las entradas antiguas.",
+    "backHome": "Ir a la página de inicio",
+    "pageErrorBody": "No se pudo cargar la página. Volver a intentarlo suele funcionar.",
+    "pageErrorTitle": "Algo ha salido mal",
+    "pageNotFoundBody": "Esta dirección no existe. Puede que el enlace esté obsoleto o mal escrito.",
+    "pageNotFoundTitle": "Página no encontrada",
+    "retry": "Intentar de nuevo"
   }
 }

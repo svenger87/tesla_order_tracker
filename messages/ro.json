@@ -534,7 +534,13 @@
     "selectModelHint": "Selectați un vehicul și un model pentru a configura constrângerile",
     "loadingOptions": "Se încarcă opțiunile...",
     "loadingConstraints": "Se încarcă constrângerile...",
-    "selectValue": "Selectați valoarea..."
+    "selectValue": "Selectați valoarea...",
+    "archiveConfirmAction": "Arhivează",
+    "archiveConfirmDescription": "Comenzile arhivate dispar din statisticile publice, dar rămân în baza de date. Anularea este posibilă doar comandă cu comandă.",
+    "archiveConfirmTitle": "Arhivezi {count} comenzi?",
+    "yearlyGoal": "Costuri server pe an (€)",
+    "yearlyGoalHint": "Lasă gol pentru a ascunde bara de costuri.",
+    "yearlyRaised": "Acoperit până acum (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Comenzi",
     "deliveredLabel": "livrate",
     "withVin": "{count} cu VIN, așteaptă",
-    "withoutVin": "{count} fără VIN"
+    "withoutVin": "{count} fără VIN",
+    "stale": "{count} fără actualizare"
   },
   "tracking": {
     "backToOverview": "Înapoi la prezentare",
@@ -794,12 +801,15 @@
     "impressum": "Mențiuni legale",
     "privacy": "Privacy",
     "toggleTheme": "Schimbă tema",
-    "changeLanguage": "Schimbă limba"
+    "changeLanguage": "Schimbă limba",
+    "skipToContent": "Sari la conținut"
   },
   "footer": {
     "operatedBy": "Operat de Sven",
     "supportDevelopment": "Sprijiniți găzduirea și dezvoltarea",
-    "stats": "{orders} comenzi · {delivered} livrate"
+    "stats": "{orders} comenzi · {delivered} livrate",
+    "serverCostsProgress": "{raised} din {goal} € acoperiți",
+    "serverCostsTitle": "Costuri server {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Este necesar acces de administrator.",
     "orderDateInFuture": "Data comenzii nu poate fi în viitor.",
     "datesOutOfOrder": "Datele nu sunt într-o ordine plauzibilă. Verifică datele de comandă, producție, documente și livrare.",
-    "legacyPasswordRequired": "Este necesară o parolă nouă pentru înregistrările vechi."
+    "legacyPasswordRequired": "Este necesară o parolă nouă pentru înregistrările vechi.",
+    "backHome": "La pagina principală",
+    "pageErrorBody": "Pagina nu a putut fi încărcată. O nouă încercare ajută de obicei.",
+    "pageErrorTitle": "Ceva nu a mers bine",
+    "pageNotFoundBody": "Această adresă nu există. Linkul poate fi vechi sau scris greșit.",
+    "pageNotFoundTitle": "Pagina nu a fost găsită",
+    "retry": "Încearcă din nou"
   }
 }

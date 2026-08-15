@@ -534,7 +534,13 @@
     "selectModelHint": "Válasszon járművet és modellt a korlátozások beállításához",
     "loadingOptions": "Opciók betöltése...",
     "loadingConstraints": "Korlátozások betöltése...",
-    "selectValue": "Érték kiválasztása..."
+    "selectValue": "Érték kiválasztása...",
+    "archiveConfirmAction": "Archiválás",
+    "archiveConfirmDescription": "Az archivált rendelések eltűnnek a nyilvános statisztikából, de a adatbázisban maradnak. Visszavonni csak rendelésenként lehet.",
+    "archiveConfirmTitle": "Archiválsz {count} rendelést?",
+    "yearlyGoal": "Szerverköltség évente (€)",
+    "yearlyGoalHint": "Hagyd üresen a költségsáv elrejtéséhez.",
+    "yearlyRaised": "Eddig fedezve (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Rendelés",
     "deliveredLabel": "kiszállítva",
     "withVin": "{count} alvázszámmal, vár",
-    "withoutVin": "{count} alvázszám nélkül"
+    "withoutVin": "{count} alvázszám nélkül",
+    "stale": "{count} frissítés nélkül"
   },
   "tracking": {
     "backToOverview": "Vissza az áttekintéshez",
@@ -794,12 +801,15 @@
     "impressum": "Jogi nyilatkozat",
     "privacy": "Privacy",
     "toggleTheme": "Téma váltása",
-    "changeLanguage": "Nyelv váltása"
+    "changeLanguage": "Nyelv váltása",
+    "skipToContent": "Ugrás a tartalomra"
   },
   "footer": {
     "operatedBy": "Üzemeltető: Sven",
     "supportDevelopment": "Támogassa a tárhelyet és a fejlesztést",
-    "stats": "{orders} rendelés · {delivered} kiszállítva"
+    "stats": "{orders} rendelés · {delivered} kiszállítva",
+    "serverCostsProgress": "{goal} €-ból {raised} € fedezve",
+    "serverCostsTitle": "Szerverköltség {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Rendszergazdai hozzáférés szükséges.",
     "orderDateInFuture": "A rendelés dátuma nem lehet a jövőben.",
     "datesOutOfOrder": "A dátumok nem állnak életszerű sorrendben. Ellenőrizze a rendelés, gyártás, iratok és szállítás dátumát.",
-    "legacyPasswordRequired": "A régi bejegyzésekhez új jelszó szükséges."
+    "legacyPasswordRequired": "A régi bejegyzésekhez új jelszó szükséges.",
+    "backHome": "A kezdőlapra",
+    "pageErrorBody": "Az oldalt nem sikerült betölteni. Egy újabb próbálkozás gyakran segít.",
+    "pageErrorTitle": "Valami hiba történt",
+    "pageNotFoundBody": "Ez a cím nem létezik. A hivatkozás elavult vagy elgépelt lehet.",
+    "pageNotFoundTitle": "Az oldal nem található",
+    "retry": "Újrapróbálkozás"
   }
 }

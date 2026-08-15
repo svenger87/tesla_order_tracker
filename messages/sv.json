@@ -534,7 +534,13 @@
     "selectModelHint": "Välj ett fordon och en modell för att konfigurera begränsningar",
     "loadingOptions": "Laddar alternativ...",
     "loadingConstraints": "Laddar begränsningar...",
-    "selectValue": "Välj värde..."
+    "selectValue": "Välj värde...",
+    "archiveConfirmAction": "Arkivera",
+    "archiveConfirmDescription": "Arkiverade beställningar försvinner från den offentliga statistiken men ligger kvar i databasen. Det går bara att ångra en beställning i taget.",
+    "archiveConfirmTitle": "Arkivera {count} beställningar?",
+    "yearlyGoal": "Serverkostnader per år (€)",
+    "yearlyGoalHint": "Lämna tomt för att dölja kostnadsraden.",
+    "yearlyRaised": "Täckt hittills (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Beställningar",
     "deliveredLabel": "levererade",
     "withVin": "{count} med VIN, väntar",
-    "withoutVin": "{count} utan VIN"
+    "withoutVin": "{count} utan VIN",
+    "stale": "{count} utan uppdatering"
   },
   "tracking": {
     "backToOverview": "Tillbaka till översikt",
@@ -794,12 +801,15 @@
     "impressum": "Juridisk information",
     "privacy": "Privacy",
     "toggleTheme": "Byt tema",
-    "changeLanguage": "Byt språk"
+    "changeLanguage": "Byt språk",
+    "skipToContent": "Hoppa till innehåll"
   },
   "footer": {
     "operatedBy": "Drivs av Sven",
     "supportDevelopment": "Stöd hosting och utveckling",
-    "stats": "{orders} beställningar · {delivered} levererade"
+    "stats": "{orders} beställningar · {delivered} levererade",
+    "serverCostsProgress": "{raised} av {goal} € täckta",
+    "serverCostsTitle": "Serverkostnader {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Administratörsåtkomst krävs.",
     "orderDateInFuture": "Beställningsdatumet kan inte ligga i framtiden.",
     "datesOutOfOrder": "Datumen står inte i en rimlig ordning. Kontrollera beställnings-, produktions-, pappers- och leveransdatum.",
-    "legacyPasswordRequired": "Ett nytt lösenord krävs för äldre poster."
+    "legacyPasswordRequired": "Ett nytt lösenord krävs för äldre poster.",
+    "backHome": "Till startsidan",
+    "pageErrorBody": "Sidan kunde inte laddas. Ett nytt försök brukar hjälpa.",
+    "pageErrorTitle": "Något gick fel",
+    "pageNotFoundBody": "Den här adressen finns inte. Länken kan vara gammal eller felstavad.",
+    "pageNotFoundTitle": "Sidan hittades inte",
+    "retry": "Försök igen"
   }
 }

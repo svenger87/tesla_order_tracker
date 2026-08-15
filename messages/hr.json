@@ -534,7 +534,13 @@
     "selectModelHint": "Odaberite vozilo i model za konfiguraciju ograničenja",
     "loadingOptions": "Učitavanje opcija...",
     "loadingConstraints": "Učitavanje ograničenja...",
-    "selectValue": "Odaberite vrijednost..."
+    "selectValue": "Odaberite vrijednost...",
+    "archiveConfirmAction": "Arhiviraj",
+    "archiveConfirmDescription": "Arhivirane narudžbe nestaju iz javne statistike, ali ostaju u bazi podataka. Poništiti se može samo jedna po jedna narudžba.",
+    "archiveConfirmTitle": "Arhivirati {count} narudžbi?",
+    "yearlyGoal": "Troškovi poslužitelja godišnje (€)",
+    "yearlyGoalHint": "Ostavite prazno da sakrijete traku troškova.",
+    "yearlyRaised": "Dosad pokriveno (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Narudžbe",
     "deliveredLabel": "isporučeno",
     "withVin": "{count} s VIN-om, čeka",
-    "withoutVin": "{count} bez VIN-a"
+    "withoutVin": "{count} bez VIN-a",
+    "stale": "{count} bez ažuriranja"
   },
   "tracking": {
     "backToOverview": "Natrag na pregled",
@@ -794,12 +801,15 @@
     "impressum": "Pravna obavijest",
     "privacy": "Privacy",
     "toggleTheme": "Promijeni temu",
-    "changeLanguage": "Promijeni jezik"
+    "changeLanguage": "Promijeni jezik",
+    "skipToContent": "Prijeđi na sadržaj"
   },
   "footer": {
     "operatedBy": "Vodi Sven",
     "supportDevelopment": "Podržite hosting i razvoj",
-    "stats": "{orders} narudžbi · {delivered} isporučeno"
+    "stats": "{orders} narudžbi · {delivered} isporučeno",
+    "serverCostsProgress": "{raised} od {goal} € pokriveno",
+    "serverCostsTitle": "Troškovi poslužitelja {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Potreban je administratorski pristup.",
     "orderDateInFuture": "Datum narudžbe ne može biti u budućnosti.",
     "datesOutOfOrder": "Datumi nisu u vjerodostojnom redoslijedu. Provjerite datume narudžbe, proizvodnje, dokumenata i isporuke.",
-    "legacyPasswordRequired": "Za starije unose potrebna je nova lozinka."
+    "legacyPasswordRequired": "Za starije unose potrebna je nova lozinka.",
+    "backHome": "Na početnu stranicu",
+    "pageErrorBody": "Stranica se nije mogla učitati. Novi pokušaj često pomogne.",
+    "pageErrorTitle": "Nešto je pošlo po zlu",
+    "pageNotFoundBody": "Ova adresa ne postoji. Poveznica je možda zastarjela ili pogrešno upisana.",
+    "pageNotFoundTitle": "Stranica nije pronađena",
+    "retry": "Pokušaj ponovno"
   }
 }

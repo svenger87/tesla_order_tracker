@@ -534,7 +534,13 @@
     "selectModelHint": "Selecteer een voertuig en model om beperkingen te configureren",
     "loadingOptions": "Opties laden...",
     "loadingConstraints": "Beperkingen laden...",
-    "selectValue": "Waarde selecteren..."
+    "selectValue": "Waarde selecteren...",
+    "archiveConfirmAction": "Archiveren",
+    "archiveConfirmDescription": "Gearchiveerde bestellingen verdwijnen uit de openbare statistieken, maar blijven in de database. Terugdraaien kan alleen per bestelling.",
+    "archiveConfirmTitle": "{count} bestellingen archiveren?",
+    "yearlyGoal": "Serverkosten per jaar (€)",
+    "yearlyGoalHint": "Laat leeg om de kostenbalk te verbergen.",
+    "yearlyRaised": "Tot nu toe gedekt (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Bestellingen",
     "deliveredLabel": "geleverd",
     "withVin": "{count} met VIN, wacht",
-    "withoutVin": "{count} zonder VIN"
+    "withoutVin": "{count} zonder VIN",
+    "stale": "{count} zonder update"
   },
   "tracking": {
     "backToOverview": "Terug naar overzicht",
@@ -794,12 +801,15 @@
     "impressum": "Juridische informatie",
     "privacy": "Privacy",
     "toggleTheme": "Thema wisselen",
-    "changeLanguage": "Taal wijzigen"
+    "changeLanguage": "Taal wijzigen",
+    "skipToContent": "Naar de inhoud"
   },
   "footer": {
     "operatedBy": "Beheerd door Sven",
     "supportDevelopment": "Hosting en ontwikkeling ondersteunen",
-    "stats": "{orders} bestellingen · {delivered} geleverd"
+    "stats": "{orders} bestellingen · {delivered} geleverd",
+    "serverCostsProgress": "{raised} van {goal} € gedekt",
+    "serverCostsTitle": "Serverkosten {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Beheerderstoegang vereist.",
     "orderDateInFuture": "De besteldatum kan niet in de toekomst liggen.",
     "datesOutOfOrder": "Deze data staan niet in een plausibele volgorde. Controleer de bestel-, productie-, papier- en leverdatum.",
-    "legacyPasswordRequired": "Voor bestaande items is een nieuw wachtwoord vereist."
+    "legacyPasswordRequired": "Voor bestaande items is een nieuw wachtwoord vereist.",
+    "backHome": "Naar de startpagina",
+    "pageErrorBody": "De pagina kon niet worden geladen. Opnieuw proberen helpt vaak.",
+    "pageErrorTitle": "Er is iets misgegaan",
+    "pageNotFoundBody": "Dit adres bestaat niet. De link is mogelijk verouderd of verkeerd getypt.",
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "retry": "Opnieuw proberen"
   }
 }

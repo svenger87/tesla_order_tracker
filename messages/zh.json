@@ -534,7 +534,13 @@
     "selectModelHint": "选择车辆和型号以配置约束",
     "loadingOptions": "正在加载选项...",
     "loadingConstraints": "正在加载约束...",
-    "selectValue": "选择值..."
+    "selectValue": "选择值...",
+    "archiveConfirmAction": "归档",
+    "archiveConfirmDescription": "归档后的订单将从公开统计中消失，但仍保留在数据库中。撤销只能逐条进行。",
+    "archiveConfirmTitle": "归档 {count} 条订单？",
+    "yearlyGoal": "每年服务器费用（€）",
+    "yearlyGoalHint": "留空可隐藏费用条。",
+    "yearlyRaised": "目前已覆盖（€）"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "订单",
     "deliveredLabel": "已交付",
     "withVin": "{count} 笔有 VIN，等待中",
-    "withoutVin": "{count} 笔无 VIN"
+    "withoutVin": "{count} 笔无 VIN",
+    "stale": "{count} 条未更新"
   },
   "tracking": {
     "backToOverview": "返回概览",
@@ -794,12 +801,15 @@
     "impressum": "法律声明",
     "privacy": "Privacy",
     "toggleTheme": "切换主题",
-    "changeLanguage": "更改语言"
+    "changeLanguage": "更改语言",
+    "skipToContent": "跳到内容"
   },
   "footer": {
     "operatedBy": "由 Sven 运营",
     "supportDevelopment": "支持托管与开发",
-    "stats": "{orders} 个订单 · {delivered} 已交付"
+    "stats": "{orders} 个订单 · {delivered} 已交付",
+    "serverCostsProgress": "{goal} € 中已覆盖 {raised} €",
+    "serverCostsTitle": "{year} 年服务器费用"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "需要管理员权限。",
     "orderDateInFuture": "订购日期不能是将来的日期。",
     "datesOutOfOrder": "日期顺序不合理。请检查订购、生产、文件和交付日期。",
-    "legacyPasswordRequired": "旧条目需要设置新密码。"
+    "legacyPasswordRequired": "旧条目需要设置新密码。",
+    "backHome": "前往首页",
+    "pageErrorBody": "页面加载失败。再试一次通常就能解决。",
+    "pageErrorTitle": "出了点问题",
+    "pageNotFoundBody": "该地址不存在。链接可能已过期或输入有误。",
+    "pageNotFoundTitle": "未找到页面",
+    "retry": "重试"
   }
 }

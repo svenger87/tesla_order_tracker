@@ -534,7 +534,13 @@
     "selectModelHint": "Valitse ajoneuvo ja malli rajoitusten määrittämiseksi",
     "loadingOptions": "Ladataan vaihtoehtoja...",
     "loadingConstraints": "Ladataan rajoituksia...",
-    "selectValue": "Valitse arvo..."
+    "selectValue": "Valitse arvo...",
+    "archiveConfirmAction": "Arkistoi",
+    "archiveConfirmDescription": "Arkistoidut tilaukset katoavat julkisista tilastoista, mutta säilyvät tietokannassa. Peruminen onnistuu vain yksi tilaus kerrallaan.",
+    "archiveConfirmTitle": "Arkistoidaanko {count} tilausta?",
+    "yearlyGoal": "Palvelinkulut vuodessa (€)",
+    "yearlyGoalHint": "Jätä tyhjäksi, jos haluat piilottaa kulupalkin.",
+    "yearlyRaised": "Katettu tähän mennessä (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Tilaukset",
     "deliveredLabel": "toimitettu",
     "withVin": "{count} VIN-koodilla, odottaa",
-    "withoutVin": "{count} ilman VIN-koodia"
+    "withoutVin": "{count} ilman VIN-koodia",
+    "stale": "{count} ilman päivitystä"
   },
   "tracking": {
     "backToOverview": "Takaisin yleiskatsaukseen",
@@ -794,12 +801,15 @@
     "impressum": "Oikeudellinen ilmoitus",
     "privacy": "Privacy",
     "toggleTheme": "Vaihda teemaa",
-    "changeLanguage": "Vaihda kieltä"
+    "changeLanguage": "Vaihda kieltä",
+    "skipToContent": "Siirry sisältöön"
   },
   "footer": {
     "operatedBy": "Ylläpitäjä Sven",
     "supportDevelopment": "Tue ylläpitoa ja kehitystä",
-    "stats": "{orders} tilausta · {delivered} toimitettu"
+    "stats": "{orders} tilausta · {delivered} toimitettu",
+    "serverCostsProgress": "{raised} / {goal} € katettu",
+    "serverCostsTitle": "Palvelinkulut {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Vaatii järjestelmänvalvojan oikeudet.",
     "orderDateInFuture": "Tilauspäivä ei voi olla tulevaisuudessa.",
     "datesOutOfOrder": "Päivämäärät eivät ole uskottavassa järjestyksessä. Tarkista tilaus-, tuotanto-, paperi- ja toimituspäivä.",
-    "legacyPasswordRequired": "Vanhoille merkinnöille vaaditaan uusi salasana."
+    "legacyPasswordRequired": "Vanhoille merkinnöille vaaditaan uusi salasana.",
+    "backHome": "Etusivulle",
+    "pageErrorBody": "Sivua ei voitu ladata. Uusi yritys auttaa usein.",
+    "pageErrorTitle": "Jokin meni pieleen",
+    "pageNotFoundBody": "Tätä osoitetta ei ole. Linkki voi olla vanhentunut tai väärin kirjoitettu.",
+    "pageNotFoundTitle": "Sivua ei löytynyt",
+    "retry": "Yritä uudelleen"
   }
 }

@@ -534,7 +534,13 @@
     "selectModelHint": "Kısıtlamaları yapılandırmak için bir araç ve model seçin",
     "loadingOptions": "Seçenekler yükleniyor...",
     "loadingConstraints": "Kısıtlamalar yükleniyor...",
-    "selectValue": "Değer seçin..."
+    "selectValue": "Değer seçin...",
+    "archiveConfirmAction": "Arşivle",
+    "archiveConfirmDescription": "Arşivlenen siparişler herkese açık istatistiklerden kaybolur, ancak veritabanında kalır. Geri alma yalnızca tek tek yapılabilir.",
+    "archiveConfirmTitle": "{count} sipariş arşivlensin mi?",
+    "yearlyGoal": "Yıllık sunucu maliyeti (€)",
+    "yearlyGoalHint": "Maliyet çubuğunu gizlemek için boş bırakın.",
+    "yearlyRaised": "Şu ana kadar karşılanan (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Sipariş",
     "deliveredLabel": "teslim edildi",
     "withVin": "{count} VIN’li, bekliyor",
-    "withoutVin": "{count} VIN’siz"
+    "withoutVin": "{count} VIN’siz",
+    "stale": "{count} güncellenmemiş"
   },
   "tracking": {
     "backToOverview": "Genel bakışa dön",
@@ -794,12 +801,15 @@
     "impressum": "Yasal Bildirim",
     "privacy": "Privacy",
     "toggleTheme": "Temayı değiştir",
-    "changeLanguage": "Dili değiştir"
+    "changeLanguage": "Dili değiştir",
+    "skipToContent": "İçeriğe geç"
   },
   "footer": {
     "operatedBy": "Sven tarafından işletilmektedir",
     "supportDevelopment": "Barındırma ve geliştirmeyi destekleyin",
-    "stats": "{orders} sipariş · {delivered} teslim edildi"
+    "stats": "{orders} sipariş · {delivered} teslim edildi",
+    "serverCostsProgress": "{goal} € içinden {raised} € karşılandı",
+    "serverCostsTitle": "{year} sunucu maliyeti"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Yönetici erişimi gerekli.",
     "orderDateInFuture": "Sipariş tarihi gelecekte olamaz.",
     "datesOutOfOrder": "Tarihler mantıklı bir sırada değil. Sipariş, üretim, belge ve teslimat tarihlerini kontrol edin.",
-    "legacyPasswordRequired": "Mevcut kayıtlar için yeni bir parola gerekli."
+    "legacyPasswordRequired": "Mevcut kayıtlar için yeni bir parola gerekli.",
+    "backHome": "Başlangıç sayfasına",
+    "pageErrorBody": "Sayfa yüklenemedi. Yeniden denemek çoğu zaman işe yarar.",
+    "pageErrorTitle": "Bir şeyler ters gitti",
+    "pageNotFoundBody": "Bu adres mevcut değil. Bağlantı eski olabilir veya yanlış yazılmış olabilir.",
+    "pageNotFoundTitle": "Sayfa bulunamadı",
+    "retry": "Yeniden dene"
   }
 }

@@ -534,7 +534,13 @@
     "selectModelHint": "Sélectionnez un véhicule et un modèle pour configurer les contraintes",
     "loadingOptions": "Chargement des options...",
     "loadingConstraints": "Chargement des contraintes...",
-    "selectValue": "Sélectionner la valeur..."
+    "selectValue": "Sélectionner la valeur...",
+    "archiveConfirmAction": "Archiver",
+    "archiveConfirmDescription": "Les commandes archivées disparaissent des statistiques publiques mais restent dans la base de données. Annuler n’est possible qu’une commande à la fois.",
+    "archiveConfirmTitle": "Archiver {count} commandes ?",
+    "yearlyGoal": "Coûts du serveur par an (€)",
+    "yearlyGoalHint": "Laissez vide pour masquer la barre des coûts.",
+    "yearlyRaised": "Couvert à ce jour (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Commandes",
     "deliveredLabel": "livrées",
     "withVin": "{count} avec VIN, en attente",
-    "withoutVin": "{count} sans VIN"
+    "withoutVin": "{count} sans VIN",
+    "stale": "{count} sans mise à jour"
   },
   "tracking": {
     "backToOverview": "Retour à la vue d'ensemble",
@@ -794,12 +801,15 @@
     "impressum": "Mentions légales",
     "privacy": "Confidentialité",
     "toggleTheme": "Changer de thème",
-    "changeLanguage": "Changer de langue"
+    "changeLanguage": "Changer de langue",
+    "skipToContent": "Aller au contenu"
   },
   "footer": {
     "operatedBy": "Géré par Sven",
     "supportDevelopment": "Soutenir l'hébergement et le développement",
-    "stats": "{orders} commandes · {delivered} livrées"
+    "stats": "{orders} commandes · {delivered} livrées",
+    "serverCostsProgress": "{raised} sur {goal} € couverts",
+    "serverCostsTitle": "Coûts du serveur {year}"
   },
   "updatesFeed": {
     "title": "Mises à jour récentes",
@@ -839,6 +849,12 @@
     "adminRequired": "Accès administrateur requis.",
     "orderDateInFuture": "La date de commande ne peut pas être dans le futur.",
     "datesOutOfOrder": "Ces dates ne suivent pas un ordre plausible. Vérifiez les dates de commande, production, documents et livraison.",
-    "legacyPasswordRequired": "Un nouveau mot de passe est requis pour les anciennes entrées."
+    "legacyPasswordRequired": "Un nouveau mot de passe est requis pour les anciennes entrées.",
+    "backHome": "Aller à la page d’accueil",
+    "pageErrorBody": "La page n’a pas pu être chargée. Un nouvel essai suffit souvent.",
+    "pageErrorTitle": "Une erreur est survenue",
+    "pageNotFoundBody": "Cette adresse n’existe pas. Le lien est peut-être obsolète ou mal saisi.",
+    "pageNotFoundTitle": "Page introuvable",
+    "retry": "Réessayer"
   }
 }

@@ -534,7 +534,13 @@
     "selectModelHint": "Velg et kjøretøy og en modell for å konfigurere begrensninger",
     "loadingOptions": "Laster alternativer...",
     "loadingConstraints": "Laster begrensninger...",
-    "selectValue": "Velg verdi..."
+    "selectValue": "Velg verdi...",
+    "archiveConfirmAction": "Arkiver",
+    "archiveConfirmDescription": "Arkiverte bestillinger forsvinner fra den offentlige statistikken, men blir liggende i databasen. Det kan bare angres én bestilling om gangen.",
+    "archiveConfirmTitle": "Arkivere {count} bestillinger?",
+    "yearlyGoal": "Serverkostnader per år (€)",
+    "yearlyGoalHint": "La feltet stå tomt for å skjule kostnadslinjen.",
+    "yearlyRaised": "Dekket så langt (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Bestillinger",
     "deliveredLabel": "levert",
     "withVin": "{count} med VIN, venter",
-    "withoutVin": "{count} uten VIN"
+    "withoutVin": "{count} uten VIN",
+    "stale": "{count} uten oppdatering"
   },
   "tracking": {
     "backToOverview": "Tilbake til oversikt",
@@ -794,12 +801,15 @@
     "impressum": "Juridisk informasjon",
     "privacy": "Privacy",
     "toggleTheme": "Bytt tema",
-    "changeLanguage": "Bytt språk"
+    "changeLanguage": "Bytt språk",
+    "skipToContent": "Gå til innhold"
   },
   "footer": {
     "operatedBy": "Driftet av Sven",
     "supportDevelopment": "Støtt hosting og utvikling",
-    "stats": "{orders} bestillinger · {delivered} levert"
+    "stats": "{orders} bestillinger · {delivered} levert",
+    "serverCostsProgress": "{raised} av {goal} € dekket",
+    "serverCostsTitle": "Serverkostnader {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Administratortilgang kreves.",
     "orderDateInFuture": "Bestillingsdatoen kan ikke være i fremtiden.",
     "datesOutOfOrder": "Datoene står ikke i en plausibel rekkefølge. Sjekk bestillings-, produksjons-, papir- og leveringsdato.",
-    "legacyPasswordRequired": "Det kreves et nytt passord for eldre oppføringer."
+    "legacyPasswordRequired": "Det kreves et nytt passord for eldre oppføringer.",
+    "backHome": "Til startsiden",
+    "pageErrorBody": "Siden kunne ikke lastes. Et nytt forsøk hjelper ofte.",
+    "pageErrorTitle": "Noe gikk galt",
+    "pageNotFoundBody": "Denne adressen finnes ikke. Lenken kan være utdatert eller feilskrevet.",
+    "pageNotFoundTitle": "Fant ikke siden",
+    "retry": "Prøv igjen"
   }
 }

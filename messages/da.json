@@ -534,7 +534,13 @@
     "selectModelHint": "Vælg et køretøj og en model for at konfigurere begrænsninger",
     "loadingOptions": "Indlæser valgmuligheder...",
     "loadingConstraints": "Indlæser begrænsninger...",
-    "selectValue": "Vælg værdi..."
+    "selectValue": "Vælg værdi...",
+    "archiveConfirmAction": "Arkivér",
+    "archiveConfirmDescription": "Arkiverede ordrer forsvinder fra den offentlige statistik, men bliver i databasen. Det kan kun fortrydes én ordre ad gangen.",
+    "archiveConfirmTitle": "Arkivér {count} ordrer?",
+    "yearlyGoal": "Serveromkostninger pr. år (€)",
+    "yearlyGoalHint": "Lad feltet stå tomt for at skjule omkostningslinjen.",
+    "yearlyRaised": "Dækket indtil nu (€)"
   },
   "options": {
     "country": {
@@ -718,7 +724,8 @@
     "ordersLabel": "Ordrer",
     "deliveredLabel": "leveret",
     "withVin": "{count} med VIN, venter",
-    "withoutVin": "{count} uden VIN"
+    "withoutVin": "{count} uden VIN",
+    "stale": "{count} uden opdatering"
   },
   "tracking": {
     "backToOverview": "Tilbage til oversigt",
@@ -794,12 +801,15 @@
     "impressum": "Juridisk information",
     "privacy": "Privacy",
     "toggleTheme": "Skift tema",
-    "changeLanguage": "Skift sprog"
+    "changeLanguage": "Skift sprog",
+    "skipToContent": "Gå til indhold"
   },
   "footer": {
     "operatedBy": "Drevet af Sven",
     "supportDevelopment": "Støt hosting og udvikling",
-    "stats": "{orders} bestillinger · {delivered} leveret"
+    "stats": "{orders} bestillinger · {delivered} leveret",
+    "serverCostsProgress": "{raised} af {goal} € dækket",
+    "serverCostsTitle": "Serveromkostninger {year}"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -839,6 +849,12 @@
     "adminRequired": "Administratoradgang kræves.",
     "orderDateInFuture": "Ordredatoen kan ikke ligge i fremtiden.",
     "datesOutOfOrder": "Datoerne står ikke i en plausibel rækkefølge. Tjek ordre-, produktions-, papir- og leveringsdato.",
-    "legacyPasswordRequired": "Der kræves en ny adgangskode til ældre poster."
+    "legacyPasswordRequired": "Der kræves en ny adgangskode til ældre poster.",
+    "backHome": "Til forsiden",
+    "pageErrorBody": "Siden kunne ikke indlæses. Et nyt forsøg hjælper ofte.",
+    "pageErrorTitle": "Noget gik galt",
+    "pageNotFoundBody": "Denne adresse findes ikke. Linket kan være forældet eller skrevet forkert.",
+    "pageNotFoundTitle": "Siden blev ikke fundet",
+    "retry": "Prøv igen"
   }
 }
