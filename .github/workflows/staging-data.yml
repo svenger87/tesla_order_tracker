@@ -4,12 +4,13 @@ name: Staging data
 on:
   workflow_dispatch:
     inputs:
-      delete_order_id:
-        description: 'Order id to delete from production first (leave empty to skip)'
-        required: false
-        default: ''
-      delete_order_name:
-        description: 'Name that id must have, as a guard against a mistyped id'
+      repair_data:
+        description: 'Repair unreadable dates and the gb country code on production'
+        type: boolean
+        required: true
+        default: false
+      delete_pairs:
+        description: 'Rows to delete, as id=name,id=name — the name guards against a mistyped id'
         required: false
         default: ''
       copy_to_staging:
@@ -29,14 +30,14 @@ jobs:
       - name: Run on the VPS
         uses: appleboy/ssh-action@v1
         env:
-          DELETE_ID: ${{ inputs.delete_order_id }}
-          DELETE_NAME: ${{ inputs.delete_order_name }}
+          REPAIR: ${{ inputs.repair_data }}
+          DELETE_PAIRS: ${{ inputs.delete_pairs }}
           COPY: ${{ inputs.copy_to_staging }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: DELETE_ID,DELETE_NAME,COPY
+          envs: REPAIR,DELETE_PAIRS,COPY
           script: |
             set -e
             cd /opt/tesla-order-tracker
@@ -62,7 +63,7 @@ jobs:
             MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
 
             git fetch origin staging
-            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs
+            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/repair-orders.mjs
 
             # Through the backup API, not cp: these databases run in WAL mode, so
             # the newest writes sit in prod.db-wal and a file copy would leave
@@ -71,20 +72,45 @@ jobs:
             docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
               node /app/ops/copy-sqlite.mjs /prod/prod.db /prod/prod.db.before-$STAMP
 
-            if [ -n "$DELETE_ID" ]; then
-              echo ">>> Dry run of the delete"
-              docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME"
+            TOUCHED=0
 
-              echo ">>> Applying"
+            # Repair before deleting: one of the duplicate pairs only becomes
+            # decidable once its unreadable date can be read, and the rule for
+            # which row to keep is "the one that has an order date".
+            if [ "$REPAIR" = "true" ]; then
+              echo ">>> Dry run of the repair"
               docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/delete-order.mjs /prod/prod.db "$DELETE_ID" --expect-name "$DELETE_NAME" --apply
+                node /app/ops/repair-orders.mjs /prod/prod.db
 
-              # Production caches the order list in memory per process; a restart
-              # is the honest way to make the change visible.
-              docker compose restart app
+              echo ">>> Applying repair"
+              docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                node /app/ops/repair-orders.mjs /prod/prod.db --apply
+              TOUCHED=1
             else
-              echo ">>> No delete requested"
+              echo ">>> No repair requested"
+            fi
+
+            if [ -n "$DELETE_PAIRS" ]; then
+              echo "$DELETE_PAIRS" | tr ',' '\n' | while IFS= read -r pair; do
+                [ -z "$pair" ] && continue
+                ID="${pair%%=*}"
+                NAME="${pair#*=}"
+                echo ">>> Dry run: $ID"
+                docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME"
+                echo ">>> Applying: $ID"
+                docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME" --apply
+              done
+              TOUCHED=1
+            else
+              echo ">>> No deletions requested"
+            fi
+
+            # Production caches the order list in memory per process; a restart
+            # is the honest way to make a data change visible.
+            if [ "$TOUCHED" = "1" ]; then
+              docker compose restart app
             fi
 
             if [ "$COPY" = "true" ]; then
