@@ -340,34 +340,11 @@ export function TrackingPageClient({
           </motion.div>
         )}
 
-        {/* Order details grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.25 }}
-        >
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{t('orderDetails')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                {detailFields.filter(f => f.value).map((field) => (
-                  <div key={field.label} className="flex justify-between items-baseline py-1.5 border-b border-border/50 last:border-0">
-                    <span className="text-sm text-muted-foreground">{field.label}</span>
-                    <span className="text-sm font-medium text-right ml-4 truncate max-w-[60%]">{field.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Last, deliberately. The forum asked for hard facts in front and
-           fewer forecasts — a prediction sitting above the recorded dates
-           reads as the headline of the page, and the same complaint is made
-           about BOT. Everything above this point is something that happened;
-           this is the only thing that has not. */}
+        {/* After the recorded facts, before the configuration table. The forum
+           asked for hard facts in front and fewer forecasts, and a prediction
+           above the dates read as the headline of the page. Dead last was the
+           other mistake: moved to the very bottom it read as removed. Every
+           section above it is something that happened; this is not. */}
         {/* Delivery prediction (only for non-delivered orders) */}
         {prediction && !order.deliveryDate && (() => {
           const elapsed = prediction.daysElapsedFromReference
@@ -436,6 +413,30 @@ export function TrackingPageClient({
           </motion.div>
           )
         })()}
+
+        {/* Order details grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">{t('orderDetails')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                {detailFields.filter(f => f.value).map((field) => (
+                  <div key={field.label} className="flex justify-between items-baseline py-1.5 border-b border-border/50 last:border-0">
+                    <span className="text-sm text-muted-foreground">{field.label}</span>
+                    <span className="text-sm font-medium text-right ml-4 truncate max-w-[60%]">{field.value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
 
       </div>
 
