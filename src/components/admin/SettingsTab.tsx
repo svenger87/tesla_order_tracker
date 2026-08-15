@@ -453,7 +453,11 @@ export function SettingsTab() {
                 <AlertTriangle className="h-5 w-5 text-data shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-700 dark:text-blue-400">
                   <p className="font-medium">Info</p>
-                  <p dangerouslySetInnerHTML={{ __html: t.raw('archiveInfo') as string }} />
+                  {/* Rendered as elements rather than injected as HTML: these
+                      strings come from Crowdin, so they are content from outside
+                      the codebase, and dangerouslySetInnerHTML would put whatever
+                      a translation contains straight into the DOM. */}
+                  <p>{t.rich('archiveInfo', { strong: (chunks) => <strong>{chunks}</strong> })}</p>
                 </div>
               </div>
 
@@ -496,7 +500,16 @@ export function SettingsTab() {
                     {tc('save')}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('archiveThresholdDescription', { days: settings?.archiveThreshold ?? 180 }) }} />
+                {/* This one was visibly broken: the message carries a <strong>
+                    tag, which next-intl treats as rich text needing a handler,
+                    so plain t() failed and the paragraph showed the literal
+                    string "admin.archiveThresholdDescription" to the admin. */}
+                <p className="text-xs text-muted-foreground">
+                  {t.rich('archiveThresholdDescription', {
+                    days: settings?.archiveThreshold ?? 180,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
+                </p>
               </div>
 
               {archiveInfo && (
