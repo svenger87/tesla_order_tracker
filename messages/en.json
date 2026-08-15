@@ -839,6 +839,12 @@
     "adminRequired": "Admin access required.",
     "orderDateInFuture": "The order date cannot be in the future.",
     "datesOutOfOrder": "These dates are not in a plausible order. Check the order, production, papers and delivery dates.",
-    "legacyPasswordRequired": "A new password is required for legacy entries."
+    "legacyPasswordRequired": "A new password is required for legacy entries.",
+    "pageNotFoundTitle": "Page not found",
+    "pageNotFoundBody": "This address does not exist. The link may be outdated or mistyped.",
+    "pageErrorTitle": "Something went wrong",
+    "pageErrorBody": "This page could not be loaded. Trying again often does the trick.",
+    "retry": "Try again",
+    "backHome": "Go to start page"
   }
 }

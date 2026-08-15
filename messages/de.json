@@ -839,6 +839,12 @@
     "adminRequired": "Admin-Zugriff erforderlich.",
     "orderDateInFuture": "Das Bestelldatum kann nicht in der Zukunft liegen.",
     "datesOutOfOrder": "Die Datumsangaben ergeben keine plausible Reihenfolge. Prüfe Bestell-, Produktions-, Papier- und Auslieferungsdatum.",
-    "legacyPasswordRequired": "Neues Passwort erforderlich für Bestandseinträge."
+    "legacyPasswordRequired": "Neues Passwort erforderlich für Bestandseinträge.",
+    "pageNotFoundTitle": "Seite nicht gefunden",
+    "pageNotFoundBody": "Diese Adresse gibt es nicht. Möglicherweise ist der Link veraltet oder hat sich vertippt.",
+    "pageErrorTitle": "Da ist etwas schiefgelaufen",
+    "pageErrorBody": "Die Seite konnte nicht geladen werden. Ein erneuter Versuch hilft oft schon.",
+    "retry": "Erneut versuchen",
+    "backHome": "Zur Startseite"
   }
 }
