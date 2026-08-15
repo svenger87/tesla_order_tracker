@@ -110,6 +110,16 @@ jobs:
             # Restart the target service and reload Caddy config
             docker compose up -d --no-deps $SERVICE
 
+            # The backup sidecar runs the production image and is only touched on
+            # a master deploy. Without this it would sit in docker-compose.yml
+            # and never start, because the deploy only ever brings up one
+            # service by name — a backup nobody notices is not running is worse
+            # than one that was never configured.
+            if [ "$SERVICE" = "app" ]; then
+              docker compose pull backup-cron
+              docker compose up -d --no-deps backup-cron
+            fi
+
             # This was `2>/dev/null || true`, so a rejected or unreloadable
             # Caddyfile looked exactly like a clean deploy: the job went green,
             # the config never took effect, and nothing anywhere said so.

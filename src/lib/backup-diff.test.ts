@@ -102,3 +102,26 @@ describe('diffOrders', () => {
     expect(d.changed[0].fields).toHaveLength(3)
   })
 })
+
+describe('the standalone script and the app agree on the filename', () => {
+  it('accepts a name scripts/backup.mjs would write', async () => {
+    // Two implementations of the same thing is how this codebase grew three
+    // copies of its date parser that quietly disagreed. The runtime image ships
+    // the Next bundle rather than an importable copy of the backup module, so
+    // the cron script has to duplicate the naming — and this fails CI if the two
+    // ever drift, rather than producing snapshots the app cannot list.
+    const { readFile } = await import('node:fs/promises')
+    const script = await readFile('scripts/backup.mjs', 'utf8')
+
+    const literal = script.match(/const BACKUP_NAME = (\/.*\/)\n/)?.[1]
+    expect(literal, 'BACKUP_NAME not found in scripts/backup.mjs').toBeTruthy()
+
+    const stamp = new Date('2026-08-15T13:31:16.110Z')
+      .toISOString().replace(/\.\d+Z$/, 'Z').replace(/:/g, '-')
+    const produced = `backup-${stamp}.db`
+
+    expect(produced).toBe('backup-2026-08-15T13-31-16Z.db')
+    expect(isBackupName(produced)).toBe(true)
+    expect(new RegExp(literal!.slice(1, -1)).test(produced)).toBe(true)
+  })
+})

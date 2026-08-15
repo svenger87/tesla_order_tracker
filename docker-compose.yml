@@ -19,6 +19,33 @@ services:
       retries: 3
       start_period: 30s
 
+  # Daily snapshot of the production database, taken on this machine rather than
+  # by anything that has to reach it from outside. Backups are the one thing that
+  # should not depend on an external service being available.
+  #
+  # Same image as the app, so it always has the matching better-sqlite3 build and
+  # ships with every deploy. It writes into the same volume as the database:
+  # that covers a bad edit, a bad sync or a bad delete — not the loss of this
+  # machine, which needs an off-site copy this does not attempt.
+  backup-cron:
+    image: ghcr.io/svenger87/tesla_order_tracker:master
+    restart: unless-stopped
+    environment:
+      - BACKUP_KEEP=20
+    volumes:
+      - sqlite_data:/app/data
+    # A snapshot on start, then one a day. --min-age-hours makes the start-up run
+    # a no-op when a recent one already exists, so redeploying ten times in an
+    # afternoon does not push every older snapshot out of a twenty-deep history.
+    entrypoint:
+      - sh
+      - -c
+      - >
+        while true; do
+          node /app/scripts/backup.mjs /app/data/prod.db --min-age-hours 20 || true;
+          sleep 86400;
+        done
+
   app-staging:
     image: ghcr.io/svenger87/tesla_order_tracker:staging
     command: >

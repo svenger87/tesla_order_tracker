@@ -40,6 +40,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modul
 COPY --from=builder --chown=nextjs:nodejs /app/src/generated ./src/generated
 COPY --from=builder --chown=nextjs:nodejs /app/schema-template.db ./schema-template.db
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate-schema.mjs ./scripts/migrate-schema.mjs
+# Run by the backup-cron service, and usable by hand on the host.
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/backup.mjs ./scripts/backup.mjs
 RUN mkdir -p /app/data /app/data/compositor-cache && chown -R nextjs:nodejs /app/data
 USER nextjs
 EXPOSE 3000
