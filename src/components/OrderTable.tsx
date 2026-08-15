@@ -383,7 +383,9 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'seats',              label: 'seats',              group: 'configuration', width: 80  },
   { key: 'autopilot',          label: 'autopilot',          group: 'configuration', width: 130 },
   // Status & Delivery
-  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 150 },
+  // 150 cut the last characters off a full date range ("02/06/2026 - 30/06/2026")
+  // by 10 to 19 pixels — measured on three of 155 cells, all of them this column.
+  { key: 'deliveryWindow',     label: 'deliveryWindow',     group: 'configuration', width: 172 },
   { key: 'deliveryLocation',   label: 'deliveryLocation',   group: 'configuration', width: 150 },
   { key: 'vin',                label: 'vin',                group: 'configuration', width: 170 },
   { key: 'vinReceivedDate',    label: 'vinDate',            group: 'configuration', width: 120 },

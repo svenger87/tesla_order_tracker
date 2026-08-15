@@ -17,6 +17,7 @@ import { DeliveryTimelineChart } from './DeliveryTimelineChart'
 import { WaitTimeDistributionChart } from './WaitTimeDistributionChart'
 import { VinWeekdayChart } from './VinWeekdayChart'
 import { MiniPieChart } from './ConfigDistributionCharts'
+import { ConfigDeliveryInsights } from './ConfigDeliveryInsights'
 import { EmptyState } from '@/components/EmptyState'
 import { DeliveryTrendChart } from './DeliveryTrendChart'
 import { VinActivityChart } from './VinActivityChart'
@@ -311,6 +312,14 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
               <MiniPieChart data={localizedDriveDistribution} title={t('driveDistribution')} delay={0.05} />
               <MiniPieChart data={localizedRangeDistribution} title={t('rangeDistribution')} delay={0.1} />
               <MiniPieChart data={localizedColorDistribution} title={t('colorDistribution')} delay={0.15} />
+            </div>
+
+            {/* The pies above say how the fleet is configured; this says what
+                each configuration costs in waiting time. It was built and then
+                never mounted anywhere, so the answer existed and no one could
+                see it. */}
+            <div className="mt-6">
+              <ConfigDeliveryInsights orders={orders} />
             </div>
           </motion.div>
         </TabsContent>
