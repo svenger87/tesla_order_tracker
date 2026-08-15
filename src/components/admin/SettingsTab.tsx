@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink, Eye, EyeOff } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
@@ -33,6 +40,7 @@ export function SettingsTab() {
   const [archiving, setArchiving] = useState(false)
   const [archiveMessage, setArchiveMessage] = useState('')
   const [archiveError, setArchiveError] = useState('')
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false)
 
   // API Key state
   const [apiKey, setApiKey] = useState<string | null>(null)
@@ -111,6 +119,7 @@ export function SettingsTab() {
 
   const handleBatchArchive = async () => {
     if (!settings) return
+    setArchiveConfirmOpen(false)
     setArchiving(true)
     setArchiveMessage('')
     setArchiveError('')
@@ -527,7 +536,11 @@ export function SettingsTab() {
 
               <div className="flex gap-2">
                 <Button
-                  onClick={handleBatchArchive}
+                  // Asks first: this archives every stale order in one go — other
+                  // people's entries — and there is no bulk way back, only one
+                  // order at a time. Deleting an order already asks; this is the
+                  // larger action of the two.
+                  onClick={() => setArchiveConfirmOpen(true)}
                   disabled={archiving || !archiveInfo || archiveInfo.staleCount === 0}
                   variant="default"
                 >
@@ -557,6 +570,26 @@ export function SettingsTab() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('archiveConfirmTitle', { count: archiveInfo?.staleCount ?? 0 })}
+            </DialogTitle>
+            <DialogDescription>{t('archiveConfirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setArchiveConfirmOpen(false)}>
+              {tc('cancel')}
+            </Button>
+            <Button onClick={handleBatchArchive}>
+              <Archive className="h-4 w-4 mr-2" />
+              {t('archiveConfirmAction')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

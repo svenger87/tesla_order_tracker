@@ -534,7 +534,10 @@
     "selectModelHint": "Wähle ein Fahrzeug und Modell, um die Einschränkungen zu konfigurieren",
     "loadingOptions": "Lade Optionen...",
     "loadingConstraints": "Lade Einschränkungen...",
-    "selectValue": "Wert wählen..."
+    "selectValue": "Wert wählen...",
+    "archiveConfirmTitle": "{count} Bestellungen archivieren?",
+    "archiveConfirmDescription": "Archivierte Bestellungen verschwinden aus den öffentlichen Statistiken, bleiben aber in der Datenbank. Rückgängig machen lässt sich das nur einzeln pro Bestellung.",
+    "archiveConfirmAction": "Archivieren"
   },
   "options": {
     "country": {

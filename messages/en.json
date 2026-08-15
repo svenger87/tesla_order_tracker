@@ -534,7 +534,10 @@
     "selectModelHint": "Select a vehicle and model to configure constraints",
     "loadingOptions": "Loading options...",
     "loadingConstraints": "Loading constraints...",
-    "selectValue": "Select value..."
+    "selectValue": "Select value...",
+    "archiveConfirmTitle": "Archive {count} orders?",
+    "archiveConfirmDescription": "Archived orders disappear from the public statistics but stay in the database. Undoing this is only possible one order at a time.",
+    "archiveConfirmAction": "Archive"
   },
   "options": {
     "country": {
