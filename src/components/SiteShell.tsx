@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { dedupedJson } from '@/lib/dedupe-fetch'
@@ -31,6 +32,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const pathname = usePathname()
+  const tn = useTranslations('nav')
 
   useEffect(() => {
     dedupedJson<Settings>('/api/settings')
@@ -51,12 +53,22 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {/* Seven tab stops separated a keyboard user from the content on every
+          page. Hidden until focused, which is the point: the first Tab press
+          offers the shortcut, and everyone else never sees it. */}
+      <a
+        href="#inhalt"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline focus:outline-2 focus:outline-primary"
+      >
+        {tn('skipToContent')}
+      </a>
+
       <Header isAdmin={isAdmin} settings={settings} />
       {/* The main landmark belongs to the frame, not to individual pages: three
           of them brought their own and six had none, so on most of the site
           there was nothing for a screen reader to skip to. Pages keep their own
           width and padding in a plain container inside this one. */}
-      <main className="flex-1">{children}</main>
+      <main id="inhalt" className="flex-1">{children}</main>
       <Footer settings={settings} />
     </div>
   )

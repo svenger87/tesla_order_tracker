@@ -684,12 +684,14 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             <p className="text-sm text-muted-foreground">{te('clickEditToChange')}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href={`/${locale}`}>
-              <Button variant="outline">{te('backToOverview')}</Button>
-            </Link>
-            <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
-              <Button>{te('viewMyOrder')}</Button>
-            </Link>
+            <Button variant="outline" asChild>
+              <Link href={`/${locale}`}>{te('backToOverview')}</Link>
+            </Button>
+            <Button asChild>
+              <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
+                {te('viewMyOrder')}
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -942,11 +944,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </Button>
             )}
             {mode === 'page' && (
-              <Link href={`/${locale}`}>
-                <Button type="button" variant="outline">
+              <Button type="button" variant="outline" asChild>
+                <Link href={`/${locale}`}>
                   {tc('cancel')}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
             <Button type="submit" disabled={loading}>
               {loading ? tc('saving') : order ? tc('update') : tc('add')}

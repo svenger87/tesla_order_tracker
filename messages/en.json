@@ -825,7 +825,8 @@
     "impressum": "Legal Notice",
     "privacy": "Privacy",
     "toggleTheme": "Toggle theme",
-    "changeLanguage": "Change language"
+    "changeLanguage": "Change language",
+    "skipToContent": "Skip to content"
   },
   "footer": {
     "operatedBy": "Operated by Sven",

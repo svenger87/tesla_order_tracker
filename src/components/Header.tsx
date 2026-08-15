@@ -94,22 +94,22 @@ export function Header({ isAdmin, settings }: HeaderProps) {
                 router pulled the docs route eagerly — and that route's stylesheet
                 is the whole 175 KB Swagger sheet, fetched for every visitor who
                 never opens the API docs. */}
-            <Link href="/docs" prefetch={false}>
-              <Button variant="ghost" size="icon" className="h-9 w-9" title={tn('apiDocs')}>
+            <Button variant="ghost" size="icon" className="h-9 w-9" title={tn('apiDocs')} asChild>
+              <Link href="/docs" prefetch={false}>
                 <Code2 className="h-4 w-4" />
                 <span className="sr-only">{tn('apiDocs')}</span>
-              </Button>
-            </Link>
-            <a
-              href="https://github.com/svenger87/tesla_order_tracker"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="ghost" size="icon" className="h-9 w-9">
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+              <a
+                href="https://github.com/svenger87/tesla_order_tracker"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Github className="h-4 w-4" />
                 <span className="sr-only">GitHub</span>
-              </Button>
-            </a>
+              </a>
+            </Button>
 
             <div className="w-px h-5 bg-border mx-2" />
 
@@ -118,18 +118,18 @@ export function Header({ isAdmin, settings }: HeaderProps) {
 
             {/* Admin */}
             {isAdmin ? (
-              <Link href="/admin">
-                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5">
+              <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5" asChild>
+                <Link href="/admin">
                   Admin
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ) : (
-              <Link href="/admin/login">
-                <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin/login">
                   <LogIn className="h-4 w-4 mr-1.5" />
                   Admin
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </nav>
 
@@ -139,22 +139,22 @@ export function Header({ isAdmin, settings }: HeaderProps) {
             <ThemeToggle />
 
             {isAdmin ? (
-              <Link href="/admin">
-                <Button variant="outline" size="icon" className="h-9 w-9 border-primary/30 text-primary" title="Admin">
+              <Button variant="outline" size="icon" className="h-9 w-9 border-primary/30 text-primary" title="Admin" asChild>
+                <Link href="/admin">
                   <LogIn className="h-4 w-4" />
                   {/* The icon-only buttons above carry one of these; these two
                       were left without a name, and a title alone is not one a
                       touch device ever shows. */}
                   <span className="sr-only">Admin</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ) : (
-              <Link href="/admin/login">
-                <Button variant="ghost" size="icon" className="h-9 w-9" title="Admin">
+              <Button variant="ghost" size="icon" className="h-9 w-9" title="Admin" asChild>
+                <Link href="/admin/login">
                   <LogIn className="h-4 w-4" />
                   <span className="sr-only">Admin</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </nav>
 

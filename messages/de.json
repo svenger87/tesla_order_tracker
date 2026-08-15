@@ -825,7 +825,8 @@
     "impressum": "Impressum",
     "privacy": "Datenschutz",
     "toggleTheme": "Design wechseln",
-    "changeLanguage": "Sprache wechseln"
+    "changeLanguage": "Sprache wechseln",
+    "skipToContent": "Zum Inhalt springen"
   },
   "footer": {
     "operatedBy": "Betrieben von Sven",

@@ -392,12 +392,12 @@ export function SettingsTab() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Link href="/docs" target="_blank">
-                    <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/docs" target="_blank">
                       <ExternalLink className="h-4 w-4 mr-2" />
                       {t('apiDocs')}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
 
                 <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
