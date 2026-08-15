@@ -782,7 +782,7 @@
     "orderToPapers": "Bestellung → Papiere",
     "papersToDelivery": "Papiere → Lieferung",
     "waitedLabel": "Gewartet",
-    "waitingLabel": "Wartet seit",
+    "waitingLabel": "Wartet",
     "daysUnit": "Tage",
     "fasterThanComparable": "{days} Tage schneller als vergleichbare Bestellungen (Median {median})",
     "slowerThanComparable": "{days} Tage länger als vergleichbare Bestellungen (Median {median})",
