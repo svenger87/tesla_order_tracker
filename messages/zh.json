@@ -563,7 +563,12 @@
     "restoreOrder": "恢复",
     "orderRestored": "已恢复 {name}",
     "restoreFailed": "恢复失败",
-    "backupCompareFailed": "比较失败"
+    "backupCompareFailed": "比较失败",
+    "backupAllFields": "所有字段",
+    "backupSortName": "按名称",
+    "backupSortChanges": "改动最多",
+    "backupShowing": "{total} 条中的 {shown} 条",
+    "backupNoMatches": "没有符合这些筛选条件的结果。"
   },
   "options": {
     "country": {

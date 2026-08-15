@@ -563,7 +563,12 @@
     "restoreOrder": "Vrati",
     "orderRestored": "{name} vraćeno",
     "restoreFailed": "Vraćanje nije uspjelo",
-    "backupCompareFailed": "Usporedba nije uspjela"
+    "backupCompareFailed": "Usporedba nije uspjela",
+    "backupAllFields": "Sva polja",
+    "backupSortName": "Po imenu",
+    "backupSortChanges": "Najviše promjena",
+    "backupShowing": "{shown} od {total}",
+    "backupNoMatches": "Nema rezultata s ovim filtrima."
   },
   "options": {
     "country": {

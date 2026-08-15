@@ -563,7 +563,12 @@
     "restoreOrder": "Återställ",
     "orderRestored": "{name} återställd",
     "restoreFailed": "Återställningen misslyckades",
-    "backupCompareFailed": "Jämförelsen misslyckades"
+    "backupCompareFailed": "Jämförelsen misslyckades",
+    "backupAllFields": "Alla fält",
+    "backupSortName": "Efter namn",
+    "backupSortChanges": "Flest ändringar",
+    "backupShowing": "{shown} av {total}",
+    "backupNoMatches": "Inga träffar med dessa filter."
   },
   "options": {
     "country": {

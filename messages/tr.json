@@ -563,7 +563,12 @@
     "restoreOrder": "Geri yükle",
     "orderRestored": "{name} geri yüklendi",
     "restoreFailed": "Geri yükleme başarısız",
-    "backupCompareFailed": "Karşılaştırma başarısız"
+    "backupCompareFailed": "Karşılaştırma başarısız",
+    "backupAllFields": "Tüm alanlar",
+    "backupSortName": "Ada göre",
+    "backupSortChanges": "En çok değişiklik",
+    "backupShowing": "{total} içinden {shown}",
+    "backupNoMatches": "Bu filtrelerle eşleşen yok."
   },
   "options": {
     "country": {

@@ -563,7 +563,12 @@
     "restoreOrder": "Επαναφορά",
     "orderRestored": "Η {name} επαναφέρθηκε",
     "restoreFailed": "Η επαναφορά απέτυχε",
-    "backupCompareFailed": "Η σύγκριση απέτυχε"
+    "backupCompareFailed": "Η σύγκριση απέτυχε",
+    "backupAllFields": "Όλα τα πεδία",
+    "backupSortName": "Κατά όνομα",
+    "backupSortChanges": "Περισσότερες αλλαγές",
+    "backupShowing": "{shown} από {total}",
+    "backupNoMatches": "Κανένα αποτέλεσμα με αυτά τα φίλτρα."
   },
   "options": {
     "country": {

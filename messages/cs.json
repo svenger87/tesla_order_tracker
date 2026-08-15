@@ -563,7 +563,12 @@
     "restoreOrder": "Obnovit",
     "orderRestored": "{name} obnoveno",
     "restoreFailed": "Obnovení selhalo",
-    "backupCompareFailed": "Porovnání selhalo"
+    "backupCompareFailed": "Porovnání selhalo",
+    "backupAllFields": "Všechna pole",
+    "backupSortName": "Podle názvu",
+    "backupSortChanges": "Nejvíce změn",
+    "backupShowing": "{shown} z {total}",
+    "backupNoMatches": "Těmto filtrům nic neodpovídá."
   },
   "options": {
     "country": {

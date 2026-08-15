@@ -563,7 +563,12 @@
     "restoreOrder": "復元",
     "orderRestored": "{name} を復元しました",
     "restoreFailed": "復元に失敗しました",
-    "backupCompareFailed": "比較に失敗しました"
+    "backupCompareFailed": "比較に失敗しました",
+    "backupAllFields": "すべての項目",
+    "backupSortName": "名前順",
+    "backupSortChanges": "変更の多い順",
+    "backupShowing": "{total} 件中 {shown} 件",
+    "backupNoMatches": "この条件に一致する項目はありません。"
   },
   "options": {
     "country": {

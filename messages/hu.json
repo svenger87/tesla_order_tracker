@@ -563,7 +563,12 @@
     "restoreOrder": "Visszaállítás",
     "orderRestored": "{name} visszaállítva",
     "restoreFailed": "A visszaállítás nem sikerült",
-    "backupCompareFailed": "Az összehasonlítás nem sikerült"
+    "backupCompareFailed": "Az összehasonlítás nem sikerült",
+    "backupAllFields": "Minden mező",
+    "backupSortName": "Név szerint",
+    "backupSortChanges": "Legtöbb változás",
+    "backupShowing": "{shown} / {total}",
+    "backupNoMatches": "Nincs találat ezekkel a szűrőkkel."
   },
   "options": {
     "country": {

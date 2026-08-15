@@ -563,7 +563,12 @@
     "restoreOrder": "Gjenopprett",
     "orderRestored": "{name} gjenopprettet",
     "restoreFailed": "Gjenoppretting mislyktes",
-    "backupCompareFailed": "Sammenligning mislyktes"
+    "backupCompareFailed": "Sammenligning mislyktes",
+    "backupAllFields": "Alle felt",
+    "backupSortName": "Etter navn",
+    "backupSortChanges": "Flest endringer",
+    "backupShowing": "{shown} av {total}",
+    "backupNoMatches": "Ingen treff med disse filtrene."
   },
   "options": {
     "country": {

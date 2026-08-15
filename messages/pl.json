@@ -563,7 +563,12 @@
     "restoreOrder": "Przywróć",
     "orderRestored": "Przywrócono {name}",
     "restoreFailed": "Przywracanie nie powiodło się",
-    "backupCompareFailed": "Porównanie nie powiodło się"
+    "backupCompareFailed": "Porównanie nie powiodło się",
+    "backupAllFields": "Wszystkie pola",
+    "backupSortName": "Wg nazwy",
+    "backupSortChanges": "Najwięcej zmian",
+    "backupShowing": "{shown} z {total}",
+    "backupNoMatches": "Brak wyników dla tych filtrów."
   },
   "options": {
     "country": {

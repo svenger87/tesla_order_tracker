@@ -563,7 +563,12 @@
     "restoreOrder": "복원",
     "orderRestored": "{name} 복원됨",
     "restoreFailed": "복원에 실패했습니다",
-    "backupCompareFailed": "비교에 실패했습니다"
+    "backupCompareFailed": "비교에 실패했습니다",
+    "backupAllFields": "모든 필드",
+    "backupSortName": "이름순",
+    "backupSortChanges": "변경 많은 순",
+    "backupShowing": "{total}개 중 {shown}개",
+    "backupNoMatches": "이 필터에 해당하는 항목이 없습니다."
   },
   "options": {
     "country": {

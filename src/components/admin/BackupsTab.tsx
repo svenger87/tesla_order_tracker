@@ -5,9 +5,8 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Archive, RotateCcw, Trash2, GitCompare, Loader2, Plus } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { BackupDiff } from './BackupDiff'
+import { Archive, Trash2, GitCompare, Loader2, Plus } from 'lucide-react'
 
 type BackupInfo = { name: string; createdAt: string; bytes: number; orders: number }
 type FieldChange = { field: string; from: unknown; to: unknown }
@@ -23,13 +22,6 @@ function formatBytes(n: number): string {
 
 function formatWhen(iso: string, locale: string): string {
   return new Date(iso).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
-/** Empty, null and undefined all mean "nothing here" to a reader. */
-function show(value: unknown): string {
-  if (value === null || value === undefined || value === '') return '—'
-  if (typeof value === 'boolean') return value ? '✓' : '—'
-  return String(value)
 }
 
 export function BackupsTab({ locale }: { locale: string }) {
@@ -130,15 +122,6 @@ export function BackupsTab({ locale }: { locale: string }) {
     }
   }
 
-  type DiffRow = { id: string; name: string; fields?: FieldChange[] }
-  const groups: { key: string; label: string; rows: DiffRow[]; restorable: boolean }[] = diff
-    ? [
-        { key: 'removed', label: t('diffRemoved'), rows: diff.removed, restorable: true },
-        { key: 'changed', label: t('diffChanged'), rows: diff.changed, restorable: true },
-        { key: 'added', label: t('diffAdded'), rows: diff.added, restorable: false },
-      ]
-    : []
-
   const empty = diff && diff.added.length + diff.removed.length + diff.changed.length === 0
 
   return (
@@ -202,55 +185,11 @@ export function BackupsTab({ locale }: { locale: string }) {
                     {empty && <p className="text-sm text-muted-foreground">{t('noDifferences')}</p>}
 
                     {diff && !empty && (
-                      <div className="space-y-4">
-                        <p className="text-xs text-muted-foreground">{t('restoreHint')}</p>
-                        {groups.filter(g => g.rows.length > 0).map(g => (
-                          <div key={g.key}>
-                            <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                              {g.label} <Badge variant="outline" className="ml-1 tabular-nums">{g.rows.length}</Badge>
-                            </h4>
-                            <ul className="grid gap-px overflow-hidden rounded-md border bg-border">
-                              {g.rows.map(row => {
-                                const fields = row.fields ?? []
-                                return (
-                                  <li key={row.id} className="bg-card px-3 py-2">
-                                    <div className="flex items-center justify-between gap-3">
-                                      <span className="truncate text-sm font-medium">{row.name}</span>
-                                      {g.restorable && (
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          disabled={busyId === row.id}
-                                          onClick={() => restore(b.name, row.id, row.name)}
-                                        >
-                                          {busyId === row.id
-                                            ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                                            : <RotateCcw className="mr-1.5 h-3.5 w-3.5" />}
-                                          {t('restoreOrder')}
-                                        </Button>
-                                      )}
-                                    </div>
-                                    {fields.length > 0 && (
-                                      <dl className="mt-1.5 grid gap-0.5 text-xs">
-                                        {fields.map(f => (
-                                          <div key={f.field} className="grid grid-cols-[minmax(0,8rem)_minmax(0,1fr)] gap-2">
-                                            <dt className="truncate text-muted-foreground">{f.field}</dt>
-                                            <dd className="min-w-0">
-                                              <span className="text-muted-foreground line-through">{show(f.from)}</span>
-                                              <span className="mx-1.5 text-muted-foreground">→</span>
-                                              <span className={cn('font-medium')}>{show(f.to)}</span>
-                                            </dd>
-                                          </div>
-                                        ))}
-                                      </dl>
-                                    )}
-                                  </li>
-                                )
-                              })}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
+                      <BackupDiff
+                        diff={diff}
+                        busyId={busyId}
+                        onRestore={(id, name) => restore(b.name, id, name)}
+                      />
                     )}
                   </div>
                 )}

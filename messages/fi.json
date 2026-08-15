@@ -563,7 +563,12 @@
     "restoreOrder": "Palauta",
     "orderRestored": "{name} palautettu",
     "restoreFailed": "Palautus epäonnistui",
-    "backupCompareFailed": "Vertailu epäonnistui"
+    "backupCompareFailed": "Vertailu epäonnistui",
+    "backupAllFields": "Kaikki kentät",
+    "backupSortName": "Nimen mukaan",
+    "backupSortChanges": "Eniten muutoksia",
+    "backupShowing": "{shown} / {total}",
+    "backupNoMatches": "Ei osumia näillä suodattimilla."
   },
   "options": {
     "country": {

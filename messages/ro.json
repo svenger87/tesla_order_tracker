@@ -563,7 +563,12 @@
     "restoreOrder": "Restaurează",
     "orderRestored": "{name} restaurată",
     "restoreFailed": "Restaurarea a eșuat",
-    "backupCompareFailed": "Comparația a eșuat"
+    "backupCompareFailed": "Comparația a eșuat",
+    "backupAllFields": "Toate câmpurile",
+    "backupSortName": "După nume",
+    "backupSortChanges": "Cele mai multe modificări",
+    "backupShowing": "{shown} din {total}",
+    "backupNoMatches": "Niciun rezultat cu aceste filtre."
   },
   "options": {
     "country": {

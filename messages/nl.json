@@ -563,7 +563,12 @@
     "restoreOrder": "Herstellen",
     "orderRestored": "{name} hersteld",
     "restoreFailed": "Herstellen mislukt",
-    "backupCompareFailed": "Vergelijken mislukt"
+    "backupCompareFailed": "Vergelijken mislukt",
+    "backupAllFields": "Alle velden",
+    "backupSortName": "Op naam",
+    "backupSortChanges": "Meeste wijzigingen",
+    "backupShowing": "{shown} van {total}",
+    "backupNoMatches": "Geen resultaten met deze filters."
   },
   "options": {
     "country": {

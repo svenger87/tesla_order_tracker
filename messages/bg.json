@@ -563,7 +563,12 @@
     "restoreOrder": "Възстанови",
     "orderRestored": "{name} е възстановена",
     "restoreFailed": "Възстановяването не успя",
-    "backupCompareFailed": "Сравнението не успя"
+    "backupCompareFailed": "Сравнението не успя",
+    "backupAllFields": "Всички полета",
+    "backupSortName": "По име",
+    "backupSortChanges": "Най-много промени",
+    "backupShowing": "{shown} от {total}",
+    "backupNoMatches": "Няма съвпадения с тези филтри."
   },
   "options": {
     "country": {

@@ -563,7 +563,12 @@
     "restoreOrder": "Gendan",
     "orderRestored": "{name} gendannet",
     "restoreFailed": "Gendannelse mislykkedes",
-    "backupCompareFailed": "Sammenligning mislykkedes"
+    "backupCompareFailed": "Sammenligning mislykkedes",
+    "backupAllFields": "Alle felter",
+    "backupSortName": "Efter navn",
+    "backupSortChanges": "Flest ændringer",
+    "backupShowing": "{shown} af {total}",
+    "backupNoMatches": "Ingen match med disse filtre."
   },
   "options": {
     "country": {
