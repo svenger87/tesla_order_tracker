@@ -40,7 +40,7 @@ jobs:
       - name: Run on the VPS
         uses: appleboy/ssh-action@v1
         env:
-          TARGET: ${{ inputs.target }}
+          DB_TARGET: ${{ inputs.target }}
           REPAIR: ${{ inputs.repair_data }}
           ARCHIVE_PAIRS: ${{ inputs.archive_pairs }}
           DELETE_PAIRS: ${{ inputs.delete_pairs }}
@@ -49,7 +49,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: TARGET,REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
+          envs: DB_TARGET,REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
           script: |
             set -e
             cd /opt/tesla-order-tracker
@@ -76,14 +76,19 @@ jobs:
 
             # Everything below writes to $DB. Staging is the default so a repair
             # can be seen on the site before it reaches anyone's real data.
-            if [ "$TARGET" = "production" ]; then
+            # Named DB_TARGET, not TARGET: the ssh-action's own environment
+            # already carries a TARGET, and it won. The log read
+            # "Acting on: /home/runner/work/_actions/appleboy/ssh-action/..."
+            # and the production branch below could never be reached — the
+            # selector silently always chose staging.
+            if [ "$DB_TARGET" = "production" ]; then
               DB=/prod/prod.db
               APP=app
             else
               DB=/staging/staging.db
               APP=app-staging
             fi
-            echo ">>> Acting on: $TARGET ($DB)"
+            echo ">>> Acting on: $DB_TARGET ($DB)"
 
             git fetch origin staging
             git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs
@@ -173,7 +178,7 @@ jobs:
             # Refuses rather than guesses: copying production over staging after
             # repairing staging would throw the repair away, and the person who
             # ticked both boxes did not mean that.
-            if [ "$COPY" = "true" ] && [ "$TARGET" = "staging" ] && [ "$TOUCHED" = "1" ]; then
+            if [ "$COPY" = "true" ] && [ "$DB_TARGET" = "staging" ] && [ "$TOUCHED" = "1" ]; then
               echo ">>> Refusing to copy production over the staging changes just made"
               echo ">>> Run the copy on its own if that is what you want"
               exit 1
