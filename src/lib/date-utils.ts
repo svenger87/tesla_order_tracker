@@ -22,12 +22,24 @@ export function normalizeDate(input: string | null | undefined): string | null {
 
   let day: number, month: number, year: number
 
-  // Try D.M.YYYY pattern (covers DD.MM.YYYY, D.MM.YYYY, DD.M.YYYY, D.M.YYYY)
-  const germanMatch = trimmed.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)
+  // Try D.M.YYYY and D/M/YYYY. The slash form is here because the sync sends
+  // it: four order dates reached production unparsed, two of them 17/04/2026
+  // and 21/01/2026. Anything this function does not recognise becomes null, so
+  // those arrived as a date and were stored as nothing.
+  //
+  // Read day first. Both live examples put a number above twelve in front, so
+  // that is what the sender means, and it matches every other format here.
+  const germanMatch = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/)
+  const compactMatch = trimmed.match(/^(\d{2})(\d{2})(\d{4})$/)
   if (germanMatch) {
     day = parseInt(germanMatch[1], 10)
     month = parseInt(germanMatch[2], 10)
     year = parseInt(germanMatch[3], 10)
+  } else if (compactMatch) {
+    // DDMMYYYY, no separators — 27032026 is in the data too.
+    day = parseInt(compactMatch[1], 10)
+    month = parseInt(compactMatch[2], 10)
+    year = parseInt(compactMatch[3], 10)
   } else {
     // Try ISO YYYY-MM-DD
     const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
@@ -123,7 +135,17 @@ export function normalizeDateFields<T extends object>(data: T): T {
   const record = data as Record<string, unknown>
   for (const field of DATE_FIELDS) {
     if (field in record && typeof record[field] === 'string') {
-      record[field] = normalizeDate(record[field])
+      const raw = record[field] as string
+      const normalized = normalizeDate(raw)
+
+      // A value that arrived and could not be read is worth a line in the log.
+      // Silently turning it into null is how 41 synced orders ended up without
+      // an order date and nobody knew a date had been sent at all.
+      if (raw.trim() && normalized === null) {
+        console.warn(`Discarded unreadable ${field}: ${JSON.stringify(raw)}`)
+      }
+
+      record[field] = normalized
     }
   }
   return data

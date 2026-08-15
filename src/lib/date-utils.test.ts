@@ -76,3 +76,39 @@ describe('findDateSequenceError', () => {
     expect(findDateSequenceError({})).toBeNull()
   })
 })
+
+describe('normalizeDate — formats the TOST sync actually sends', () => {
+  // These are not hypothetical: the four unparseable order dates sitting in
+  // production read 17/04/2026, 21/01/2026, 27032026 and "12.". Anything the
+  // normalizer does not recognise is set to null, so a date arriving in one of
+  // these shapes was thrown away and the order landed without one.
+  test('accepts slashes', () => {
+    expect(normalizeDate('17/04/2026')).toBe('17.04.2026')
+    expect(normalizeDate('21/01/2026')).toBe('21.01.2026')
+    expect(normalizeDate('5/3/2026')).toBe('05.03.2026')
+  })
+
+  test('accepts a compact date with no separators', () => {
+    expect(normalizeDate('27032026')).toBe('27.03.2026')
+  })
+
+  test('reads day first, as every other format here does', () => {
+    // Both live examples put a number above twelve first, so day-first is what
+    // the sender means. A German tool feeding a German-first site would be an
+    // odd place for month-first.
+    expect(normalizeDate('17/04/2026')).toBe('17.04.2026')
+  })
+
+  test('still rejects what is not a date', () => {
+    expect(normalizeDate('12.')).toBeNull()
+    expect(normalizeDate('27/03/26')).toBeNull()
+    expect(normalizeDate('2703202')).toBeNull()
+    expect(normalizeDate('32/01/2026')).toBeNull()
+    expect(normalizeDate('17/13/2026')).toBeNull()
+  })
+
+  test('applies the same calendar check as the dot format', () => {
+    expect(normalizeDate('31/02/2027')).toBeNull()
+    expect(normalizeDate('29/02/2028')).toBe('29.02.2028')
+  })
+})
