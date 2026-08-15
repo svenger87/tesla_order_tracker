@@ -296,7 +296,7 @@ export function SettingsTab() {
             {/* These two feed the cost bar in the footer. The columns existed in
                 the database for months with nothing reading or writing them, so
                 the bar could never be switched on. Empty means off. */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="yearlyGoal">{t('yearlyGoal')}</Label>
                 <Input
