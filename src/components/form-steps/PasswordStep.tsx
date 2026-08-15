@@ -46,10 +46,10 @@ export function PasswordStep({
     return (
       <div className={className}>
         <div className="bg-pending/10 border border-pending/20 rounded-md p-4">
-          <h4 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
+          <h2 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <KeyRound className="h-4 w-4" />
             {t('legacyPasswordTitle')}
-          </h4>
+          </h2>
           <p className="text-sm text-amber-600 dark:text-amber-300 mt-1">
             {t('legacyPasswordDescription')}
           </p>
@@ -88,10 +88,10 @@ export function PasswordStep({
     return (
       <div className={className}>
         {showHeading && (
-          <h4 className="font-medium flex items-center gap-2">
+          <h2 className="font-medium flex items-center gap-2">
             <KeyRound className="h-4 w-4" />
             {t('password')}
-          </h4>
+          </h2>
         )}
         <p className="text-sm text-muted-foreground">
           {t('passwordDescription')}

@@ -80,7 +80,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6">
         <Tabs defaultValue="settings">
           <TabsList className="mb-6">
             <TabsTrigger value="settings">
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
             <CompositorTab />
           </TabsContent>
         </Tabs>
-      </main>
+      </div>
     </div>
   )
 }

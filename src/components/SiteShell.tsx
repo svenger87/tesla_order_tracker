@@ -52,7 +52,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header isAdmin={isAdmin} settings={settings} />
-      <div className="flex-1">{children}</div>
+      {/* The main landmark belongs to the frame, not to individual pages: three
+          of them brought their own and six had none, so on most of the site
+          there was nothing for a screen reader to skip to. Pages keep their own
+          width and padding in a plain container inside this one. */}
+      <main className="flex-1">{children}</main>
       <Footer settings={settings} />
     </div>
   )

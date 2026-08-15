@@ -21,7 +21,7 @@ import {
 import { Calendar } from '@/components/ui/calendar'
 import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
@@ -700,7 +700,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   if (mode === 'page') {
     const formHeader = (
       <CardHeader>
-        <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+        {/* h1, not CardTitle: in page mode this heading *is* the page's title,
+                and CardTitle renders a plain div — so /new and the edit page
+                had no heading at all for a screen reader to land on. Same
+                classes CardTitle applies, so nothing moves visually. */}
+            <h1 className="leading-none font-semibold" data-slot="card-title">
+              {order ? t('editOrder') : t('newOrder')}
+            </h1>
         <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
       </CardHeader>
     )
@@ -769,10 +775,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           {/* Section 1: Persönliche Daten */}
           <div className="space-y-3 rounded-lg border surface-subtle p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <User className="h-4 w-4 text-primary" />
               {t('personalData')}
-            </h4>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <PersonalDataStep
                 formData={formData}
@@ -788,10 +794,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           {/* Section 2: Fahrzeugkonfiguration */}
           <div className="space-y-3 rounded-lg border surface-subtle p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <Car className="h-4 w-4 text-primary" />
               {t('vehicleConfig')}
-            </h4>
+            </h2>
             {/* Two steps, one grid. `contents` drops their own wrappers so the
                 ten fields stay a single flowing sequence — split into two grids
                 they would break into a ragged row after the drive select. */}
@@ -835,10 +841,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
           {/* Section 3: Lieferung */}
           <div className="space-y-3 rounded-lg border surface-subtle p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <MapPin className="h-4 w-4 text-primary" />
               {t('delivery')}
-            </h4>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DeliveryStep
                 formData={formData}
@@ -908,10 +914,10 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           {/* Password - only for new orders */}
           {!order && (
             <div className="space-y-3 rounded-lg border surface-subtle p-4">
-              <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+              <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
                 <KeyRound className="h-4 w-4 text-primary" />
                 {t('password')}
-              </h4>
+              </h2>
               <PasswordStep
                 formData={formData}
                 handleChange={handleChange}
@@ -955,7 +961,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+          {/* h1, not CardTitle: in page mode this heading *is* the page's title,
+                and CardTitle renders a plain div — so /new and the edit page
+                had no heading at all for a screen reader to land on. Same
+                classes CardTitle applies, so nothing moves visually. */}
+            <h1 className="leading-none font-semibold" data-slot="card-title">
+              {order ? t('editOrder') : t('newOrder')}
+            </h1>
           <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
         </CardHeader>
         <CardContent>

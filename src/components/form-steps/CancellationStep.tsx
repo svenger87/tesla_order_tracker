@@ -30,10 +30,10 @@ export function CancellationStep({ formData, handleChange, t }: CancellationStep
         formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'surface-subtle',
       )}
     >
-      <h4 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
+      <h2 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
         <Ban className={cn('h-4 w-4', formData.cancelled ? 'text-destructive' : 'text-muted-foreground')} />
         {t('cancelledTitle')}
-      </h4>
+      </h2>
       <p className="text-sm text-muted-foreground">{t('cancelledDescription')}</p>
       <div className="flex items-center gap-3">
         <Checkbox

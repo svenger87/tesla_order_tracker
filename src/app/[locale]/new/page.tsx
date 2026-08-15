@@ -9,13 +9,13 @@ const OrderForm = dynamic(
 
 export default function NewOrderPage() {
   return (
-    <main className="w-full max-w-3xl mx-auto px-4 py-8">
+    <div className="w-full max-w-3xl mx-auto px-4 py-8">
       <OrderForm
         open={true}
         onOpenChange={() => {}}
         mode="page"
         onSuccess={() => {}}
       />
-    </main>
+    </div>
   )
 }

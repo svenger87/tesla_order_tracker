@@ -50,7 +50,7 @@ export function DeliveryTimeline({ stats }: DeliveryTimelineProps) {
 
   return (
     <div className="rounded-xl border bg-card p-4 sm:p-6">
-      <h3 className="text-sm font-medium text-muted-foreground mb-4">{t('deliveryPipeline')}</h3>
+      <h2 className="text-sm font-medium text-muted-foreground mb-4">{t('deliveryPipeline')}</h2>
 
       {/* Desktop: horizontal */}
       <div className="hidden sm:flex items-center justify-between gap-0">

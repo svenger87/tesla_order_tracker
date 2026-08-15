@@ -347,7 +347,7 @@ export function HomeClient({ initialOrders }: HomeClientProps) {
       {/* Header and footer moved into SiteShell, which the layout wraps around
           every page — they used to exist only here, so this was the one page in
           the app with navigation. */}
-      <main className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
+      <div className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
         {/* Hero Section */}
         <HeroSection orders={orders} onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
@@ -429,10 +429,14 @@ export function HomeClient({ initialOrders }: HomeClientProps) {
           <CardHeader className="border-b bg-transparent px-0 pb-2 pt-0 sm:bg-card sm:px-4 sm:py-5">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <CardTitle className="flex items-center gap-2 text-[22px] sm:text-xl">
+                {/* h2, not CardTitle: the quarter accordions below render as h3
+                    (Radix puts its trigger in one), so with only a div here the
+                    page jumped from the hero h1 straight to h3. Same classes, so
+                    nothing moves. */}
+                <h2 className="flex items-center gap-2 text-[22px] font-semibold leading-none sm:text-xl" data-slot="card-title">
                   <Car className="h-5 w-5 text-primary" />
                   {t('orders')}
-                </CardTitle>
+                </h2>
                 <CardDescription className="text-sm">
                   {hasActiveGlobalFilters
                     ? `${liveOrders.length} / ${orders.filter(o => !o.cancelled).length} ${t('orders')}`
@@ -485,7 +489,7 @@ export function HomeClient({ initialOrders }: HomeClientProps) {
             vehicleType: globalFilters.vehicle ?? 'all',
           }}
         />
-      </main>
+      </div>
 
       {/* Delivery Prediction Dialog */}
       <Dialog open={showPrediction} onOpenChange={setShowPrediction}>
