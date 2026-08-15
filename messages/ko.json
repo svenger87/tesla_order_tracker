@@ -787,7 +787,8 @@
     "fasterThanComparable": "비슷한 주문보다 {days}일 빠름 (중앙값 {median})",
     "slowerThanComparable": "비슷한 주문보다 {days}일 느림 (중앙값 {median})",
     "matchesComparable": "비슷한 주문의 중앙값과 동일 ({median})",
-    "comparableTypically": "비슷한 주문은 중앙값 {median}일이 걸렸습니다"
+    "comparableTypically": "비슷한 주문은 중앙값 {median}일이 걸렸습니다",
+    "today": "오늘"
   },
   "support": {
     "communityMessage": "이 데이터는 커뮤니티에 의해 커뮤니티를 위해 유지됩니다. 이 사이트가 도움이 되셨다면 서버 비용을 지원해 주실 수 있습니다.",

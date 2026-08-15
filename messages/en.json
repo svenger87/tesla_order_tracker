@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} days faster than comparable orders (median {median})",
     "slowerThanComparable": "{days} days slower than comparable orders (median {median})",
     "matchesComparable": "Right on the median for comparable orders ({median})",
-    "comparableTypically": "Comparable orders took a median of {median} days"
+    "comparableTypically": "Comparable orders took a median of {median} days",
+    "today": "Today"
   },
   "updatesFeed": {
     "title": "Recent updates",

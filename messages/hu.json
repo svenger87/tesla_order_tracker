@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} nappal gyorsabb a hasonló rendeléseknél (medián {median})",
     "slowerThanComparable": "{days} nappal lassabb a hasonló rendeléseknél (medián {median})",
     "matchesComparable": "Pontosan a hasonló rendelések mediánján ({median})",
-    "comparableTypically": "A hasonló rendelések mediánban {median} napig tartottak"
+    "comparableTypically": "A hasonló rendelések mediánban {median} napig tartottak",
+    "today": "Ma"
   },
   "support": {
     "communityMessage": "Ezeket az adatokat a közösség tartja karban a közösség számára. Ha ez az oldal segít Önnek, támogathatja a szerver költségeit.",

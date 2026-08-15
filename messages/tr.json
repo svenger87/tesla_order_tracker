@@ -787,7 +787,8 @@
     "fasterThanComparable": "Benzer siparişlerden {days} gün daha hızlı (medyan {median})",
     "slowerThanComparable": "Benzer siparişlerden {days} gün daha yavaş (medyan {median})",
     "matchesComparable": "Benzer siparişlerin medyanında ({median})",
-    "comparableTypically": "Benzer siparişler medyan {median} gün sürdü"
+    "comparableTypically": "Benzer siparişler medyan {median} gün sürdü",
+    "today": "Bugün"
   },
   "support": {
     "communityMessage": "Bu veriler topluluk tarafından topluluk için korunmaktadır. Bu site size yardımcı oluyorsa, sunucu maliyetlerini destekleyebilirsiniz.",

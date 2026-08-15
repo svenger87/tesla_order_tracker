@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} Tage schneller als vergleichbare Bestellungen (Median {median})",
     "slowerThanComparable": "{days} Tage länger als vergleichbare Bestellungen (Median {median})",
     "matchesComparable": "Genau im Schnitt vergleichbarer Bestellungen (Median {median})",
-    "comparableTypically": "Vergleichbare Bestellungen brauchten im Median {median} Tage"
+    "comparableTypically": "Vergleichbare Bestellungen brauchten im Median {median} Tage",
+    "today": "Heute"
   },
   "updatesFeed": {
     "title": "Letzte Updates",

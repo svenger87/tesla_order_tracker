@@ -402,40 +402,76 @@ export function TrackingPageClient({
               </CardHeader>
               <CardContent>
                 {exceedsPessimistic && (
-                  <div className="mb-4 rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20 p-2.5">
-                    <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
+                  <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 p-2.5">
+                    <p className="text-xs text-destructive flex items-start gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                       <span>{t('exceedsPessimisticHint', { days: elapsed })}</span>
                     </p>
                   </div>
                 )}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className={cn(
-                    "text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800",
-                    past(prediction.optimisticDays) && "opacity-50",
-                  )}>
-                    <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
-                    <p className={cn("font-bold text-green-700 dark:text-green-400", past(prediction.optimisticDays) && "line-through")}>{prediction.optimisticDate}</p>
-                    <p className="text-xs text-muted-foreground">{prediction.optimisticDays}d</p>
-                  </div>
-                  <div className={cn(
-                    "text-center p-3 rounded-lg bg-primary/5 border border-primary/20",
-                    past(prediction.expectedDays) && "opacity-50",
-                  )}>
-                    <p className="text-xs text-muted-foreground mb-1">{t('expected')}</p>
-                    <p className={cn("font-bold text-primary", past(prediction.expectedDays) && "line-through")}>{prediction.expectedDate}</p>
-                    <p className="text-xs text-muted-foreground">{prediction.expectedDays}d</p>
-                  </div>
-                  <div className={cn(
-                    "text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800",
-                    past(prediction.pessimisticDays) && "opacity-50",
-                  )}>
-                    <p className="text-xs text-muted-foreground mb-1">{t('pessimistic')}</p>
-                    <p className={cn("font-bold text-amber-700 dark:text-amber-400", past(prediction.pessimisticDays) && "line-through")}>{prediction.pessimisticDate}</p>
-                    <p className="text-xs text-muted-foreground">{prediction.pessimisticDays}d</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+
+                {/* One interval, drawn as one interval.
+                    This was three equally sized boxes — green, brand, amber —
+                    which read as good, normal and bad. None of that is true: a
+                    delivery at the 75th percentile is not a warning, it is the
+                    slower end of the same ordinary range, and splitting it into
+                    three cards hid that the three numbers are one distribution.
+                    The band is that range, the line inside it is the median, and
+                    the marker is where this order stands today — which is the
+                    thing the reader came to find out and was not shown at all. */}
+                {(() => {
+                  const span = Math.max(prediction.pessimisticDays, elapsed) * 1.15 || 1
+                  const at = (d: number) => `${Math.min(100, Math.max(0, (d / span) * 100))}%`
+                  return (
+                    <div className="pt-5 pb-1">
+                      <div className="relative">
+                        <div
+                          className="absolute -top-5 z-10 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-foreground"
+                          style={{ left: at(elapsed) }}
+                        >
+                          {t('today')}
+                        </div>
+                        <div className="relative h-2 rounded-full bg-muted">
+                          <div
+                            className="absolute inset-y-0 rounded-full bg-primary/25"
+                            style={{ left: at(prediction.optimisticDays), right: `calc(100% - ${at(prediction.pessimisticDays)})` }}
+                          />
+                          <div
+                            className="absolute inset-y-0 w-0.5 -translate-x-1/2 rounded-full bg-primary"
+                            style={{ left: at(prediction.expectedDays) }}
+                          />
+                          <div
+                            className="absolute -inset-y-1 w-0.5 -translate-x-1/2 rounded-full bg-foreground"
+                            style={{ left: at(elapsed) }}
+                          />
+                        </div>
+                      </div>
+
+                      <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
+                        {[
+                          { label: t('optimistic'), date: prediction.optimisticDate, days: prediction.optimisticDays },
+                          { label: t('expected'), date: prediction.expectedDate, days: prediction.expectedDays },
+                          { label: t('pessimistic'), date: prediction.pessimisticDate, days: prediction.pessimisticDays },
+                        ].map((c, i) => (
+                          <div key={c.label} className={cn(past(c.days) && 'opacity-45')}>
+                            <dt className="text-xs text-muted-foreground">{c.label}</dt>
+                            <dd className={cn(
+                              'mt-0.5 font-semibold tabular-nums',
+                              i === 1 ? 'text-primary' : 'text-foreground',
+                            )}>
+                              {c.date}
+                            </dd>
+                            <dd className="text-xs tabular-nums text-muted-foreground">
+                              {c.days} {tc('days')}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  )
+                })()}
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
                   <span className={confidenceColor}>
                     {t('predictionConfidence', { level: t(`confidence_${prediction.confidence}`) })}
                   </span>
@@ -492,7 +528,13 @@ export function TrackingPageClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <SimilarOrders orders={similar} currentOrderId={order.id} ownWaitDays={waitComparison?.waitedDays ?? null} />
+            <SimilarOrders
+              orders={similar}
+              currentOrderId={order.id}
+              ownWaitDays={waitComparison?.waitedDays ?? null}
+              ownName={order.name}
+              ownDelivered={waitComparison?.isDelivered}
+            />
           </motion.div>
         )}
 

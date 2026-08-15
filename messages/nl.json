@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} dagen sneller dan vergelijkbare bestellingen (mediaan {median})",
     "slowerThanComparable": "{days} dagen langzamer dan vergelijkbare bestellingen (mediaan {median})",
     "matchesComparable": "Precies op de mediaan van vergelijkbare bestellingen ({median})",
-    "comparableTypically": "Vergelijkbare bestellingen duurden mediaan {median} dagen"
+    "comparableTypically": "Vergelijkbare bestellingen duurden mediaan {median} dagen",
+    "today": "Vandaag"
   },
   "support": {
     "communityMessage": "Deze gegevens worden door de community voor de community onderhouden. Als deze site u helpt, kunt u de serverkosten ondersteunen.",

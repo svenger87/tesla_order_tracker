@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} dias mais rápido do que encomendas comparáveis (mediana {median})",
     "slowerThanComparable": "{days} dias mais lento do que encomendas comparáveis (mediana {median})",
     "matchesComparable": "Exatamente na mediana de encomendas comparáveis ({median})",
-    "comparableTypically": "As encomendas comparáveis demoraram uma mediana de {median} dias"
+    "comparableTypically": "As encomendas comparáveis demoraram uma mediana de {median} dias",
+    "today": "Hoje"
   },
   "support": {
     "communityMessage": "Estes dados são mantidos pela comunidade para a comunidade. Se este site o ajuda, pode apoiar os custos do servidor.",

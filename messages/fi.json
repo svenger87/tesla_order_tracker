@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} päivää nopeammin kuin vastaavat tilaukset (mediaani {median})",
     "slowerThanComparable": "{days} päivää hitaammin kuin vastaavat tilaukset (mediaani {median})",
     "matchesComparable": "Täsmälleen vastaavien tilausten mediaani ({median})",
-    "comparableTypically": "Vastaavat tilaukset kestivät mediaanina {median} päivää"
+    "comparableTypically": "Vastaavat tilaukset kestivät mediaanina {median} päivää",
+    "today": "Tänään"
   },
   "support": {
     "communityMessage": "Tätä dataa ylläpitää yhteisö yhteisölle. Jos tämä sivusto auttaa sinua, voit tukea palvelinkustannuksia.",

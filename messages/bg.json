@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} дни по-бързо от сравними поръчки (медиана {median})",
     "slowerThanComparable": "{days} дни по-бавно от сравними поръчки (медиана {median})",
     "matchesComparable": "Точно колкото сравними поръчки (медиана {median})",
-    "comparableTypically": "Сравними поръчки са отнели медиана от {median} дни"
+    "comparableTypically": "Сравними поръчки са отнели медиана от {median} дни",
+    "today": "Днес"
   },
   "support": {
     "communityMessage": "Тези данни се поддържат от общността за общността. Ако този сайт Ви помага, можете да подкрепите разходите за сървъра.",

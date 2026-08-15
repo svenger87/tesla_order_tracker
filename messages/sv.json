@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} dagar snabbare än jämförbara beställningar (median {median})",
     "slowerThanComparable": "{days} dagar långsammare än jämförbara beställningar (median {median})",
     "matchesComparable": "Precis på medianen för jämförbara beställningar ({median})",
-    "comparableTypically": "Jämförbara beställningar tog median {median} dagar"
+    "comparableTypically": "Jämförbara beställningar tog median {median} dagar",
+    "today": "Idag"
   },
   "support": {
     "communityMessage": "Dessa data underhålls av communityn för communityn. Om denna webbplats hjälper dig kan du stödja serverkostnaderna.",

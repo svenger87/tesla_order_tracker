@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} dage hurtigere end sammenlignelige ordrer (median {median})",
     "slowerThanComparable": "{days} dage langsommere end sammenlignelige ordrer (median {median})",
     "matchesComparable": "Præcis som sammenlignelige ordrer (median {median})",
-    "comparableTypically": "Sammenlignelige ordrer tog median {median} dage"
+    "comparableTypically": "Sammenlignelige ordrer tog median {median} dage",
+    "today": "I dag"
   },
   "support": {
     "communityMessage": "Disse data vedligeholdes af fællesskabet for fællesskabet. Hvis dette websted hjælper dig, kan du støtte serveromkostningerne.",

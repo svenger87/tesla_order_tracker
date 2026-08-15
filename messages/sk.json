@@ -787,7 +787,8 @@
     "fasterThanComparable": "O {days} dní rýchlejšie než porovnateľné objednávky (medián {median})",
     "slowerThanComparable": "O {days} dní pomalšie než porovnateľné objednávky (medián {median})",
     "matchesComparable": "Presne na medián porovnateľných objednávok ({median})",
-    "comparableTypically": "Porovnateľné objednávky trvali medián {median} dní"
+    "comparableTypically": "Porovnateľné objednávky trvali medián {median} dní",
+    "today": "Dnes"
   },
   "support": {
     "communityMessage": "Tieto údaje spravuje komunita pre komunitu. Ak vám táto stránka pomáha, môžete podporiť náklady na server.",

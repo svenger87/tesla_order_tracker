@@ -787,7 +787,8 @@
     "fasterThanComparable": "比同类订单快 {days} 天（中位数 {median}）",
     "slowerThanComparable": "比同类订单慢 {days} 天（中位数 {median}）",
     "matchesComparable": "正好处于同类订单的中位数（{median}）",
-    "comparableTypically": "同类订单的中位数为 {median} 天"
+    "comparableTypically": "同类订单的中位数为 {median} 天",
+    "today": "今天"
   },
   "support": {
     "communityMessage": "这些数据由社区为社区维护。如果本站对您有帮助，您可以支持服务器费用。",

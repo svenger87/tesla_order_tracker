@@ -787,7 +787,8 @@
     "fasterThanComparable": "{days} dana brže od usporedivih narudžbi (medijan {median})",
     "slowerThanComparable": "{days} dana sporije od usporedivih narudžbi (medijan {median})",
     "matchesComparable": "Točno na medijanu usporedivih narudžbi ({median})",
-    "comparableTypically": "Usporedive narudžbe trajale su medijan {median} dana"
+    "comparableTypically": "Usporedive narudžbe trajale su medijan {median} dana",
+    "today": "Danas"
   },
   "support": {
     "communityMessage": "Ove podatke održava zajednica za zajednicu. Ako vam ova stranica pomaže, možete podržati troškove poslužitelja.",

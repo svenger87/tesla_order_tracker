@@ -787,7 +787,8 @@
     "fasterThanComparable": "Cu {days} zile mai rapid decât comenzi comparabile (mediana {median})",
     "slowerThanComparable": "Cu {days} zile mai lent decât comenzi comparabile (mediana {median})",
     "matchesComparable": "Exact pe mediana comenzilor comparabile ({median})",
-    "comparableTypically": "Comenzile comparabile au durat o mediană de {median} zile"
+    "comparableTypically": "Comenzile comparabile au durat o mediană de {median} zile",
+    "today": "Azi"
   },
   "support": {
     "communityMessage": "Aceste date sunt întreținute de comunitate pentru comunitate. Dacă acest site vă ajută, puteți sprijini costurile serverului.",

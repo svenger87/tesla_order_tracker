@@ -1,5 +1,6 @@
 import { Order, MODEL_Y_TRIMS, MODEL_3_TRIMS, COLORS, DRIVES, COUNTRIES } from './types'
 import { parseGermanDate, calculateDaysBetween, getOrderStatus } from './statistics'
+import { isHandedOver, countsTowardStats, startOfToday } from './order-state'
 
 // Resolve internal value to display label
 function resolveLabel(value: string, dimension: 'model' | 'color' | 'drive' | 'country'): string {
@@ -113,8 +114,20 @@ export function predictDelivery(
 ): DeliveryPrediction | null {
   const filtersUsed: string[] = []
 
-  // Start with strict filters, progressively relax
-  let candidates = orders.filter(o => o.deliveryDate && o.vehicleType === vehicleType)
+  // Start with strict filters, progressively relax.
+  //
+  // Handed over, not merely dated: a booked delivery states what somebody
+  // expects, not what they waited, and forecasting from it is forecasting from
+  // a forecast. The recency window below excluded future dates as a side effect
+  // of its own cutoff — but only when it engaged, and for 87 of the 1834 live
+  // predictions no window reaches its minimum sample and the full history is
+  // used instead. Those are exactly the rare configurations with least data to
+  // spare. Cancelled and archived orders are out for the same reason they are
+  // out of every other figure.
+  const todayStart = startOfToday()
+  let candidates = orders.filter(o =>
+    o.vehicleType === vehicleType && countsTowardStats(o) && isHandedOver(o, todayStart),
+  )
   filtersUsed.push(vehicleType)
 
   if (model && candidates.filter(o => o.model === model).length >= 5) {

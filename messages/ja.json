@@ -787,7 +787,8 @@
     "fasterThanComparable": "同等の注文より {days} 日早い（中央値 {median}）",
     "slowerThanComparable": "同等の注文より {days} 日遅い（中央値 {median}）",
     "matchesComparable": "同等の注文の中央値ちょうど（{median}）",
-    "comparableTypically": "同等の注文は中央値 {median} 日かかりました"
+    "comparableTypically": "同等の注文は中央値 {median} 日かかりました",
+    "today": "今日"
   },
   "support": {
     "communityMessage": "このデータはコミュニティによってコミュニティのために管理されています。このサイトがお役に立てば、サーバー費用のご支援をお願いいたします。",
