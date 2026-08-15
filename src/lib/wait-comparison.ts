@@ -1,5 +1,6 @@
 import type { Order } from './types'
 import { parseGermanDate } from './date-utils'
+import { isHandedOver } from './order-state'
 
 export interface WaitComparison {
   /** Days from ordering to handover, or to today while still waiting. */
@@ -46,8 +47,12 @@ export function getWaitComparison(order: Order, comparable: Order[]): WaitCompar
 
   const waitedDays = handedOver ? days(ordered, handedOver) : days(ordered, today)
 
+  // Same rule as for the order itself: a date still to come is an appointment,
+  // and a comparison built from appointments describes what was booked rather
+  // than what anyone waited.
   const comparableWaits = comparable
     .map(o => {
+      if (!isHandedOver(o, today)) return null
       const from = parseGermanDate(o.orderDate)
       const to = parseGermanDate(o.deliveryDate)
       return from && to ? days(from, to) : null

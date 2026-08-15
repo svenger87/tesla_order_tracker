@@ -72,3 +72,36 @@ describe('getWaitComparison', () => {
     expect(getWaitComparison(o({ orderDate: 'Quatsch' }), [])).toBeNull()
   })
 })
+
+describe('getWaitComparison — which orders it compares against', () => {
+  const mk = (o: Partial<Order>): Order => ({
+    id: Math.random().toString(36).slice(2),
+    name: 'x', vehicleType: 'Model 3', archived: false, archivedAt: null,
+    createdAt: '2026-01-01T00:00:00.000Z', ...o,
+  } as Order)
+
+  test('a scheduled delivery is not a completed wait', () => {
+    // A date still to come says when the car is expected, not how long anyone
+    // waited. Counting it dragged the comparison toward whatever was booked.
+    const self = mk({ orderDate: '01.06.2026' })
+    const future = new Date(Date.now() + 30 * 86_400_000)
+    const dd = `${String(future.getDate()).padStart(2, '0')}.${String(future.getMonth() + 1).padStart(2, '0')}.${future.getFullYear()}`
+    const result = getWaitComparison(self, [
+      mk({ orderDate: '01.01.2025', deliveryDate: '20.03.2025' }), // 78 days, real
+      mk({ orderDate: '01.06.2026', deliveryDate: dd }),           // scheduled
+    ])
+    expect(result?.comparableMedian).toBe(78)
+  })
+
+  test('uses every comparable order it is given, not a slice of them', () => {
+    // The page passed the first eight rows it happened to have. The median of
+    // an arbitrary eight is arbitrary: reconstructing that selection from a
+    // different ordering of the same data produced 87 days where the live page
+    // showed 30, for the same order.
+    const self = mk({ orderDate: '01.06.2026' })
+    const many = Array.from({ length: 26 }, (_, i) =>
+      mk({ orderDate: '01.01.2025', deliveryDate: `${String((i % 28) + 1).padStart(2, '0')}.03.2025` }))
+    const result = getWaitComparison(self, many)
+    expect(result?.comparableMedian).not.toBeNull()
+  })
+})

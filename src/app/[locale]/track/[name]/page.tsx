@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { Order, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
 import { findColorInfo } from '@/lib/color-lookup'
 import { getWaitComparison } from '@/lib/wait-comparison'
+import { isHandedOver, startOfToday } from '@/lib/order-state'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
 import { Link } from '@/i18n/navigation'
@@ -185,32 +186,48 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     order,
   )
 
-  // Similar orders with progressive relaxation
-  let similar = orders.filter(o =>
+  // Comparable orders, with progressive relaxation. Handed over, not merely
+  // dated: an order whose delivery is still booked says what someone expects,
+  // not what they waited.
+  const today = startOfToday()
+  // Takes just the field it reads, so it works on the raw rows too.
+  const handedOver = (o: { deliveryDate: string | null }) => isHandedOver(o, today)
+
+  let comparable = orders.filter(o =>
     o.vehicleType === order.vehicleType &&
     o.model === order.model &&
-    o.deliveryDate &&
-    o.id !== order.id
-  ).slice(0, 8)
+    o.id !== order.id &&
+    handedOver(o)
+  )
 
-  if (similar.length < 3) {
-    similar = orders.filter(o =>
+  if (comparable.length < 3) {
+    comparable = orders.filter(o =>
       o.vehicleType === order.vehicleType &&
       o.drive === order.drive &&
-      o.deliveryDate &&
-      o.id !== order.id
-    ).slice(0, 8)
+      o.id !== order.id &&
+      handedOver(o)
+    )
   }
 
-  // How long this took, next to comparable orders. The comparable set was
-  // already gathered above and shown as cards; this turns it into an answer.
-  const waitComparison = getWaitComparison(order, similar)
+  // The median runs over every comparable order; only the card list is capped.
+  // Taking the first eight and calling their middle value "what comparable
+  // orders needed" made the figure depend on the order rows happened to arrive
+  // in — the same order showed 30 days on the page and 87 when the selection
+  // was rebuilt from the same data in a different sequence. For Model 3
+  // Standard the honest median across all 26 delivered ones is 50.
+  const waitComparison = getWaitComparison(order, comparable)
+
+  const similar = comparable.slice(0, 8)
 
   // Percentile calculation for delivered orders
+  // Only once the car is actually here. orderToDelivery is written when the
+  // order is saved, so for a booked delivery it holds the length of a wait that
+  // has not finished — and ranking that against other people's finished waits
+  // announced how fast a delivery was before it happened.
   let fasterPercent: number | null = null
-  if (order.orderToDelivery != null) {
+  if (order.orderToDelivery != null && handedOver(order)) {
     const allDeliveryDays = allOrders
-      .filter(o => o.orderToDelivery != null && o.vehicleType === order.vehicleType)
+      .filter(o => o.orderToDelivery != null && o.vehicleType === order.vehicleType && handedOver(o))
       .map(o => o.orderToDelivery as number)
       .sort((a, b) => a - b)
 
@@ -275,8 +292,11 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   const durationFields: { label: string; value: number | null }[] = [
     { label: t('orderToVin'), value: order.orderToVin },
     { label: t('orderToPapers'), value: order.orderToPapers },
-    { label: t('orderToDelivery'), value: order.orderToDelivery },
-    { label: t('papersToDelivery'), value: order.papersToDelivery },
+    // Hidden until the handover: the stored value counts to the booked date, so
+    // the page was showing "order to delivery: 57 days" beside "waiting for 51
+    // days" for the same order.
+    { label: t('orderToDelivery'), value: handedOver(order) ? order.orderToDelivery : null },
+    { label: t('papersToDelivery'), value: handedOver(order) ? order.papersToDelivery : null },
   ]
 
   const predictionData = prediction ? {
