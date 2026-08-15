@@ -7,6 +7,7 @@ import { getWaitComparison } from '@/lib/wait-comparison'
 import { isHandedOver, startOfToday } from '@/lib/order-state'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
+import { countryNameFromCode, flagFromCode } from '@/lib/country-display'
 import { Link } from '@/i18n/navigation'
 import { ArrowLeft, Search, PlusCircle, Calendar } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -14,9 +15,25 @@ import { Card, CardContent } from '@/components/ui/card'
 import { TrackingPageClient } from './client'
 
 // Helpers
-function findCountryInfo(country: string | null) {
+/**
+ * The configured country, or one worked out from the code.
+ *
+ * COUNTRIES is the curated list and stays the first answer. Without a fallback
+ * a code that is not on it — us, ca and tw are all in the live data — returned
+ * nothing at all, so the country simply vanished from the order rather than
+ * appearing without a flag.
+ */
+function findCountryInfo(country: string | null, locale: string) {
   if (!country) return null
-  return COUNTRIES.find(c => c.value === country || c.label.toLowerCase() === country.toLowerCase())
+
+  const known = COUNTRIES.find(
+    c => c.value === country || c.label.toLowerCase() === country.toLowerCase(),
+  )
+  if (known) return known
+
+  const flag = flagFromCode(country)
+  if (!flag) return null
+  return { value: country, label: countryNameFromCode(country, locale) ?? country, flag }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ name: string; locale: string }> }): Promise<Metadata> {
@@ -120,7 +137,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
           <div className="space-y-3">
             {matches.map((order) => {
               const status = getOrderStatus(order)
-              const countryInfo = findCountryInfo(order.country)
+              const countryInfo = findCountryInfo(order.country, locale)
               return (
                 <Link
                   key={order.id}
@@ -174,7 +191,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // Single match: full tracking view
   const order = matches[0]
   const colorInfo = findColorInfo(order.color)
-  const countryInfo = findCountryInfo(order.country)
+  const countryInfo = findCountryInfo(order.country, locale)
   // Delivery prediction — status-aware: predicts remaining time from current milestone
   const prediction = predictDelivery(
     orders,

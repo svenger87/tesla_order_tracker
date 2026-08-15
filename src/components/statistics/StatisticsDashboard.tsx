@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useMemo, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType } from '@/lib/types'
+import { countryNameFromCode, flagFromCode } from '@/lib/country-display'
 import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } from '@/lib/statistics'
 import { useOptions } from '@/hooks/useOptions'
 import { TwemojiEmoji } from '@/components/TwemojiText'
@@ -47,6 +48,7 @@ interface StatisticsDashboardProps {
 }
 
 export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }: StatisticsDashboardProps) {
+  const locale = useLocale()
   const t = useTranslations('statistics')
   const tcd = useTranslations('countryDelivery')
   const tCommon = useTranslations('common')
@@ -75,9 +77,20 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const resolveCountry = useCallback(
     (value: string): { label: string; flag?: string } => {
       if (value === UNKNOWN_COUNTRY) return { label: tCommon('unknown') }
-      return countryByKey.get(value.toLowerCase()) ?? { label: value }
+
+      const known = countryByKey.get(value.toLowerCase())
+      if (known) return known
+
+      // Not in the options, which happens because the orders arrive from a sync
+      // that has never seen that list: us, ca and tw are all in the live data and
+      // in nobody's options. They showed as a bare "us" with no flag, beside every
+      // other country having one. Both are derivable from the code itself.
+      return {
+        label: countryNameFromCode(value, locale) ?? value,
+        flag: flagFromCode(value) ?? undefined,
+      }
     },
-    [countryByKey, tCommon]
+    [countryByKey, tCommon, locale]
   )
 
   const localizedCountryDistribution = useMemo(
