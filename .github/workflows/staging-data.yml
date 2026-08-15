@@ -91,7 +91,7 @@ jobs:
             echo ">>> Acting on: $DB_TARGET ($DB)"
 
             git fetch origin staging
-            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs
+            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs scripts/backup.mjs
 
             # Through the backup API, not cp: these databases run in WAL mode, so
             # the newest writes sit in prod.db-wal and a file copy would leave
@@ -102,6 +102,15 @@ jobs:
             echo ">>> Backing up $DB before touching anything"
             docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
               node /app/ops/copy-sqlite.mjs "$DB" "$DB.before-$STAMP"
+
+            # And a second one the admin dashboard can actually see. The line
+            # above writes beside the database under a name nothing lists, so
+            # after a run there was no snapshot anyone could open, compare or
+            # restore a single order from — which is exactly the moment they
+            # would want one.
+            echo ">>> Leaving a listable snapshot for the dashboard"
+            docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+              node /app/ops/backup.mjs "$DB"
 
             TOUCHED=0
 
