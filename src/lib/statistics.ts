@@ -1,6 +1,6 @@
 import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
 import { CHART_COLORS } from './chart-colors'
-import { isHandedOver, startOfToday } from './order-state'
+import { isHandedOver, startOfToday, countsTowardStats } from './order-state'
 
 // Build code/label lookup tables from the canonical COUNTRIES constant.
 // CODE_SET stores ISO codes (uppercase) for fast membership checks.
@@ -348,7 +348,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Cancelled orders never reached delivery, so every average built below would
   // be skewed by them. Count them once, then drop them.
   const cancelledOrders = filteredOrders.filter(o => o.cancelled).length
-  filteredOrders = filteredOrders.filter(o => !o.cancelled)
+  filteredOrders = filteredOrders.filter(countsTowardStats)
 
   const totalOrders = filteredOrders.length
   // Handed over, not merely dated: a delivery date in the future is an

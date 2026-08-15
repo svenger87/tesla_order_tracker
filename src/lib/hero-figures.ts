@@ -1,6 +1,6 @@
 import type { Order } from './types'
 import { parseGermanDate } from './date-utils'
-import { isHandedOver, isStaleOpen, startOfToday } from './order-state'
+import { isHandedOver, isStaleOpen, startOfToday, countsTowardStats } from './order-state'
 
 export interface HeroFigures {
   /** Orders that count — cancelled ones are excluded from every figure here. */
@@ -70,7 +70,7 @@ function daysBetween(from: Date, to: Date): number {
  * stay put when someone narrows the table to one country.
  */
 export function getHeroFigures(orders: Order[]): HeroFigures {
-  const live = orders.filter(o => !o.cancelled)
+  const live = orders.filter(countsTowardStats)
   const today = startOfToday()
 
   const waits: number[] = []

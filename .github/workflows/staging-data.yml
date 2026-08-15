@@ -9,8 +9,12 @@ on:
         type: boolean
         required: true
         default: false
+      archive_pairs:
+        description: 'Rows to archive, as id=name,id=name — takes them out of the list and every statistic, reversibly'
+        required: false
+        default: ''
       delete_pairs:
-        description: 'Rows to delete, as id=name,id=name — the name guards against a mistyped id'
+        description: 'Rows to delete for good, as id=name,id=name — prefer archiving; this cannot be undone'
         required: false
         default: ''
       copy_to_staging:
@@ -31,13 +35,14 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           REPAIR: ${{ inputs.repair_data }}
+          ARCHIVE_PAIRS: ${{ inputs.archive_pairs }}
           DELETE_PAIRS: ${{ inputs.delete_pairs }}
           COPY: ${{ inputs.copy_to_staging }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: REPAIR,DELETE_PAIRS,COPY
+          envs: REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
           script: |
             set -e
             cd /opt/tesla-order-tracker
@@ -63,7 +68,7 @@ jobs:
             MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
 
             git fetch origin staging
-            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/repair-orders.mjs
+            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs
 
             # Through the backup API, not cp: these databases run in WAL mode, so
             # the newest writes sit in prod.db-wal and a file copy would leave
@@ -90,21 +95,52 @@ jobs:
               echo ">>> No repair requested"
             fi
 
-            if [ -n "$DELETE_PAIRS" ]; then
-              echo "$DELETE_PAIRS" | tr ',' '\n' | while IFS= read -r pair; do
+            # One helper for both lists. A row whose --expect-name does not match
+            # is reported and skipped rather than ending the run: the guard doing
+            # its job on one pair is not a reason to abandon the others, and a
+            # silent abort halfway through is worse than a listed failure.
+            FAILED=""
+            run_pairs() {
+              SCRIPT="$1"
+              PAIRS="$2"
+              OLD_IFS="$IFS"
+              IFS=','
+              for pair in $PAIRS; do
+                IFS="$OLD_IFS"
                 [ -z "$pair" ] && continue
                 ID="${pair%%=*}"
                 NAME="${pair#*=}"
-                echo ">>> Dry run: $ID"
+                echo ">>> Dry run ($SCRIPT): $ID"
+                if ! docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                     node "/app/ops/$SCRIPT" /prod/prod.db "$ID" --expect-name "$NAME"; then
+                  echo ">>> REFUSED: $ID — left alone"
+                  FAILED="$FAILED $ID"
+                  IFS=','
+                  continue
+                fi
+                echo ">>> Applying ($SCRIPT): $ID"
                 docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME"
-                echo ">>> Applying: $ID"
-                docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME" --apply
+                  node "/app/ops/$SCRIPT" /prod/prod.db "$ID" --expect-name "$NAME" --apply
+                TOUCHED=1
+                IFS=','
               done
-              TOUCHED=1
+              IFS="$OLD_IFS"
+            }
+
+            if [ -n "$ARCHIVE_PAIRS" ]; then
+              run_pairs archive-order.mjs "$ARCHIVE_PAIRS"
+            else
+              echo ">>> Nothing to archive"
+            fi
+
+            if [ -n "$DELETE_PAIRS" ]; then
+              run_pairs delete-order.mjs "$DELETE_PAIRS"
             else
               echo ">>> No deletions requested"
+            fi
+
+            if [ -n "$FAILED" ]; then
+              echo ">>> These were refused by their name guard and left untouched:$FAILED"
             fi
 
             # Production caches the order list in memory per process; a restart

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { SyncResult } from '@/lib/types'
+import { withDerivedDurations } from '@/lib/order-durations'
 import { normalizeDate } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 
@@ -43,12 +44,10 @@ const COLUMNS = {
   typeApproval: 17,
   typeVariant: 18,
   deliveryDate: 19,
-  // Column 20 is blank
-  orderToProduction: 21,
-  orderToVin: 22,
-  orderToDelivery: 23,
-  orderToPapers: 24,
-  papersToDelivery: 25,
+  // Column 20 is blank.
+  // Columns 21-25 hold the sheet's own duration figures. They are not read:
+  // this app computes durations from the dates it stored, so that a duration
+  // and the dates it claims to span can never disagree.
 }
 
 // Q3 sheet has different structure: Option Code in T (19), Delivery Date in U (20)
@@ -56,8 +55,6 @@ const COLUMNS_Q3 = {
   ...COLUMNS,
   // Q3-specific: Delivery date is in column U (20), not T (19)
   deliveryDate: 20,
-  // orderToDelivery is in V (21) for Q3
-  orderToDelivery: 21,
 }
 
 function parseCSV(csvText: string): string[][] {
@@ -113,12 +110,6 @@ function parseCSV(csvText: string): string[][] {
 function cleanValue(value: string | undefined): string | null {
   if (!value || value === '-' || value === '') return null
   return value.trim()
-}
-
-function parseNumber(value: string | undefined): number | null {
-  if (!value || value === '-' || value === '') return null
-  const num = parseInt(value, 10)
-  return isNaN(num) ? null : num
 }
 
 // Normalize color - convert display name to internal code
@@ -292,7 +283,7 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
       continue
     }
 
-    const orderData = {
+    const datedFields = {
       name,
       orderDate: normalizeDate(orderDate),
       country: normalizeCountry(cleanValue(row[cols.country])),
@@ -312,12 +303,13 @@ async function syncSheet(gid: string, label: string, isQ3: boolean = false): Pro
       typeApproval: cleanValue(row[cols.typeApproval]),
       typeVariant: cleanValue(row[cols.typeVariant]),
       deliveryDate: normalizeDate(cleanValue(row[cols.deliveryDate])),
-      orderToProduction: parseNumber(row[cols.orderToProduction]),
-      orderToVin: parseNumber(row[cols.orderToVin]),
-      orderToDelivery: parseNumber(row[cols.orderToDelivery]),
-      orderToPapers: parseNumber(row[cols.orderToPapers]),
-      papersToDelivery: parseNumber(row[cols.papersToDelivery]),
     }
+
+    // Derived from the dates above, not copied from the sheet. The sheet sends
+    // both, and its durations were computed from the raw values — including the
+    // ones normalizeDate refuses, which are stored as null. Taking both meant a
+    // record could hold a wait of -477253 days beside no order date at all.
+    const orderData = withDerivedDurations(datedFields)
 
     try {
       // Check if order exists by name + orderDate

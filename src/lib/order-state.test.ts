@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isHandedOver, isStaleOpen, startOfToday, STALE_AFTER_DAYS } from './order-state'
+import { isHandedOver, isStaleOpen, startOfToday, STALE_AFTER_DAYS, countsTowardStats } from './order-state'
 
 const TODAY = new Date(2026, 7, 15) // 15.08.2026, local midnight
 const daysAgo = (n: number) => new Date(TODAY.getTime() - n * 86_400_000).toISOString()
@@ -74,5 +74,26 @@ describe('startOfToday', () => {
     const t = startOfToday(new Date(2026, 7, 15, 23, 59, 59))
     expect(t.getHours()).toBe(0)
     expect(t.getDate()).toBe(15)
+  })
+})
+
+describe('countsTowardStats', () => {
+  it('counts an ordinary order', () => {
+    expect(countsTowardStats({ cancelled: false, archived: false })).toBe(true)
+  })
+
+  it('drops a cancelled order', () => {
+    expect(countsTowardStats({ cancelled: true, archived: false })).toBe(false)
+  })
+
+  it('drops an archived order', () => {
+    // Archived orders were already hidden from the public list but still counted
+    // in every average, so the same page reported different numbers depending on
+    // whether an admin was logged in.
+    expect(countsTowardStats({ cancelled: false, archived: true })).toBe(false)
+  })
+
+  it('treats a missing flag as not set', () => {
+    expect(countsTowardStats({})).toBe(true)
   })
 })

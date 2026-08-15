@@ -60,11 +60,46 @@ function normalizeDate(input) {
 const DATE_FIELDS = ['orderDate', 'vinReceivedDate', 'papersReceivedDate', 'productionDate', 'deliveryDate']
 const READABLE = /^\d{2}\.\d{2}\.\d{4}$/
 
+/**
+ * A year this dataset could plausibly contain. Same window the app's
+ * normalizeDate enforces on input, applied here to values that were stored
+ * before it did: one production date reads 26.08.0205, and computing from it
+ * produced a duration of -664721 days — a repair inventing worse data than it
+ * found.
+ */
+const YEAR_MIN = new Date().getFullYear() - 6
+const YEAR_MAX = new Date().getFullYear() + 6
+
+function usable(value) {
+  if (!READABLE.test(String(value || ''))) return null
+  const [d, m, y] = value.split('.').map(Number)
+  if (y < YEAR_MIN || y > YEAR_MAX) return null
+  return Date.UTC(y, m - 1, d)
+}
+
+/** Whole days between two usable DD.MM.YYYY dates, or null. */
+function daysBetween(from, to) {
+  const a = usable(from)
+  const b = usable(to)
+  if (a === null || b === null) return null
+  return Math.round((b - a) / 86400000)
+}
+
+/** Mirrors calculateTimePeriods in src/lib/date-utils.ts. */
+const DURATIONS = {
+  orderToProduction: (r) => daysBetween(r.orderDate, r.productionDate),
+  orderToVin: (r) => daysBetween(r.orderDate, r.vinReceivedDate),
+  orderToDelivery: (r) => daysBetween(r.orderDate, r.deliveryDate),
+  orderToPapers: (r) => daysBetween(r.orderDate, r.papersReceivedDate),
+  papersToDelivery: (r) => daysBetween(r.papersReceivedDate, r.deliveryDate),
+}
+
 const db = new Database(dbPath, { fileMustExist: true })
 const rows = db.prepare('SELECT * FROM "Order"').all()
 
 const dateFixes = []
 const countryFixes = []
+const durationFixes = []
 
 for (const row of rows) {
   for (const field of DATE_FIELDS) {
@@ -79,11 +114,43 @@ for (const row of rows) {
   }
 }
 
+// Second pass, over the repaired dates: the stored durations came from the
+// spreadsheet rather than from these dates, so they can contradict them. One
+// order carries orderToDelivery = -477253 next to no order date at all.
+const repairedById = new Map()
+for (const row of rows) repairedById.set(row.id, { ...row })
+for (const f of dateFixes) repairedById.get(f.id)[f.field] = f.to
+
+// Dates that read cleanly but cannot be true. Left in place rather than
+// guessed at — nulling them would hide the typo from whoever can correct it.
+for (const row of repairedById.values()) {
+  for (const field of DATE_FIELDS) {
+    const v = row[field]
+    if (v && READABLE.test(String(v)) && usable(v) === null) {
+      console.log(`>>> Implausible ${field} ${JSON.stringify(v)} on "${row.name}" — kept, but no duration computed from it`)
+    }
+  }
+}
+
+for (const row of repairedById.values()) {
+  for (const [field, compute] of Object.entries(DURATIONS)) {
+    const should = compute(row)
+    if (row[field] !== should) {
+      durationFixes.push({ id: row.id, name: row.name, field, from: row[field], to: should })
+    }
+  }
+}
+
 console.log(`\n>>> ${dateFixes.length} date(s) to repair:`)
 for (const f of dateFixes) console.log(`    "${f.name}" ${f.field}: ${JSON.stringify(f.from)} -> ${f.to}`)
 
 console.log(`\n>>> ${countryFixes.length} country code(s) to repair:`)
 for (const f of countryFixes) console.log(`    "${f.name}": gb -> uk`)
+
+console.log(`\n>>> ${durationFixes.length} duration(s) to recompute from the dates:`)
+const WILD = durationFixes.filter(f => f.from != null && (f.from < -3 || f.from > 1000))
+console.log(`    of those, ${WILD.length} currently hold an impossible value:`)
+for (const f of WILD) console.log(`      "${f.name}" ${f.field}: ${f.from} -> ${f.to}`)
 
 if (!apply) {
   console.log('\n>>> Dry run. Pass --apply to write these.')
@@ -98,9 +165,13 @@ const write = db.transaction(() => {
   for (const f of countryFixes) {
     db.prepare('UPDATE "Order" SET country = ? WHERE id = ?').run(f.to, f.id)
   }
+  for (const f of durationFixes) {
+    db.prepare(`UPDATE "Order" SET "${f.field}" = ? WHERE id = ?`).run(f.to, f.id)
+  }
 })
 write()
 
 const leftGb = db.prepare("SELECT COUNT(*) AS n FROM \"Order\" WHERE country = 'gb'").get().n
 console.log(`\n>>> Written. Rows still carrying gb: ${leftGb}`)
+console.log(`>>> Durations recomputed: ${durationFixes.length}`)
 db.close()

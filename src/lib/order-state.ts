@@ -33,6 +33,21 @@ export function isHandedOver(
 }
 
 /**
+ * Whether an order belongs in the public figures at all.
+ *
+ * Two flags take an order out: `cancelled`, set by its owner, and `archived`,
+ * set by an admin. Archived orders were already hidden from the order list but
+ * not from the statistics, and the list is where the statistics get their data —
+ * so the averages quietly depended on who was asking. An admin loading the page
+ * with archived orders included saw different numbers than everyone else.
+ */
+export function countsTowardStats(
+  order: { cancelled?: boolean | null; archived?: boolean | null },
+): boolean {
+  return !order.cancelled && !order.archived
+}
+
+/**
  * An open order nobody has touched for a long time.
  *
  * The live data shows what these are: entries carried in when the database was
