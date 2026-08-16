@@ -17,7 +17,7 @@
     "close": "Zavrieť",
     "copy": "Kopírovať",
     "support": "Podpora",
-    "menu": "Menu",
+    "menu": "Ponuka",
     "refresh": "Obnoviť",
     "allGood": "Všetko je v poriadku!",
     "understood": "Rozumiem, kód bol uložený",
@@ -41,7 +41,12 @@
     "projectSupport": "Podporte tento projekt",
     "reset": "Obnoviť",
     "ordersRefreshed": "{count} objednávok aktualizovaných",
-    "refreshError": "Chyba pri aktualizácii"
+    "refreshError": "Chyba pri aktualizácii",
+    "hide": "Skryť",
+    "show": "Zobraziť",
+    "only": "Iba",
+    "compact": "Kompaktné",
+    "deleteError": "Odstránenie zlyhalo."
   },
   "home": {
     "title": "Objednávky a štatistiky Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Obrázok vozidla",
     "delivered": "Dodané: {date}",
     "errorGeneratingCode": "Chyba pri generovaní kódu",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "neaktuálne",
+    "staleHint": "Táto objednávka nebola aktualizovaná viac ako 60 dní — údaje môžu byť neaktuálne.",
     "statsTitle": "Štatistiky",
     "statsSubtitle": "Dodacie lehoty, konfigurácie a trendy",
     "cancelledBadge": "Zrušené",
@@ -85,7 +90,9 @@
     "title": "Vyhľadávanie objednávok",
     "description": "Nájdite objednávku vo všetkých štvrťrokoch",
     "hint": "Navigujte šípkami, vyberte pomocou Enter",
-    "openSearch": "Hľadať"
+    "openSearch": "Hľadať",
+    "results": "{count} výsledkov",
+    "noResultsHint": "Skúste meno, VIN, krajinu alebo miesto odovzdania."
   },
   "form": {
     "personalData": "Osobné údaje",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Kliknite na \"Upraviť“ a zadajte heslo na zmenu údajov objednávky.",
     "saveCodeWarning": "Uložte si tento kód na neskoršiu úpravu objednávky.",
     "codeShownOnce": "Tento kód sa zobrazí iba raz!",
-    "codeUsageHint": "Tento kód použite v časti \"Úprava objednávky“ na zmenu svojich údajov."
+    "codeUsageHint": "Tento kód použite v časti \"Úprava objednávky“ na zmenu svojich údajov.",
+    "backToOverview": "Späť na prehľad",
+    "viewMyOrder": "Zobraziť moju objednávku"
   },
   "editByCode": {
     "passwordPromptTitle": "Úprava objednávky",
@@ -230,11 +239,11 @@
     "typeVariant": "Var. typu",
     "deliveryDate": "Dátum dodania",
     "orderToVin": "O→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→V",
+    "productionToPapers": "V→D",
     "papersToDelivery": "Dok→D",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Čakanie",
     "updatedAt": "Aktualizované",
     "country": "Krajina",
     "allVehicles": "Všetky vozidlá",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Tieto polia je možné upraviť manuálne, aj pre objednávky spravované cez TOST.",
     "papersReceivedDate": "Dokumenty prijaté dňa",
     "saveError": "Chyba pri ukladaní",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Dátum výroby",
+    "staleFilter": "Neaktuálne",
+    "staleTooltip": "Prepnúť filter: všetko / skryť neaktuálne / len neaktuálne (≥60 dní bez aktualizácie pri otvorených objednávkach)",
     "cancelledFilter": "Zrušené",
-    "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené"
+    "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené",
+    "incompleteBadge": "neúplné",
+    "incompleteHint": "Pri tejto objednávke chýba dátum objednania, hoci je vyplnený neskorší dátum. Všetky čakacie doby sa merajú od neho — bez neho záznam nemožno zaradiť v čase a nevstupuje do žiadnej štatistiky."
   },
   "progress": {
     "ordered": "Objednané",
@@ -274,7 +285,8 @@
     "papers": "Dokumenty",
     "production": "Výroba",
     "delivered": "Dodané",
-    "deliveryScheduled": "Dodanie naplánované"
+    "deliveryScheduled": "Dodanie naplánované",
+    "stepOfTotal": "Krok {current} z {total}"
   },
   "statistics": {
     "overview": "Prehľad",
@@ -365,8 +377,8 @@
     "timelinePapers": "Dokumenty",
     "timelineDelivery": "Dodanie",
     "totalWaitTime": "Celková čakacia doba",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detail (min / max)",
+    "pipelineSegment": "Úsek",
     "cancelledExcluded": "{count} zrušených (nezapočítané)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Vyberte vozidlo a model na konfiguráciu obmedzení",
     "loadingOptions": "Načítavanie možností...",
     "loadingConstraints": "Načítavanie obmedzení...",
-    "selectValue": "Vyberte hodnotu..."
+    "selectValue": "Vyberte hodnotu...",
+    "archiveConfirmAction": "Archivovať",
+    "archiveConfirmDescription": "Archivované objednávky zmiznú z verejných štatistík, ale zostanú v databáze. Vrátiť sa to dá len po jednej objednávke.",
+    "archiveConfirmTitle": "Archivovať {count} objednávok?",
+    "yearlyGoal": "Náklady na server za rok (€)",
+    "yearlyGoalHint": "Nechajte prázdne, ak chcete lištu nákladov skryť.",
+    "yearlyRaised": "Doteraz pokryté (€)",
+    "backups": "Zálohy",
+    "backupsDescription": "Snímky databázy objednávok. Každú možno porovnať s aktuálnym stavom a obnoviť z nej jednotlivé záznamy.",
+    "createBackup": "Vytvoriť zálohu",
+    "backupCreating": "Vytvára sa…",
+    "backupCreated": "Záloha vytvorená",
+    "backupFailed": "Záloha zlyhala",
+    "backupListFailed": "Zálohy sa nepodarilo načítať",
+    "backupDeleted": "Záloha vymazaná",
+    "backupDeleteFailed": "Zálohu sa nepodarilo vymazať",
+    "noBackups": "Zatiaľ žiadne zálohy.",
+    "backupOrders": "{count} objednávok",
+    "backupKeepHint": "Uchováva sa {count} najnovších záloh; staršie sa pri vytvorení novej odstránia.",
+    "compareBackup": "Porovnať",
+    "backupComparing": "Porovnáva sa…",
+    "noDifferences": "Žiadne rozdiely oproti aktuálnemu stavu.",
+    "diffAdded": "Pribudlo od tejto zálohy",
+    "diffRemoved": "Odvtedy zmizlo",
+    "diffChanged": "Zmenené",
+    "restoreHint": "Obnoví sa údaje objednávky. Heslo vlastníka zostáva nezmenené — okrem úplne chýbajúceho záznamu, ktorý sa vytvorí celý nanovo.",
+    "restoreOrder": "Obnoviť",
+    "orderRestored": "{name} obnovené",
+    "restoreFailed": "Obnovenie zlyhalo",
+    "backupCompareFailed": "Porovnanie zlyhalo",
+    "backupAllFields": "Všetky polia",
+    "backupSortName": "Podľa názvu",
+    "backupSortChanges": "Najviac zmien",
+    "backupShowing": "{shown} z {total}",
+    "backupNoMatches": "Týmto filtrom nič nezodpovedá."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Na základe {count} objednávok",
     "notEnoughData": "Nedostatok údajov na predikciu. Vyberte typ vozidla.",
     "lowDataHint": "Málo údajov — predpoveď môže byť nepresná. Viac objednávok zlepší presnosť.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Na základe {count} dodaní za posledných {days} dní",
+    "exceedsPessimisticHint": "Vaše doterajšie čakanie ({days} dní) už prekračuje pesimistický odhad (75 % porovnateľných dodaní). Súčasné čakacie doby sú dlhšie než historické rozdelenie — berte prognózu s rezervou."
   },
   "trend": {
     "title": "Trend dodaní",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Objednávky a štatistiky Tesla",
     "subtitle": "Najväčšia komunitná databáza termínov dodania Tesla. Model Y, Model 3 — celosvetovo.",
-    "findMyOrder": "Nájsť moju objednávku"
+    "findMyOrder": "Nájsť moju objednávku",
+    "claim": "<em>{days}</em> dní od objednávky po odovzdanie",
+    "claimSub": "Medián z {delivered} doručených objednávok. {waiting} stále čaká — najdlhšie {longest} dní.",
+    "kicker": "Komunitná databáza · Model Y a Model 3",
+    "ordersLabel": "Objednávky",
+    "deliveredLabel": "doručené",
+    "withVin": "{count} s VIN, čaká",
+    "withoutVin": "{count} bez VIN",
+    "stale": "{count} bez aktualizácie"
   },
   "tracking": {
     "backToOverview": "Späť na prehľad",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Objednávka → Dodanie",
     "orderToPapers": "Objednávka → Dokumenty",
     "papersToDelivery": "Dokumenty → Dodanie",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Na základe {count} dodaní za posledných {days} dní",
+    "exceedsPessimisticHint": "Vaše doterajšie čakanie ({days} dní) už prekračuje pesimistický odhad. Prognóza vychádza z historických dodacích lehôt a v tejto situácii už nie je spoľahlivá — riaďte sa oficiálnym termínom dodania od Tesly.",
+    "staleHint": "Táto objednávka nebola aktualizovaná viac ako 60 dní. Údaje nižšie už nemusia byť aktuálne.",
+    "waitedLabel": "Čakanie",
+    "waitingLabel": "Čaká",
+    "daysUnit": "dní",
+    "fasterThanComparable": "O {days} dní rýchlejšie než porovnateľné objednávky (medián {median})",
+    "slowerThanComparable": "O {days} dní pomalšie než porovnateľné objednávky (medián {median})",
+    "matchesComparable": "Presne na medián porovnateľných objednávok ({median})",
+    "comparableTypically": "Porovnateľné objednávky trvali medián {median} dní",
+    "today": "Dnes"
   },
   "support": {
     "communityMessage": "Tieto údaje spravuje komunita pre komunitu. Ak vám táto stránka pomáha, môžete podporiť náklady na server.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Administrátorský panel",
     "navigationMenu": "Navigačné menu",
     "impressum": "Právne informácie",
-    "privacy": "Privacy"
+    "privacy": "Ochrana údajov",
+    "toggleTheme": "Prepnúť motív",
+    "changeLanguage": "Zmeniť jazyk",
+    "skipToContent": "Prejsť na obsah"
   },
   "footer": {
     "operatedBy": "Prevádzkuje Sven",
     "supportDevelopment": "Podporte hosting a vývoj",
-    "stats": "{orders} objednávok · {delivered} dodaných"
+    "stats": "{orders} objednávok · {delivered} dodaných",
+    "serverCostsProgress": "{raised} z {goal} € pokryté",
+    "serverCostsTitle": "Náklady na server {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Posledné zmeny",
+    "entries": "záznamov",
+    "loading": "Načítava sa…",
+    "loadMore": "Načítať ďalšie",
+    "empty": "Zatiaľ žiadne zmeny.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Dnes",
+      "yesterday": "Včera",
+      "week": "Tento týždeň",
+      "older": "Staršie"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN pridelené",
+      "production": "Vo výrobe",
+      "papers": "Doklady prijaté",
+      "delivery": "Doručené",
+      "window": "Zmena termínu dodania",
+      "created": "Nová objednávka"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "pred {n} min",
+      "hoursAgo": "pred {n} h",
+      "yesterday": "včera",
+      "daysAgo": "pred {n} dňami",
+      "weeksAgo": "pred {n} týž."
     }
+  },
+  "errors": {
+    "rateLimited": "Príliš veľa požiadaviek. Skúste to neskôr.",
+    "orderNotFound": "Objednávka sa nenašla.",
+    "conflict": "Medzitým tento záznam zmenil niekto iný. Znovu načítajte stránku a skúste to znova.",
+    "resetCodeInvalid": "Neplatný alebo expirovaný jednorazový kód.",
+    "resetCodeRequired": "Vyžaduje sa jednorazový kód.",
+    "tostFieldsRestricted": "Túto objednávku spravuje TOST. Upraviť možno len dátum objednávky, dátum dokladov, dátum výroby, schválenie typu a variant typu.",
+    "adminRequired": "Vyžaduje sa prístup správcu.",
+    "orderDateInFuture": "Dátum objednávky nemôže byť v budúcnosti.",
+    "datesOutOfOrder": "Dátumy nie sú v pravdepodobnom poradí. Skontrolujte dátum objednávky, výroby, dokladov a dodania.",
+    "legacyPasswordRequired": "Pre staršie záznamy sa vyžaduje nové heslo.",
+    "backHome": "Na úvodnú stránku",
+    "pageErrorBody": "Stránku sa nepodarilo načítať. Ďalší pokus často pomôže.",
+    "pageErrorTitle": "Niečo sa pokazilo",
+    "pageNotFoundBody": "Táto adresa neexistuje. Odkaz môže byť zastaraný alebo zle napísaný.",
+    "pageNotFoundTitle": "Stránka sa nenašla",
+    "retry": "Skúsiť znova"
   }
 }

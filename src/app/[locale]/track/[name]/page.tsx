@@ -1,9 +1,12 @@
 import { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/db'
-import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
+import { Order, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from '@/lib/types'
+import { findColorInfo } from '@/lib/color-lookup'
+import { isHandedOver, startOfToday } from '@/lib/order-state'
 import { getOrderStatus } from '@/lib/statistics'
 import { predictDelivery } from '@/lib/prediction'
+import { countryNameFromCode, flagFromCode } from '@/lib/country-display'
 import { Link } from '@/i18n/navigation'
 import { ArrowLeft, Search, PlusCircle, Calendar } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -11,19 +14,25 @@ import { Card, CardContent } from '@/components/ui/card'
 import { TrackingPageClient } from './client'
 
 // Helpers
-function findColorInfo(colorLabel: string | null) {
-  if (!colorLabel) return null
-  const normalizedLabel = colorLabel.toLowerCase().trim()
-  return COLORS.find(c =>
-    normalizedLabel.includes(c.label.toLowerCase()) ||
-    c.label.toLowerCase().includes(normalizedLabel) ||
-    c.value === normalizedLabel
-  )
-}
-
-function findCountryInfo(country: string | null) {
+/**
+ * The configured country, or one worked out from the code.
+ *
+ * COUNTRIES is the curated list and stays the first answer. Without a fallback
+ * a code that is not on it — us, ca and tw are all in the live data — returned
+ * nothing at all, so the country simply vanished from the order rather than
+ * appearing without a flag.
+ */
+function findCountryInfo(country: string | null, locale: string) {
   if (!country) return null
-  return COUNTRIES.find(c => c.value === country || c.label.toLowerCase() === country.toLowerCase())
+
+  const known = COUNTRIES.find(
+    c => c.value === country || c.label.toLowerCase() === country.toLowerCase(),
+  )
+  if (known) return known
+
+  const flag = flagFromCode(country)
+  if (!flag) return null
+  return { value: country, label: countryNameFromCode(country, locale) ?? country, flag }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ name: string; locale: string }> }): Promise<Metadata> {
@@ -51,6 +60,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
 
   const t = await getTranslations({ locale, namespace: 'tracking' })
   const tp = await getTranslations({ locale, namespace: 'progress' })
+  const to = await getTranslations({ locale, namespace: 'options' })
 
   // Fetch all non-archived orders and settings
   const [allOrders, settings] = await Promise.all([
@@ -73,7 +83,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // 0 matches: not found
   if (matches.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div>
         <div className="max-w-2xl mx-auto px-4 py-12">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
             <ArrowLeft className="h-4 w-4" />
@@ -113,7 +123,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // Multiple matches: disambiguation
   if (matches.length > 1) {
     return (
-      <div className="min-h-screen bg-background">
+      <div>
         <div className="max-w-2xl mx-auto px-4 py-12">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
             <ArrowLeft className="h-4 w-4" />
@@ -126,7 +136,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
           <div className="space-y-3">
             {matches.map((order) => {
               const status = getOrderStatus(order)
-              const countryInfo = findCountryInfo(order.country)
+              const countryInfo = findCountryInfo(order.country, locale)
               return (
                 <Link
                   key={order.id}
@@ -157,7 +167,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
                       </div>
                       <div className="shrink-0">
                         {order.deliveryDate ? (
-                          <Badge variant="default" className="bg-green-600 text-white text-xs">
+                          <Badge variant="default" className="bg-success text-white text-xs">
                             {order.deliveryDate}
                           </Badge>
                         ) : (
@@ -180,7 +190,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   // Single match: full tracking view
   const order = matches[0]
   const colorInfo = findColorInfo(order.color)
-  const countryInfo = findCountryInfo(order.country)
+  const countryInfo = findCountryInfo(order.country, locale)
   // Delivery prediction — status-aware: predicts remaining time from current milestone
   const prediction = predictDelivery(
     orders,
@@ -192,28 +202,47 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     order,
   )
 
-  // Similar orders with progressive relaxation
-  let similar = orders.filter(o =>
+  // Comparable orders, with progressive relaxation. Handed over, not merely
+  // dated: an order whose delivery is still booked says what someone expects,
+  // not what they waited.
+  const today = startOfToday()
+  // Takes just the field it reads, so it works on the raw rows too.
+  const handedOver = (o: { deliveryDate: string | null }) => isHandedOver(o, today)
+
+  let comparable = orders.filter(o =>
     o.vehicleType === order.vehicleType &&
     o.model === order.model &&
-    o.deliveryDate &&
-    o.id !== order.id
-  ).slice(0, 8)
+    o.id !== order.id &&
+    handedOver(o)
+  )
 
-  if (similar.length < 3) {
-    similar = orders.filter(o =>
+  if (comparable.length < 3) {
+    comparable = orders.filter(o =>
       o.vehicleType === order.vehicleType &&
       o.drive === order.drive &&
-      o.deliveryDate &&
-      o.id !== order.id
-    ).slice(0, 8)
+      o.id !== order.id &&
+      handedOver(o)
+    )
   }
 
+  // The median runs over every comparable order; only the card list is capped.
+  // Taking the first eight and calling their middle value "what comparable
+  // orders needed" made the figure depend on the order rows happened to arrive
+  // in — the same order showed 30 days on the page and 87 when the selection
+  // was rebuilt from the same data in a different sequence. For Model 3
+  // Standard the honest median across all 26 delivered ones is 50.
+
+  const similar = comparable.slice(0, 8)
+
   // Percentile calculation for delivered orders
+  // Only once the car is actually here. orderToDelivery is written when the
+  // order is saved, so for a booked delivery it holds the length of a wait that
+  // has not finished — and ranking that against other people's finished waits
+  // announced how fast a delivery was before it happened.
   let fasterPercent: number | null = null
-  if (order.orderToDelivery != null) {
+  if (order.orderToDelivery != null && handedOver(order)) {
     const allDeliveryDays = allOrders
-      .filter(o => o.orderToDelivery != null && o.vehicleType === order.vehicleType)
+      .filter(o => o.orderToDelivery != null && o.vehicleType === order.vehicleType && handedOver(o))
       .map(o => o.orderToDelivery as number)
       .sort((a, b) => a - b)
 
@@ -223,10 +252,27 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     }
   }
 
-  // Resolve internal values to display labels
-  const resolve = (value: string | null, options: { value: string; label: string }[]): string | null => {
+  /**
+   * Resolve a stored value to a label in the reader's language.
+   *
+   * The constants in lib/types carry German labels — they are the seed data,
+   * not the display layer — so resolving against them alone put "Schwarz",
+   * "Nein" and "5-Sitzer" on the English page next to English field names. The
+   * rest of the app goes through useOptions(), which reads the `options`
+   * namespace; this is a server component, so it does the same lookup directly.
+   */
+  const resolve = (
+    value: string | null,
+    options: { value: string; label: string }[],
+    type?: string,
+  ): string | null => {
     if (!value) return null
     const match = options.find(o => o.value === value || o.label.toLowerCase() === value.toLowerCase())
+    const key = match?.value ?? value
+    if (type) {
+      const translationKey = `${type}.${key}` as Parameters<typeof to.has>[0]
+      if (to.has(translationKey)) return to(translationKey)
+    }
     return match?.label || value
   }
 
@@ -237,14 +283,14 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
     { label: t('orderDate'), value: order.orderDate },
     { label: t('vehicle'), value: order.vehicleType },
     { label: t('model'), value: resolve(order.model, allTrims) },
-    { label: t('range'), value: resolve(order.range, RANGES) },
+    { label: t('range'), value: resolve(order.range, RANGES, 'range') },
     { label: t('drive'), value: resolve(order.drive, DRIVES) },
     { label: t('color'), value: colorInfo?.label || order.color },
-    { label: t('interior'), value: resolve(order.interior, INTERIORS) },
+    { label: t('interior'), value: resolve(order.interior, INTERIORS, 'interior') },
     { label: t('wheels'), value: order.wheels ? `${order.wheels}"` : null },
-    { label: t('towHitch'), value: resolve(order.towHitch, TOW_HITCH_OPTIONS) },
-    { label: t('seats'), value: resolve(order.seats, SEATS_OPTIONS) },
-    { label: t('autopilot'), value: resolve(order.autopilot, AUTOPILOT_OPTIONS) },
+    { label: t('towHitch'), value: resolve(order.towHitch, TOW_HITCH_OPTIONS, 'towHitch') },
+    { label: t('seats'), value: resolve(order.seats, SEATS_OPTIONS, 'seats') },
+    { label: t('autopilot'), value: resolve(order.autopilot, AUTOPILOT_OPTIONS, 'autopilot') },
     { label: t('country'), value: countryInfo?.label || order.country },
     { label: t('deliveryWindow'), value: order.deliveryWindow },
     { label: t('deliveryLocation'), value: order.deliveryLocation },
@@ -258,11 +304,23 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
   ]
 
   // Duration stats
+  // A duration below zero is not a duration. 78 orders carry one, almost all a
+  // production date entered ahead of the order date, and the figures are now
+  // derived from those dates rather than copied from the sheet — so the page
+  // would faithfully render "order to VIN: -14 days". The statistics already
+  // drop negatives; the page has to as well, and staying silent is the honest
+  // option when the underlying dates contradict each other.
+  const duration = (value: number | null | undefined) =>
+    value != null && value >= 0 ? value : null
+
   const durationFields: { label: string; value: number | null }[] = [
-    { label: t('orderToVin'), value: order.orderToVin },
-    { label: t('orderToPapers'), value: order.orderToPapers },
-    { label: t('orderToDelivery'), value: order.orderToDelivery },
-    { label: t('papersToDelivery'), value: order.papersToDelivery },
+    { label: t('orderToVin'), value: duration(order.orderToVin) },
+    { label: t('orderToPapers'), value: duration(order.orderToPapers) },
+    // Hidden until the handover: the stored value counts to the booked date, so
+    // the page was showing "order to delivery: 57 days" beside "waiting for 51
+    // days" for the same order.
+    { label: t('orderToDelivery'), value: handedOver(order) ? duration(order.orderToDelivery) : null },
+    { label: t('papersToDelivery'), value: handedOver(order) ? duration(order.papersToDelivery) : null },
   ]
 
   const predictionData = prediction ? {
@@ -295,7 +353,7 @@ export default async function TrackPage({ params, searchParams }: { params: Prom
         model: resolve(order.model, allTrims),
         range: resolve(order.range, RANGES),
         drive: resolve(order.drive, DRIVES),
-        interior: resolve(order.interior, INTERIORS),
+        interior: resolve(order.interior, INTERIORS, 'interior'),
       }}
     />
   )

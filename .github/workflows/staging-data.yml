@@ -4,13 +4,23 @@ name: Staging data
 on:
   workflow_dispatch:
     inputs:
+      target:
+        description: 'Which database the repair, archive and delete steps act on'
+        type: choice
+        required: true
+        default: staging
+        options: [staging, production]
       repair_data:
-        description: 'Repair unreadable dates and the gb country code on production'
+        description: 'Repair dates, the gb country code, and durations that contradict their dates'
         type: boolean
         required: true
         default: false
+      archive_pairs:
+        description: 'Rows to archive, as id=name,id=name — takes them out of the list and every statistic, reversibly'
+        required: false
+        default: ''
       delete_pairs:
-        description: 'Rows to delete, as id=name,id=name — the name guards against a mistyped id'
+        description: 'Rows to delete for good, as id=name,id=name — prefer archiving; this cannot be undone'
         required: false
         default: ''
       copy_to_staging:
@@ -30,14 +40,16 @@ jobs:
       - name: Run on the VPS
         uses: appleboy/ssh-action@v1
         env:
+          DB_TARGET: ${{ inputs.target }}
           REPAIR: ${{ inputs.repair_data }}
+          ARCHIVE_PAIRS: ${{ inputs.archive_pairs }}
           DELETE_PAIRS: ${{ inputs.delete_pairs }}
           COPY: ${{ inputs.copy_to_staging }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: REPAIR,DELETE_PAIRS,COPY
+          envs: DB_TARGET,REPAIR,ARCHIVE_PAIRS,DELETE_PAIRS,COPY
           script: |
             set -e
             cd /opt/tesla-order-tracker
@@ -62,15 +74,43 @@ jobs:
             echo ">>> Staging volume:    $STAGING_VOL"
             MOUNTS="-v $PROD_VOL:/prod -v $STAGING_VOL:/staging"
 
+            # Everything below writes to $DB. Staging is the default so a repair
+            # can be seen on the site before it reaches anyone's real data.
+            # Named DB_TARGET, not TARGET: the ssh-action's own environment
+            # already carries a TARGET, and it won. The log read
+            # "Acting on: /home/runner/work/_actions/appleboy/ssh-action/..."
+            # and the production branch below could never be reached — the
+            # selector silently always chose staging.
+            if [ "$DB_TARGET" = "production" ]; then
+              DB=/prod/prod.db
+              APP=app
+            else
+              DB=/staging/staging.db
+              APP=app-staging
+            fi
+            echo ">>> Acting on: $DB_TARGET ($DB)"
+
             git fetch origin staging
-            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/repair-orders.mjs
+            git checkout origin/staging -- scripts/copy-sqlite.mjs scripts/delete-order.mjs scripts/archive-order.mjs scripts/repair-orders.mjs scripts/backup.mjs
 
             # Through the backup API, not cp: these databases run in WAL mode, so
             # the newest writes sit in prod.db-wal and a file copy would leave
             # them behind — a backup quietly missing whatever happened last.
-            echo ">>> Backing up production before touching anything"
+            # Back up whatever is about to be written, through the backup API
+            # rather than cp: these databases run in WAL mode, so the newest
+            # writes sit in a -wal file that a file copy leaves behind.
+            echo ">>> Backing up $DB before touching anything"
             docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-              node /app/ops/copy-sqlite.mjs /prod/prod.db /prod/prod.db.before-$STAMP
+              node /app/ops/copy-sqlite.mjs "$DB" "$DB.before-$STAMP"
+
+            # And a second one the admin dashboard can actually see. The line
+            # above writes beside the database under a name nothing lists, so
+            # after a run there was no snapshot anyone could open, compare or
+            # restore a single order from — which is exactly the moment they
+            # would want one.
+            echo ">>> Leaving a listable snapshot for the dashboard"
+            docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+              node /app/ops/backup.mjs "$DB"
 
             TOUCHED=0
 
@@ -80,37 +120,77 @@ jobs:
             if [ "$REPAIR" = "true" ]; then
               echo ">>> Dry run of the repair"
               docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/repair-orders.mjs /prod/prod.db
+                node /app/ops/repair-orders.mjs "$DB"
 
               echo ">>> Applying repair"
               docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                node /app/ops/repair-orders.mjs /prod/prod.db --apply
+                node /app/ops/repair-orders.mjs "$DB" --apply
               TOUCHED=1
             else
               echo ">>> No repair requested"
             fi
 
-            if [ -n "$DELETE_PAIRS" ]; then
-              echo "$DELETE_PAIRS" | tr ',' '\n' | while IFS= read -r pair; do
+            # One helper for both lists. A row whose --expect-name does not match
+            # is reported and skipped rather than ending the run: the guard doing
+            # its job on one pair is not a reason to abandon the others, and a
+            # silent abort halfway through is worse than a listed failure.
+            FAILED=""
+            run_pairs() {
+              SCRIPT="$1"
+              PAIRS="$2"
+              OLD_IFS="$IFS"
+              IFS=','
+              for pair in $PAIRS; do
+                IFS="$OLD_IFS"
                 [ -z "$pair" ] && continue
                 ID="${pair%%=*}"
                 NAME="${pair#*=}"
-                echo ">>> Dry run: $ID"
+                echo ">>> Dry run ($SCRIPT): $ID"
+                if ! docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
+                     node "/app/ops/$SCRIPT" "$DB" "$ID" --expect-name "$NAME"; then
+                  echo ">>> REFUSED: $ID — left alone"
+                  FAILED="$FAILED $ID"
+                  IFS=','
+                  continue
+                fi
+                echo ">>> Applying ($SCRIPT): $ID"
                 docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME"
-                echo ">>> Applying: $ID"
-                docker run --rm $MOUNTS -v "$PWD/scripts:/app/ops:ro" "$IMAGE" \
-                  node /app/ops/delete-order.mjs /prod/prod.db "$ID" --expect-name "$NAME" --apply
+                  node "/app/ops/$SCRIPT" "$DB" "$ID" --expect-name "$NAME" --apply
+                TOUCHED=1
+                IFS=','
               done
-              TOUCHED=1
+              IFS="$OLD_IFS"
+            }
+
+            if [ -n "$ARCHIVE_PAIRS" ]; then
+              run_pairs archive-order.mjs "$ARCHIVE_PAIRS"
+            else
+              echo ">>> Nothing to archive"
+            fi
+
+            if [ -n "$DELETE_PAIRS" ]; then
+              run_pairs delete-order.mjs "$DELETE_PAIRS"
             else
               echo ">>> No deletions requested"
+            fi
+
+            if [ -n "$FAILED" ]; then
+              echo ">>> These were refused by their name guard and left untouched:$FAILED"
             fi
 
             # Production caches the order list in memory per process; a restart
             # is the honest way to make a data change visible.
             if [ "$TOUCHED" = "1" ]; then
-              docker compose restart app
+              docker compose restart "$APP"
+            fi
+
+            # Refuses rather than guesses: copying production over staging after
+            # repairing staging would throw the repair away, and the person who
+            # ticked both boxes did not mean that.
+            if [ "$COPY" = "true" ] && [ "$DB_TARGET" = "staging" ] && [ "$TOUCHED" = "1" ]; then
+              echo ">>> Refusing to copy production over the staging changes just made"
+              echo ">>> Run the copy on its own if that is what you want"
+              exit 1
             fi
 
             if [ "$COPY" = "true" ]; then

@@ -16,7 +16,7 @@
     "back": "Tilbage",
     "close": "Luk",
     "copy": "Kopier",
-    "support": "Support",
+    "support": "Støt",
     "menu": "Menu",
     "refresh": "Opdater",
     "allGood": "Alt i orden!",
@@ -41,7 +41,12 @@
     "projectSupport": "Støt dette projekt",
     "reset": "Nulstil",
     "ordersRefreshed": "{count} bestillinger opdateret",
-    "refreshError": "Fejl ved opdatering"
+    "refreshError": "Fejl ved opdatering",
+    "hide": "Skjul",
+    "show": "Vis",
+    "only": "Kun",
+    "compact": "Kompakt",
+    "deleteError": "Sletning mislykkedes."
   },
   "home": {
     "title": "Tesla-bestillinger og statistik",
@@ -72,8 +77,8 @@
     "vehicleImage": "Køretøjsbillede",
     "delivered": "Leveret: {date}",
     "errorGeneratingCode": "Fejl ved generering af kode",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "forældet",
+    "staleHint": "Denne ordre er ikke opdateret i over 60 dage — dataene kan være forældede.",
     "statsTitle": "Statistik",
     "statsSubtitle": "Leveringstider, konfigurationer og trends",
     "cancelledBadge": "Annulleret",
@@ -85,7 +90,9 @@
     "title": "Søg bestillinger",
     "description": "Find en bestilling på tværs af alle kvartaler",
     "hint": "Naviger med piletasterne, vælg med Enter",
-    "openSearch": "Søg"
+    "openSearch": "Søg",
+    "results": "{count} resultater",
+    "noResultsHint": "Prøv navn, VIN, land eller leveringssted."
   },
   "form": {
     "personalData": "Personlige data",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Klik på \"Rediger\" og indtast adgangskoden for at ændre bestillingsdataene.",
     "saveCodeWarning": "Gem denne kode for at redigere bestillingen senere.",
     "codeShownOnce": "Denne kode vises kun én gang!",
-    "codeUsageHint": "Brug denne kode under \"Rediger bestilling\" for at ændre dataene."
+    "codeUsageHint": "Brug denne kode under \"Rediger bestilling\" for at ændre dataene.",
+    "backToOverview": "Tilbage til oversigten",
+    "viewMyOrder": "Se min ordre"
   },
   "editByCode": {
     "passwordPromptTitle": "Rediger bestilling",
@@ -231,10 +240,10 @@
     "deliveryDate": "Leveringsdato",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pa",
     "papersToDelivery": "Dok→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Ventetid",
     "updatedAt": "Opdateret",
     "country": "Land",
     "allVehicles": "Alle køretøjer",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Disse felter kan redigeres manuelt, selv for TOST-administrerede bestillinger.",
     "papersReceivedDate": "Dokumenter modtaget den",
     "saveError": "Fejl ved lagring",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Produktionsdato",
+    "staleFilter": "Forældet",
+    "staleTooltip": "Skift filter: alle / skjul forældede / kun forældede (≥60 dage uden opdatering på åbne ordrer)",
     "cancelledFilter": "Annulleret",
-    "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede"
+    "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede",
+    "incompleteBadge": "ufuldstændig",
+    "incompleteHint": "Denne ordre mangler bestillingsdatoen, selvom en senere dato er angivet. Al ventetid måles fra bestillingsdatoen — uden den kan posten ikke placeres i tid og indgår ikke i nogen ventetidsstatistik."
   },
   "progress": {
     "ordered": "Bestilt",
@@ -274,7 +285,8 @@
     "papers": "Dokumenter",
     "production": "Produktion",
     "delivered": "Leveret",
-    "deliveryScheduled": "Levering planlagt"
+    "deliveryScheduled": "Levering planlagt",
+    "stepOfTotal": "Trin {current} af {total}"
   },
   "statistics": {
     "overview": "Oversigt",
@@ -365,8 +377,8 @@
     "timelinePapers": "Papirer",
     "timelineDelivery": "Levering",
     "totalWaitTime": "Samlet ventetid",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaljer (min / maks)",
+    "pipelineSegment": "Etape",
     "cancelledExcluded": "{count} annulleret (ikke medregnet)"
   },
   "admin": {
@@ -444,7 +456,7 @@
     "importModel3": "Importer Model 3",
     "syncingModel3": "Synkroniserer Model 3...",
     "model3Hint": "Importerer Model 3-data fra det separate Google-regneark.",
-    "debugSheets": "Debug Sheets",
+    "debugSheets": "Fejlsøg ark",
     "debugChecking": "Tjekker...",
     "dataExport": "Dataeksport",
     "dataExportDescription": "Eksporter alle data og statistik som Excel-fil (exitplan)",
@@ -498,7 +510,7 @@
     "vehicleType": "Køretøjstype",
     "allVehicles": "Alle køretøjer",
     "vehicleTypeHint": "Lad stå tomt for valgmuligheder, der gælder alle køretøjer",
-    "flagEmoji": "Flag (Emoji)",
+    "flagEmoji": "Flag (emoji)",
     "colorCode": "Farvekode (Hex)",
     "showBorder": "Vis kantlinje (til lyse farver)",
     "constraintManager": "Modelbegrænsninger",
@@ -524,7 +536,41 @@
     "selectModelHint": "Vælg et køretøj og en model for at konfigurere begrænsninger",
     "loadingOptions": "Indlæser valgmuligheder...",
     "loadingConstraints": "Indlæser begrænsninger...",
-    "selectValue": "Vælg værdi..."
+    "selectValue": "Vælg værdi...",
+    "archiveConfirmAction": "Arkivér",
+    "archiveConfirmDescription": "Arkiverede ordrer forsvinder fra den offentlige statistik, men bliver i databasen. Det kan kun fortrydes én ordre ad gangen.",
+    "archiveConfirmTitle": "Arkivér {count} ordrer?",
+    "yearlyGoal": "Serveromkostninger pr. år (€)",
+    "yearlyGoalHint": "Lad feltet stå tomt for at skjule omkostningslinjen.",
+    "yearlyRaised": "Dækket indtil nu (€)",
+    "backups": "Sikkerhedskopier",
+    "backupsDescription": "Øjebliksbilleder af ordredatabasen. Hver kan sammenlignes med de aktuelle data, og enkelte poster kan gendannes.",
+    "createBackup": "Opret sikkerhedskopi",
+    "backupCreating": "Opretter…",
+    "backupCreated": "Sikkerhedskopi oprettet",
+    "backupFailed": "Sikkerhedskopi mislykkedes",
+    "backupListFailed": "Kunne ikke indlæse sikkerhedskopier",
+    "backupDeleted": "Sikkerhedskopi slettet",
+    "backupDeleteFailed": "Kunne ikke slette sikkerhedskopien",
+    "noBackups": "Ingen sikkerhedskopier endnu.",
+    "backupOrders": "{count} ordrer",
+    "backupKeepHint": "De {count} nyeste sikkerhedskopier beholdes; ældre fjernes, når en ny oprettes.",
+    "compareBackup": "Sammenlign",
+    "backupComparing": "Sammenligner…",
+    "noDifferences": "Ingen forskelle fra de aktuelle data.",
+    "diffAdded": "Tilføjet siden denne sikkerhedskopi",
+    "diffRemoved": "Forsvundet siden da",
+    "diffChanged": "Ændret",
+    "restoreHint": "Gendannelse sætter ordrens data tilbage. Ejerens adgangskode forbliver uændret — undtagen ved en post, der mangler helt, og som genskabes fuldt ud.",
+    "restoreOrder": "Gendan",
+    "orderRestored": "{name} gendannet",
+    "restoreFailed": "Gendannelse mislykkedes",
+    "backupCompareFailed": "Sammenligning mislykkedes",
+    "backupAllFields": "Alle felter",
+    "backupSortName": "Efter navn",
+    "backupSortChanges": "Flest ændringer",
+    "backupShowing": "{shown} af {total}",
+    "backupNoMatches": "Ingen match med disse filtre."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Baseret på {count} bestillinger",
     "notEnoughData": "Ikke nok data til forudsigelse. Vælg en køretøjstype.",
     "lowDataHint": "Få datapunkter — prognosen kan være unøjagtig. Flere bestillinger vil forbedre nøjagtigheden.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Baseret på {count} leveringer fra de seneste {days} dage",
+    "exceedsPessimisticHint": "Din hidtidige ventetid ({days} dage) overstiger allerede det pessimistiske skøn (75 % af sammenlignelige leveringer). De nuværende ventetider er længere end den historiske fordeling — tag prognosen med forbehold."
   },
   "trend": {
     "title": "Leveringstendens",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla-bestillinger og statistik",
     "subtitle": "Den største fællesskabsdatabase for Tesla-leveringstider. Model Y, Model 3 — verdensomspændende.",
-    "findMyOrder": "Find min bestilling"
+    "findMyOrder": "Find min bestilling",
+    "claim": "<em>{days}</em> dage fra bestilling til overdragelse",
+    "claimSub": "Median af {delivered} leverede ordrer. {waiting} venter stadig — den længste i {longest} dage.",
+    "kicker": "Fællesskabsdatabase · Model Y og Model 3",
+    "ordersLabel": "Ordrer",
+    "deliveredLabel": "leveret",
+    "withVin": "{count} med VIN, venter",
+    "withoutVin": "{count} uden VIN",
+    "stale": "{count} uden opdatering"
   },
   "tracking": {
     "backToOverview": "Tilbage til oversigt",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Bestilling → Levering",
     "orderToPapers": "Bestilling → Dokumenter",
     "papersToDelivery": "Dokumenter → Levering",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Baseret på {count} leveringer fra de seneste {days} dage",
+    "exceedsPessimisticHint": "Din hidtidige ventetid ({days} dage) overstiger allerede det pessimistiske skøn. Prognosen bygger på historiske leveringstider og er ikke længere pålidelig her — hold dig til Teslas officielle leveringsvindue.",
+    "staleHint": "Denne ordre er ikke opdateret i over 60 dage. Dataene nedenfor er måske ikke aktuelle.",
+    "waitedLabel": "Ventetid",
+    "waitingLabel": "Venter",
+    "daysUnit": "dage",
+    "fasterThanComparable": "{days} dage hurtigere end sammenlignelige ordrer (median {median})",
+    "slowerThanComparable": "{days} dage langsommere end sammenlignelige ordrer (median {median})",
+    "matchesComparable": "Præcis som sammenlignelige ordrer (median {median})",
+    "comparableTypically": "Sammenlignelige ordrer tog median {median} dage",
+    "today": "I dag"
   },
   "support": {
     "communityMessage": "Disse data vedligeholdes af fællesskabet for fællesskabet. Hvis dette websted hjælper dig, kan du støtte serveromkostningerne.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Administrationspanel",
     "navigationMenu": "Navigationsmenu",
     "impressum": "Juridisk information",
-    "privacy": "Privacy"
+    "privacy": "Privatliv",
+    "toggleTheme": "Skift tema",
+    "changeLanguage": "Skift sprog",
+    "skipToContent": "Gå til indhold"
   },
   "footer": {
     "operatedBy": "Drevet af Sven",
     "supportDevelopment": "Støt hosting og udvikling",
-    "stats": "{orders} bestillinger · {delivered} leveret"
+    "stats": "{orders} bestillinger · {delivered} leveret",
+    "serverCostsProgress": "{raised} af {goal} € dækket",
+    "serverCostsTitle": "Serveromkostninger {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Seneste opdateringer",
+    "entries": "poster",
+    "loading": "Indlæser…",
+    "loadMore": "Indlæs mere",
+    "empty": "Ingen opdateringer endnu.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "I dag",
+      "yesterday": "I går",
+      "week": "Denne uge",
+      "older": "Ældre"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN tildelt",
+      "production": "I produktion",
+      "papers": "Papirer modtaget",
+      "delivery": "Leveret",
+      "window": "Leveringsvindue ændret",
+      "created": "Ny ordre"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "for {n} min siden",
+      "hoursAgo": "for {n} t siden",
+      "yesterday": "i går",
+      "daysAgo": "for {n} dage siden",
+      "weeksAgo": "for {n} uger siden"
     }
+  },
+  "errors": {
+    "rateLimited": "For mange forespørgsler. Prøv igen senere.",
+    "orderNotFound": "Ordren blev ikke fundet.",
+    "conflict": "Posten er ændret af en anden i mellemtiden. Genindlæs siden, og prøv igen.",
+    "resetCodeInvalid": "Ugyldig eller udløbet engangskode.",
+    "resetCodeRequired": "Engangskode påkrævet.",
+    "tostFieldsRestricted": "Denne ordre administreres af TOST. Kun ordredato, papirdato, produktionsdato, typegodkendelse og typevariant kan redigeres.",
+    "adminRequired": "Administratoradgang kræves.",
+    "orderDateInFuture": "Ordredatoen kan ikke ligge i fremtiden.",
+    "datesOutOfOrder": "Datoerne står ikke i en plausibel rækkefølge. Tjek ordre-, produktions-, papir- og leveringsdato.",
+    "legacyPasswordRequired": "Der kræves en ny adgangskode til ældre poster.",
+    "backHome": "Til forsiden",
+    "pageErrorBody": "Siden kunne ikke indlæses. Et nyt forsøg hjælper ofte.",
+    "pageErrorTitle": "Noget gik galt",
+    "pageNotFoundBody": "Denne adresse findes ikke. Linket kan være forældet eller skrevet forkert.",
+    "pageNotFoundTitle": "Siden blev ikke fundet",
+    "retry": "Prøv igen"
   }
 }

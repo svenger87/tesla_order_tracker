@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RefreshCw, AlertTriangle, Database, Bug, Download } from 'lucide-react'
 
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
 interface MultiSheetSyncResult extends SyncResult {
   sheets?: Array<SyncResult & { sheetLabel: string }>
@@ -104,8 +105,8 @@ export function ImportExportTab() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-md">
-            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 bg-pending/10 border border-pending/20 rounded-md">
+            <AlertTriangle className="h-5 w-5 text-pending shrink-0 mt-0.5" />
             <div className="text-sm text-amber-700 dark:text-amber-400">
               <p className="font-medium">Hinweis</p>
               <p>
@@ -131,7 +132,7 @@ export function ImportExportTab() {
             <div className="bg-green-500/10 text-green-600 dark:text-green-400 px-4 py-3 rounded-md text-sm space-y-2">
               <p className="font-medium">
                 {syncResult.message || t('syncCompleted')}
-                {syncResult.vehicleType && <span className="ml-2 px-2 py-0.5 bg-green-500/20 rounded text-xs">{syncResult.vehicleType}</span>}
+                {syncResult.vehicleType && <span className="ml-2 px-2 py-0.5 bg-success/20 rounded text-xs">{syncResult.vehicleType}</span>}
               </p>
 
               {syncResult.sheets && syncResult.sheets.length > 0 && (
@@ -147,7 +148,7 @@ export function ImportExportTab() {
                 </div>
               )}
 
-              <div className="flex gap-4 pt-1 border-t border-green-500/20">
+              <div className="flex gap-4 pt-1 border-t border-success/20">
                 <span>{tc('new')}: {syncResult.created}</span>
                 <span>{tc('update')}: {syncResult.updated}</span>
                 <span>Skipped: {syncResult.skipped}</span>
@@ -284,7 +285,7 @@ export function ImportExportTab() {
                 document.body.removeChild(a)
               } catch (err) {
                 console.error('Export error:', err)
-                alert(t('exportFailed'))
+                toast.error(t('exportFailed'))
               } finally {
                 setExporting(false)
               }

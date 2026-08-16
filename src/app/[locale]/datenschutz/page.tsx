@@ -31,7 +31,7 @@ export default async function DatenschutzPage({ params }: { params: Promise<{ lo
   ]
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 sm:p-10 space-y-6">
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>

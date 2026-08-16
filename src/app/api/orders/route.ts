@@ -2,7 +2,11 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
-import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
+import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+import { canClaimLegacyOrder } from '@/lib/legacy-claim'
+import { computeETag, isNotModified } from '@/lib/http-cache'
+import { fetchOrders } from '@/lib/orders-query'
 import { recordOrderChanges } from '@/lib/order-history'
 import {
   COLORS,
@@ -67,6 +71,42 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
   return input === stored
 }
 
+// Anyone may create and edit without an account, so these are the only brakes.
+const CREATE_RULE = { limit: 5, windowMs: 60 * 60 * 1000 }
+const WRITE_RULE = { limit: 60, windowMs: 15 * 60 * 1000 }
+
+function rateLimited(request: NextRequest, bucket: string, rule: { limit: number; windowMs: number }) {
+  const limit = checkRateLimit(clientKey(request, bucket), rule)
+  if (limit.allowed) return null
+  return NextResponse.json(
+    { error: 'Zu viele Anfragen. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+    { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+  )
+}
+
+/**
+ * Reject chronologically impossible dates. These fields are community-editable
+ * and feed the public wait-time medians, so this is the only defence the numbers
+ * on the front page have.
+ */
+function dateSequenceError(data: Record<string, unknown>) {
+  const code = findDateSequenceError(data)
+  if (!code) return null
+  const messages: Record<string, string> = {
+    ORDER_DATE_IN_FUTURE: 'Das Bestelldatum kann nicht in der Zukunft liegen.',
+    PRODUCTION_BEFORE_ORDER: 'Das Produktionsdatum kann nicht vor dem Bestelldatum liegen.',
+    PAPERS_BEFORE_ORDER: 'Das Papierdatum kann nicht vor dem Bestelldatum liegen.',
+    PAPERS_BEFORE_PRODUCTION: 'Das Papierdatum kann nicht vor dem Produktionsdatum liegen.',
+    DELIVERY_BEFORE_ORDER: 'Das Auslieferungsdatum kann nicht vor dem Bestelldatum liegen.',
+    DELIVERY_BEFORE_PRODUCTION: 'Das Auslieferungsdatum kann nicht vor dem Produktionsdatum liegen.',
+    DELIVERY_BEFORE_PAPERS: 'Das Auslieferungsdatum kann nicht vor dem Papierdatum liegen.',
+  }
+  return NextResponse.json(
+    { error: messages[code] ?? 'Die Datumsangaben sind nicht plausibel.', code },
+    { status: 400 }
+  )
+}
+
 /**
  * "Storniert" is owner-driven: whoever holds the edit code can flag their order
  * as cancelled and clear it again. `cancelledAt` is stamped only on the
@@ -88,99 +128,27 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const includeArchived = searchParams.get('includeArchived') === 'true'
 
-    // Check if admin - only admins can see archived orders
+    // Only admins may see archived orders
     const admin = await getAdminFromCookie()
-    const showArchived = admin && includeArchived
+    const orders = await fetchOrders({ includeArchived: Boolean(admin && includeArchived) })
 
-    // Try to query with archive filter, fall back to without if field doesn't exist
-    let orders
-    try {
-      orders = await prisma.order.findMany({
-        where: showArchived ? {} : { archived: false },
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          vehicleType: true,
-          orderDate: true,
-          country: true,
-          model: true,
-          range: true,
-          drive: true,
-          color: true,
-          interior: true,
-          wheels: true,
-          towHitch: true,
-          autopilot: true,
-          seats: true,
-          source: true,
-          tostUserId: true,
-          deliveryWindow: true,
-          deliveryLocation: true,
-          vin: true,
-          vinReceivedDate: true,
-          papersReceivedDate: true,
-          productionDate: true,
-          typeApproval: true,
-          typeVariant: true,
-          deliveryDate: true,
-          orderToProduction: true,
-          orderToVin: true,
-          orderToDelivery: true,
-          orderToPapers: true,
-          papersToDelivery: true,
-          archived: true,
-          archivedAt: true,
-          cancelled: true,
-          cancelledAt: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-    } catch {
-      // If archived field doesn't exist yet (migration not run), fetch without it
-      orders = await prisma.order.findMany({
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          vehicleType: true,
-          orderDate: true,
-          country: true,
-          model: true,
-          range: true,
-          drive: true,
-          color: true,
-          interior: true,
-          wheels: true,
-          towHitch: true,
-          autopilot: true,
-          seats: true,
-          source: true,
-          tostUserId: true,
-          deliveryWindow: true,
-          deliveryLocation: true,
-          vin: true,
-          vinReceivedDate: true,
-          papersReceivedDate: true,
-          productionDate: true,
-          typeApproval: true,
-          typeVariant: true,
-          deliveryDate: true,
-          orderToProduction: true,
-          orderToVin: true,
-          orderToDelivery: true,
-          orderToPapers: true,
-          papersToDelivery: true,
-          createdAt: true,
-        },
-      })
-      // Add default archived fields to the response
-      orders = orders.map(o => ({ ...o, archived: false, archivedAt: null, cancelled: false, cancelledAt: null, updatedAt: o.createdAt }))
+    // Every open tab polls this every 30 seconds and gets the entire dataset
+    // back. Most of those polls return exactly what the client already has.
+    const etag = computeETag(orders)
+    const cacheHeaders = {
+      // max-age=0 + must-revalidate makes the browser re-ask every time and send
+      // If-None-Match, which is what turns an unchanged poll into an empty 304.
+      // Without it the response carried only s-maxage, which shared caches honour
+      // and browsers ignore, so no client ever revalidated.
+      'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=5, stale-while-revalidate=25',
+      'ETag': etag,
     }
-    return NextResponse.json(orders, {
-      headers: { 'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=25' },
-    })
+
+    if (isNotModified(request.headers.get('if-none-match'), etag)) {
+      return new NextResponse(null, { status: 304, headers: cacheHeaders })
+    }
+
+    return NextResponse.json(orders, { headers: cacheHeaders })
   } catch (error) {
     console.error('Failed to fetch orders:', error)
     // Return empty array to prevent frontend crash
@@ -190,6 +158,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const throttled = rateLimited(request, 'orders-create', CREATE_RULE)
+    if (throttled) return throttled
+
     const body = await request.json()
 
     // Validate required fields for vehicle configuration
@@ -208,7 +179,7 @@ export async function POST(request: NextRequest) {
     for (const { field, label } of requiredFields) {
       if (!body[field] || (typeof body[field] === 'string' && !body[field].trim())) {
         return NextResponse.json(
-          { error: `${label} ist erforderlich` },
+          { error: `${label} ist erforderlich`, code: 'FIELD_REQUIRED', field: label },
           { status: 400 }
         )
       }
@@ -217,7 +188,7 @@ export async function POST(request: NextRequest) {
     // Validate username minimum length
     if (typeof body.name === 'string' && body.name.trim().length < 3) {
       return NextResponse.json(
-        { error: 'Benutzername muss mindestens 3 Zeichen lang sein' },
+        { error: 'Benutzername muss mindestens 3 Zeichen lang sein', code: 'NAME_TOO_SHORT' },
         { status: 400 }
       )
     }
@@ -225,19 +196,19 @@ export async function POST(request: NextRequest) {
     // Validate password (required for all new orders)
     if (!body.customPassword) {
       return NextResponse.json(
-        { error: 'Passwort ist erforderlich' },
+        { error: 'Passwort ist erforderlich', code: 'PASSWORD_REQUIRED' },
         { status: 400 }
       )
     }
     if (body.customPassword.length < 6) {
       return NextResponse.json(
-        { error: 'Passwort muss mindestens 6 Zeichen lang sein' },
+        { error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' },
         { status: 400 }
       )
     }
     if (!/\d/.test(body.customPassword)) {
       return NextResponse.json(
-        { error: 'Passwort muss mindestens eine Zahl enthalten' },
+        { error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' },
         { status: 400 }
       )
     }
@@ -250,6 +221,9 @@ export async function POST(request: NextRequest) {
 
     // Normalize date fields (fix missing leading zeros, reject garbage)
     normalizeDateFields(normalizedBody)
+
+    const sequenceError = dateSequenceError(normalizedBody)
+    if (sequenceError) return sequenceError
 
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(normalizedBody)
@@ -295,13 +269,16 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Failed to create order:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
+    const throttled = rateLimited(request, 'orders-write', WRITE_RULE)
+    if (throttled) return throttled
+
     const { id, editCode, isLegacy, newEditCode, expectedUpdatedAt, ...rawData } = body
 
     // Normalize display labels → internal values
@@ -319,13 +296,15 @@ export async function PUT(request: NextRequest) {
       const attemptedFields = Object.keys(rawData).filter(k => k !== 'id')
       const disallowedFields = attemptedFields.filter(f => !tostUserEditableFields.includes(f))
       if (disallowedFields.length > 0) {
-        return NextResponse.json({ error: 'This order is managed by TOST. Only order date, papers received date, type approval, and type variant can be edited.' }, { status: 403 })
+        return NextResponse.json({ error: 'This order is managed by TOST. Only order date, papers received date, type approval, and type variant can be edited.', code: 'TOST_FIELDS_RESTRICTED' }, { status: 403 })
       }
-      // Allow the edit — update only the allowed fields directly
+      // Allow the edit — update only the allowed fields directly.
+      // Read from `data`, not `rawData`: normalizeDateFields() ran on the copy,
+      // so taking raw values here wrote unnormalized dates straight to the DB.
       const updateData: Record<string, unknown> = {}
       for (const field of tostUserEditableFields) {
         if (field in rawData) {
-          updateData[field] = rawData[field] || null
+          updateData[field] = data[field] || null
         }
       }
       if (Object.keys(updateData).length > 0) {
@@ -334,6 +313,11 @@ export async function PUT(request: NextRequest) {
           where: { id },
           select: { orderDate: true, deliveryDate: true, vinReceivedDate: true, productionDate: true, papersReceivedDate: true },
         })
+
+        // Validate the merged chronology, not just the submitted fields — a
+        // single new date only becomes implausible next to the stored ones.
+        const tostSequenceError = dateSequenceError({ ...existingOrder, ...updateData })
+        if (tostSequenceError) return tostSequenceError
 
         // Recalculate papersToDelivery if papersReceivedDate changed
         if (updateData.papersReceivedDate) {
@@ -364,7 +348,10 @@ export async function PUT(request: NextRequest) {
         const updated = await prisma.$transaction(async (tx) => {
           const before = await tx.order.findUnique({ where: { id } })
           const u = await tx.order.update({ where: { id }, data: updateData })
-          await recordOrderChanges(id, before, u, { tx, source: 'tost' })
+          // 'web', not 'tost': this edit came from an anonymous visitor filling in
+          // fields TOST does not track. Logging it as 'tost' made a community
+          // entry look like it had been synced from the source system.
+          await recordOrderChanges(id, before, u, { tx, source: 'web' })
           return u
         })
         return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated' })
@@ -377,23 +364,38 @@ export async function PUT(request: NextRequest) {
       const order = await prisma.order.findUnique({ where: { id } })
 
       if (!order) {
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Order not found', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
-      // Legacy order flow - user verified via username
+      // Legacy order flow — an imported order that nobody has claimed yet.
       if (isLegacy && order.editCode === null) {
+        // Re-check the claim here. /api/orders/verify performs the same check
+        // before the client ever gets here, but a request can be sent straight
+        // to this route, and trusting `isLegacy` from the body meant anyone
+        // holding an order id — which GET /api/orders hands out — could take
+        // over any unclaimed order and rewrite its fields in one call.
+        if (!canClaimLegacyOrder(editCode, order.name)) {
+          return NextResponse.json(
+            { error: 'Ungültiges Passwort oder Benutzername', code: 'INVALID_EDIT_CODE' },
+            { status: 401 }
+          )
+        }
+
         // For legacy orders, user must set a new password
         if (!newEditCode) {
-          return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge' }, { status: 400 })
+          return NextResponse.json({ error: 'Neues Passwort erforderlich für Bestandseinträge', code: 'LEGACY_PASSWORD_REQUIRED' }, { status: 400 })
         }
 
         // Validate new password
         if (newEditCode.length < 6) {
-          return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
+          return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' }, { status: 400 })
         }
         if (!/\d/.test(newEditCode)) {
-          return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
+          return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' }, { status: 400 })
         }
+
+        const legacySequenceError = dateSequenceError(data)
+        if (legacySequenceError) return legacySequenceError
 
         // Hash the new password
         const hashedPassword = await bcrypt.hash(newEditCode, 10)
@@ -448,13 +450,16 @@ export async function PUT(request: NextRequest) {
 
       // Standard edit code verification
       if (!editCode) {
-        return NextResponse.json({ error: 'Edit code required' }, { status: 401 })
+        return NextResponse.json({ error: 'Edit code required', code: 'EDIT_CODE_REQUIRED' }, { status: 401 })
       }
 
       if (!order.editCode || !(await comparePassword(editCode, order.editCode))) {
-        return NextResponse.json({ error: 'Invalid edit code' }, { status: 401 })
+        return NextResponse.json({ error: 'Invalid edit code', code: 'INVALID_EDIT_CODE' }, { status: 401 })
       }
     }
+
+    const putSequenceError = dateSequenceError(data)
+    if (putSequenceError) return putSequenceError
 
     // Optimistic locking: check if order was modified since user loaded it
     if (expectedUpdatedAt) {
@@ -515,7 +520,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ id: updated.id, updatedAt: updated.updatedAt, message: 'Order updated successfully' })
   } catch (error) {
     console.error('Failed to update order:', error)
-    return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }
 
@@ -523,7 +528,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
     if (!admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
+      return NextResponse.json({ error: 'Admin access required', code: 'ADMIN_REQUIRED' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -537,6 +542,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Order deleted successfully' })
   } catch (error) {
     console.error('Failed to delete order:', error)
-    return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete order', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }

@@ -15,7 +15,7 @@ export default async function ImpressumPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'impressum' })
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex items-center justify-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-lg">
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-8 space-y-6">
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>

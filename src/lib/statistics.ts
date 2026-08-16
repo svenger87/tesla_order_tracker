@@ -1,4 +1,7 @@
 import { Order, COLORS, COUNTRIES, VehicleType, MODEL_Y_TRIMS, MODEL_3_TRIMS, RANGES, DRIVES, INTERIORS, AUTOPILOT_OPTIONS, TOW_HITCH_OPTIONS, SEATS_OPTIONS } from './types'
+import { CHART_COLORS } from './chart-colors'
+import { isHandedOver, startOfToday, countsTowardStats } from './order-state'
+import { parseGermanDate, calculateDaysBetween as daysBetweenDates } from './date-utils'
 
 // Build code/label lookup tables from the canonical COUNTRIES constant.
 // CODE_SET stores ISO codes (uppercase) for fast membership checks.
@@ -68,6 +71,14 @@ export interface OrderStatistics {
   avgOrderToDelivery: number | null
   avgOrderToPapers: number | null
   avgPapersToDelivery: number | null
+  /** How many orders each average above was measured over. They differ: an average
+   *  can only include orders that carry both of the dates it spans. */
+  sampleSizes: {
+    orderToVin: number
+    orderToDelivery: number
+    orderToPapers: number
+    papersToDelivery: number
+  }
   /** `name` is a Tesla trim name (kept verbatim — universal, not translated) or the UNKNOWN_OPTION sentinel, which the display layer localizes. */
   modelDistribution: { name: string; count: number; fill: string }[]
   /** `name` is an option value (e.g. 'maximale_reichweite') or the UNKNOWN_OPTION sentinel. Localize at display time via a useOptions() lookup. */
@@ -188,21 +199,11 @@ function getModelColor(trimName: string, vehicleType?: VehicleType): string {
   return MODEL_Y_COLORS[trimName] || MODEL_3_COLORS[trimName] || 'var(--chart-4)'
 }
 
-const COUNTRY_COLORS = [
-  'var(--chart-1)',
-  'var(--chart-2)',
-  'var(--chart-3)',
-  'var(--chart-4)',
-  'var(--chart-5)',
-]
-
-const CONFIG_COLORS = [
-  'oklch(0.55 0.22 25)',   // Tesla Red
-  'oklch(0.65 0.15 220)',  // Blue
-  'oklch(0.70 0.12 160)',  // Teal
-  'oklch(0.75 0.15 80)',   // Yellow
-  'oklch(0.60 0.18 280)',  // Purple
-]
+// Both of these were separate copies of the categorical palette — one built
+// from tokens, one hardcoded in oklch with no dark-mode variant. There is now a
+// single validated palette; see lib/chart-colors.ts.
+const COUNTRY_COLORS = CHART_COLORS
+const CONFIG_COLORS = CHART_COLORS
 
 // Build a color lookup map for finding hex colors by label
 const COLOR_HEX_MAP = new Map<string, string>()
@@ -286,6 +287,11 @@ function normalizeModel(model: string | null | undefined): string {
   return model
 }
 
+/** How many orders yielded a usable value for one of the averages. */
+function countMeasurable(orders: Order[], measure: (o: Order) => number | null): number {
+  return orders.filter(o => measure(o) !== null).length
+}
+
 function calculateAverage(values: (number | null)[]): number | null {
   const validValues = values.filter((v): v is number => v !== null && !isNaN(v) && v >= 0)
   if (validValues.length === 0) return null
@@ -301,8 +307,11 @@ export interface SegmentStats {
 }
 
 function calculateSegmentStats(values: (number | null)[]): SegmentStats {
-  // Exclude 0-day values — they indicate same-day entries (data quality issues)
-  const validValues = values.filter((v): v is number => v !== null && !isNaN(v) && v > 0)
+  // Zero is a duration, not a defect. These were filtered out as "data quality
+  // issues", but papers signed on handover day is an ordinary Tuesday — and
+  // dropping 36 of the 726 real papers-to-delivery values moved that average
+  // from 9.5 days to 10.2.
+  const validValues = values.filter((v): v is number => v !== null && !isNaN(v) && v >= 0)
   if (validValues.length === 0) return { avg: null, min: null, max: null, count: 0 }
   const sum = validValues.reduce((acc, val) => acc + val, 0)
   return {
@@ -313,31 +322,31 @@ function calculateSegmentStats(values: (number | null)[]): SegmentStats {
   }
 }
 
-export function parseGermanDate(dateStr: string | null): Date | null {
-  if (!dateStr) return null
-  // Format: DD.MM.YYYY
-  const parts = dateStr.split('.')
-  if (parts.length !== 3) return null
-  const [day, month, year] = parts.map(Number)
-  if (isNaN(day) || isNaN(month) || isNaN(year)) return null
-  // Validate reasonable date ranges
-  if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2020 || year > 2030) return null
-  return new Date(year, month - 1, day)
-}
+/**
+ * Re-exported from date-utils, which is the one implementation.
+ *
+ * This module used to carry its own copy. The two drifted: this one accepted
+ * 31.02.2026 and turned it into March the 3rd, and it rejected any year outside
+ * a hardcoded 2020-2030 — a check written as a sanity guard that was really a
+ * deadline, after which every new order would have vanished from every figure
+ * on the site with no error anywhere.
+ */
+export { parseGermanDate }
 
-// Calculate days between two German-format date strings
-// Returns null if either date is invalid or if the result would be negative
+/**
+ * Days between two dates, or null when the pair cannot describe a real wait.
+ *
+ * Negative is impossible and stays excluded — an order cannot arrive before it
+ * was placed, so that is a broken record, and two exist. The old rule also threw
+ * away anything above 365 days as "unreasonably large". The longest real wait in
+ * the data is 218 days, so nothing was being lost yet; but a year is not an
+ * implausible wait for a car, and the rule was set to silently delete exactly
+ * the long waits this site exists to make visible.
+ */
 export function calculateDaysBetween(startDateStr: string | null, endDateStr: string | null): number | null {
-  const startDate = parseGermanDate(startDateStr)
-  const endDate = parseGermanDate(endDateStr)
-  if (!startDate || !endDate) return null
-
-  const diffMs = endDate.getTime() - startDate.getTime()
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
-
-  // Return null for negative values (invalid data) or unreasonably large values (> 1 year)
-  if (diffDays < 0 || diffDays > 365) return null
-  return diffDays
+  const days = daysBetweenDates(startDateStr, endDateStr)
+  if (days === null || days < 0) return null
+  return days
 }
 
 function getMonthKey(date: Date): string {
@@ -356,15 +365,17 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
   // Cancelled orders never reached delivery, so every average built below would
   // be skewed by them. Count them once, then drop them.
   const cancelledOrders = filteredOrders.filter(o => o.cancelled).length
-  filteredOrders = filteredOrders.filter(o => !o.cancelled)
+  filteredOrders = filteredOrders.filter(countsTowardStats)
 
   const totalOrders = filteredOrders.length
-  const deliveredOrders = filteredOrders.filter(o => o.deliveryDate).length
+  // Handed over, not merely dated: a delivery date in the future is an
+  // appointment. Counting those as delivered reported people who were still
+  // waiting as finished, and measured their wait to a day that had not come.
+  const today = startOfToday()
+  const deliveredOrdersList = filteredOrders.filter(o => isHandedOver(o, today))
+  const deliveredOrders = deliveredOrdersList.length
   const pendingOrders = totalOrders - deliveredOrders
   const ordersWithoutDate = filteredOrders.filter(o => !parseGermanDate(o.orderDate)).length
-
-  // Calculate averages from delivered orders
-  const deliveredOrdersList = filteredOrders.filter(o => o.deliveryDate)
 
   // Total delivery time: all delivered orders
   const avgOrderToDelivery = calculateAverage(
@@ -376,19 +387,25 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     deliveredOrdersList.map(o => calculateDaysBetween(o.orderDate, o.vinReceivedDate))
   )
 
-  // Papers stats: only from orders with papers date (subset)
-  // These might be from different sample sizes, so we cap them at avgOrderToDelivery for logical consistency
-  const rawAvgOrderToPapers = calculateAverage(
+  const avgOrderToPapers = calculateAverage(
     deliveredOrdersList.map(o => calculateDaysBetween(o.orderDate, o.papersReceivedDate))
   )
-  const rawAvgPapersToDelivery = calculateAverage(
+  const avgPapersToDelivery = calculateAverage(
     deliveredOrdersList.map(o => calculateDaysBetween(o.papersReceivedDate, o.deliveryDate))
   )
 
-  // If intermediate stats exceed total delivery time, show null (data inconsistency)
-  const avgOrderToPapers = rawAvgOrderToPapers !== null && avgOrderToDelivery !== null && rawAvgOrderToPapers > avgOrderToDelivery
-    ? null : rawAvgOrderToPapers
-  const avgPapersToDelivery = rawAvgPapersToDelivery
+  // Each average above runs over whatever subset carries the dates it needs, so
+  // they describe different groups of people and need not add up. That was
+  // handled by replacing the papers figure with null whenever it exceeded the
+  // delivery figure — which removed a number from the page and said nothing
+  // about why, while leaving the mismatch it was hiding entirely in place.
+  // Reporting the sizes states the thing instead of concealing it.
+  const sampleSizes = {
+    orderToVin: countMeasurable(deliveredOrdersList, o => calculateDaysBetween(o.orderDate, o.vinReceivedDate)),
+    orderToDelivery: countMeasurable(deliveredOrdersList, o => calculateDaysBetween(o.orderDate, o.deliveryDate)),
+    orderToPapers: countMeasurable(deliveredOrdersList, o => calculateDaysBetween(o.orderDate, o.papersReceivedDate)),
+    papersToDelivery: countMeasurable(deliveredOrdersList, o => calculateDaysBetween(o.papersReceivedDate, o.deliveryDate)),
+  }
 
   // Model distribution (normalized to proper labels)
   const modelCounts: Record<string, number> = {}
@@ -711,6 +728,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     avgOrderToDelivery,
     avgOrderToPapers,
     avgPapersToDelivery,
+    sampleSizes,
     modelDistribution,
     rangeDistribution,
     countryDistribution,

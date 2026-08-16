@@ -41,7 +41,12 @@
     "projectSupport": "Támogassa a projektet",
     "reset": "Visszaállítás",
     "ordersRefreshed": "{count} rendelés frissítve",
-    "refreshError": "Hiba a frissítés során"
+    "refreshError": "Hiba a frissítés során",
+    "hide": "Elrejtés",
+    "show": "Megjelenítés",
+    "only": "Csak",
+    "compact": "Kompakt",
+    "deleteError": "A törlés sikertelen."
   },
   "home": {
     "title": "Tesla rendelések és statisztikák",
@@ -72,8 +77,8 @@
     "vehicleImage": "Jármű képe",
     "delivered": "Kiszállítva: {date}",
     "errorGeneratingCode": "Hiba a kód generálásakor",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "elavult",
+    "staleHint": "Ezt a rendelést több mint 60 napja nem frissítették — az adatok elavultak lehetnek.",
     "statsTitle": "Statisztikák",
     "statsSubtitle": "Szállítási idők, konfigurációk és trendek",
     "cancelledBadge": "Törölve",
@@ -85,7 +90,9 @@
     "title": "Rendelések keresése",
     "description": "Rendelés keresése az összes negyedévben",
     "hint": "Navigálás a nyílbillentyűkkel, kiválasztás Enterrel",
-    "openSearch": "Keresés"
+    "openSearch": "Keresés",
+    "results": "{count} találat",
+    "noResultsHint": "Próbáljon nevet, alvázszámot, országot vagy átvételi helyet."
   },
   "form": {
     "personalData": "Személyes adatok",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Kattintson a \"Szerkesztés\" gombra és adja meg jelszavát a rendelési adatok módosításához.",
     "saveCodeWarning": "Mentse el ezt a kódot a rendelés későbbi szerkesztéséhez.",
     "codeShownOnce": "Ez a kód csak egyszer jelenik meg!",
-    "codeUsageHint": "Használja ezt a kódot a \"Rendelés szerkesztése\" menüpontban az adatok módosításához."
+    "codeUsageHint": "Használja ezt a kódot a \"Rendelés szerkesztése\" menüpontban az adatok módosításához.",
+    "backToOverview": "Vissza az áttekintéshez",
+    "viewMyOrder": "Rendelésem megtekintése"
   },
   "editByCode": {
     "passwordPromptTitle": "Rendelés szerkesztése",
@@ -230,11 +239,11 @@
     "typeVariant": "Típ. vált.",
     "deliveryDate": "Szállítási dátum",
     "orderToVin": "R→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Gy",
+    "productionToPapers": "Gy→Pa",
     "papersToDelivery": "Dok→Sz",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Várakozás",
     "updatedAt": "Frissítve",
     "country": "Ország",
     "allVehicles": "Összes jármű",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Ezek a mezők manuálisan szerkeszthetők, még TOST által kezelt rendeléseknél is.",
     "papersReceivedDate": "Dokumentumok beérkezése",
     "saveError": "Mentési hiba",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Gyártás dátuma",
+    "staleFilter": "Elavult",
+    "staleTooltip": "Szűrő váltása: mind / elavultak elrejtése / csak elavultak (≥60 nap frissítés nélkül nyitott rendeléseknél)",
     "cancelledFilter": "Töröltek",
-    "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek"
+    "cancelledTooltip": "Szűrő váltása: töröltek elrejtése / megjelenítése / csak töröltek",
+    "incompleteBadge": "hiányos",
+    "incompleteHint": "Ennél a rendelésnél hiányzik a rendelés dátuma, pedig szerepel egy későbbi dátum. Minden várakozási időt ettől mérünk — nélküle a bejegyzés időben nem helyezhető el, és egyetlen statisztikába sem számít bele."
   },
   "progress": {
     "ordered": "Megrendelve",
@@ -274,7 +285,8 @@
     "papers": "Dokumentumok",
     "production": "Gyártás",
     "delivered": "Kiszállítva",
-    "deliveryScheduled": "Szállítás ütemezve"
+    "deliveryScheduled": "Szállítás ütemezve",
+    "stepOfTotal": "{current}. lépés a(z) {total}-ból"
   },
   "statistics": {
     "overview": "Áttekintés",
@@ -365,8 +377,8 @@
     "timelinePapers": "Dokumentumok",
     "timelineDelivery": "Kiszállítás",
     "totalWaitTime": "Teljes várakozási idő",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Részletek (min / max)",
+    "pipelineSegment": "Szakasz",
     "cancelledExcluded": "{count} törölve (nincs beszámítva)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Válasszon járművet és modellt a korlátozások beállításához",
     "loadingOptions": "Opciók betöltése...",
     "loadingConstraints": "Korlátozások betöltése...",
-    "selectValue": "Érték kiválasztása..."
+    "selectValue": "Érték kiválasztása...",
+    "archiveConfirmAction": "Archiválás",
+    "archiveConfirmDescription": "Az archivált rendelések eltűnnek a nyilvános statisztikából, de a adatbázisban maradnak. Visszavonni csak rendelésenként lehet.",
+    "archiveConfirmTitle": "Archiválsz {count} rendelést?",
+    "yearlyGoal": "Szerverköltség évente (€)",
+    "yearlyGoalHint": "Hagyd üresen a költségsáv elrejtéséhez.",
+    "yearlyRaised": "Eddig fedezve (€)",
+    "backups": "Biztonsági mentések",
+    "backupsDescription": "A rendelési adatbázis pillanatképei. Mindegyik összevethető a jelenlegi adatokkal, és egyes bejegyzések visszaállíthatók belőle.",
+    "createBackup": "Mentés készítése",
+    "backupCreating": "Készül…",
+    "backupCreated": "Mentés elkészült",
+    "backupFailed": "A mentés nem sikerült",
+    "backupListFailed": "A mentések nem tölthetők be",
+    "backupDeleted": "Mentés törölve",
+    "backupDeleteFailed": "A mentés nem törölhető",
+    "noBackups": "Még nincsenek mentések.",
+    "backupOrders": "{count} rendelés",
+    "backupKeepHint": "A {count} legújabb mentés marad meg; a régebbiek új mentéskor törlődnek.",
+    "compareBackup": "Összehasonlítás",
+    "backupComparing": "Összehasonlítás…",
+    "noDifferences": "Nincs eltérés a jelenlegi adatokhoz képest.",
+    "diffAdded": "Ez a mentés óta hozzáadva",
+    "diffRemoved": "Azóta eltűnt",
+    "diffChanged": "Módosult",
+    "restoreHint": "A visszaállítás a rendelés adatait állítja vissza. A tulajdonos jelszava változatlan marad — kivéve a teljesen hiányzó bejegyzést, amely egészben jön létre újra.",
+    "restoreOrder": "Visszaállítás",
+    "orderRestored": "{name} visszaállítva",
+    "restoreFailed": "A visszaállítás nem sikerült",
+    "backupCompareFailed": "Az összehasonlítás nem sikerült",
+    "backupAllFields": "Minden mező",
+    "backupSortName": "Név szerint",
+    "backupSortChanges": "Legtöbb változás",
+    "backupShowing": "{shown} / {total}",
+    "backupNoMatches": "Nincs találat ezekkel a szűrőkkel."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "{count} rendelés alapján",
     "notEnoughData": "Nincs elegendő adat az előrejelzéshez. Válasszon járműtípust.",
     "lowDataHint": "Kevés adat — az előrejelzés pontatlan lehet. Több rendelés javítja a pontosságot.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "{count} szállítás alapján az elmúlt {days} napból",
+    "exceedsPessimisticHint": "A jelenlegi várakozási ideje ({days} nap) már meghaladja a pesszimista becslést (az összehasonlítható szállítások 75%-a). A mostani várakozási idők hosszabbak a korábbi eloszlásnál — kezelje fenntartással az előrejelzést."
   },
   "trend": {
     "title": "Szállítási trend",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla rendelések és statisztikák",
     "subtitle": "A legnagyobb közösségi adatbázis a Tesla szállítási határidőkről. Model Y, Model 3 — világszerte.",
-    "findMyOrder": "Rendelésem keresése"
+    "findMyOrder": "Rendelésem keresése",
+    "claim": "<em>{days}</em> nap a rendeléstől az átadásig",
+    "claimSub": "{delivered} kiszállított rendelés mediánja. {waiting} még vár — a leghosszabb {longest} napja.",
+    "kicker": "Közösségi adatbázis · Model Y és Model 3",
+    "ordersLabel": "Rendelés",
+    "deliveredLabel": "kiszállítva",
+    "withVin": "{count} alvázszámmal, vár",
+    "withoutVin": "{count} alvázszám nélkül",
+    "stale": "{count} frissítés nélkül"
   },
   "tracking": {
     "backToOverview": "Vissza az áttekintéshez",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Rendelés → szállítás",
     "orderToPapers": "Rendelés → dokumentumok",
     "papersToDelivery": "Dokumentumok → szállítás",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "{count} szállítás alapján az elmúlt {days} napból",
+    "exceedsPessimisticHint": "A jelenlegi várakozási ideje ({days} nap) már meghaladja a pesszimista becslést. Az előrejelzés korábbi szállítási időkön alapul, és ebben a helyzetben már nem megbízható — tájékozódjon a Tesla hivatalos szállítási időablakából.",
+    "staleHint": "Ezt a rendelést több mint 60 napja nem frissítették. Az alábbi adatok már nem feltétlenül aktuálisak.",
+    "waitedLabel": "Várakozás",
+    "waitingLabel": "Vár",
+    "daysUnit": "nap",
+    "fasterThanComparable": "{days} nappal gyorsabb a hasonló rendeléseknél (medián {median})",
+    "slowerThanComparable": "{days} nappal lassabb a hasonló rendeléseknél (medián {median})",
+    "matchesComparable": "Pontosan a hasonló rendelések mediánján ({median})",
+    "comparableTypically": "A hasonló rendelések mediánban {median} napig tartottak",
+    "today": "Ma"
   },
   "support": {
     "communityMessage": "Ezeket az adatokat a közösség tartja karban a közösség számára. Ha ez az oldal segít Önnek, támogathatja a szerver költségeit.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Rendszergazdai kezelőpanel",
     "navigationMenu": "Navigációs menü",
     "impressum": "Jogi nyilatkozat",
-    "privacy": "Privacy"
+    "privacy": "Adatvédelem",
+    "toggleTheme": "Téma váltása",
+    "changeLanguage": "Nyelv váltása",
+    "skipToContent": "Ugrás a tartalomra"
   },
   "footer": {
     "operatedBy": "Üzemeltető: Sven",
     "supportDevelopment": "Támogassa a tárhelyet és a fejlesztést",
-    "stats": "{orders} rendelés · {delivered} kiszállítva"
+    "stats": "{orders} rendelés · {delivered} kiszállítva",
+    "serverCostsProgress": "{goal} €-ból {raised} € fedezve",
+    "serverCostsTitle": "Szerverköltség {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Legutóbbi frissítések",
+    "entries": "bejegyzés",
+    "loading": "Betöltés…",
+    "loadMore": "Több betöltése",
+    "empty": "Még nincsenek frissítések.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Ma",
+      "yesterday": "Tegnap",
+      "week": "Ezen a héten",
+      "older": "Régebbi"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN kiosztva",
+      "production": "Gyártásban",
+      "papers": "Papírok megérkeztek",
+      "delivery": "Kiszállítva",
+      "window": "Szállítási időablak módosult",
+      "created": "Új rendelés"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} perce",
+      "hoursAgo": "{n} órája",
+      "yesterday": "tegnap",
+      "daysAgo": "{n} napja",
+      "weeksAgo": "{n} hete"
     }
+  },
+  "errors": {
+    "rateLimited": "Túl sok kérés. Kérjük, próbálja meg később.",
+    "orderNotFound": "A rendelés nem található.",
+    "conflict": "Időközben valaki más módosította ezt a bejegyzést. Töltse újra az oldalt, és próbálja újra.",
+    "resetCodeInvalid": "Érvénytelen vagy lejárt egyszeri kód.",
+    "resetCodeRequired": "Egyszeri kód szükséges.",
+    "tostFieldsRestricted": "Ezt a rendelést a TOST kezeli. Csak a rendelés dátuma, az iratok dátuma, a gyártás dátuma, a típusjóváhagyás és a típusváltozat szerkeszthető.",
+    "adminRequired": "Rendszergazdai hozzáférés szükséges.",
+    "orderDateInFuture": "A rendelés dátuma nem lehet a jövőben.",
+    "datesOutOfOrder": "A dátumok nem állnak életszerű sorrendben. Ellenőrizze a rendelés, gyártás, iratok és szállítás dátumát.",
+    "legacyPasswordRequired": "A régi bejegyzésekhez új jelszó szükséges.",
+    "backHome": "A kezdőlapra",
+    "pageErrorBody": "Az oldalt nem sikerült betölteni. Egy újabb próbálkozás gyakran segít.",
+    "pageErrorTitle": "Valami hiba történt",
+    "pageNotFoundBody": "Ez a cím nem létezik. A hivatkozás elavult vagy elgépelt lehet.",
+    "pageNotFoundTitle": "Az oldal nem található",
+    "retry": "Újrapróbálkozás"
   }
 }

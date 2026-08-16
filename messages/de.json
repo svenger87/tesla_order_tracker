@@ -41,7 +41,12 @@
     "projectSupport": "Projekt unterstützen",
     "reset": "Zurücksetzen",
     "ordersRefreshed": "{count} Bestellungen aktualisiert",
-    "refreshError": "Fehler beim Aktualisieren"
+    "refreshError": "Fehler beim Aktualisieren",
+    "hide": "Ausblenden",
+    "show": "Anzeigen",
+    "only": "Nur",
+    "compact": "Kompakt",
+    "deleteError": "Löschen fehlgeschlagen."
   },
   "home": {
     "title": "Tesla Bestellungen und Statistiken",
@@ -85,7 +90,9 @@
     "title": "Bestellungen suchen",
     "description": "Finde eine Bestellung über alle Quartale",
     "hint": "Mit Pfeiltasten navigieren, mit Enter auswählen",
-    "openSearch": "Suche"
+    "openSearch": "Suche",
+    "results": "{count} Treffer",
+    "noResultsHint": "Versuch es mit Name, VIN, Land oder Abholort."
   },
   "form": {
     "personalData": "Persönliche Daten",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Klicke auf \"Bearbeiten\" und gib dein Passwort ein, um deine Bestelldaten zu ändern.",
     "saveCodeWarning": "Speichere diesen Code, um deine Bestellung später bearbeiten zu können.",
     "codeShownOnce": "Dieser Code wird nur einmal angezeigt!",
-    "codeUsageHint": "Mit diesem Code kannst du unter \"Bestellung bearbeiten\" deine Daten ändern."
+    "codeUsageHint": "Mit diesem Code kannst du unter \"Bestellung bearbeiten\" deine Daten ändern.",
+    "backToOverview": "Zur Übersicht",
+    "viewMyOrder": "Meine Bestellung ansehen"
   },
   "editByCode": {
     "passwordPromptTitle": "Bestellung bearbeiten",
@@ -266,7 +275,9 @@
     "productionDate": "Produktionsdatum",
     "saveError": "Fehler beim Speichern",
     "cancelledFilter": "Storniert",
-    "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte"
+    "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte",
+    "incompleteBadge": "unvollständig",
+    "incompleteHint": "Bei dieser Bestellung fehlt das Bestelldatum, obwohl ein späteres Datum eingetragen ist. Alle Wartezeiten werden ab dem Bestelldatum gemessen — ohne es lässt sich dieser Eintrag zeitlich nicht einordnen und fließt in keine Wartezeit-Statistik ein."
   },
   "progress": {
     "ordered": "Bestellt",
@@ -274,7 +285,8 @@
     "papers": "Papiere",
     "production": "Produktion",
     "delivered": "Geliefert",
-    "deliveryScheduled": "Lieferung geplant"
+    "deliveryScheduled": "Lieferung geplant",
+    "stepOfTotal": "Schritt {current} von {total}"
   },
   "statistics": {
     "overview": "Übersicht",
@@ -524,7 +536,41 @@
     "selectModelHint": "Wähle ein Fahrzeug und Modell, um die Einschränkungen zu konfigurieren",
     "loadingOptions": "Lade Optionen...",
     "loadingConstraints": "Lade Einschränkungen...",
-    "selectValue": "Wert wählen..."
+    "selectValue": "Wert wählen...",
+    "archiveConfirmTitle": "{count} Bestellungen archivieren?",
+    "archiveConfirmDescription": "Archivierte Bestellungen verschwinden aus den öffentlichen Statistiken, bleiben aber in der Datenbank. Rückgängig machen lässt sich das nur einzeln pro Bestellung.",
+    "archiveConfirmAction": "Archivieren",
+    "yearlyGoal": "Serverkosten pro Jahr (€)",
+    "yearlyRaised": "Davon gedeckt (€)",
+    "yearlyGoalHint": "Leer lassen, um den Kostenbalken auszublenden.",
+    "backups": "Sicherungen",
+    "backupsDescription": "Momentaufnahmen der Bestelldatenbank. Jede lässt sich mit dem aktuellen Stand vergleichen und einzelne Einträge daraus zurückholen.",
+    "createBackup": "Sicherung erstellen",
+    "backupCreating": "Wird erstellt…",
+    "backupCreated": "Sicherung erstellt",
+    "backupFailed": "Sicherung fehlgeschlagen",
+    "backupListFailed": "Sicherungen konnten nicht geladen werden",
+    "backupDeleted": "Sicherung gelöscht",
+    "backupDeleteFailed": "Sicherung konnte nicht gelöscht werden",
+    "noBackups": "Noch keine Sicherungen vorhanden.",
+    "backupOrders": "{count} Bestellungen",
+    "backupKeepHint": "Die {count} neuesten Sicherungen werden behalten, ältere beim Erstellen einer neuen entfernt.",
+    "compareBackup": "Vergleichen",
+    "backupComparing": "Wird verglichen…",
+    "noDifferences": "Keine Unterschiede zum aktuellen Stand.",
+    "diffAdded": "Seit dieser Sicherung hinzugekommen",
+    "diffRemoved": "Seitdem verschwunden",
+    "diffChanged": "Geändert",
+    "restoreHint": "Wiederhergestellt werden die Daten der Bestellung. Das Passwort des Besitzers bleibt unverändert — außer bei einem Eintrag, der ganz fehlt: der wird vollständig neu angelegt.",
+    "restoreOrder": "Wiederherstellen",
+    "orderRestored": "{name} wiederhergestellt",
+    "restoreFailed": "Wiederherstellung fehlgeschlagen",
+    "backupCompareFailed": "Vergleich fehlgeschlagen",
+    "backupAllFields": "Alle Felder",
+    "backupSortName": "Nach Name",
+    "backupSortChanges": "Meiste Änderungen",
+    "backupShowing": "{shown} von {total}",
+    "backupNoMatches": "Keine Treffer mit diesen Filtern."
   },
   "options": {
     "country": {
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla Bestellungen und Statistiken",
     "subtitle": "Die größte Community-Datenbank für Tesla Lieferzeiten. Model Y, Model 3 — weltweit.",
-    "findMyOrder": "Meine Bestellung finden"
+    "findMyOrder": "Meine Bestellung finden",
+    "claim": "<em>{days}</em> Tage vom Bestellen bis zur Übergabe",
+    "claimSub": "Median aus {delivered} ausgelieferten Bestellungen. {waiting} warten noch — die längsten seit über {longest} Tagen.",
+    "kicker": "Community-Datenbank · Model Y & Model 3",
+    "ordersLabel": "Bestellungen",
+    "deliveredLabel": "ausgeliefert",
+    "withVin": "{count} mit VIN, wartet",
+    "withoutVin": "{count} ohne VIN",
+    "stale": "{count} ohne Aktualisierung"
   },
   "tracking": {
     "backToOverview": "Zurück zur Übersicht",
@@ -756,7 +810,15 @@
     "orderToVin": "Bestellung → VIN",
     "orderToDelivery": "Bestellung → Lieferung",
     "orderToPapers": "Bestellung → Papiere",
-    "papersToDelivery": "Papiere → Lieferung"
+    "papersToDelivery": "Papiere → Lieferung",
+    "waitedLabel": "Gewartet",
+    "waitingLabel": "Wartet",
+    "daysUnit": "Tage",
+    "fasterThanComparable": "{days} Tage schneller als vergleichbare Bestellungen (Median {median})",
+    "slowerThanComparable": "{days} Tage länger als vergleichbare Bestellungen (Median {median})",
+    "matchesComparable": "Genau im Schnitt vergleichbarer Bestellungen (Median {median})",
+    "comparableTypically": "Vergleichbare Bestellungen brauchten im Median {median} Tage",
+    "today": "Heute"
   },
   "updatesFeed": {
     "title": "Letzte Updates",
@@ -796,11 +858,34 @@
     "adminDashboard": "Admin Dashboard",
     "navigationMenu": "Navigationsmenü",
     "impressum": "Impressum",
-    "privacy": "Datenschutz"
+    "privacy": "Datenschutz",
+    "toggleTheme": "Design wechseln",
+    "changeLanguage": "Sprache wechseln",
+    "skipToContent": "Zum Inhalt springen"
   },
   "footer": {
     "operatedBy": "Betrieben von Sven",
     "supportDevelopment": "Hosting & Entwicklung unterstützen",
-    "stats": "{orders} Bestellungen · {delivered} ausgeliefert"
+    "stats": "{orders} Bestellungen · {delivered} ausgeliefert",
+    "serverCostsTitle": "Serverkosten {year}",
+    "serverCostsProgress": "{raised} von {goal} € gedeckt"
+  },
+  "errors": {
+    "rateLimited": "Zu viele Anfragen. Bitte später erneut versuchen.",
+    "orderNotFound": "Bestellung nicht gefunden.",
+    "conflict": "Dieser Eintrag wurde zwischenzeitlich von jemand anderem geändert. Bitte lade die Seite neu und versuche es erneut.",
+    "resetCodeInvalid": "Ungültiger oder abgelaufener Einmalcode.",
+    "resetCodeRequired": "Einmalcode erforderlich.",
+    "tostFieldsRestricted": "Diese Bestellung wird von TOST verwaltet. Nur Bestelldatum, Papierdatum, Produktionsdatum, Typgenehmigung und Typ-Variante können bearbeitet werden.",
+    "adminRequired": "Admin-Zugriff erforderlich.",
+    "orderDateInFuture": "Das Bestelldatum kann nicht in der Zukunft liegen.",
+    "datesOutOfOrder": "Die Datumsangaben ergeben keine plausible Reihenfolge. Prüfe Bestell-, Produktions-, Papier- und Auslieferungsdatum.",
+    "legacyPasswordRequired": "Neues Passwort erforderlich für Bestandseinträge.",
+    "pageNotFoundTitle": "Seite nicht gefunden",
+    "pageNotFoundBody": "Diese Adresse gibt es nicht. Möglicherweise ist der Link veraltet oder hat sich vertippt.",
+    "pageErrorTitle": "Da ist etwas schiefgelaufen",
+    "pageErrorBody": "Die Seite konnte nicht geladen werden. Ein erneuter Versuch hilft oft schon.",
+    "retry": "Erneut versuchen",
+    "backHome": "Zur Startseite"
   }
 }

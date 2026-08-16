@@ -41,7 +41,12 @@
     "projectSupport": "このプロジェクトを支援する",
     "reset": "リセット",
     "ordersRefreshed": "{count} 件の注文を更新しました",
-    "refreshError": "更新に失敗しました"
+    "refreshError": "更新に失敗しました",
+    "hide": "非表示",
+    "show": "表示",
+    "only": "のみ表示",
+    "compact": "コンパクト",
+    "deleteError": "削除に失敗しました。"
   },
   "home": {
     "title": "Tesla 注文と統計",
@@ -72,8 +77,8 @@
     "vehicleImage": "車両画像",
     "delivered": "納車済み：{date}",
     "errorGeneratingCode": "コード生成エラー",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "更新なし",
+    "staleHint": "この注文は60日以上更新されていません。データが古い可能性があります。",
     "statsTitle": "統計",
     "statsSubtitle": "納期、構成、トレンド",
     "cancelledBadge": "キャンセル済み",
@@ -85,7 +90,9 @@
     "title": "注文を検索",
     "description": "すべての四半期から注文を検索",
     "hint": "矢印キーで移動、Enter で選択",
-    "openSearch": "検索"
+    "openSearch": "検索",
+    "results": "{count} 件",
+    "noResultsHint": "名前・VIN・国・受取場所でお試しください。"
   },
   "form": {
     "personalData": "個人情報",
@@ -177,7 +184,9 @@
     "clickEditToChange": "「編集」をクリックし、パスワードを入力して注文データを変更してください。",
     "saveCodeWarning": "後で注文を編集するために、このコードを保存してください。",
     "codeShownOnce": "このコードは一度のみ表示されます！",
-    "codeUsageHint": "「注文を編集」でこのコードを使用してデータを変更してください。"
+    "codeUsageHint": "「注文を編集」でこのコードを使用してデータを変更してください。",
+    "backToOverview": "一覧に戻る",
+    "viewMyOrder": "自分の注文を見る"
   },
   "editByCode": {
     "passwordPromptTitle": "注文を編集",
@@ -230,11 +239,11 @@
     "typeVariant": "型式バリ",
     "deliveryDate": "納車日",
     "orderToVin": "注→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→生産",
+    "productionToPapers": "生産→書類",
     "papersToDelivery": "書類→納",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "待機日数",
     "updatedAt": "更新日",
     "country": "国",
     "allVehicles": "すべての車両",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "TOST 管理の注文でも、これらのフィールドは手動で編集できます。",
     "papersReceivedDate": "書類受信日",
     "saveError": "保存エラー",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "生産日",
+    "staleFilter": "更新なし",
+    "staleTooltip": "フィルター切替：すべて / 更新なしを非表示 / 更新なしのみ（未納車で60日以上更新なし）",
     "cancelledFilter": "キャンセル済み",
-    "cancelledTooltip": "フィルター切替: キャンセル済みを隠す / 表示する / キャンセル済みのみ"
+    "cancelledTooltip": "フィルター切替: キャンセル済みを隠す / 表示する / キャンセル済みのみ",
+    "incompleteBadge": "情報不足",
+    "incompleteHint": "この注文には後続の日付があるのに注文日がありません。待機期間はすべて注文日から測るため、この記録は時系列に位置づけられず、待機時間の統計には含まれません。"
   },
   "progress": {
     "ordered": "注文済み",
@@ -274,7 +285,8 @@
     "papers": "書類",
     "production": "生産",
     "delivered": "納車済み",
-    "deliveryScheduled": "納車予定"
+    "deliveryScheduled": "納車予定",
+    "stepOfTotal": "{total} 段階中 {current}"
   },
   "statistics": {
     "overview": "概要",
@@ -365,8 +377,8 @@
     "timelinePapers": "書類",
     "timelineDelivery": "納車",
     "totalWaitTime": "合計待ち時間",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "詳細（最小 / 最大）",
+    "pipelineSegment": "区間",
     "cancelledExcluded": "{count} 件キャンセル済み（集計対象外）"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "制約を設定するには車両とモデルを選択してください",
     "loadingOptions": "オプションを読み込み中...",
     "loadingConstraints": "制約を読み込み中...",
-    "selectValue": "値を選択..."
+    "selectValue": "値を選択...",
+    "archiveConfirmAction": "アーカイブ",
+    "archiveConfirmDescription": "アーカイブした注文は公開統計から消えますが、データベースには残ります。元に戻せるのは1件ずつです。",
+    "archiveConfirmTitle": "{count} 件の注文をアーカイブしますか？",
+    "yearlyGoal": "年間サーバー費用（€）",
+    "yearlyGoalHint": "空欄にすると費用バーを非表示にします。",
+    "yearlyRaised": "これまでの充当額（€）",
+    "backups": "バックアップ",
+    "backupsDescription": "注文データベースのスナップショット。それぞれ現在のデータと比較でき、個別の項目を復元できます。",
+    "createBackup": "バックアップを作成",
+    "backupCreating": "作成中…",
+    "backupCreated": "バックアップを作成しました",
+    "backupFailed": "バックアップに失敗しました",
+    "backupListFailed": "バックアップを読み込めませんでした",
+    "backupDeleted": "バックアップを削除しました",
+    "backupDeleteFailed": "バックアップを削除できませんでした",
+    "noBackups": "まだバックアップはありません。",
+    "backupOrders": "{count} 件の注文",
+    "backupKeepHint": "最新の{count}件を保持し、新しく作成した時点で古いものを削除します。",
+    "compareBackup": "比較",
+    "backupComparing": "比較中…",
+    "noDifferences": "現在のデータとの差分はありません。",
+    "diffAdded": "このバックアップ以降に追加",
+    "diffRemoved": "それ以降に消えたもの",
+    "diffChanged": "変更あり",
+    "restoreHint": "注文のデータを元に戻します。所有者のパスワードは変更されません。完全に失われた項目のみ、そのまま再作成されます。",
+    "restoreOrder": "復元",
+    "orderRestored": "{name} を復元しました",
+    "restoreFailed": "復元に失敗しました",
+    "backupCompareFailed": "比較に失敗しました",
+    "backupAllFields": "すべての項目",
+    "backupSortName": "名前順",
+    "backupSortChanges": "変更の多い順",
+    "backupShowing": "{total} 件中 {shown} 件",
+    "backupNoMatches": "この条件に一致する項目はありません。"
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "{count} 件の注文に基づく",
     "notEnoughData": "予測に十分なデータがありません。車両タイプを選択してください。",
     "lowDataHint": "データが少ないため、予測が不正確な場合があります。注文が増えると精度が向上します。",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "過去{days}日間の{count}件の納車に基づく",
+    "exceedsPessimisticHint": "現在の待機日数（{days}日）はすでに悲観的な見込み（同等の納車の75%）を超えています。現在の待機期間は過去の分布より長く、この予測は参考程度にお考えください。"
   },
   "trend": {
     "title": "納車トレンド",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla 注文と統計",
     "subtitle": "Tesla の納車スケジュールに関する最大のコミュニティデータベース。Model Y、Model 3 — 世界中。",
-    "findMyOrder": "注文を検索"
+    "findMyOrder": "注文を検索",
+    "claim": "注文から納車まで <em>{days}</em> 日",
+    "claimSub": "納車済み {delivered} 件の中央値。{waiting} 件が待機中 — 最長 {longest} 日。",
+    "kicker": "コミュニティ データベース · Model Y / Model 3",
+    "ordersLabel": "注文",
+    "deliveredLabel": "納車済み",
+    "withVin": "VIN あり {count} 件が待機",
+    "withoutVin": "VIN なし {count} 件",
+    "stale": "更新なし {count} 件"
   },
   "tracking": {
     "backToOverview": "概要に戻る",
@@ -754,9 +808,17 @@
     "orderToDelivery": "注文 → 納車",
     "orderToPapers": "注文 → 書類",
     "papersToDelivery": "書類 → 納車",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "過去{days}日間の{count}件の納車に基づく",
+    "exceedsPessimisticHint": "現在の待機日数（{days}日）はすでに悲観的な見込みを超えています。この予測は過去の納車実績に基づくもので、この状況では信頼できません。Tesla公式の納車時期をご確認ください。",
+    "staleHint": "この注文は60日以上更新されていません。以下のデータは最新ではない可能性があります。",
+    "waitedLabel": "待機",
+    "waitingLabel": "待機中",
+    "daysUnit": "日",
+    "fasterThanComparable": "同等の注文より {days} 日早い（中央値 {median}）",
+    "slowerThanComparable": "同等の注文より {days} 日遅い（中央値 {median}）",
+    "matchesComparable": "同等の注文の中央値ちょうど（{median}）",
+    "comparableTypically": "同等の注文は中央値 {median} 日かかりました",
+    "today": "今日"
   },
   "support": {
     "communityMessage": "このデータはコミュニティによってコミュニティのために管理されています。このサイトがお役に立てば、サーバー費用のご支援をお願いいたします。",
@@ -768,39 +830,62 @@
     "adminDashboard": "管理者ダッシュボード",
     "navigationMenu": "ナビゲーションメニュー",
     "impressum": "法的情報",
-    "privacy": "Privacy"
+    "privacy": "プライバシー",
+    "toggleTheme": "テーマを切り替える",
+    "changeLanguage": "言語を変更",
+    "skipToContent": "本文へスキップ"
   },
   "footer": {
     "operatedBy": "Sven が運営",
     "supportDevelopment": "ホスティングと開発を支援",
-    "stats": "{orders} 件の注文 · {delivered} 件納車済み"
+    "stats": "{orders} 件の注文 · {delivered} 件納車済み",
+    "serverCostsProgress": "{goal} € のうち {raised} € を充当",
+    "serverCostsTitle": "{year} 年のサーバー費用"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "最近の更新",
+    "entries": "件",
+    "loading": "読み込み中…",
+    "loadMore": "もっと見る",
+    "empty": "まだ更新はありません。",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "今日",
+      "yesterday": "昨日",
+      "week": "今週",
+      "older": "それ以前"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN割当",
+      "production": "生産中",
+      "papers": "書類受領",
+      "delivery": "納車済み",
+      "window": "納車時期が変更",
+      "created": "新規注文"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n}分前",
+      "hoursAgo": "{n}時間前",
+      "yesterday": "昨日",
+      "daysAgo": "{n}日前",
+      "weeksAgo": "{n}週間前"
     }
+  },
+  "errors": {
+    "rateLimited": "リクエストが多すぎます。しばらくしてからお試しください。",
+    "orderNotFound": "注文が見つかりません。",
+    "conflict": "この記録は他の人によって変更されました。ページを再読み込みしてもう一度お試しください。",
+    "resetCodeInvalid": "ワンタイムコードが無効または期限切れです。",
+    "resetCodeRequired": "ワンタイムコードが必要です。",
+    "tostFieldsRestricted": "この注文は TOST が管理しています。編集できるのは注文日、書類日、生産日、型式認可、型式バリエーションのみです。",
+    "adminRequired": "管理者権限が必要です。",
+    "orderDateInFuture": "注文日を未来の日付にすることはできません。",
+    "datesOutOfOrder": "日付の順序が正しくありません。注文日、生産日、書類日、納車日をご確認ください。",
+    "legacyPasswordRequired": "既存の登録には新しいパスワードが必要です。",
+    "backHome": "トップページへ",
+    "pageErrorBody": "ページを読み込めませんでした。もう一度試すと解決することがあります。",
+    "pageErrorTitle": "問題が発生しました",
+    "pageNotFoundBody": "このアドレスは存在しません。リンクが古いか、入力に誤りがある可能性があります。",
+    "pageNotFoundTitle": "ページが見つかりません",
+    "retry": "再試行"
   }
 }

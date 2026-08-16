@@ -41,7 +41,12 @@
     "projectSupport": "Support this project",
     "reset": "Reset",
     "ordersRefreshed": "{count} orders refreshed",
-    "refreshError": "Failed to refresh orders"
+    "refreshError": "Failed to refresh orders",
+    "hide": "Hide",
+    "show": "Show",
+    "only": "Only",
+    "compact": "Compact",
+    "deleteError": "Deletion failed."
   },
   "home": {
     "title": "Tesla Orders and Statistics",
@@ -85,7 +90,9 @@
     "title": "Search Orders",
     "description": "Find an order across all quarters",
     "hint": "Navigate with arrow keys, select with Enter",
-    "openSearch": "Search"
+    "openSearch": "Search",
+    "results": "{count} results",
+    "noResultsHint": "Try a name, VIN, country or delivery location."
   },
   "form": {
     "personalData": "Personal data",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Click \"Edit\" and enter your password to change your order data.",
     "saveCodeWarning": "Save this code to edit your order later.",
     "codeShownOnce": "This code is only shown once!",
-    "codeUsageHint": "Use this code under \"Edit order\" to change your data."
+    "codeUsageHint": "Use this code under \"Edit order\" to change your data.",
+    "backToOverview": "Back to overview",
+    "viewMyOrder": "View my order"
   },
   "editByCode": {
     "passwordPromptTitle": "Edit order",
@@ -266,7 +275,9 @@
     "productionDate": "Production date",
     "saveError": "Error saving",
     "cancelledFilter": "Cancelled",
-    "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled"
+    "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled",
+    "incompleteBadge": "incomplete",
+    "incompleteHint": "This order has no order date although a later date is recorded. Every waiting time is measured from the order date — without it the entry cannot be placed in time and counts towards no wait statistic."
   },
   "progress": {
     "ordered": "Ordered",
@@ -274,7 +285,8 @@
     "papers": "Documents",
     "production": "Production",
     "delivered": "Delivered",
-    "deliveryScheduled": "Delivery scheduled"
+    "deliveryScheduled": "Delivery scheduled",
+    "stepOfTotal": "Step {current} of {total}"
   },
   "statistics": {
     "overview": "Overview",
@@ -524,7 +536,41 @@
     "selectModelHint": "Select a vehicle and model to configure constraints",
     "loadingOptions": "Loading options...",
     "loadingConstraints": "Loading constraints...",
-    "selectValue": "Select value..."
+    "selectValue": "Select value...",
+    "archiveConfirmTitle": "Archive {count} orders?",
+    "archiveConfirmDescription": "Archived orders disappear from the public statistics but stay in the database. Undoing this is only possible one order at a time.",
+    "archiveConfirmAction": "Archive",
+    "yearlyGoal": "Server costs per year (€)",
+    "yearlyRaised": "Covered so far (€)",
+    "yearlyGoalHint": "Leave empty to hide the cost bar.",
+    "backups": "Backups",
+    "backupsDescription": "Snapshots of the order database. Each can be compared against the current data, and single entries restored from it.",
+    "createBackup": "Create backup",
+    "backupCreating": "Creating…",
+    "backupCreated": "Backup created",
+    "backupFailed": "Backup failed",
+    "backupListFailed": "Could not load backups",
+    "backupDeleted": "Backup deleted",
+    "backupDeleteFailed": "Could not delete backup",
+    "noBackups": "No backups yet.",
+    "backupOrders": "{count} orders",
+    "backupKeepHint": "The {count} newest backups are kept; older ones are removed when a new one is taken.",
+    "compareBackup": "Compare",
+    "backupComparing": "Comparing…",
+    "noDifferences": "No differences from the current data.",
+    "diffAdded": "Added since this backup",
+    "diffRemoved": "Gone since then",
+    "diffChanged": "Changed",
+    "restoreHint": "Restoring puts the order's data back. The owner's password is left as it is — except for an entry that is missing entirely, which is recreated whole.",
+    "restoreOrder": "Restore",
+    "orderRestored": "{name} restored",
+    "restoreFailed": "Restore failed",
+    "backupCompareFailed": "Comparison failed",
+    "backupAllFields": "All fields",
+    "backupSortName": "By name",
+    "backupSortChanges": "Most changes",
+    "backupShowing": "{shown} of {total}",
+    "backupNoMatches": "Nothing matches these filters."
   },
   "options": {
     "country": {
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla Orders and Statistics",
     "subtitle": "The largest community database for Tesla delivery timelines. Model Y, Model 3 — worldwide.",
-    "findMyOrder": "Find my order"
+    "findMyOrder": "Find my order",
+    "claim": "<em>{days}</em> days from order to handover",
+    "claimSub": "Median across {delivered} delivered orders. {waiting} are still waiting — the longest for over {longest} days.",
+    "kicker": "Community database · Model Y & Model 3",
+    "ordersLabel": "Orders",
+    "deliveredLabel": "delivered",
+    "withVin": "{count} with VIN, waiting",
+    "withoutVin": "{count} without VIN",
+    "stale": "{count} not updated"
   },
   "tracking": {
     "backToOverview": "Back to overview",
@@ -756,7 +810,15 @@
     "orderToVin": "Order → VIN",
     "orderToDelivery": "Order → Delivery",
     "orderToPapers": "Order → Documents",
-    "papersToDelivery": "Documents → Delivery"
+    "papersToDelivery": "Documents → Delivery",
+    "waitedLabel": "Waited",
+    "waitingLabel": "Waiting",
+    "daysUnit": "days",
+    "fasterThanComparable": "{days} days faster than comparable orders (median {median})",
+    "slowerThanComparable": "{days} days slower than comparable orders (median {median})",
+    "matchesComparable": "Right on the median for comparable orders ({median})",
+    "comparableTypically": "Comparable orders took a median of {median} days",
+    "today": "Today"
   },
   "updatesFeed": {
     "title": "Recent updates",
@@ -796,11 +858,34 @@
     "adminDashboard": "Admin Dashboard",
     "navigationMenu": "Navigation menu",
     "impressum": "Legal Notice",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Toggle theme",
+    "changeLanguage": "Change language",
+    "skipToContent": "Skip to content"
   },
   "footer": {
     "operatedBy": "Operated by Sven",
     "supportDevelopment": "Support hosting & development",
-    "stats": "{orders} orders · {delivered} delivered"
+    "stats": "{orders} orders · {delivered} delivered",
+    "serverCostsTitle": "Server costs {year}",
+    "serverCostsProgress": "{raised} of {goal} € covered"
+  },
+  "errors": {
+    "rateLimited": "Too many requests. Please try again later.",
+    "orderNotFound": "Order not found.",
+    "conflict": "Someone else changed this entry in the meantime. Reload the page and try again.",
+    "resetCodeInvalid": "Invalid or expired one-time code.",
+    "resetCodeRequired": "One-time code required.",
+    "tostFieldsRestricted": "This order is managed by TOST. Only order date, papers date, production date, type approval and type variant can be edited.",
+    "adminRequired": "Admin access required.",
+    "orderDateInFuture": "The order date cannot be in the future.",
+    "datesOutOfOrder": "These dates are not in a plausible order. Check the order, production, papers and delivery dates.",
+    "legacyPasswordRequired": "A new password is required for legacy entries.",
+    "pageNotFoundTitle": "Page not found",
+    "pageNotFoundBody": "This address does not exist. The link may be outdated or mistyped.",
+    "pageErrorTitle": "Something went wrong",
+    "pageErrorBody": "This page could not be loaded. Trying again often does the trick.",
+    "retry": "Try again",
+    "backHome": "Go to start page"
   }
 }

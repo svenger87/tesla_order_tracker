@@ -61,10 +61,19 @@ turso-schema.sql
 *.png
 !/public/*.png
 .env*.local
-backups/
+# Database snapshots, which live beside the database itself. Anchored with a
+# leading slash: written as "backups/" it matched every directory of that name
+# anywhere in the tree, and silently swallowed src/app/api/admin/backups — the
+# routes were committed as nothing, built as nothing, and deployed as a UI
+# whose endpoints returned 404.
+/data/backups/
+/prisma/backups/
 
 # SSH keys
 deploy_key
 deploy_key.pub
 DEPLOYMENT.md
 CREDENTIALS.md
+
+# Arbeitsliste dieser Überarbeitung (lokal)
+todo.md

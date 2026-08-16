@@ -41,7 +41,12 @@
     "projectSupport": "Podržite ovaj projekt",
     "reset": "Poništi",
     "ordersRefreshed": "{count} narudžbi osvježeno",
-    "refreshError": "Greška pri osvježavanju"
+    "refreshError": "Greška pri osvježavanju",
+    "hide": "Sakrij",
+    "show": "Prikaži",
+    "only": "Samo",
+    "compact": "Kompaktno",
+    "deleteError": "Brisanje nije uspjelo."
   },
   "home": {
     "title": "Tesla narudžbe i statistike",
@@ -72,8 +77,8 @@
     "vehicleImage": "Slika vozila",
     "delivered": "Isporučeno: {date}",
     "errorGeneratingCode": "Greška pri generiranju koda",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "zastarjelo",
+    "staleHint": "Ova narudžba nije ažurirana više od 60 dana — podaci možda nisu točni.",
     "statsTitle": "Statistike",
     "statsSubtitle": "Vremena isporuke, konfiguracije i trendovi",
     "cancelledBadge": "Otkazano",
@@ -85,7 +90,9 @@
     "title": "Pretraživanje narudžbi",
     "description": "Pronađite narudžbu u svim kvartalima",
     "hint": "Navigirajte strelicama, odaberite s Enter",
-    "openSearch": "Pretraži"
+    "openSearch": "Pretraži",
+    "results": "{count} rezultata",
+    "noResultsHint": "Pokušajte s imenom, VIN-om, državom ili mjestom preuzimanja."
   },
   "form": {
     "personalData": "Osobni podaci",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Kliknite \"Uredi“ i unesite lozinku za promjenu podataka narudžbe.",
     "saveCodeWarning": "Spremite ovaj kôd za kasniju izmjenu narudžbe.",
     "codeShownOnce": "Ovaj kôd se prikazuje samo jednom!",
-    "codeUsageHint": "Koristite ovaj kôd pod \"Uređivanje narudžbe“ za promjenu podataka."
+    "codeUsageHint": "Koristite ovaj kôd pod \"Uređivanje narudžbe“ za promjenu podataka.",
+    "backToOverview": "Natrag na pregled",
+    "viewMyOrder": "Pogledaj moju narudžbu"
   },
   "editByCode": {
     "passwordPromptTitle": "Uređivanje narudžbe",
@@ -231,10 +240,10 @@
     "deliveryDate": "Datum isporuke",
     "orderToVin": "N→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Dok",
     "papersToDelivery": "Dok→I",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Čekanje",
     "updatedAt": "Ažurirano",
     "country": "Država",
     "allVehicles": "Sva vozila",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Ova polja se mogu ručno uređivati, čak i za narudžbe kojima upravlja TOST.",
     "papersReceivedDate": "Dokumenti primljeni dana",
     "saveError": "Greška pri spremanju",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Datum proizvodnje",
+    "staleFilter": "Zastarjelo",
+    "staleTooltip": "Promjena filtra: sve / sakrij zastarjele / samo zastarjele (≥60 dana bez ažuriranja kod otvorenih narudžbi)",
     "cancelledFilter": "Otkazane",
-    "cancelledTooltip": "Promijeni filtar: sakrij otkazane / prikaži ih / samo otkazane"
+    "cancelledTooltip": "Promijeni filtar: sakrij otkazane / prikaži ih / samo otkazane",
+    "incompleteBadge": "nepotpuno",
+    "incompleteHint": "Ovoj narudžbi nedostaje datum narudžbe iako je upisan kasniji datum. Sva vremena čekanja mjere se od njega — bez tog datuma unos se ne može smjestiti u vrijeme i ne ulazi ni u jednu statistiku."
   },
   "progress": {
     "ordered": "Naručeno",
@@ -274,7 +285,8 @@
     "papers": "Dokumenti",
     "production": "Proizvodnja",
     "delivered": "Isporučeno",
-    "deliveryScheduled": "Isporuka zakazana"
+    "deliveryScheduled": "Isporuka zakazana",
+    "stepOfTotal": "Korak {current} od {total}"
   },
   "statistics": {
     "overview": "Pregled",
@@ -365,8 +377,8 @@
     "timelinePapers": "Dokumenti",
     "timelineDelivery": "Isporuka",
     "totalWaitTime": "Ukupno vrijeme čekanja",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detalji (min / maks)",
+    "pipelineSegment": "Dionica",
     "cancelledExcluded": "{count} otkazano (nije uračunato)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Odaberite vozilo i model za konfiguraciju ograničenja",
     "loadingOptions": "Učitavanje opcija...",
     "loadingConstraints": "Učitavanje ograničenja...",
-    "selectValue": "Odaberite vrijednost..."
+    "selectValue": "Odaberite vrijednost...",
+    "archiveConfirmAction": "Arhiviraj",
+    "archiveConfirmDescription": "Arhivirane narudžbe nestaju iz javne statistike, ali ostaju u bazi podataka. Poništiti se može samo jedna po jedna narudžba.",
+    "archiveConfirmTitle": "Arhivirati {count} narudžbi?",
+    "yearlyGoal": "Troškovi poslužitelja godišnje (€)",
+    "yearlyGoalHint": "Ostavite prazno da sakrijete traku troškova.",
+    "yearlyRaised": "Dosad pokriveno (€)",
+    "backups": "Sigurnosne kopije",
+    "backupsDescription": "Snimke baze narudžbi. Svaku možete usporediti s trenutnim podacima i vratiti pojedinačne unose.",
+    "createBackup": "Stvori kopiju",
+    "backupCreating": "Stvaranje…",
+    "backupCreated": "Kopija stvorena",
+    "backupFailed": "Kopija nije uspjela",
+    "backupListFailed": "Kopije se ne mogu učitati",
+    "backupDeleted": "Kopija obrisana",
+    "backupDeleteFailed": "Kopiju nije moguće obrisati",
+    "noBackups": "Još nema kopija.",
+    "backupOrders": "{count} narudžbi",
+    "backupKeepHint": "Čuva se {count} najnovijih kopija; starije se uklanjaju pri stvaranju nove.",
+    "compareBackup": "Usporedi",
+    "backupComparing": "Uspoređivanje…",
+    "noDifferences": "Nema razlika u odnosu na trenutne podatke.",
+    "diffAdded": "Dodano nakon ove kopije",
+    "diffRemoved": "Nestalo otada",
+    "diffChanged": "Promijenjeno",
+    "restoreHint": "Vraćaju se podaci narudžbe. Lozinka vlasnika ostaje nepromijenjena — osim kod unosa koji potpuno nedostaje, koji se ponovno stvara u cijelosti.",
+    "restoreOrder": "Vrati",
+    "orderRestored": "{name} vraćeno",
+    "restoreFailed": "Vraćanje nije uspjelo",
+    "backupCompareFailed": "Usporedba nije uspjela",
+    "backupAllFields": "Sva polja",
+    "backupSortName": "Po imenu",
+    "backupSortChanges": "Najviše promjena",
+    "backupShowing": "{shown} od {total}",
+    "backupNoMatches": "Nema rezultata s ovim filtrima."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Na temelju {count} narudžbi",
     "notEnoughData": "Nedovoljno podataka za prognozu. Odaberite tip vozila.",
     "lowDataHint": "Malo podataka — prognoza može biti netočna. Više narudžbi poboljšat će točnost.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Na temelju {count} isporuka u posljednjih {days} dana",
+    "exceedsPessimisticHint": "Vaše dosadašnje čekanje ({days} dana) već premašuje pesimističnu procjenu (75 % usporedivih isporuka). Trenutna čekanja dulja su od povijesne raspodjele — uzmite prognozu s oprezom."
   },
   "trend": {
     "title": "Trend isporuka",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla narudžbe i statistike",
     "subtitle": "Najveća baza podataka zajednice za rokove isporuke Tesla vozila. Model Y, Model 3 — diljem svijeta.",
-    "findMyOrder": "Pronađi moju narudžbu"
+    "findMyOrder": "Pronađi moju narudžbu",
+    "claim": "<em>{days}</em> dana od narudžbe do preuzimanja",
+    "claimSub": "Medijan od {delivered} isporučenih narudžbi. {waiting} još čeka — najdulja {longest} dana.",
+    "kicker": "Baza zajednice · Model Y i Model 3",
+    "ordersLabel": "Narudžbe",
+    "deliveredLabel": "isporučeno",
+    "withVin": "{count} s VIN-om, čeka",
+    "withoutVin": "{count} bez VIN-a",
+    "stale": "{count} bez ažuriranja"
   },
   "tracking": {
     "backToOverview": "Natrag na pregled",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Narudžba → Isporuka",
     "orderToPapers": "Narudžba → Dokumenti",
     "papersToDelivery": "Dokumenti → Isporuka",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Na temelju {count} isporuka u posljednjih {days} dana",
+    "exceedsPessimisticHint": "Vaše dosadašnje čekanje ({days} dana) već premašuje pesimističnu procjenu. Prognoza se temelji na povijesnim rokovima i u ovoj situaciji više nije pouzdana — oslonite se na službeni Teslin rok isporuke.",
+    "staleHint": "Ova narudžba nije ažurirana više od 60 dana. Podaci u nastavku možda više nisu točni.",
+    "waitedLabel": "Čekanje",
+    "waitingLabel": "Čeka",
+    "daysUnit": "dana",
+    "fasterThanComparable": "{days} dana brže od usporedivih narudžbi (medijan {median})",
+    "slowerThanComparable": "{days} dana sporije od usporedivih narudžbi (medijan {median})",
+    "matchesComparable": "Točno na medijanu usporedivih narudžbi ({median})",
+    "comparableTypically": "Usporedive narudžbe trajale su medijan {median} dana",
+    "today": "Danas"
   },
   "support": {
     "communityMessage": "Ove podatke održava zajednica za zajednicu. Ako vam ova stranica pomaže, možete podržati troškove poslužitelja.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Administratorska ploča",
     "navigationMenu": "Navigacijski izbornik",
     "impressum": "Pravna obavijest",
-    "privacy": "Privacy"
+    "privacy": "Privatnost",
+    "toggleTheme": "Promijeni temu",
+    "changeLanguage": "Promijeni jezik",
+    "skipToContent": "Prijeđi na sadržaj"
   },
   "footer": {
     "operatedBy": "Vodi Sven",
     "supportDevelopment": "Podržite hosting i razvoj",
-    "stats": "{orders} narudžbi · {delivered} isporučeno"
+    "stats": "{orders} narudžbi · {delivered} isporučeno",
+    "serverCostsProgress": "{raised} od {goal} € pokriveno",
+    "serverCostsTitle": "Troškovi poslužitelja {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Najnovije promjene",
+    "entries": "unosa",
+    "loading": "Učitavanje…",
+    "loadMore": "Učitaj više",
+    "empty": "Još nema promjena.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Danas",
+      "yesterday": "Jučer",
+      "week": "Ovaj tjedan",
+      "older": "Starije"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN dodijeljen",
+      "production": "U proizvodnji",
+      "papers": "Dokumenti primljeni",
+      "delivery": "Isporučeno",
+      "window": "Promijenjen rok isporuke",
+      "created": "Nova narudžba"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "prije {n} min",
+      "hoursAgo": "prije {n} h",
+      "yesterday": "jučer",
+      "daysAgo": "prije {n} d",
+      "weeksAgo": "prije {n} tj."
     }
+  },
+  "errors": {
+    "rateLimited": "Previše zahtjeva. Pokušajte ponovno kasnije.",
+    "orderNotFound": "Narudžba nije pronađena.",
+    "conflict": "Netko drugi je u međuvremenu promijenio ovaj unos. Ponovno učitajte stranicu i pokušajte opet.",
+    "resetCodeInvalid": "Nevažeći ili istekao jednokratni kod.",
+    "resetCodeRequired": "Potreban je jednokratni kod.",
+    "tostFieldsRestricted": "Ovom narudžbom upravlja TOST. Uređivati se mogu samo datum narudžbe, datum dokumenata, datum proizvodnje, homologacija i varijanta tipa.",
+    "adminRequired": "Potreban je administratorski pristup.",
+    "orderDateInFuture": "Datum narudžbe ne može biti u budućnosti.",
+    "datesOutOfOrder": "Datumi nisu u vjerodostojnom redoslijedu. Provjerite datume narudžbe, proizvodnje, dokumenata i isporuke.",
+    "legacyPasswordRequired": "Za starije unose potrebna je nova lozinka.",
+    "backHome": "Na početnu stranicu",
+    "pageErrorBody": "Stranica se nije mogla učitati. Novi pokušaj često pomogne.",
+    "pageErrorTitle": "Nešto je pošlo po zlu",
+    "pageNotFoundBody": "Ova adresa ne postoji. Poveznica je možda zastarjela ili pogrešno upisana.",
+    "pageNotFoundTitle": "Stranica nije pronađena",
+    "retry": "Pokušaj ponovno"
   }
 }

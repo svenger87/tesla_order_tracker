@@ -41,7 +41,12 @@
     "projectSupport": "Sostieni questo progetto",
     "reset": "Reimposta",
     "ordersRefreshed": "{count} ordini aggiornati",
-    "refreshError": "Errore durante l'aggiornamento"
+    "refreshError": "Errore durante l'aggiornamento",
+    "hide": "Nascondi",
+    "show": "Mostra",
+    "only": "Solo",
+    "compact": "Compatto",
+    "deleteError": "Eliminazione non riuscita."
   },
   "home": {
     "title": "Ordini e statistiche Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Immagine del veicolo",
     "delivered": "Consegnato: {date}",
     "errorGeneratingCode": "Errore nella generazione del codice",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "obsoleto",
+    "staleHint": "Questo ordine non viene aggiornato da oltre 60 giorni — i dati potrebbero non essere attuali.",
     "statsTitle": "Statistiche",
     "statsSubtitle": "Tempi di consegna, configurazioni e tendenze",
     "cancelledBadge": "Annullato",
@@ -85,7 +90,9 @@
     "title": "Cerca ordini",
     "description": "Trova un ordine in tutti i trimestri",
     "hint": "Navighi con i tasti freccia, selezioni con Invio",
-    "openSearch": "Cerca"
+    "openSearch": "Cerca",
+    "results": "{count} risultati",
+    "noResultsHint": "Prova con un nome, un VIN, un paese o un luogo di consegna."
   },
   "form": {
     "personalData": "Dati personali",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Clicchi su \"Modifica\" e inserisca la Sua password per modificare i dati dell'ordine.",
     "saveCodeWarning": "Salvi questo codice per modificare il Suo ordine in seguito.",
     "codeShownOnce": "Questo codice viene mostrato una sola volta!",
-    "codeUsageHint": "Utilizzi questo codice sotto \"Modifica ordine\" per modificare i Suoi dati."
+    "codeUsageHint": "Utilizzi questo codice sotto \"Modifica ordine\" per modificare i Suoi dati.",
+    "backToOverview": "Torna alla panoramica",
+    "viewMyOrder": "Visualizza il mio ordine"
   },
   "editByCode": {
     "passwordPromptTitle": "Modifica ordine",
@@ -234,7 +243,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→C",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Attesa",
     "updatedAt": "Aggiornato",
     "country": "Paese",
     "allVehicles": "Tutti i veicoli",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Questi campi possono essere modificati manualmente, anche per gli ordini gestiti da TOST.",
     "papersReceivedDate": "Documenti ricevuti il",
     "saveError": "Errore nel salvataggio",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Data di produzione",
+    "staleFilter": "Obsoleto",
+    "staleTooltip": "Cambia filtro: tutti / nascondi obsoleti / solo obsoleti (≥60 giorni senza aggiornamento sugli ordini aperti)",
     "cancelledFilter": "Annullati",
-    "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati"
+    "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati",
+    "incompleteBadge": "incompleto",
+    "incompleteHint": "A questo ordine manca la data d'ordine benché sia registrata una data successiva. Ogni attesa si misura da quella data: senza, la voce non è collocabile nel tempo e non entra in alcuna statistica."
   },
   "progress": {
     "ordered": "Ordinato",
@@ -274,13 +285,14 @@
     "papers": "Documenti",
     "production": "Produzione",
     "delivered": "Consegnato",
-    "deliveryScheduled": "Consegna programmata"
+    "deliveryScheduled": "Consegna programmata",
+    "stepOfTotal": "Fase {current} di {total}"
   },
   "statistics": {
     "overview": "Panoramica",
     "overviewShort": "Stat.",
     "configuration": "Configurazione",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Equipaggiamento",
     "equipmentShort": "Extra",
     "geo": "Geo",
@@ -365,8 +377,8 @@
     "timelinePapers": "Documenti",
     "timelineDelivery": "Consegna",
     "totalWaitTime": "Tempo di attesa totale",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Dettaglio (min / max)",
+    "pipelineSegment": "Tratta",
     "cancelledExcluded": "{count} annullati (non conteggiati)"
   },
   "admin": {
@@ -444,7 +456,7 @@
     "importModel3": "Importa Model 3",
     "syncingModel3": "Sincronizzazione Model 3...",
     "model3Hint": "Importa i dati Model 3 dal foglio di calcolo Google separato.",
-    "debugSheets": "Debug Sheets",
+    "debugSheets": "Debug fogli",
     "debugChecking": "Verifica...",
     "dataExport": "Esportazione dati",
     "dataExportDescription": "Esporti tutti i dati e le statistiche come file Excel (piano di uscita)",
@@ -524,7 +536,41 @@
     "selectModelHint": "Selezioni un veicolo e un modello per configurare i vincoli",
     "loadingOptions": "Caricamento opzioni...",
     "loadingConstraints": "Caricamento vincoli...",
-    "selectValue": "Seleziona valore..."
+    "selectValue": "Seleziona valore...",
+    "archiveConfirmAction": "Archivia",
+    "archiveConfirmDescription": "Gli ordini archiviati spariscono dalle statistiche pubbliche ma restano nel database. Annullare è possibile solo un ordine alla volta.",
+    "archiveConfirmTitle": "Archiviare {count} ordini?",
+    "yearlyGoal": "Costi del server all’anno (€)",
+    "yearlyGoalHint": "Lascia vuoto per nascondere la barra dei costi.",
+    "yearlyRaised": "Coperto finora (€)",
+    "backups": "Backup",
+    "backupsDescription": "Istantanee del database ordini. Ognuna può essere confrontata con i dati attuali e da essa si possono ripristinare singole voci.",
+    "createBackup": "Crea backup",
+    "backupCreating": "Creazione…",
+    "backupCreated": "Backup creato",
+    "backupFailed": "Backup non riuscito",
+    "backupListFailed": "Impossibile caricare i backup",
+    "backupDeleted": "Backup eliminato",
+    "backupDeleteFailed": "Impossibile eliminare il backup",
+    "noBackups": "Nessun backup finora.",
+    "backupOrders": "{count} ordini",
+    "backupKeepHint": "Vengono conservati i {count} backup più recenti; i più vecchi si rimuovono creandone uno nuovo.",
+    "compareBackup": "Confronta",
+    "backupComparing": "Confronto…",
+    "noDifferences": "Nessuna differenza rispetto ai dati attuali.",
+    "diffAdded": "Aggiunti dopo questo backup",
+    "diffRemoved": "Spariti da allora",
+    "diffChanged": "Modificati",
+    "restoreHint": "Il ripristino riporta i dati dell'ordine. La password del proprietario resta invariata, tranne per una voce del tutto assente, che viene ricreata per intero.",
+    "restoreOrder": "Ripristina",
+    "orderRestored": "{name} ripristinato",
+    "restoreFailed": "Ripristino non riuscito",
+    "backupCompareFailed": "Confronto non riuscito",
+    "backupAllFields": "Tutti i campi",
+    "backupSortName": "Per nome",
+    "backupSortChanges": "Più modifiche",
+    "backupShowing": "{shown} di {total}",
+    "backupNoMatches": "Nessun risultato con questi filtri."
   },
   "options": {
     "country": {
@@ -596,7 +642,7 @@
     "title": "Note legali",
     "legalInfo": "Informazioni ai sensi del § 5 TMG",
     "contact": "Contatto",
-    "email": "Email",
+    "email": "E-mail",
     "disclaimer": "Avvertenza",
     "disclaimerText": "Questo è un progetto comunitario privato senza scopo commerciale.",
     "backToHome": "Torna alla pagina iniziale",
@@ -662,8 +708,8 @@
     "basedOn": "Basato su {count} ordini",
     "notEnoughData": "Dati insufficienti per la previsione. Selezioni un tipo di veicolo.",
     "lowDataHint": "Pochi dati — la previsione potrebbe essere imprecisa. Più ordini miglioreranno la precisione.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Basato su {count} consegne degli ultimi {days} giorni",
+    "exceedsPessimisticHint": "La tua attesa attuale ({days} giorni) supera già la stima pessimistica (75% delle consegne comparabili). I tempi attuali sono più lunghi della distribuzione storica: prendi questa previsione con cautela."
   },
   "trend": {
     "title": "Tendenza consegne",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Ordini e statistiche Tesla",
     "subtitle": "Il più grande database della comunità per i tempi di consegna Tesla. Model Y, Model 3 — in tutto il mondo.",
-    "findMyOrder": "Trova il mio ordine"
+    "findMyOrder": "Trova il mio ordine",
+    "claim": "<em>{days}</em> giorni dall'ordine alla consegna",
+    "claimSub": "Mediana su {delivered} ordini consegnati. {waiting} sono ancora in attesa — il più lungo da {longest} giorni.",
+    "kicker": "Database della community · Model Y e Model 3",
+    "ordersLabel": "Ordini",
+    "deliveredLabel": "consegnati",
+    "withVin": "{count} con VIN, in attesa",
+    "withoutVin": "{count} senza VIN",
+    "stale": "{count} senza aggiornamento"
   },
   "tracking": {
     "backToOverview": "Torna alla panoramica",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Ordine → Consegna",
     "orderToPapers": "Ordine → Documenti",
     "papersToDelivery": "Documenti → Consegna",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Basato su {count} consegne degli ultimi {days} giorni",
+    "exceedsPessimisticHint": "La tua attesa attuale ({days} giorni) supera già la stima pessimistica. La previsione si basa su tempi storici e in questa situazione non è più affidabile: fai riferimento alla finestra di consegna ufficiale Tesla.",
+    "staleHint": "Questo ordine non viene aggiornato da oltre 60 giorni. I dati sotto potrebbero non essere più attuali.",
+    "waitedLabel": "Attesa",
+    "waitingLabel": "In attesa",
+    "daysUnit": "giorni",
+    "fasterThanComparable": "{days} giorni più veloce di ordini comparabili (mediana {median})",
+    "slowerThanComparable": "{days} giorni più lento di ordini comparabili (mediana {median})",
+    "matchesComparable": "Esattamente sulla mediana di ordini comparabili ({median})",
+    "comparableTypically": "Gli ordini comparabili hanno richiesto una mediana di {median} giorni",
+    "today": "Oggi"
   },
   "support": {
     "communityMessage": "Questi dati sono mantenuti dalla comunità per la comunità. Se questo sito Le è utile, può sostenere i costi del server.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Pannello di amministrazione",
     "navigationMenu": "Menu di navigazione",
     "impressum": "Note legali",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Cambia tema",
+    "changeLanguage": "Cambia lingua",
+    "skipToContent": "Vai al contenuto"
   },
   "footer": {
     "operatedBy": "Gestito da Sven",
     "supportDevelopment": "Sostieni hosting e sviluppo",
-    "stats": "{orders} ordini · {delivered} consegnati"
+    "stats": "{orders} ordini · {delivered} consegnati",
+    "serverCostsProgress": "{raised} di {goal} € coperti",
+    "serverCostsTitle": "Costi del server {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Ultimi aggiornamenti",
+    "entries": "voci",
+    "loading": "Caricamento…",
+    "loadMore": "Carica altri",
+    "empty": "Nessun aggiornamento finora.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "week": "Questa settimana",
+      "older": "Meno recenti"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN assegnato",
+      "production": "In produzione",
+      "papers": "Documenti ricevuti",
+      "delivery": "Consegnato",
+      "window": "Finestra di consegna modificata",
+      "created": "Nuovo ordine"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min fa",
+      "hoursAgo": "{n} h fa",
+      "yesterday": "ieri",
+      "daysAgo": "{n} g fa",
+      "weeksAgo": "{n} sett. fa"
     }
+  },
+  "errors": {
+    "rateLimited": "Troppe richieste. Riprova più tardi.",
+    "orderNotFound": "Ordine non trovato.",
+    "conflict": "Qualcun altro ha modificato questa voce nel frattempo. Ricarica la pagina e riprova.",
+    "resetCodeInvalid": "Codice monouso non valido o scaduto.",
+    "resetCodeRequired": "È richiesto un codice monouso.",
+    "tostFieldsRestricted": "Questo ordine è gestito da TOST. È possibile modificare solo data d'ordine, data dei documenti, data di produzione, omologazione e variante di tipo.",
+    "adminRequired": "È richiesto l'accesso amministratore.",
+    "orderDateInFuture": "La data dell'ordine non può essere nel futuro.",
+    "datesOutOfOrder": "Queste date non seguono un ordine plausibile. Controlla le date di ordine, produzione, documenti e consegna.",
+    "legacyPasswordRequired": "È richiesta una nuova password per le voci preesistenti.",
+    "backHome": "Vai alla pagina iniziale",
+    "pageErrorBody": "Non è stato possibile caricare la pagina. Spesso basta riprovare.",
+    "pageErrorTitle": "Qualcosa è andato storto",
+    "pageNotFoundBody": "Questo indirizzo non esiste. Il link potrebbe essere vecchio o digitato male.",
+    "pageNotFoundTitle": "Pagina non trovata",
+    "retry": "Riprova"
   }
 }

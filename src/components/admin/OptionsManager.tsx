@@ -315,6 +315,7 @@ export function OptionsManager() {
                               onClick={() => openEditDialog(option)}
                             >
                               <Pencil className="h-3 w-3" />
+                              <span className="sr-only">{tc('edit')}</span>
                             </Button>
                             <Button
                               variant="ghost"
@@ -323,6 +324,7 @@ export function OptionsManager() {
                               onClick={() => handleDelete(option)}
                             >
                               <Trash2 className="h-3 w-3" />
+                              <span className="sr-only">{tc('delete')}</span>
                             </Button>
                           </div>
                         </div>

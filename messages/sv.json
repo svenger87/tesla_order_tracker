@@ -16,7 +16,7 @@
     "back": "Tillbaka",
     "close": "Stäng",
     "copy": "Kopiera",
-    "support": "Support",
+    "support": "Stötta",
     "menu": "Meny",
     "refresh": "Uppdatera",
     "allGood": "Allt i ordning!",
@@ -41,7 +41,12 @@
     "projectSupport": "Stöd detta projekt",
     "reset": "Återställ",
     "ordersRefreshed": "{count} beställningar uppdaterade",
-    "refreshError": "Fel vid uppdatering"
+    "refreshError": "Fel vid uppdatering",
+    "hide": "Dölj",
+    "show": "Visa",
+    "only": "Endast",
+    "compact": "Kompakt",
+    "deleteError": "Borttagningen misslyckades."
   },
   "home": {
     "title": "Tesla-beställningar och statistik",
@@ -72,8 +77,8 @@
     "vehicleImage": "Fordonsbild",
     "delivered": "Levererad: {date}",
     "errorGeneratingCode": "Fel vid generering av kod",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "inaktuell",
+    "staleHint": "Denna order har inte uppdaterats på över 60 dagar — uppgifterna kan vara inaktuella.",
     "statsTitle": "Statistik",
     "statsSubtitle": "Leveranstider, konfigurationer och trender",
     "cancelledBadge": "Avbeställd",
@@ -85,7 +90,9 @@
     "title": "Sök beställningar",
     "description": "Hitta en beställning över alla kvartal",
     "hint": "Navigera med piltangenterna, välj med Enter",
-    "openSearch": "Sök"
+    "openSearch": "Sök",
+    "results": "{count} träffar",
+    "noResultsHint": "Prova ett namn, VIN, land eller leveransplats."
   },
   "form": {
     "personalData": "Personuppgifter",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Klicka på \"Redigera\" och ange lösenordet för att ändra beställningsuppgifterna.",
     "saveCodeWarning": "Spara denna kod för att redigera beställningen senare.",
     "codeShownOnce": "Denna kod visas bara en gång!",
-    "codeUsageHint": "Använd denna kod under \"Redigera beställning\" för att ändra uppgifterna."
+    "codeUsageHint": "Använd denna kod under \"Redigera beställning\" för att ändra uppgifterna.",
+    "backToOverview": "Tillbaka till översikten",
+    "viewMyOrder": "Visa min beställning"
   },
   "editByCode": {
     "passwordPromptTitle": "Redigera beställning",
@@ -231,10 +240,10 @@
     "deliveryDate": "Leveransdatum",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pap",
     "papersToDelivery": "Dok→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Väntetid",
     "updatedAt": "Uppdaterad",
     "country": "Land",
     "allVehicles": "Alla fordon",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Dessa fält kan redigeras manuellt, även för TOST-hanterade beställningar.",
     "papersReceivedDate": "Dokument mottagna den",
     "saveError": "Fel vid sparande",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Produktionsdatum",
+    "staleFilter": "Inaktuell",
+    "staleTooltip": "Växla filter: alla / dölj inaktuella / endast inaktuella (≥60 dagar utan uppdatering på öppna ordrar)",
     "cancelledFilter": "Avbeställda",
-    "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda"
+    "cancelledTooltip": "Växla filter: dölj avbeställda / visa dem / endast avbeställda",
+    "incompleteBadge": "ofullständig",
+    "incompleteHint": "Denna order saknar beställningsdatum trots att ett senare datum är ifyllt. All väntetid mäts från det — utan datumet kan posten inte placeras i tiden och räknas inte in i någon statistik."
   },
   "progress": {
     "ordered": "Beställd",
@@ -274,7 +285,8 @@
     "papers": "Dokument",
     "production": "Produktion",
     "delivered": "Levererad",
-    "deliveryScheduled": "Leverans planerad"
+    "deliveryScheduled": "Leverans planerad",
+    "stepOfTotal": "Steg {current} av {total}"
   },
   "statistics": {
     "overview": "Översikt",
@@ -365,8 +377,8 @@
     "timelinePapers": "Dokument",
     "timelineDelivery": "Leverans",
     "totalWaitTime": "Total väntetid",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaljer (min / max)",
+    "pipelineSegment": "Sträcka",
     "cancelledExcluded": "{count} avbeställda (ej medräknade)"
   },
   "admin": {
@@ -444,7 +456,7 @@
     "importModel3": "Importera Model 3",
     "syncingModel3": "Synkroniserar Model 3...",
     "model3Hint": "Importerar Model 3-data från det separata Google-kalkylbladet.",
-    "debugSheets": "Debug Sheets",
+    "debugSheets": "Felsök blad",
     "debugChecking": "Kontrollerar...",
     "dataExport": "Dataexport",
     "dataExportDescription": "Exportera all data och statistik som Excel-fil (exitplan)",
@@ -524,7 +536,41 @@
     "selectModelHint": "Välj ett fordon och en modell för att konfigurera begränsningar",
     "loadingOptions": "Laddar alternativ...",
     "loadingConstraints": "Laddar begränsningar...",
-    "selectValue": "Välj värde..."
+    "selectValue": "Välj värde...",
+    "archiveConfirmAction": "Arkivera",
+    "archiveConfirmDescription": "Arkiverade beställningar försvinner från den offentliga statistiken men ligger kvar i databasen. Det går bara att ångra en beställning i taget.",
+    "archiveConfirmTitle": "Arkivera {count} beställningar?",
+    "yearlyGoal": "Serverkostnader per år (€)",
+    "yearlyGoalHint": "Lämna tomt för att dölja kostnadsraden.",
+    "yearlyRaised": "Täckt hittills (€)",
+    "backups": "Säkerhetskopior",
+    "backupsDescription": "Ögonblicksbilder av orderdatabasen. Varje kan jämföras med aktuella data och enskilda poster kan återställas.",
+    "createBackup": "Skapa säkerhetskopia",
+    "backupCreating": "Skapar…",
+    "backupCreated": "Säkerhetskopia skapad",
+    "backupFailed": "Säkerhetskopieringen misslyckades",
+    "backupListFailed": "Kunde inte läsa in säkerhetskopior",
+    "backupDeleted": "Säkerhetskopia borttagen",
+    "backupDeleteFailed": "Kunde inte ta bort säkerhetskopian",
+    "noBackups": "Inga säkerhetskopior än.",
+    "backupOrders": "{count} ordrar",
+    "backupKeepHint": "De {count} senaste säkerhetskopiorna behålls; äldre tas bort när en ny skapas.",
+    "compareBackup": "Jämför",
+    "backupComparing": "Jämför…",
+    "noDifferences": "Inga skillnader mot aktuella data.",
+    "diffAdded": "Tillagda sedan denna säkerhetskopia",
+    "diffRemoved": "Försvunna sedan dess",
+    "diffChanged": "Ändrade",
+    "restoreHint": "Återställning sätter tillbaka orderns data. Ägarens lösenord lämnas orört — utom för en post som saknas helt, som återskapas i sin helhet.",
+    "restoreOrder": "Återställ",
+    "orderRestored": "{name} återställd",
+    "restoreFailed": "Återställningen misslyckades",
+    "backupCompareFailed": "Jämförelsen misslyckades",
+    "backupAllFields": "Alla fält",
+    "backupSortName": "Efter namn",
+    "backupSortChanges": "Flest ändringar",
+    "backupShowing": "{shown} av {total}",
+    "backupNoMatches": "Inga träffar med dessa filter."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Baserad på {count} beställningar",
     "notEnoughData": "Inte tillräckligt med data för prognos. Välj en fordonstyp.",
     "lowDataHint": "Få datapunkter — prognosen kan vara felaktig. Fler beställningar förbättrar noggrannheten.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Baserat på {count} leveranser från de senaste {days} dagarna",
+    "exceedsPessimisticHint": "Din nuvarande väntetid ({days} dagar) överstiger redan den pessimistiska uppskattningen (75 % av jämförbara leveranser). Dagens väntetider är längre än den historiska fördelningen — ta prognosen med en nypa salt."
   },
   "trend": {
     "title": "Leveranstrend",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla-beställningar och statistik",
     "subtitle": "Den största communitydatabasen för Tesla-leveranstider. Model Y, Model 3 — världen över.",
-    "findMyOrder": "Hitta min beställning"
+    "findMyOrder": "Hitta min beställning",
+    "claim": "<em>{days}</em> dagar från beställning till överlämning",
+    "claimSub": "Median av {delivered} levererade beställningar. {waiting} väntar fortfarande — den längsta i {longest} dagar.",
+    "kicker": "Community-databas · Model Y och Model 3",
+    "ordersLabel": "Beställningar",
+    "deliveredLabel": "levererade",
+    "withVin": "{count} med VIN, väntar",
+    "withoutVin": "{count} utan VIN",
+    "stale": "{count} utan uppdatering"
   },
   "tracking": {
     "backToOverview": "Tillbaka till översikt",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Beställning → Leverans",
     "orderToPapers": "Beställning → Dokument",
     "papersToDelivery": "Dokument → Leverans",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Baserat på {count} leveranser från de senaste {days} dagarna",
+    "exceedsPessimisticHint": "Din nuvarande väntetid ({days} dagar) överstiger redan den pessimistiska uppskattningen. Prognosen bygger på historiska leveranstider och är inte längre tillförlitlig här — utgå från Teslas officiella leveransfönster.",
+    "staleHint": "Denna order har inte uppdaterats på över 60 dagar. Uppgifterna nedan kanske inte är aktuella.",
+    "waitedLabel": "Väntat",
+    "waitingLabel": "Väntar",
+    "daysUnit": "dagar",
+    "fasterThanComparable": "{days} dagar snabbare än jämförbara beställningar (median {median})",
+    "slowerThanComparable": "{days} dagar långsammare än jämförbara beställningar (median {median})",
+    "matchesComparable": "Precis på medianen för jämförbara beställningar ({median})",
+    "comparableTypically": "Jämförbara beställningar tog median {median} dagar",
+    "today": "Idag"
   },
   "support": {
     "communityMessage": "Dessa data underhålls av communityn för communityn. Om denna webbplats hjälper dig kan du stödja serverkostnaderna.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Administrationspanel",
     "navigationMenu": "Navigeringsmeny",
     "impressum": "Juridisk information",
-    "privacy": "Privacy"
+    "privacy": "Integritet",
+    "toggleTheme": "Byt tema",
+    "changeLanguage": "Byt språk",
+    "skipToContent": "Hoppa till innehåll"
   },
   "footer": {
     "operatedBy": "Drivs av Sven",
     "supportDevelopment": "Stöd hosting och utveckling",
-    "stats": "{orders} beställningar · {delivered} levererade"
+    "stats": "{orders} beställningar · {delivered} levererade",
+    "serverCostsProgress": "{raised} av {goal} € täckta",
+    "serverCostsTitle": "Serverkostnader {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Senaste uppdateringar",
+    "entries": "poster",
+    "loading": "Laddar…",
+    "loadMore": "Ladda mer",
+    "empty": "Inga uppdateringar än.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Idag",
+      "yesterday": "Igår",
+      "week": "Denna vecka",
+      "older": "Äldre"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN tilldelat",
+      "production": "I produktion",
+      "papers": "Papper mottagna",
+      "delivery": "Levererad",
+      "window": "Leveransfönster ändrat",
+      "created": "Ny order"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min sedan",
+      "hoursAgo": "{n} tim sedan",
+      "yesterday": "igår",
+      "daysAgo": "{n} dgr sedan",
+      "weeksAgo": "{n} v sedan"
     }
+  },
+  "errors": {
+    "rateLimited": "För många förfrågningar. Försök igen senare.",
+    "orderNotFound": "Beställningen hittades inte.",
+    "conflict": "Någon annan har ändrat den här posten under tiden. Ladda om sidan och försök igen.",
+    "resetCodeInvalid": "Ogiltig eller utgången engångskod.",
+    "resetCodeRequired": "Engångskod krävs.",
+    "tostFieldsRestricted": "Den här beställningen hanteras av TOST. Endast beställningsdatum, pappersdatum, produktionsdatum, typgodkännande och typvariant kan redigeras.",
+    "adminRequired": "Administratörsåtkomst krävs.",
+    "orderDateInFuture": "Beställningsdatumet kan inte ligga i framtiden.",
+    "datesOutOfOrder": "Datumen står inte i en rimlig ordning. Kontrollera beställnings-, produktions-, pappers- och leveransdatum.",
+    "legacyPasswordRequired": "Ett nytt lösenord krävs för äldre poster.",
+    "backHome": "Till startsidan",
+    "pageErrorBody": "Sidan kunde inte laddas. Ett nytt försök brukar hjälpa.",
+    "pageErrorTitle": "Något gick fel",
+    "pageNotFoundBody": "Den här adressen finns inte. Länken kan vara gammal eller felstavad.",
+    "pageNotFoundTitle": "Sidan hittades inte",
+    "retry": "Försök igen"
   }
 }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import { VEHICLE_TYPES } from '@/lib/types'
 import { compareOptions } from '@/lib/optionSort'
+import { computeETag, isNotModified } from '@/lib/http-cache'
 
 // Valid option types
 const VALID_TYPES = ['country', 'model', 'range', 'drive', 'color', 'interior', 'wheels', 'autopilot', 'towHitch', 'seats', 'deliveryLocation'] as const
@@ -58,7 +59,25 @@ export async function GET(request: NextRequest) {
     // Countries and delivery locations sort alphabetically, other types by sortOrder
     const sortedOptions = parsedOptions.sort(compareOptions)
 
-    return NextResponse.json(sortedOptions)
+    // Six components ask for this list on a single page load, and it changes
+    // only when an admin edits the vehicle configuration — so nearly every one
+    // of those requests returns bytes the browser already has. Same treatment
+    // the orders list already gets: revalidate every time, answer 304 when
+    // nothing moved. Admin writes below change the payload and so the tag.
+    const etag = computeETag(sortedOptions)
+    const cacheHeaders = {
+      // Browser revalidation only. No s-maxage: there is no shared cache in
+      // front of this to benefit, and a shared TTL would hide an admin's own
+      // option edit from them for its duration.
+      'Cache-Control': 'public, max-age=0, must-revalidate',
+      'ETag': etag,
+    }
+
+    if (isNotModified(request.headers.get('if-none-match'), etag)) {
+      return new NextResponse(null, { status: 304, headers: cacheHeaders })
+    }
+
+    return NextResponse.json(sortedOptions, { headers: cacheHeaders })
   } catch (error) {
     console.error('Failed to fetch options:', error)
     return NextResponse.json({ error: 'Failed to fetch options' }, { status: 500 })

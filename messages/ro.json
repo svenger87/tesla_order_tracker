@@ -41,7 +41,12 @@
     "projectSupport": "Sprijiniți acest proiect",
     "reset": "Resetează",
     "ordersRefreshed": "{count} comenzi actualizate",
-    "refreshError": "Eroare la actualizare"
+    "refreshError": "Eroare la actualizare",
+    "hide": "Ascunde",
+    "show": "Arată",
+    "only": "Doar",
+    "compact": "Compact",
+    "deleteError": "Ștergerea a eșuat."
   },
   "home": {
     "title": "Comenzi și statistici Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Imagine vehicul",
     "delivered": "Livrat: {date}",
     "errorGeneratingCode": "Eroare la generarea codului",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "învechit",
+    "staleHint": "Această comandă nu a fost actualizată de peste 60 de zile — datele pot fi învechite.",
     "statsTitle": "Statistici",
     "statsSubtitle": "Termene de livrare, configurații și tendințe",
     "cancelledBadge": "Anulată",
@@ -85,7 +90,9 @@
     "title": "Căutare comenzi",
     "description": "Găsiți o comandă în toate trimestrele",
     "hint": "Navigați cu tastele săgeți, selectați cu Enter",
-    "openSearch": "Căutare"
+    "openSearch": "Căutare",
+    "results": "{count} rezultate",
+    "noResultsHint": "Încearcă un nume, VIN, țară sau loc de livrare."
   },
   "form": {
     "personalData": "Date personale",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Apăsați \"Editează\" și introduceți parola pentru a modifica datele comenzii.",
     "saveCodeWarning": "Salvați acest cod pentru a putea edita comanda ulterior.",
     "codeShownOnce": "Acest cod este afișat o singură dată!",
-    "codeUsageHint": "Folosiți acest cod la \"Editare comandă\" pentru a vă modifica datele."
+    "codeUsageHint": "Folosiți acest cod la \"Editare comandă\" pentru a vă modifica datele.",
+    "backToOverview": "Înapoi la prezentare",
+    "viewMyOrder": "Vezi comanda mea"
   },
   "editByCode": {
     "passwordPromptTitle": "Editare comandă",
@@ -206,7 +215,7 @@
     "passwordNeedsNumber": "Parola trebuie să conțină cel puțin o cifră"
   },
   "table": {
-    "status": "Status",
+    "status": "Stare",
     "name": "Nume",
     "vehicle": "Vehicul",
     "image": "Imagine",
@@ -234,7 +243,7 @@
     "productionToPapers": "P→Doc",
     "papersToDelivery": "Doc→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Așteptare",
     "updatedAt": "Actualizat",
     "country": "Țară",
     "allVehicles": "Toate vehiculele",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Aceste câmpuri pot fi editate manual, chiar și pentru comenzile gestionate de TOST.",
     "papersReceivedDate": "Documente primite pe",
     "saveError": "Eroare la salvare",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Data producției",
+    "staleFilter": "Învechit",
+    "staleTooltip": "Comută filtrul: toate / ascunde învechite / doar învechite (≥60 de zile fără actualizare la comenzi deschise)",
     "cancelledFilter": "Anulate",
-    "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele"
+    "cancelledTooltip": "Comută filtrul: ascunde anulatele / include-le / doar anulatele",
+    "incompleteBadge": "incomplet",
+    "incompleteHint": "Acestei comenzi îi lipsește data comenzii, deși există o dată ulterioară. Toți timpii de așteptare se măsoară de la ea — fără această dată intrarea nu poate fi plasată în timp și nu intră în nicio statistică."
   },
   "progress": {
     "ordered": "Comandat",
@@ -274,15 +285,16 @@
     "papers": "Documente",
     "production": "Producție",
     "delivered": "Livrat",
-    "deliveryScheduled": "Livrare programată"
+    "deliveryScheduled": "Livrare programată",
+    "stepOfTotal": "Pasul {current} din {total}"
   },
   "statistics": {
     "overview": "Prezentare generală",
     "overviewShort": "Statistici",
     "configuration": "Configurație",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Echipament",
-    "equipmentShort": "Extras",
+    "equipmentShort": "Extraopțiuni",
     "geo": "Geo",
     "timeline": "Cronologie",
     "timelineShort": "Timp",
@@ -365,8 +377,8 @@
     "timelinePapers": "Documente",
     "timelineDelivery": "Livrare",
     "totalWaitTime": "Timp total de așteptare",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detaliu (min / max)",
+    "pipelineSegment": "Etapă",
     "cancelledExcluded": "{count} anulate (necontorizate)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Selectați un vehicul și un model pentru a configura constrângerile",
     "loadingOptions": "Se încarcă opțiunile...",
     "loadingConstraints": "Se încarcă constrângerile...",
-    "selectValue": "Selectați valoarea..."
+    "selectValue": "Selectați valoarea...",
+    "archiveConfirmAction": "Arhivează",
+    "archiveConfirmDescription": "Comenzile arhivate dispar din statisticile publice, dar rămân în baza de date. Anularea este posibilă doar comandă cu comandă.",
+    "archiveConfirmTitle": "Arhivezi {count} comenzi?",
+    "yearlyGoal": "Costuri server pe an (€)",
+    "yearlyGoalHint": "Lasă gol pentru a ascunde bara de costuri.",
+    "yearlyRaised": "Acoperit până acum (€)",
+    "backups": "Copii de rezervă",
+    "backupsDescription": "Instantanee ale bazei de comenzi. Fiecare poate fi comparată cu datele curente, iar din ea se pot restaura intrări individuale.",
+    "createBackup": "Creează copie",
+    "backupCreating": "Se creează…",
+    "backupCreated": "Copie creată",
+    "backupFailed": "Copia a eșuat",
+    "backupListFailed": "Copiile nu au putut fi încărcate",
+    "backupDeleted": "Copie ștearsă",
+    "backupDeleteFailed": "Copia nu a putut fi ștearsă",
+    "noBackups": "Încă nu există copii.",
+    "backupOrders": "{count} comenzi",
+    "backupKeepHint": "Se păstrează cele mai recente {count} copii; cele vechi se elimină la crearea uneia noi.",
+    "compareBackup": "Compară",
+    "backupComparing": "Se compară…",
+    "noDifferences": "Nicio diferență față de datele curente.",
+    "diffAdded": "Adăugate după această copie",
+    "diffRemoved": "Dispărute de atunci",
+    "diffChanged": "Modificate",
+    "restoreHint": "Restaurarea readuce datele comenzii. Parola proprietarului rămâne neschimbată — cu excepția unei intrări lipsă complet, care este recreată în întregime.",
+    "restoreOrder": "Restaurează",
+    "orderRestored": "{name} restaurată",
+    "restoreFailed": "Restaurarea a eșuat",
+    "backupCompareFailed": "Comparația a eșuat",
+    "backupAllFields": "Toate câmpurile",
+    "backupSortName": "După nume",
+    "backupSortChanges": "Cele mai multe modificări",
+    "backupShowing": "{shown} din {total}",
+    "backupNoMatches": "Niciun rezultat cu aceste filtre."
   },
   "options": {
     "country": {
@@ -596,7 +642,7 @@
     "title": "Mențiuni legale",
     "legalInfo": "Informații conform § 5 TMG",
     "contact": "Contact",
-    "email": "Email",
+    "email": "E-mail",
     "disclaimer": "Declinarea responsabilității",
     "disclaimerText": "Acesta este un proiect comunitar privat, fără scop comercial.",
     "backToHome": "Înapoi la pagina principală",
@@ -662,8 +708,8 @@
     "basedOn": "Pe baza a {count} comenzi",
     "notEnoughData": "Date insuficiente pentru predicție. Selectați un tip de vehicul.",
     "lowDataHint": "Puține date — prognoza poate fi inexactă. Mai multe comenzi vor îmbunătăți precizia.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Pe baza a {count} livrări din ultimele {days} zile",
+    "exceedsPessimisticHint": "Timpul dvs. de așteptare ({days} zile) depășește deja estimarea pesimistă (75% dintre livrările comparabile). Timpii actuali sunt mai mari decât distribuția istorică — priviți această estimare cu prudență."
   },
   "trend": {
     "title": "Tendința livrărilor",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Comenzi și statistici Tesla",
     "subtitle": "Cea mai mare bază de date comunitară pentru termenele de livrare Tesla. Model Y, Model 3 — la nivel mondial.",
-    "findMyOrder": "Găsește comanda mea"
+    "findMyOrder": "Găsește comanda mea",
+    "claim": "<em>{days}</em> zile de la comandă la predare",
+    "claimSub": "Mediana din {delivered} comenzi livrate. {waiting} încă așteaptă — cea mai lungă de {longest} zile.",
+    "kicker": "Bază de date a comunității · Model Y și Model 3",
+    "ordersLabel": "Comenzi",
+    "deliveredLabel": "livrate",
+    "withVin": "{count} cu VIN, așteaptă",
+    "withoutVin": "{count} fără VIN",
+    "stale": "{count} fără actualizare"
   },
   "tracking": {
     "backToOverview": "Înapoi la prezentare",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Comandă → Livrare",
     "orderToPapers": "Comandă → Documente",
     "papersToDelivery": "Documente → Livrare",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Pe baza a {count} livrări din ultimele {days} zile",
+    "exceedsPessimisticHint": "Timpul dvs. de așteptare ({days} zile) depășește deja estimarea pesimistă. Estimarea se bazează pe timpi istorici și nu mai este de încredere aici — consultați intervalul oficial de livrare Tesla.",
+    "staleHint": "Această comandă nu a fost actualizată de peste 60 de zile. Datele de mai jos pot fi depășite.",
+    "waitedLabel": "Așteptare",
+    "waitingLabel": "Așteaptă",
+    "daysUnit": "zile",
+    "fasterThanComparable": "Cu {days} zile mai rapid decât comenzi comparabile (mediana {median})",
+    "slowerThanComparable": "Cu {days} zile mai lent decât comenzi comparabile (mediana {median})",
+    "matchesComparable": "Exact pe mediana comenzilor comparabile ({median})",
+    "comparableTypically": "Comenzile comparabile au durat o mediană de {median} zile",
+    "today": "Azi"
   },
   "support": {
     "communityMessage": "Aceste date sunt întreținute de comunitate pentru comunitate. Dacă acest site vă ajută, puteți sprijini costurile serverului.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Panou de administrare",
     "navigationMenu": "Meniu de navigare",
     "impressum": "Mențiuni legale",
-    "privacy": "Privacy"
+    "privacy": "Confidențialitate",
+    "toggleTheme": "Schimbă tema",
+    "changeLanguage": "Schimbă limba",
+    "skipToContent": "Sari la conținut"
   },
   "footer": {
     "operatedBy": "Operat de Sven",
     "supportDevelopment": "Sprijiniți găzduirea și dezvoltarea",
-    "stats": "{orders} comenzi · {delivered} livrate"
+    "stats": "{orders} comenzi · {delivered} livrate",
+    "serverCostsProgress": "{raised} din {goal} € acoperiți",
+    "serverCostsTitle": "Costuri server {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Ultimele actualizări",
+    "entries": "intrări",
+    "loading": "Se încarcă…",
+    "loadMore": "Încarcă mai multe",
+    "empty": "Încă nu există actualizări.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Azi",
+      "yesterday": "Ieri",
+      "week": "Săptămâna aceasta",
+      "older": "Mai vechi"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN atribuit",
+      "production": "În producție",
+      "papers": "Documente primite",
+      "delivery": "Livrat",
+      "window": "Interval de livrare modificat",
+      "created": "Comandă nouă"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "acum {n} min",
+      "hoursAgo": "acum {n} h",
+      "yesterday": "ieri",
+      "daysAgo": "acum {n} z",
+      "weeksAgo": "acum {n} săpt."
     }
+  },
+  "errors": {
+    "rateLimited": "Prea multe cereri. Încearcă din nou mai târziu.",
+    "orderNotFound": "Comanda nu a fost găsită.",
+    "conflict": "Între timp, altcineva a modificat această înregistrare. Reîncarcă pagina și încearcă din nou.",
+    "resetCodeInvalid": "Cod unic invalid sau expirat.",
+    "resetCodeRequired": "Este necesar un cod unic.",
+    "tostFieldsRestricted": "Această comandă este gestionată de TOST. Pot fi editate doar data comenzii, data documentelor, data producției, omologarea și varianta de tip.",
+    "adminRequired": "Este necesar acces de administrator.",
+    "orderDateInFuture": "Data comenzii nu poate fi în viitor.",
+    "datesOutOfOrder": "Datele nu sunt într-o ordine plauzibilă. Verifică datele de comandă, producție, documente și livrare.",
+    "legacyPasswordRequired": "Este necesară o parolă nouă pentru înregistrările vechi.",
+    "backHome": "La pagina principală",
+    "pageErrorBody": "Pagina nu a putut fi încărcată. O nouă încercare ajută de obicei.",
+    "pageErrorTitle": "Ceva nu a mers bine",
+    "pageNotFoundBody": "Această adresă nu există. Linkul poate fi vechi sau scris greșit.",
+    "pageNotFoundTitle": "Pagina nu a fost găsită",
+    "retry": "Încearcă din nou"
   }
 }

@@ -41,7 +41,12 @@
     "projectSupport": "Подкрепете този проект",
     "reset": "Нулиране",
     "ordersRefreshed": "{count} поръчки опреснени",
-    "refreshError": "Грешка при опресняване"
+    "refreshError": "Грешка при опресняване",
+    "hide": "Скрий",
+    "show": "Покажи",
+    "only": "Само",
+    "compact": "Компактно",
+    "deleteError": "Изтриването е неуспешно."
   },
   "home": {
     "title": "Поръчки и статистики на Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Изображение на превозното средство",
     "delivered": "Доставено: {date}",
     "errorGeneratingCode": "Грешка при генериране на кода",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "остаряла",
+    "staleHint": "Тази поръчка не е обновявана над 60 дни — данните може да са остарели.",
     "statsTitle": "Статистики",
     "statsSubtitle": "Време за доставка, конфигурации и тенденции",
     "cancelledBadge": "Отказана",
@@ -85,7 +90,9 @@
     "title": "Търсене на поръчки",
     "description": "Намерете поръчка във всички тримесечия",
     "hint": "Навигирайте със стрелките, изберете с Enter",
-    "openSearch": "Търсене"
+    "openSearch": "Търсене",
+    "results": "{count} Резултата",
+    "noResultsHint": "Опитайте с име, VIN, държава или място на доставка."
   },
   "form": {
     "personalData": "Лични данни",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Натиснете \"Редактирай“ и въведете паролата си, за да промените данните на поръчката.",
     "saveCodeWarning": "Запазете този код, за да редактирате поръчката си по-късно.",
     "codeShownOnce": "Този код се показва само веднъж!",
-    "codeUsageHint": "Използвайте този код в \"Редактиране на поръчка“, за да промените данните си."
+    "codeUsageHint": "Използвайте този код в \"Редактиране на поръчка“, за да промените данните си.",
+    "backToOverview": "Към прегледа",
+    "viewMyOrder": "Виж моята поръчка"
   },
   "editByCode": {
     "passwordPromptTitle": "Редактиране на поръчка",
@@ -230,11 +239,11 @@
     "typeVariant": "Вар. тип",
     "deliveryDate": "Дата на доставка",
     "orderToVin": "П→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Пр",
+    "productionToPapers": "Пр→Д",
     "papersToDelivery": "Док→Д",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Изчакване",
     "updatedAt": "Актуализирано",
     "country": "Държава",
     "allVehicles": "Всички превозни средства",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Тези полета могат да се редактират ръчно, дори за поръчки, управлявани от TOST.",
     "papersReceivedDate": "Документи получени на",
     "saveError": "Грешка при запазване",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Дата на производство",
+    "staleFilter": "Остаряли",
+    "staleTooltip": "Превключване: всички / скрий остарелите / само остарели (≥60 дни без обновяване при отворени поръчки)",
     "cancelledFilter": "Отказани",
-    "cancelledTooltip": "Превключване на филтъра: скрий отказаните / покажи ги / само отказани"
+    "cancelledTooltip": "Превключване на филтъра: скрий отказаните / покажи ги / само отказани",
+    "incompleteBadge": "непълна",
+    "incompleteHint": "При тази поръчка липсва датата на поръчката, въпреки че е въведена по-късна дата. Всички времена на изчакване се измерват от датата на поръчката — без нея записът не може да бъде подреден във времето и не влиза в статистиката."
   },
   "progress": {
     "ordered": "Поръчано",
@@ -274,7 +285,8 @@
     "papers": "Документи",
     "production": "Производство",
     "delivered": "Доставено",
-    "deliveryScheduled": "Доставка насрочена"
+    "deliveryScheduled": "Доставка насрочена",
+    "stepOfTotal": "Стъпка {current} от {total}"
   },
   "statistics": {
     "overview": "Общ преглед",
@@ -365,8 +377,8 @@
     "timelinePapers": "Документи",
     "timelineDelivery": "Доставка",
     "totalWaitTime": "Общо време на чакане",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Детайли (мин. / макс.)",
+    "pipelineSegment": "Отсечка",
     "cancelledExcluded": "{count} отказани (не се броят)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Изберете превозно средство и модел, за да конфигурирате ограниченията",
     "loadingOptions": "Зареждане на опциите...",
     "loadingConstraints": "Зареждане на ограниченията...",
-    "selectValue": "Изберете стойност..."
+    "selectValue": "Изберете стойност...",
+    "archiveConfirmAction": "Архивиране",
+    "archiveConfirmDescription": "Архивираните поръчки изчезват от публичната статистика, но остават в базата данни. Връщането е възможно само поръчка по поръчка.",
+    "archiveConfirmTitle": "Архивиране на {count} поръчки?",
+    "yearlyGoal": "Разходи за сървър годишно (€)",
+    "yearlyGoalHint": "Оставете празно, за да скриете лентата с разходите.",
+    "yearlyRaised": "Покрито досега (€)",
+    "backups": "Резервни копия",
+    "backupsDescription": "Моментни снимки на базата с поръчки. Всяка може да се сравни с текущите данни и отделни записи да се възстановят.",
+    "createBackup": "Създай копие",
+    "backupCreating": "Създаване…",
+    "backupCreated": "Копието е създадено",
+    "backupFailed": "Копието не бе създадено",
+    "backupListFailed": "Копията не могат да се заредят",
+    "backupDeleted": "Копието е изтрито",
+    "backupDeleteFailed": "Копието не бе изтрито",
+    "noBackups": "Все още няма копия.",
+    "backupOrders": "{count} поръчки",
+    "backupKeepHint": "Пазят се {count}-те най-нови копия; по-старите се премахват при създаване на ново.",
+    "compareBackup": "Сравни",
+    "backupComparing": "Сравняване…",
+    "noDifferences": "Няма разлики с текущите данни.",
+    "diffAdded": "Добавени след това копие",
+    "diffRemoved": "Изчезнали оттогава",
+    "diffChanged": "Променени",
+    "restoreHint": "Възстановяват се данните на поръчката. Паролата на собственика остава непроменена — освен при напълно липсващ запис, който се създава наново.",
+    "restoreOrder": "Възстанови",
+    "orderRestored": "{name} е възстановена",
+    "restoreFailed": "Възстановяването не успя",
+    "backupCompareFailed": "Сравнението не успя",
+    "backupAllFields": "Всички полета",
+    "backupSortName": "По име",
+    "backupSortChanges": "Най-много промени",
+    "backupShowing": "{shown} от {total}",
+    "backupNoMatches": "Няма съвпадения с тези филтри."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "На базата на {count} поръчки",
     "notEnoughData": "Недостатъчно данни за прогноза. Изберете тип превозно средство.",
     "lowDataHint": "Малко данни — прогнозата може да е неточна. Повече поръчки ще подобрят точността.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Въз основа на {count} доставки от последните {days} дни",
+    "exceedsPessimisticHint": "Досегашното ви изчакване ({days} дни) вече надхвърля песимистичната оценка (75% от сравнимите доставки). Текущите срокове са по-дълги от историческото разпределение — приемете прогнозата с уговорки."
   },
   "trend": {
     "title": "Тенденция на доставките",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Поръчки и статистики на Tesla",
     "subtitle": "Най-голямата база данни на общността за срокове на доставка на Tesla. Model Y, Model 3 — по целия свят.",
-    "findMyOrder": "Намери моята поръчка"
+    "findMyOrder": "Намери моята поръчка",
+    "claim": "<em>{days}</em> дни от поръчката до предаването",
+    "claimSub": "Медиана от {delivered} предадени поръчки. {waiting} все още чакат — най-дългата от {longest} дни.",
+    "kicker": "Общностна база данни · Model Y и Model 3",
+    "ordersLabel": "Поръчки",
+    "deliveredLabel": "предадени",
+    "withVin": "{count} с VIN, чакат",
+    "withoutVin": "{count} без VIN",
+    "stale": "{count} без актуализация"
   },
   "tracking": {
     "backToOverview": "Назад към прегледа",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Поръчка → Доставка",
     "orderToPapers": "Поръчка → Документи",
     "papersToDelivery": "Документи → Доставка",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Въз основа на {count} доставки от последните {days} дни",
+    "exceedsPessimisticHint": "Досегашното ви изчакване ({days} дни) вече надхвърля песимистичната оценка. Прогнозата се основава на исторически срокове и в този случай не е надеждна — придържайте се към официалния период на доставка на Tesla.",
+    "staleHint": "Тази поръчка не е обновявана над 60 дни. Данните по-долу може вече да не са актуални.",
+    "waitedLabel": "Изчаквано",
+    "waitingLabel": "Изчаква",
+    "daysUnit": "дни",
+    "fasterThanComparable": "{days} дни по-бързо от сравними поръчки (медиана {median})",
+    "slowerThanComparable": "{days} дни по-бавно от сравними поръчки (медиана {median})",
+    "matchesComparable": "Точно колкото сравними поръчки (медиана {median})",
+    "comparableTypically": "Сравними поръчки са отнели медиана от {median} дни",
+    "today": "Днес"
   },
   "support": {
     "communityMessage": "Тези данни се поддържат от общността за общността. Ако този сайт Ви помага, можете да подкрепите разходите за сървъра.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Административен панел",
     "navigationMenu": "Навигационно меню",
     "impressum": "Правна информация",
-    "privacy": "Privacy"
+    "privacy": "Поверителност",
+    "toggleTheme": "Смяна на темата",
+    "changeLanguage": "Смяна на езика",
+    "skipToContent": "Към съдържанието"
   },
   "footer": {
     "operatedBy": "Поддържан от Sven",
     "supportDevelopment": "Подкрепете хостинга и разработката",
-    "stats": "{orders} поръчки · {delivered} доставени"
+    "stats": "{orders} поръчки · {delivered} доставени",
+    "serverCostsProgress": "{raised} от {goal} € покрити",
+    "serverCostsTitle": "Разходи за сървър {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Последни промени",
+    "entries": "записа",
+    "loading": "Зареждане…",
+    "loadMore": "Зареди още",
+    "empty": "Все още няма промени.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Днес",
+      "yesterday": "Вчера",
+      "week": "Тази седмица",
+      "older": "По-стари"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "Присвоен VIN",
+      "production": "В производство",
+      "papers": "Получени документи",
+      "delivery": "Доставена",
+      "window": "Промяна на периода на доставка",
+      "created": "Нова поръчка"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "преди {n} мин",
+      "hoursAgo": "преди {n} ч",
+      "yesterday": "вчера",
+      "daysAgo": "преди {n} дни",
+      "weeksAgo": "преди {n} седм."
     }
+  },
+  "errors": {
+    "rateLimited": "Твърде много заявки. Опитайте отново по-късно.",
+    "orderNotFound": "Поръчката не е намерена.",
+    "conflict": "Междувременно записът е променен от някой друг. Презаредете страницата и опитайте отново.",
+    "resetCodeInvalid": "Невалиден или изтекъл еднократен код.",
+    "resetCodeRequired": "Необходим е еднократен код.",
+    "tostFieldsRestricted": "Тази поръчка се управлява от TOST. Могат да се редактират само дата на поръчка, дата на документите, дата на производство, типово одобрение и типов вариант.",
+    "adminRequired": "Необходими са администраторски права.",
+    "orderDateInFuture": "Датата на поръчката не може да е в бъдещето.",
+    "datesOutOfOrder": "Датите не са в правдоподобен ред. Проверете датата на поръчката, производството, документите и доставката.",
+    "legacyPasswordRequired": "За стари записи е необходима нова парола.",
+    "backHome": "Към началната страница",
+    "pageErrorBody": "Страницата не можа да се зареди. Нов опит често помага.",
+    "pageErrorTitle": "Нещо се обърка",
+    "pageNotFoundBody": "Този адрес не съществува. Връзката може да е остаряла или сгрешена.",
+    "pageNotFoundTitle": "Страницата не е намерена",
+    "retry": "Опитайте отново"
   }
 }

@@ -1,14 +1,21 @@
-# tff order stats
+# TFF Order Stats
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buymeacoffee&logoColor=white)](https://buymeacoffee.com/sven.7687)
 [![PayPal](https://img.shields.io/badge/PayPal-donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/svenrosema)
 [![GitHub](https://img.shields.io/badge/GitHub-svenger87-181717?style=for-the-badge&logo=github)](https://github.com/svenger87/tesla_order_tracker)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-A community-driven web application for tracking Tesla Model Y orders, delivery timelines, and statistics. Built with Next.js 16, React 19, and Prisma.
+A community-driven web application for tracking Tesla Model Y and Model 3 orders, delivery timelines, and statistics. Built with Next.js 16, React 19, and Prisma.
+
+Live at **<https://tff-order-stats.de>**. The repository is named
+`tesla_order_tracker` for historical reasons; the product is TFF Order Stats.
+
+Found a security issue? See [SECURITY.md](SECURITY.md) — please do not open a
+public issue.
 
 ## Features
 
+- **23 Languages**: The whole interface is translated and maintained through Crowdin — see [Translations](#translations)
 - **Order Tracking**: Track Tesla Model Y orders with detailed configuration information
 - **Statistics Dashboard**: Visualize order trends, delivery timelines, and configuration distributions
 - **Multi-Quarter Support**: Organize orders by quarter (Q1 2026, Q4 2025, Q3 2025, etc.)
@@ -166,9 +173,20 @@ npx prisma studio
 ### Production
 
 Production runs the same SQLite engine, on a Docker volume mounted at
-`/app/data` (`prod.db` for master, `staging.db` for staging). The container
-entrypoint runs `scripts/migrate-schema.mjs` before starting the server, so
-schema changes apply on deploy.
+`/app/data` (`prod.db` for master, `staging.db` for staging).
+
+Schema changes reach production through **one** mechanism, and it is not Prisma
+Migrate: the container entrypoint runs `scripts/migrate-schema.mjs`, which diffs
+`schema-template.db` — built into the image from `prisma/schema.prisma` — against
+the live database and adds whatever tables, columns and indexes are missing.
+
+In practice: **edit `prisma/schema.prisma`, and the next deploy applies it.**
+
+The step is additive only. It never drops or renames a column and never
+backfills data, so anything destructive or data-shaped belongs in a script under
+`scripts/`, run deliberately. `prisma/migrations/` is kept for local development;
+older hand-written SQL lives in [`docs/legacy-migrations`](docs/legacy-migrations)
+and is not run by anything.
 
 ## Data Import
 
@@ -183,40 +201,69 @@ Import orders from Google Sheets:
 
 The script maps columns automatically based on German headers (Bestelldatum, Farbe, etc.).
 
-## API Endpoints
+## API
+
+### Public REST API (`/api/v1`)
+
+The stable, documented interface for anything outside this app. It is described
+by [`docs/openapi/openapi.yaml`](docs/openapi/openapi.yaml), browsable at
+[`/docs`](https://tff-order-stats.de/docs), and there is a Postman collection in
+[`docs/postman`](docs/postman). Authenticate with an `X-API-Key` header
+(`EXTERNAL_API_KEY`).
+
+Please use `/api/v1` rather than the internal endpoints below — those are shaped
+around the UI and change without notice.
+
+### Internal endpoints
+
+Used by the web app itself.
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/orders` | GET | List all orders |
-| `/api/orders` | POST | Create a new order |
-| `/api/orders/[id]` | PUT | Update an order |
-| `/api/orders/[id]` | DELETE | Delete an order |
-| `/api/options` | GET | List dropdown options |
-| `/api/options` | POST | Create option (admin) |
-| `/api/settings` | GET | Get app settings |
-| `/api/settings` | PUT | Update settings (admin) |
-| `/api/admin/login` | POST | Admin authentication |
+| `/api/orders` | GET | List all orders. Sends an `ETag`; a matching `If-None-Match` answers `304`. |
+| `/api/orders` | POST | Create an order (rate limited) |
+| `/api/orders` | PUT | Update an order — id in the body, authorised by edit code or admin cookie |
+| `/api/orders?id=…` | DELETE | Delete an order (admin) |
+| `/api/orders/verify` | GET | Check an edit code, or whether an order has a password |
+| `/api/orders/reset-code` | POST | Issue a one-time code for an order (admin) |
+| `/api/orders/use-reset-code` | POST | Redeem a one-time code and set a new password |
+| `/api/orders/history` | GET | Change history behind the updates feed |
+| `/api/options` | GET/POST | Dropdown options (POST is admin) |
+| `/api/constraints` | GET | Option constraints per vehicle type |
+| `/api/settings` | GET/PUT | App settings (PUT is admin) |
+| `/api/predict` | GET | Delivery estimate |
+| `/api/pulse` | GET | Aggregated community figures |
+| `/api/compositor-image` | GET/POST | Cache for rendered vehicle images |
+| `/api/auth/login` | POST | Admin authentication (rate limited) |
+| `/api/auth/logout` | POST | End the admin session |
+| `/api/auth/check` | GET | Whether the current cookie is an admin session |
+| `/api/health` | GET | Health check used by the deploy workflow |
 
 ## Project Structure
 
 ```
 tesla_order_tracker/
+├── messages/              # One JSON file per language (de.json is the source)
 ├── prisma/
 │   ├── schema.prisma      # Database schema
 │   └── migrations/        # Database migrations
 ├── scripts/
-│   └── import-from-sheets.ts  # Data import script
+│   ├── ship.sh                # Staging-first release flow
+│   ├── import-from-sheets.ts  # Data import script
+│   └── validate-translations.mjs
 ├── src/
 │   ├── app/
-│   │   ├── api/           # API routes
-│   │   ├── admin/         # Admin pages
-│   │   └── page.tsx       # Main page
+│   │   ├── api/           # API routes (not locale-prefixed)
+│   │   └── [locale]/      # Every page, incl. admin and /track
 │   ├── components/
 │   │   ├── ui/            # shadcn/ui components
 │   │   ├── statistics/    # Chart components
+│   │   ├── form-steps/    # Steps of the order form
 │   │   └── admin/         # Admin components
+│   ├── i18n/              # Locale list, routing, request config
 │   ├── hooks/             # React hooks
-│   └── lib/               # Utilities and types
+│   ├── lib/               # Utilities, types, and their unit tests
+│   └── middleware.ts      # Locale detection and redirects
 └── public/                # Static assets
 ```
 
@@ -225,13 +272,43 @@ tesla_order_tracker/
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | SQLite database path |
-| `JWT_SECRET` | Yes | Secret for JWT tokens |
-| `ADMIN_USERNAME` | Yes | Default admin username |
-| `ADMIN_PASSWORD` | Yes | Default admin password |
-| `EXTERNAL_API_KEY` | No | API key for the external `/api/v1` REST API |
+| `JWT_SECRET` | Yes | Signs the admin session. At least 32 characters — admin auth refuses to work without it, by design. |
+| `ADMIN_USERNAME` | Yes | Admin account, created on first login |
+| `ADMIN_PASSWORD` | Yes | Password for that account |
+| `TOST_API_KEY` | For TOST | Key for the `/api/v1/tost` endpoints. Without it every TOST request answers 500. |
+| `EXTERNAL_API_KEY` | No | Key for the public `/api/v1` REST API |
+| `ADMIN_RESET_TOKEN` | No | Enables `POST /api/auth/reset-admin?token=…` to rebuild the admin from the env vars |
 | `UMAMI_WEBSITE_ID` | No | Enables the Umami analytics script |
+| `UMAMI_HOST` | No | Umami host, if it is not the bundled one |
 
 See `.env.example` (local) and `.env.production.example` (server) for the full set.
+
+## Translations
+
+The interface ships in 23 languages. Every locale carries the same set of keys —
+`scripts/validate-translations.mjs` checks that, and CI runs it on every pull
+request.
+
+- `messages/de.json` is the source. New keys go there first.
+- Everything else is translated through Crowdin (`crowdin.yml`), so edits to the
+  other files are usually overwritten on the next sync.
+- Adding a language: add it to `src/i18n/locales.ts`, create
+  `messages/<code>.json`, and add the locale in Crowdin.
+
+Test a language locally by visiting the prefixed path, for example
+<http://localhost:3000/fr>. German is served without a prefix.
+
+## Testing
+
+```bash
+npm test          # unit tests (vitest)
+npm run test:watch
+npm run lint
+```
+
+The unit tests cover the pure logic under `src/lib` — date normalisation and
+plausibility, rate limiting, HTTP caching. CI runs lint, tests, translation
+validation and a production build on every pull request.
 
 ## Support the Project
 

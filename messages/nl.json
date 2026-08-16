@@ -41,7 +41,12 @@
     "projectSupport": "Dit project ondersteunen",
     "reset": "Resetten",
     "ordersRefreshed": "{count} bestellingen vernieuwd",
-    "refreshError": "Fout bij het vernieuwen"
+    "refreshError": "Fout bij het vernieuwen",
+    "hide": "Verbergen",
+    "show": "Tonen",
+    "only": "Alleen",
+    "compact": "Compact",
+    "deleteError": "Verwijderen mislukt."
   },
   "home": {
     "title": "Tesla bestellingen en statistieken",
@@ -72,8 +77,8 @@
     "vehicleImage": "Voertuigafbeelding",
     "delivered": "Geleverd: {date}",
     "errorGeneratingCode": "Fout bij het genereren van de code",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "verouderd",
+    "staleHint": "Deze bestelling is al meer dan 60 dagen niet bijgewerkt — de gegevens kunnen verouderd zijn.",
     "statsTitle": "Statistieken",
     "statsSubtitle": "Levertijden, configuraties en trends",
     "cancelledBadge": "Geannuleerd",
@@ -85,7 +90,9 @@
     "title": "Bestellingen zoeken",
     "description": "Zoek een bestelling in alle kwartalen",
     "hint": "Navigeer met pijltjestoetsen, selecteer met Enter",
-    "openSearch": "Zoeken"
+    "openSearch": "Zoeken",
+    "results": "{count} resultaten",
+    "noResultsHint": "Probeer een naam, VIN, land of afhaallocatie."
   },
   "form": {
     "personalData": "Persoonlijke gegevens",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Klik op \"Bewerken\" en voer uw wachtwoord in om uw bestelgegevens te wijzigen.",
     "saveCodeWarning": "Bewaar deze code om uw bestelling later te bewerken.",
     "codeShownOnce": "Deze code wordt slechts één keer getoond!",
-    "codeUsageHint": "Gebruik deze code onder \"Bestelling bewerken\" om uw gegevens te wijzigen."
+    "codeUsageHint": "Gebruik deze code onder \"Bestelling bewerken\" om uw gegevens te wijzigen.",
+    "backToOverview": "Terug naar overzicht",
+    "viewMyOrder": "Mijn bestelling bekijken"
   },
   "editByCode": {
     "passwordPromptTitle": "Bestelling bewerken",
@@ -231,10 +240,10 @@
     "deliveryDate": "Leverdatum",
     "orderToVin": "B→VIN",
     "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "productionToPapers": "P→Pap",
     "papersToDelivery": "Doc→L",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Wachttijd",
     "updatedAt": "Bijgewerkt",
     "country": "Land",
     "allVehicles": "Alle voertuigen",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Deze velden kunnen handmatig worden bewerkt, ook voor door TOST beheerde bestellingen.",
     "papersReceivedDate": "Documenten ontvangen op",
     "saveError": "Fout bij opslaan",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Productiedatum",
+    "staleFilter": "Verouderd",
+    "staleTooltip": "Filter wisselen: alle / verouderde verbergen / alleen verouderde (≥60 dagen zonder update bij open bestellingen)",
     "cancelledFilter": "Geannuleerd",
-    "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde"
+    "cancelledTooltip": "Filter wisselen: geannuleerde verbergen / tonen / alleen geannuleerde",
+    "incompleteBadge": "onvolledig",
+    "incompleteHint": "Bij deze bestelling ontbreekt de besteldatum terwijl er een latere datum is ingevuld. Alle wachttijden worden vanaf die datum gemeten — zonder haar is de invoer niet in de tijd te plaatsen en telt niet mee in enige statistiek."
   },
   "progress": {
     "ordered": "Besteld",
@@ -274,13 +285,14 @@
     "papers": "Documenten",
     "production": "Productie",
     "delivered": "Geleverd",
-    "deliveryScheduled": "Levering gepland"
+    "deliveryScheduled": "Levering gepland",
+    "stepOfTotal": "Stap {current} van {total}"
   },
   "statistics": {
     "overview": "Overzicht",
     "overviewShort": "Stats",
     "configuration": "Configuratie",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Uitrusting",
     "equipmentShort": "Extra's",
     "geo": "Geo",
@@ -365,8 +377,8 @@
     "timelinePapers": "Papieren",
     "timelineDelivery": "Levering",
     "totalWaitTime": "Totale wachttijd",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detail (min / max)",
+    "pipelineSegment": "Traject",
     "cancelledExcluded": "{count} geannuleerd (niet meegeteld)"
   },
   "admin": {
@@ -474,7 +486,7 @@
     "noCodes": "Geen codes gevonden.",
     "noCodesHint": "Gebruik \"Ontbrekende codes toevoegen\" om standaardcodes te laden.",
     "lookupKey": "Zoeksleutel",
-    "teslaCode": "Tesla Code",
+    "teslaCode": "Tesla-code",
     "label": "Label",
     "sortOrder": "Sorteervolgorde",
     "editCode": "Code bewerken",
@@ -524,7 +536,41 @@
     "selectModelHint": "Selecteer een voertuig en model om beperkingen te configureren",
     "loadingOptions": "Opties laden...",
     "loadingConstraints": "Beperkingen laden...",
-    "selectValue": "Waarde selecteren..."
+    "selectValue": "Waarde selecteren...",
+    "archiveConfirmAction": "Archiveren",
+    "archiveConfirmDescription": "Gearchiveerde bestellingen verdwijnen uit de openbare statistieken, maar blijven in de database. Terugdraaien kan alleen per bestelling.",
+    "archiveConfirmTitle": "{count} bestellingen archiveren?",
+    "yearlyGoal": "Serverkosten per jaar (€)",
+    "yearlyGoalHint": "Laat leeg om de kostenbalk te verbergen.",
+    "yearlyRaised": "Tot nu toe gedekt (€)",
+    "backups": "Back-ups",
+    "backupsDescription": "Momentopnamen van de besteldatabase. Elke kan worden vergeleken met de huidige gegevens en er kunnen losse items uit worden hersteld.",
+    "createBackup": "Back-up maken",
+    "backupCreating": "Bezig…",
+    "backupCreated": "Back-up gemaakt",
+    "backupFailed": "Back-up mislukt",
+    "backupListFailed": "Back-ups konden niet worden geladen",
+    "backupDeleted": "Back-up verwijderd",
+    "backupDeleteFailed": "Back-up kon niet worden verwijderd",
+    "noBackups": "Nog geen back-ups.",
+    "backupOrders": "{count} bestellingen",
+    "backupKeepHint": "De {count} nieuwste back-ups blijven bewaard; oudere worden verwijderd bij een nieuwe.",
+    "compareBackup": "Vergelijken",
+    "backupComparing": "Vergelijken…",
+    "noDifferences": "Geen verschillen met de huidige gegevens.",
+    "diffAdded": "Toegevoegd sinds deze back-up",
+    "diffRemoved": "Sindsdien verdwenen",
+    "diffChanged": "Gewijzigd",
+    "restoreHint": "Herstellen zet de gegevens van de bestelling terug. Het wachtwoord van de eigenaar blijft ongewijzigd — behalve bij een item dat volledig ontbreekt; dat wordt volledig opnieuw aangemaakt.",
+    "restoreOrder": "Herstellen",
+    "orderRestored": "{name} hersteld",
+    "restoreFailed": "Herstellen mislukt",
+    "backupCompareFailed": "Vergelijken mislukt",
+    "backupAllFields": "Alle velden",
+    "backupSortName": "Op naam",
+    "backupSortChanges": "Meeste wijzigingen",
+    "backupShowing": "{shown} van {total}",
+    "backupNoMatches": "Geen resultaten met deze filters."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Gebaseerd op {count} bestellingen",
     "notEnoughData": "Onvoldoende gegevens voor voorspelling. Selecteer een voertuigtype.",
     "lowDataHint": "Weinig gegevens — de voorspelling kan onnauwkeurig zijn. Meer bestellingen verbeteren de nauwkeurigheid.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Op basis van {count} leveringen uit de laatste {days} dagen",
+    "exceedsPessimisticHint": "Je huidige wachttijd ({days} dagen) overschrijdt al de pessimistische schatting (75% van vergelijkbare leveringen). De huidige wachttijden zijn langer dan de historische verdeling — neem deze voorspelling met een slag om de arm."
   },
   "trend": {
     "title": "Leveringstrend",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla bestellingen en statistieken",
     "subtitle": "De grootste communitydatabase voor Tesla levertijden. Model Y, Model 3 — wereldwijd.",
-    "findMyOrder": "Mijn bestelling zoeken"
+    "findMyOrder": "Mijn bestelling zoeken",
+    "claim": "<em>{days}</em> dagen van bestelling tot overdracht",
+    "claimSub": "Mediaan van {delivered} geleverde bestellingen. {waiting} wachten nog — de langste al {longest} dagen.",
+    "kicker": "Community-database · Model Y & Model 3",
+    "ordersLabel": "Bestellingen",
+    "deliveredLabel": "geleverd",
+    "withVin": "{count} met VIN, wacht",
+    "withoutVin": "{count} zonder VIN",
+    "stale": "{count} zonder update"
   },
   "tracking": {
     "backToOverview": "Terug naar overzicht",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Bestelling → Levering",
     "orderToPapers": "Bestelling → Documenten",
     "papersToDelivery": "Documenten → Levering",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Op basis van {count} leveringen uit de laatste {days} dagen",
+    "exceedsPessimisticHint": "Je huidige wachttijd ({days} dagen) overschrijdt al de pessimistische schatting. De voorspelling is gebaseerd op historische levertijden en is hier niet meer betrouwbaar — ga uit van de officiële leverperiode van Tesla.",
+    "staleHint": "Deze bestelling is al meer dan 60 dagen niet bijgewerkt. De gegevens hieronder zijn mogelijk niet actueel.",
+    "waitedLabel": "Gewacht",
+    "waitingLabel": "Wacht",
+    "daysUnit": "dagen",
+    "fasterThanComparable": "{days} dagen sneller dan vergelijkbare bestellingen (mediaan {median})",
+    "slowerThanComparable": "{days} dagen langzamer dan vergelijkbare bestellingen (mediaan {median})",
+    "matchesComparable": "Precies op de mediaan van vergelijkbare bestellingen ({median})",
+    "comparableTypically": "Vergelijkbare bestellingen duurden mediaan {median} dagen",
+    "today": "Vandaag"
   },
   "support": {
     "communityMessage": "Deze gegevens worden door de community voor de community onderhouden. Als deze site u helpt, kunt u de serverkosten ondersteunen.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Beheerdersdashboard",
     "navigationMenu": "Navigatiemenu",
     "impressum": "Juridische informatie",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "toggleTheme": "Thema wisselen",
+    "changeLanguage": "Taal wijzigen",
+    "skipToContent": "Naar de inhoud"
   },
   "footer": {
     "operatedBy": "Beheerd door Sven",
     "supportDevelopment": "Hosting en ontwikkeling ondersteunen",
-    "stats": "{orders} bestellingen · {delivered} geleverd"
+    "stats": "{orders} bestellingen · {delivered} geleverd",
+    "serverCostsProgress": "{raised} van {goal} € gedekt",
+    "serverCostsTitle": "Serverkosten {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Laatste updates",
+    "entries": "items",
+    "loading": "Laden…",
+    "loadMore": "Meer laden",
+    "empty": "Nog geen updates.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "week": "Deze week",
+      "older": "Ouder"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN toegewezen",
+      "production": "In productie",
+      "papers": "Papieren ontvangen",
+      "delivery": "Geleverd",
+      "window": "Leverperiode gewijzigd",
+      "created": "Nieuwe bestelling"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min geleden",
+      "hoursAgo": "{n} u geleden",
+      "yesterday": "gisteren",
+      "daysAgo": "{n} d geleden",
+      "weeksAgo": "{n} wk geleden"
     }
+  },
+  "errors": {
+    "rateLimited": "Te veel verzoeken. Probeer het later opnieuw.",
+    "orderNotFound": "Bestelling niet gevonden.",
+    "conflict": "Iemand anders heeft dit item intussen gewijzigd. Herlaad de pagina en probeer het opnieuw.",
+    "resetCodeInvalid": "Ongeldige of verlopen eenmalige code.",
+    "resetCodeRequired": "Eenmalige code vereist.",
+    "tostFieldsRestricted": "Deze bestelling wordt beheerd door TOST. Alleen besteldatum, papierdatum, productiedatum, typegoedkeuring en typevariant kunnen worden bewerkt.",
+    "adminRequired": "Beheerderstoegang vereist.",
+    "orderDateInFuture": "De besteldatum kan niet in de toekomst liggen.",
+    "datesOutOfOrder": "Deze data staan niet in een plausibele volgorde. Controleer de bestel-, productie-, papier- en leverdatum.",
+    "legacyPasswordRequired": "Voor bestaande items is een nieuw wachtwoord vereist.",
+    "backHome": "Naar de startpagina",
+    "pageErrorBody": "De pagina kon niet worden geladen. Opnieuw proberen helpt vaak.",
+    "pageErrorTitle": "Er is iets misgegaan",
+    "pageNotFoundBody": "Dit adres bestaat niet. De link is mogelijk verouderd of verkeerd getypt.",
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "retry": "Opnieuw proberen"
   }
 }

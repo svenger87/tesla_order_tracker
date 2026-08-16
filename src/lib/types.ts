@@ -100,6 +100,10 @@ export interface Settings {
   lastSyncCount: number | null
   archiveEnabled: boolean
   archiveThreshold: number
+  /** Server costs for the year, in euro. Null hides the transparency bar. */
+  yearlyGoal: number | null
+  /** Of those costs, how much donations have covered so far. */
+  yearlyRaised: number | null
 }
 
 export interface SyncResult {
@@ -141,6 +145,11 @@ export const COUNTRIES = [
   { value: 'uk', label: 'UK', flag: '🇬🇧' },
   { value: 'hu', label: 'Ungarn', flag: '🇭🇺' },
   { value: 'cy', label: 'Zypern', flag: '🇨🇾' },
+  // Orders exist from all three; without an entry here they showed as a
+  // bare lowercase code with no flag and could not be filtered by name.
+  { value: 'us', label: 'USA', flag: '🇺🇸' },
+  { value: 'ca', label: 'Kanada', flag: '🇨🇦' },
+  { value: 'tw', label: 'Taiwan', flag: '🇹🇼' },
 ]
 
 // Model Y trims

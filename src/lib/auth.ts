@@ -2,7 +2,30 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production'
+class MissingSecretError extends Error {}
+
+/**
+ * No fallback on purpose: a default secret in a public repository means anyone
+ * can mint a valid admin token against an instance that forgot to set this.
+ *
+ * Resolved per call rather than at module load, because the Docker image is
+ * built without runtime secrets — validating at import time would fail the
+ * build instead of the misconfigured deployment.
+ */
+function requireJwtSecret(): string {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new MissingSecretError(
+      'JWT_SECRET is not set. Generate one with `openssl rand -base64 32` and put it in the environment.'
+    )
+  }
+  if (secret.length < 32) {
+    throw new MissingSecretError(
+      `JWT_SECRET is too short (${secret.length} characters). Use at least 32.`
+    )
+  }
+  return secret
+}
 
 export interface JWTPayload {
   adminId: string
@@ -10,13 +33,16 @@ export interface JWTPayload {
 }
 
 export function signToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
+  return jwt.sign(payload, requireJwtSecret(), { expiresIn: '7d' })
 }
 
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload
-  } catch {
+    return jwt.verify(token, requireJwtSecret()) as JWTPayload
+  } catch (error) {
+    // An invalid or expired token is routine and means "not logged in".
+    // A missing secret is a deployment fault and must not hide behind that.
+    if (error instanceof MissingSecretError) throw error
     return null
   }
 }

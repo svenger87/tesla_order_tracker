@@ -4,6 +4,7 @@ import { withTostAuth } from '@/lib/tost-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { calculateTimePeriods, orderSelectFields } from '@/lib/tost-helpers'
 import { normalizeDateFields } from '@/lib/date-utils'
+import { normalizeCountryCode } from '@/lib/country-code'
 import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 import { recordOrderChanges } from '@/lib/order-history'
@@ -25,7 +26,8 @@ function buildOrderData(body: TostOrderBody) {
     name: asOptionalString(body.name)?.trim() ?? '',
     vehicleType: asOptionalString(body.vehicleType) ?? 'Model Y',
     orderDate: asOptionalString(body.orderDate),
-    country: asOptionalString(body.country),
+    // gb from the sync means the uk this app stores everywhere else.
+    country: normalizeCountryCode(asOptionalString(body.country)),
     model: asOptionalString(body.model),
     range: asOptionalString(body.range),
     drive: asOptionalString(body.drive),

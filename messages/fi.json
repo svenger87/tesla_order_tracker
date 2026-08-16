@@ -41,7 +41,12 @@
     "projectSupport": "Tue tätä projektia",
     "reset": "Nollaa",
     "ordersRefreshed": "{count} tilausta päivitetty",
-    "refreshError": "Virhe päivittäessä"
+    "refreshError": "Virhe päivittäessä",
+    "hide": "Piilota",
+    "show": "Näytä",
+    "only": "Vain",
+    "compact": "Tiivis",
+    "deleteError": "Poistaminen epäonnistui."
   },
   "home": {
     "title": "Tesla-tilaukset ja tilastot",
@@ -72,8 +77,8 @@
     "vehicleImage": "Ajoneuvon kuva",
     "delivered": "Toimitettu: {date}",
     "errorGeneratingCode": "Virhe koodin luomisessa",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "vanhentunut",
+    "staleHint": "Tätä tilausta ei ole päivitetty yli 60 päivään — tiedot voivat olla vanhentuneita.",
     "statsTitle": "Tilastot",
     "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit",
     "cancelledBadge": "Peruutettu",
@@ -85,7 +90,9 @@
     "title": "Hae tilauksia",
     "description": "Etsi tilaus kaikilta neljänneksiltä",
     "hint": "Navigoi nuolinäppäimillä, valitse Enterillä",
-    "openSearch": "Haku"
+    "openSearch": "Haku",
+    "results": "{count} tulosta",
+    "noResultsHint": "Kokeile nimeä, VIN-koodia, maata tai luovutuspaikkaa."
   },
   "form": {
     "personalData": "Henkilötiedot",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Napsauta \"Muokkaa\" ja syötä salasanasi muuttaaksesi tilaustietojasi.",
     "saveCodeWarning": "Tallenna tämä koodi muokataksesi tilaustasi myöhemmin.",
     "codeShownOnce": "Tämä koodi näytetään vain kerran!",
-    "codeUsageHint": "Käytä tätä koodia kohdassa \"Muokkaa tilausta\" tietojesi muuttamiseen."
+    "codeUsageHint": "Käytä tätä koodia kohdassa \"Muokkaa tilausta\" tietojesi muuttamiseen.",
+    "backToOverview": "Takaisin yleisnäkymään",
+    "viewMyOrder": "Näytä tilaukseni"
   },
   "editByCode": {
     "passwordPromptTitle": "Muokkaa tilausta",
@@ -230,11 +239,11 @@
     "typeVariant": "Tyyppivar.",
     "deliveryDate": "Toimituspäivä",
     "orderToVin": "T→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Tu",
+    "productionToPapers": "Tu→Pa",
     "papersToDelivery": "As→To",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Odotus",
     "updatedAt": "Päivitetty",
     "country": "Maa",
     "allVehicles": "Kaikki ajoneuvot",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Näitä kenttiä voi muokata manuaalisesti, myös TOST-hallinnoiduissa tilauksissa.",
     "papersReceivedDate": "Asiakirjat vastaanotettu",
     "saveError": "Virhe tallennettaessa",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Tuotantopäivä",
+    "staleFilter": "Vanhentunut",
+    "staleTooltip": "Vaihda suodatin: kaikki / piilota vanhentuneet / vain vanhentuneet (≥60 päivää ilman päivitystä avoimissa tilauksissa)",
     "cancelledFilter": "Peruutetut",
-    "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut"
+    "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut",
+    "incompleteBadge": "puutteellinen",
+    "incompleteHint": "Tästä tilauksesta puuttuu tilauspäivä, vaikka myöhempi päivä on kirjattu. Kaikki odotusajat mitataan tilauspäivästä — ilman sitä merkintää ei voi sijoittaa aikaan eikä se sisälly tilastoihin."
   },
   "progress": {
     "ordered": "Tilattu",
@@ -274,7 +285,8 @@
     "papers": "Asiakirjat",
     "production": "Tuotanto",
     "delivered": "Toimitettu",
-    "deliveryScheduled": "Toimitus sovittu"
+    "deliveryScheduled": "Toimitus sovittu",
+    "stepOfTotal": "Vaihe {current}/{total}"
   },
   "statistics": {
     "overview": "Yleiskatsaus",
@@ -365,8 +377,8 @@
     "timelinePapers": "Asiakirjat",
     "timelineDelivery": "Toimitus",
     "totalWaitTime": "Kokonaisodotusaika",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Tiedot (min / maks)",
+    "pipelineSegment": "Vaihe",
     "cancelledExcluded": "{count} peruutettu (ei laskettu mukaan)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Valitse ajoneuvo ja malli rajoitusten määrittämiseksi",
     "loadingOptions": "Ladataan vaihtoehtoja...",
     "loadingConstraints": "Ladataan rajoituksia...",
-    "selectValue": "Valitse arvo..."
+    "selectValue": "Valitse arvo...",
+    "archiveConfirmAction": "Arkistoi",
+    "archiveConfirmDescription": "Arkistoidut tilaukset katoavat julkisista tilastoista, mutta säilyvät tietokannassa. Peruminen onnistuu vain yksi tilaus kerrallaan.",
+    "archiveConfirmTitle": "Arkistoidaanko {count} tilausta?",
+    "yearlyGoal": "Palvelinkulut vuodessa (€)",
+    "yearlyGoalHint": "Jätä tyhjäksi, jos haluat piilottaa kulupalkin.",
+    "yearlyRaised": "Katettu tähän mennessä (€)",
+    "backups": "Varmuuskopiot",
+    "backupsDescription": "Tilaustietokannan tilannevedokset. Kutakin voi verrata nykyiseen dataan ja palauttaa siitä yksittäisiä merkintöjä.",
+    "createBackup": "Luo varmuuskopio",
+    "backupCreating": "Luodaan…",
+    "backupCreated": "Varmuuskopio luotu",
+    "backupFailed": "Varmuuskopiointi epäonnistui",
+    "backupListFailed": "Varmuuskopioita ei voitu ladata",
+    "backupDeleted": "Varmuuskopio poistettu",
+    "backupDeleteFailed": "Varmuuskopiota ei voitu poistaa",
+    "noBackups": "Ei vielä varmuuskopioita.",
+    "backupOrders": "{count} tilausta",
+    "backupKeepHint": "{count} uusinta varmuuskopiota säilytetään; vanhemmat poistetaan uutta luotaessa.",
+    "compareBackup": "Vertaa",
+    "backupComparing": "Verrataan…",
+    "noDifferences": "Ei eroja nykyiseen dataan.",
+    "diffAdded": "Lisätty tämän varmuuskopion jälkeen",
+    "diffRemoved": "Kadonneet sen jälkeen",
+    "diffChanged": "Muuttuneet",
+    "restoreHint": "Palautus palauttaa tilauksen tiedot. Omistajan salasana säilyy ennallaan — paitsi kokonaan puuttuva merkintä, joka luodaan kokonaan uudelleen.",
+    "restoreOrder": "Palauta",
+    "orderRestored": "{name} palautettu",
+    "restoreFailed": "Palautus epäonnistui",
+    "backupCompareFailed": "Vertailu epäonnistui",
+    "backupAllFields": "Kaikki kentät",
+    "backupSortName": "Nimen mukaan",
+    "backupSortChanges": "Eniten muutoksia",
+    "backupShowing": "{shown} / {total}",
+    "backupNoMatches": "Ei osumia näillä suodattimilla."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Perustuu {count} tilaukseen",
     "notEnoughData": "Ei riittävästi dataa ennustetta varten. Valitse ajoneuvotyyppi.",
     "lowDataHint": "Vähän datapisteitä — ennuste voi olla epätarkka. Lisää tilauksia parantaa tarkkuutta.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Perustuu {count} toimitukseen viimeisten {days} päivän ajalta",
+    "exceedsPessimisticHint": "Nykyinen odotusaikasi ({days} päivää) ylittää jo pessimistisen arvion (75 % vertailukelpoisista toimituksista). Nykyiset odotusajat ovat pidempiä kuin historiallinen jakauma — suhtaudu ennusteeseen varauksella."
   },
   "trend": {
     "title": "Toimitustrendi",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla-tilaukset ja tilastot",
     "subtitle": "Suurin yhteisötietokanta Teslan toimitusaikatauluille. Model Y, Model 3 — maailmanlaajuisesti.",
-    "findMyOrder": "Etsi tilaukseni"
+    "findMyOrder": "Etsi tilaukseni",
+    "claim": "<em>{days}</em> päivää tilauksesta luovutukseen",
+    "claimSub": "Mediaani {delivered} toimitetusta tilauksesta. {waiting} odottaa yhä — pisin {longest} päivää.",
+    "kicker": "Yhteisötietokanta · Model Y ja Model 3",
+    "ordersLabel": "Tilaukset",
+    "deliveredLabel": "toimitettu",
+    "withVin": "{count} VIN-koodilla, odottaa",
+    "withoutVin": "{count} ilman VIN-koodia",
+    "stale": "{count} ilman päivitystä"
   },
   "tracking": {
     "backToOverview": "Takaisin yleiskatsaukseen",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Tilaus → toimitus",
     "orderToPapers": "Tilaus → asiakirjat",
     "papersToDelivery": "Asiakirjat → toimitus",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Perustuu {count} toimitukseen viimeisten {days} päivän ajalta",
+    "exceedsPessimisticHint": "Nykyinen odotusaikasi ({days} päivää) ylittää jo pessimistisen arvion. Ennuste perustuu aiempiin toimitusaikoihin eikä ole tässä tilanteessa enää luotettava — luota Teslan viralliseen toimitusikkunaan.",
+    "staleHint": "Tätä tilausta ei ole päivitetty yli 60 päivään. Alla olevat tiedot eivät ehkä ole ajan tasalla.",
+    "waitedLabel": "Odotettu",
+    "waitingLabel": "Odottaa",
+    "daysUnit": "päivää",
+    "fasterThanComparable": "{days} päivää nopeammin kuin vastaavat tilaukset (mediaani {median})",
+    "slowerThanComparable": "{days} päivää hitaammin kuin vastaavat tilaukset (mediaani {median})",
+    "matchesComparable": "Täsmälleen vastaavien tilausten mediaani ({median})",
+    "comparableTypically": "Vastaavat tilaukset kestivät mediaanina {median} päivää",
+    "today": "Tänään"
   },
   "support": {
     "communityMessage": "Tätä dataa ylläpitää yhteisö yhteisölle. Jos tämä sivusto auttaa sinua, voit tukea palvelinkustannuksia.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Ylläpidon hallintapaneeli",
     "navigationMenu": "Navigointivalikko",
     "impressum": "Oikeudellinen ilmoitus",
-    "privacy": "Privacy"
+    "privacy": "Tietosuoja",
+    "toggleTheme": "Vaihda teemaa",
+    "changeLanguage": "Vaihda kieltä",
+    "skipToContent": "Siirry sisältöön"
   },
   "footer": {
     "operatedBy": "Ylläpitäjä Sven",
     "supportDevelopment": "Tue ylläpitoa ja kehitystä",
-    "stats": "{orders} tilausta · {delivered} toimitettu"
+    "stats": "{orders} tilausta · {delivered} toimitettu",
+    "serverCostsProgress": "{raised} / {goal} € katettu",
+    "serverCostsTitle": "Palvelinkulut {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Viimeisimmät päivitykset",
+    "entries": "merkintää",
+    "loading": "Ladataan…",
+    "loadMore": "Lataa lisää",
+    "empty": "Ei vielä päivityksiä.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Tänään",
+      "yesterday": "Eilen",
+      "week": "Tällä viikolla",
+      "older": "Vanhemmat"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN annettu",
+      "production": "Tuotannossa",
+      "papers": "Paperit saatu",
+      "delivery": "Toimitettu",
+      "window": "Toimitusikkuna muuttui",
+      "created": "Uusi tilaus"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n} min sitten",
+      "hoursAgo": "{n} t sitten",
+      "yesterday": "eilen",
+      "daysAgo": "{n} pv sitten",
+      "weeksAgo": "{n} vk sitten"
     }
+  },
+  "errors": {
+    "rateLimited": "Liian monta pyyntöä. Yritä myöhemmin uudelleen.",
+    "orderNotFound": "Tilausta ei löytynyt.",
+    "conflict": "Joku muu muutti tätä merkintää välillä. Lataa sivu uudelleen ja yritä uudestaan.",
+    "resetCodeInvalid": "Virheellinen tai vanhentunut kertakoodi.",
+    "resetCodeRequired": "Kertakoodi vaaditaan.",
+    "tostFieldsRestricted": "Tätä tilausta hallinnoi TOST. Vain tilauspäivä, papereiden päivä, tuotantopäivä, tyyppihyväksyntä ja tyyppivariantti ovat muokattavissa.",
+    "adminRequired": "Vaatii järjestelmänvalvojan oikeudet.",
+    "orderDateInFuture": "Tilauspäivä ei voi olla tulevaisuudessa.",
+    "datesOutOfOrder": "Päivämäärät eivät ole uskottavassa järjestyksessä. Tarkista tilaus-, tuotanto-, paperi- ja toimituspäivä.",
+    "legacyPasswordRequired": "Vanhoille merkinnöille vaaditaan uusi salasana.",
+    "backHome": "Etusivulle",
+    "pageErrorBody": "Sivua ei voitu ladata. Uusi yritys auttaa usein.",
+    "pageErrorTitle": "Jokin meni pieleen",
+    "pageNotFoundBody": "Tätä osoitetta ei ole. Linkki voi olla vanhentunut tai väärin kirjoitettu.",
+    "pageNotFoundTitle": "Sivua ei löytynyt",
+    "retry": "Yritä uudelleen"
   }
 }

@@ -295,6 +295,56 @@ export function TrackingPageClient({
           </Card>
         </motion.div>
 
+        {/* Duration stats (for delivered orders) */}
+        {durationFields.some(f => f.value != null) && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+          >
+            <Card>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {durationFields.filter(f => f.value != null).map((field) => (
+                    <div key={field.label} className="text-center">
+                      <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
+                      <p className="text-2xl font-bold font-mono">{field.value}</p>
+                      <p className="text-xs text-muted-foreground">{tc('days')}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Support card — post-value donation ask */}
+        {donationUrl && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <SupportCard donationUrl={donationUrl} paypalUrl={paypalUrl ?? undefined} />
+          </motion.div>
+        )}
+
+        {/* Similar orders */}
+        {similar.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <SimilarOrders orders={similar} currentOrderId={order.id} />
+          </motion.div>
+        )}
+
+        {/* After the recorded facts, before the configuration table. The forum
+           asked for hard facts in front and fewer forecasts, and a prediction
+           above the dates read as the headline of the page. Dead last was the
+           other mistake: moved to the very bottom it read as removed. Every
+           section above it is something that happened; this is not. */}
         {/* Delivery prediction (only for non-delivered orders) */}
         {prediction && !order.deliveryDate && (() => {
           const elapsed = prediction.daysElapsedFromReference
@@ -364,51 +414,6 @@ export function TrackingPageClient({
           )
         })()}
 
-        {/* Duration stats (for delivered orders) */}
-        {durationFields.some(f => f.value != null) && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.15 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {durationFields.filter(f => f.value != null).map((field) => (
-                    <div key={field.label} className="text-center">
-                      <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
-                      <p className="text-2xl font-bold font-mono">{field.value}</p>
-                      <p className="text-xs text-muted-foreground">{tc('days')}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Support card — post-value donation ask */}
-        {donationUrl && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <SupportCard donationUrl={donationUrl} paypalUrl={paypalUrl ?? undefined} />
-          </motion.div>
-        )}
-
-        {/* Similar orders */}
-        {similar.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <SimilarOrders orders={similar} currentOrderId={order.id} />
-          </motion.div>
-        )}
-
         {/* Order details grid */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -431,6 +436,8 @@ export function TrackingPageClient({
             </CardContent>
           </Card>
         </motion.div>
+
+
       </div>
 
       {order.source !== 'tost' && (

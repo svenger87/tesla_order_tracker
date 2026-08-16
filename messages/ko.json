@@ -41,7 +41,12 @@
     "projectSupport": "이 프로젝트를 지원해 주세요",
     "reset": "초기화",
     "ordersRefreshed": "{count}개 주문 새로고침 완료",
-    "refreshError": "새로고침 실패"
+    "refreshError": "새로고침 실패",
+    "hide": "숨기기",
+    "show": "표시",
+    "only": "만 표시",
+    "compact": "간략히",
+    "deleteError": "삭제에 실패했습니다."
   },
   "home": {
     "title": "Tesla 주문 및 통계",
@@ -72,8 +77,8 @@
     "vehicleImage": "차량 이미지",
     "delivered": "인도 완료: {date}",
     "errorGeneratingCode": "코드 생성 오류",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "오래됨",
+    "staleHint": "이 주문은 60일 넘게 업데이트되지 않았습니다 — 데이터가 오래되었을 수 있습니다.",
     "statsTitle": "통계",
     "statsSubtitle": "배송 시간, 구성 및 트렌드",
     "cancelledBadge": "취소됨",
@@ -85,7 +90,9 @@
     "title": "주문 검색",
     "description": "모든 분기에서 주문 찾기",
     "hint": "화살표 키로 이동, Enter로 선택",
-    "openSearch": "검색"
+    "openSearch": "검색",
+    "results": "{count}개 결과",
+    "noResultsHint": "이름, VIN, 국가 또는 인도 장소로 검색해 보세요."
   },
   "form": {
     "personalData": "개인 정보",
@@ -177,7 +184,9 @@
     "clickEditToChange": "\"편집\"을 클릭하고 비밀번호를 입력하여 주문 데이터를 변경하세요.",
     "saveCodeWarning": "나중에 주문을 편집하기 위해 이 코드를 저장하세요.",
     "codeShownOnce": "이 코드는 한 번만 표시됩니다!",
-    "codeUsageHint": "\"주문 편집\"에서 이 코드를 사용하여 데이터를 변경하세요."
+    "codeUsageHint": "\"주문 편집\"에서 이 코드를 사용하여 데이터를 변경하세요.",
+    "backToOverview": "목록으로 돌아가기",
+    "viewMyOrder": "내 주문 보기"
   },
   "editByCode": {
     "passwordPromptTitle": "주문 편집",
@@ -230,11 +239,11 @@
     "typeVariant": "형식 변형",
     "deliveryDate": "인도일",
     "orderToVin": "주→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→생산",
+    "productionToPapers": "생산→서류",
     "papersToDelivery": "서류→인",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "대기",
     "updatedAt": "업데이트",
     "country": "국가",
     "allVehicles": "모든 차량",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "TOST 관리 주문의 경우에도 이 필드는 수동으로 편집할 수 있습니다.",
     "papersReceivedDate": "서류 수신일",
     "saveError": "저장 오류",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "생산일",
+    "staleFilter": "오래됨",
+    "staleTooltip": "필터 전환: 전체 / 오래된 항목 숨기기 / 오래된 항목만 (미완료 주문이 60일 이상 미갱신)",
     "cancelledFilter": "취소됨",
-    "cancelledTooltip": "필터 전환: 취소된 주문 숨기기 / 표시 / 취소된 주문만"
+    "cancelledTooltip": "필터 전환: 취소된 주문 숨기기 / 표시 / 취소된 주문만",
+    "incompleteBadge": "정보 부족",
+    "incompleteHint": "이 주문에는 이후 날짜가 있는데도 주문일이 없습니다. 모든 대기 기간은 주문일부터 측정하므로, 이 항목은 시간상 위치를 알 수 없고 대기 통계에 포함되지 않습니다."
   },
   "progress": {
     "ordered": "주문 완료",
@@ -274,7 +285,8 @@
     "papers": "서류",
     "production": "생산",
     "delivered": "인도 완료",
-    "deliveryScheduled": "인도 예정"
+    "deliveryScheduled": "인도 예정",
+    "stepOfTotal": "{total}단계 중 {current}단계"
   },
   "statistics": {
     "overview": "개요",
@@ -365,8 +377,8 @@
     "timelinePapers": "서류",
     "timelineDelivery": "배송",
     "totalWaitTime": "총 대기 시간",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "상세 (최소 / 최대)",
+    "pipelineSegment": "구간",
     "cancelledExcluded": "{count}건 취소됨 (집계 제외)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "제약을 설정하려면 차량과 모델을 선택하세요",
     "loadingOptions": "옵션 로딩 중...",
     "loadingConstraints": "제약 로딩 중...",
-    "selectValue": "값 선택..."
+    "selectValue": "값 선택...",
+    "archiveConfirmAction": "보관",
+    "archiveConfirmDescription": "보관한 주문은 공개 통계에서 사라지지만 데이터베이스에는 남습니다. 되돌리는 것은 주문 하나씩만 가능합니다.",
+    "archiveConfirmTitle": "주문 {count}건을 보관할까요?",
+    "yearlyGoal": "연간 서버 비용 (€)",
+    "yearlyGoalHint": "비워 두면 비용 막대를 숨깁니다.",
+    "yearlyRaised": "현재까지 충당액 (€)",
+    "backups": "백업",
+    "backupsDescription": "주문 데이터베이스의 스냅샷입니다. 각 백업을 현재 데이터와 비교하고 개별 항목을 복원할 수 있습니다.",
+    "createBackup": "백업 만들기",
+    "backupCreating": "만드는 중…",
+    "backupCreated": "백업이 생성되었습니다",
+    "backupFailed": "백업에 실패했습니다",
+    "backupListFailed": "백업을 불러올 수 없습니다",
+    "backupDeleted": "백업이 삭제되었습니다",
+    "backupDeleteFailed": "백업을 삭제할 수 없습니다",
+    "noBackups": "아직 백업이 없습니다.",
+    "backupOrders": "주문 {count}건",
+    "backupKeepHint": "최신 {count}개를 유지하며, 새로 만들면 오래된 백업은 삭제됩니다.",
+    "compareBackup": "비교",
+    "backupComparing": "비교 중…",
+    "noDifferences": "현재 데이터와 차이가 없습니다.",
+    "diffAdded": "이 백업 이후 추가됨",
+    "diffRemoved": "그 이후 사라짐",
+    "diffChanged": "변경됨",
+    "restoreHint": "주문 데이터를 되돌립니다. 소유자의 비밀번호는 그대로 유지됩니다 — 완전히 사라진 항목만 통째로 다시 만들어집니다.",
+    "restoreOrder": "복원",
+    "orderRestored": "{name} 복원됨",
+    "restoreFailed": "복원에 실패했습니다",
+    "backupCompareFailed": "비교에 실패했습니다",
+    "backupAllFields": "모든 필드",
+    "backupSortName": "이름순",
+    "backupSortChanges": "변경 많은 순",
+    "backupShowing": "{total}개 중 {shown}개",
+    "backupNoMatches": "이 필터에 해당하는 항목이 없습니다."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "{count}건의 주문 기준",
     "notEnoughData": "예측에 충분한 데이터가 없습니다. 차량 유형을 선택하세요.",
     "lowDataHint": "데이터가 적어 예측이 부정확할 수 있습니다. 더 많은 주문이 정확도를 높입니다.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "최근 {days}일간 {count}건의 인도 기준",
+    "exceedsPessimisticHint": "현재 대기 기간({days}일)이 이미 비관적 추정치(비교 가능한 인도의 75%)를 넘었습니다. 현재 대기 기간은 과거 분포보다 길어 이 예측은 참고용으로만 보세요."
   },
   "trend": {
     "title": "인도 추세",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Tesla 주문 및 통계",
     "subtitle": "Tesla 인도 일정에 대한 최대 커뮤니티 데이터베이스. Model Y, Model 3 — 전 세계.",
-    "findMyOrder": "내 주문 찾기"
+    "findMyOrder": "내 주문 찾기",
+    "claim": "주문부터 인도까지 <em>{days}</em>일",
+    "claimSub": "인도 완료 {delivered}건의 중앙값. {waiting}건이 대기 중 — 최장 {longest}일.",
+    "kicker": "커뮤니티 데이터베이스 · Model Y & Model 3",
+    "ordersLabel": "주문",
+    "deliveredLabel": "인도 완료",
+    "withVin": "VIN 있음 {count}건 대기",
+    "withoutVin": "VIN 없음 {count}건",
+    "stale": "업데이트 없음 {count}건"
   },
   "tracking": {
     "backToOverview": "개요로 돌아가기",
@@ -754,9 +808,17 @@
     "orderToDelivery": "주문 → 인도",
     "orderToPapers": "주문 → 서류",
     "papersToDelivery": "서류 → 인도",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "최근 {days}일간 {count}건의 인도 기준",
+    "exceedsPessimisticHint": "현재 대기 기간({days}일)이 이미 비관적 추정치를 넘었습니다. 이 예측은 과거 인도 기간을 기반으로 하며 이런 상황에서는 신뢰할 수 없습니다 — Tesla 공식 인도 기간을 참고하세요.",
+    "staleHint": "이 주문은 60일 넘게 업데이트되지 않았습니다. 아래 데이터는 최신이 아닐 수 있습니다.",
+    "waitedLabel": "대기",
+    "waitingLabel": "대기 중",
+    "daysUnit": "일",
+    "fasterThanComparable": "비슷한 주문보다 {days}일 빠름 (중앙값 {median})",
+    "slowerThanComparable": "비슷한 주문보다 {days}일 느림 (중앙값 {median})",
+    "matchesComparable": "비슷한 주문의 중앙값과 동일 ({median})",
+    "comparableTypically": "비슷한 주문은 중앙값 {median}일이 걸렸습니다",
+    "today": "오늘"
   },
   "support": {
     "communityMessage": "이 데이터는 커뮤니티에 의해 커뮤니티를 위해 유지됩니다. 이 사이트가 도움이 되셨다면 서버 비용을 지원해 주실 수 있습니다.",
@@ -768,39 +830,62 @@
     "adminDashboard": "관리자 대시보드",
     "navigationMenu": "탐색 메뉴",
     "impressum": "법적 고지",
-    "privacy": "Privacy"
+    "privacy": "개인정보",
+    "toggleTheme": "테마 전환",
+    "changeLanguage": "언어 변경",
+    "skipToContent": "본문으로 건너뛰기"
   },
   "footer": {
     "operatedBy": "Sven이 운영합니다",
     "supportDevelopment": "호스팅 및 개발 지원",
-    "stats": "{orders}건 주문 · {delivered}건 인도 완료"
+    "stats": "{orders}건 주문 · {delivered}건 인도 완료",
+    "serverCostsProgress": "{goal} € 중 {raised} € 충당",
+    "serverCostsTitle": "{year}년 서버 비용"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "최근 업데이트",
+    "entries": "건",
+    "loading": "불러오는 중…",
+    "loadMore": "더 보기",
+    "empty": "아직 업데이트가 없습니다.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "오늘",
+      "yesterday": "어제",
+      "week": "이번 주",
+      "older": "이전"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN 배정",
+      "production": "생산 중",
+      "papers": "서류 수령",
+      "delivery": "인도 완료",
+      "window": "인도 기간 변경",
+      "created": "새 주문"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "{n}분 전",
+      "hoursAgo": "{n}시간 전",
+      "yesterday": "어제",
+      "daysAgo": "{n}일 전",
+      "weeksAgo": "{n}주 전"
     }
+  },
+  "errors": {
+    "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    "orderNotFound": "주문을 찾을 수 없습니다.",
+    "conflict": "그 사이 다른 사람이 이 항목을 변경했습니다. 페이지를 새로 고친 후 다시 시도해 주세요.",
+    "resetCodeInvalid": "일회용 코드가 유효하지 않거나 만료되었습니다.",
+    "resetCodeRequired": "일회용 코드가 필요합니다.",
+    "tostFieldsRestricted": "이 주문은 TOST에서 관리합니다. 주문일, 서류일, 생산일, 형식 승인, 형식 변형만 편집할 수 있습니다.",
+    "adminRequired": "관리자 권한이 필요합니다.",
+    "orderDateInFuture": "주문일은 미래일 수 없습니다.",
+    "datesOutOfOrder": "날짜 순서가 올바르지 않습니다. 주문일, 생산일, 서류일, 인도일을 확인해 주세요.",
+    "legacyPasswordRequired": "기존 항목에는 새 비밀번호가 필요합니다.",
+    "backHome": "시작 페이지로",
+    "pageErrorBody": "페이지를 불러오지 못했습니다. 다시 시도하면 해결되는 경우가 많습니다.",
+    "pageErrorTitle": "문제가 발생했습니다",
+    "pageNotFoundBody": "이 주소는 존재하지 않습니다. 링크가 오래되었거나 잘못 입력되었을 수 있습니다.",
+    "pageNotFoundTitle": "페이지를 찾을 수 없습니다",
+    "retry": "다시 시도"
   }
 }

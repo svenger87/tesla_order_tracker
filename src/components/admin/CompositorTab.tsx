@@ -328,7 +328,7 @@ export function CompositorTab() {
           </div>
 
           {seedMessage && (
-            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith(tc('error')) ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-600'}`}>
+            <div className={`px-4 py-2 rounded-md text-sm ${seedMessage.startsWith(tc('error')) ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}>
               {seedMessage}
             </div>
           )}
@@ -402,7 +402,7 @@ export function CompositorTab() {
                 </thead>
                 <tbody>
                   {filteredCodes.map((code) => (
-                    <tr key={`${code.category}_${code.vehicleType}_${code.lookupKey}`} className="border-b last:border-0 hover:bg-muted/30">
+                    <tr key={`${code.category}_${code.vehicleType}_${code.lookupKey}`} className="border-b last:border-0 hover:surface-subtle">
                       <td className="p-3">
                         <Badge variant="outline" className="text-xs">
                           {{ 'Model Y': 'MY', 'Model 3': 'M3', 'Model S': 'MS', 'Model X': 'MX', 'Cybertruck': 'CT', 'Roadster': 'R' }[code.vehicleType] || code.vehicleType}
@@ -417,9 +417,11 @@ export function CompositorTab() {
                         <div className="flex justify-end gap-1">
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(code)}>
                             <Pencil className="h-3.5 w-3.5" />
+                            <span className="sr-only">{tc('edit')}</span>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(code)}>
                             <Trash2 className="h-3.5 w-3.5" />
+                            <span className="sr-only">{tc('delete')}</span>
                           </Button>
                         </div>
                       </td>
@@ -453,7 +455,7 @@ export function CompositorTab() {
 
             {!editingCode && (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>{tc('configuration')}</Label>
                     <Select value={formData.category} onValueChange={(v) => setFormData(d => ({ ...d, category: v }))}>
@@ -544,7 +546,7 @@ export function CompositorTab() {
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label className="text-xs">{t('vehicleType')}</Label>
                 <Select value={previewVehicle} onValueChange={(v) => {
@@ -620,7 +622,7 @@ export function CompositorTab() {
               </div>
             </div>
 
-            <div className="flex justify-center p-4 bg-muted/30 rounded-lg">
+            <div className="flex justify-center p-4 surface-subtle rounded-lg">
               <TeslaCarImage
                 vehicleType={previewVehicle}
                 color={previewColor}

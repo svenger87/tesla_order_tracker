@@ -1,6 +1,6 @@
 'use client'
 
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useRouter, usePathname } from '@/i18n/navigation'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,7 @@ function saveLocalePreference(locale: string) {
 
 export function LanguageSwitcher() {
   const locale = useLocale()
+  const tn = useTranslations('nav')
   const router = useRouter()
   const pathname = usePathname()
   const current = LOCALE_CONFIG[locale as Locale] ?? LOCALE_CONFIG.de
@@ -48,7 +49,9 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label={current.label}>
+        {/* The label names the action, not the current value — a screen reader
+            announcing "German, button" says nothing about what the button does. */}
+        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label={`${tn('changeLanguage')} (${current.label})`}>
           <TwemojiEmoji emoji={current.flag} size={20} />
         </Button>
       </DropdownMenuTrigger>

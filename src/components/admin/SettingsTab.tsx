@@ -7,7 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink, Eye, EyeOff } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 
@@ -33,11 +40,14 @@ export function SettingsTab() {
   const [archiving, setArchiving] = useState(false)
   const [archiveMessage, setArchiveMessage] = useState('')
   const [archiveError, setArchiveError] = useState('')
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false)
 
   // API Key state
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false)
   const [apiKeyCopied, setApiKeyCopied] = useState(false)
+  const [apiKeyVisible, setApiKeyVisible] = useState(false)
+  const [endpoints, setEndpoints] = useState<{ method: string; path: string }[]>([])
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -74,6 +84,37 @@ export function SettingsTab() {
     }
   }, [])
 
+  /**
+   * The endpoints this key unlocks, taken from the OpenAPI document.
+   *
+   * Reading them here means the card cannot fall out of step with the API the
+   * way a hand-kept list did. A failure is not worth reporting: the list is
+   * supporting detail beside a link to the full documentation, so it simply
+   * does not render.
+   */
+  const fetchEndpoints = useCallback(async () => {
+    try {
+      const res = await fetch('/api/api-docs')
+      if (!res.ok) return
+      const spec = await res.json()
+      const base = '/api/v1'
+      const rows: { method: string; path: string }[] = []
+      for (const [path, ops] of Object.entries(spec.paths ?? {})) {
+        // The /tost/ routes are in the same document but behind a different
+        // secret (TOST_API_KEY, not EXTERNAL_API_KEY). Listing them under this
+        // key would promise access it does not grant.
+        if (path.startsWith('/tost/')) continue
+        for (const method of Object.keys(ops as object)) {
+          if (!['get', 'post', 'put', 'delete', 'patch'].includes(method)) continue
+          rows.push({ method: method.toUpperCase(), path: base + path })
+        }
+      }
+      setEndpoints(rows.sort((a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method)))
+    } catch {
+      // leaves the list empty, which hides it
+    }
+  }, [])
+
   useEffect(() => {
     fetchSettings().then((settingsData) => {
       if (settingsData) {
@@ -81,6 +122,7 @@ export function SettingsTab() {
       }
     }).finally(() => setLoading(false))
     fetchApiKey()
+    fetchEndpoints()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -110,6 +152,7 @@ export function SettingsTab() {
 
   const handleBatchArchive = async () => {
     if (!settings) return
+    setArchiveConfirmOpen(false)
     setArchiving(true)
     setArchiveMessage('')
     setArchiveError('')
@@ -193,7 +236,7 @@ export function SettingsTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             {message && (
-              <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+              <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                 {message}
               </div>
             )}
@@ -250,6 +293,39 @@ export function SettingsTab() {
               />
             </div>
 
+            {/* These two feed the cost bar in the footer. The columns existed in
+                the database for months with nothing reading or writing them, so
+                the bar could never be switched on. Empty means off. */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="yearlyGoal">{t('yearlyGoal')}</Label>
+                <Input
+                  id="yearlyGoal"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={settings?.yearlyGoal ?? ''}
+                  onChange={(e) =>
+                    setSettings((s) => s ? { ...s, yearlyGoal: e.target.value === '' ? null : Number(e.target.value) } : null)
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="yearlyRaised">{t('yearlyRaised')}</Label>
+                <Input
+                  id="yearlyRaised"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={settings?.yearlyRaised ?? ''}
+                  onChange={(e) =>
+                    setSettings((s) => s ? { ...s, yearlyRaised: e.target.value === '' ? null : Number(e.target.value) } : null)
+                  }
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{t('yearlyGoalHint')}</p>
+
             <Button onClick={handleSaveSettings} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
               {saving ? tc('saving') : tc('save')}
@@ -271,7 +347,7 @@ export function SettingsTab() {
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               {passwordMessage && (
-                <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+                <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                   {passwordMessage}
                 </div>
               )}
@@ -340,11 +416,24 @@ export function SettingsTab() {
                 <div className="space-y-2">
                   <Label>{t('apiKey')}</Label>
                   <div className="flex gap-2">
+                    {/* Hidden by default: the key was previously rendered in
+                        plaintext on a page that gets screenshotted and screen-
+                        shared. Copying still works without revealing it. */}
                     <Input
                       value={apiKey}
+                      type={apiKeyVisible ? 'text' : 'password'}
                       readOnly
                       className="font-mono text-sm"
                     />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setApiKeyVisible(v => !v)}
+                      title={apiKeyVisible ? tc('hide') : tc('show')}
+                      aria-label={apiKeyVisible ? tc('hide') : tc('show')}
+                    >
+                      {apiKeyVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
@@ -356,10 +445,11 @@ export function SettingsTab() {
                       title={tc('copy')}
                     >
                       {apiKeyCopied ? (
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-success" />
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
+                      <span className="sr-only">{tc('copy')}</span>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -368,24 +458,30 @@ export function SettingsTab() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Link href="/docs" target="_blank">
-                    <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/docs" target="_blank">
                       <ExternalLink className="h-4 w-4 mr-2" />
                       {t('apiDocs')}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
 
-                <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                  <p><strong>{t('apiEndpoints')}</strong></p>
-                  <ul className="list-disc list-inside ml-2 font-mono">
-                    <li>GET /api/v1/orders - Alle Bestellungen</li>
-                    <li>GET /api/v1/orders/by-name/:name - Nach Name</li>
-                    <li>POST /api/v1/orders - Neue Bestellung</li>
-                    <li>PUT /api/v1/orders/:id - Bestellung aktualisieren</li>
-                    <li>GET /api/v1/options - Dropdown-Optionen</li>
-                  </ul>
-                </div>
+                {endpoints.length > 0 && (
+                  <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                    <p><strong>{t('apiEndpoints')}</strong></p>
+                    {/* Read from the OpenAPI document the docs page already
+                        serves, rather than a copy kept by hand. The copy had
+                        drifted — it was missing GET /orders/:id — and carried
+                        German descriptions in an app that ships 23 languages.
+                        Method and path need no translation; what each one does
+                        is one click away in the docs linked above. */}
+                    <ul className="list-disc list-inside ml-2 font-mono">
+                      {endpoints.map(e => (
+                        <li key={`${e.method} ${e.path}`}>{e.method} {e.path}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-sm text-muted-foreground">
@@ -434,16 +530,20 @@ export function SettingsTab() {
 
           {settings?.archiveEnabled && (
             <>
-              <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md">
-                <AlertTriangle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 p-3 bg-data/10 border border-data/20 rounded-md">
+                <AlertTriangle className="h-5 w-5 text-data shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-700 dark:text-blue-400">
                   <p className="font-medium">Info</p>
-                  <p dangerouslySetInnerHTML={{ __html: t.raw('archiveInfo') as string }} />
+                  {/* Rendered as elements rather than injected as HTML: these
+                      strings come from Crowdin, so they are content from outside
+                      the codebase, and dangerouslySetInnerHTML would put whatever
+                      a translation contains straight into the DOM. */}
+                  <p>{t.rich('archiveInfo', { strong: (chunks) => <strong>{chunks}</strong> })}</p>
                 </div>
               </div>
 
               {archiveMessage && (
-                <div className="bg-green-500/10 text-green-600 px-4 py-2 rounded-md text-sm">
+                <div className="bg-success/10 text-success px-4 py-2 rounded-md text-sm">
                   {archiveMessage}
                 </div>
               )}
@@ -481,14 +581,23 @@ export function SettingsTab() {
                     {tc('save')}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('archiveThresholdDescription', { days: settings?.archiveThreshold ?? 180 }) }} />
+                {/* This one was visibly broken: the message carries a <strong>
+                    tag, which next-intl treats as rich text needing a handler,
+                    so plain t() failed and the paragraph showed the literal
+                    string "admin.archiveThresholdDescription" to the admin. */}
+                <p className="text-xs text-muted-foreground">
+                  {t.rich('archiveThresholdDescription', {
+                    days: settings?.archiveThreshold ?? 180,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
+                </p>
               </div>
 
               {archiveInfo && (
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-md">
+                <div className="grid grid-cols-2 gap-4 p-4 surface-subtle rounded-md">
                   <div>
                     <p className="text-sm text-muted-foreground">{t('inactiveOrders')}</p>
-                    <p className="text-2xl font-bold text-amber-600">{archiveInfo.staleCount}</p>
+                    <p className="text-2xl font-bold text-pending">{archiveInfo.staleCount}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t('alreadyArchived')}</p>
@@ -499,7 +608,11 @@ export function SettingsTab() {
 
               <div className="flex gap-2">
                 <Button
-                  onClick={handleBatchArchive}
+                  // Asks first: this archives every stale order in one go — other
+                  // people's entries — and there is no bulk way back, only one
+                  // order at a time. Deleting an order already asks; this is the
+                  // larger action of the two.
+                  onClick={() => setArchiveConfirmOpen(true)}
                   disabled={archiving || !archiveInfo || archiveInfo.staleCount === 0}
                   variant="default"
                 >
@@ -529,6 +642,26 @@ export function SettingsTab() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('archiveConfirmTitle', { count: archiveInfo?.staleCount ?? 0 })}
+            </DialogTitle>
+            <DialogDescription>{t('archiveConfirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setArchiveConfirmOpen(false)}>
+              {tc('cancel')}
+            </Button>
+            <Button onClick={handleBatchArchive}>
+              <Archive className="h-4 w-4 mr-2" />
+              {t('archiveConfirmAction')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

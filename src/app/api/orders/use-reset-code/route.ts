@@ -1,23 +1,36 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+
+// A 6-digit code is only 900k possibilities — without a limit it is guessable
+// in minutes, which would hand over the order it was issued for.
+const RESET_CODE_RULE = { limit: 5, windowMs: 15 * 60 * 1000 }
 
 // User endpoint to use a one-time reset code and set a new password
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(clientKey(request, 'use-reset-code'), RESET_CODE_RULE)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Zu viele Versuche. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+      )
+    }
+
     const { resetCode, newPassword } = await request.json()
 
     if (!resetCode) {
-      return NextResponse.json({ error: 'Einmalcode erforderlich' }, { status: 400 })
+      return NextResponse.json({ error: 'Einmalcode erforderlich', code: 'RESET_CODE_REQUIRED' }, { status: 400 })
     }
 
     if (!newPassword || newPassword.length < 6) {
-      return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein' }, { status: 400 })
+      return NextResponse.json({ error: 'Passwort muss mindestens 6 Zeichen lang sein', code: 'PASSWORD_TOO_SHORT' }, { status: 400 })
     }
 
     // Check if password contains at least one number
     if (!/\d/.test(newPassword)) {
-      return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten' }, { status: 400 })
+      return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' }, { status: 400 })
     }
 
     // Find order with this reset code
@@ -32,7 +45,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json({ error: 'Ungültiger oder abgelaufener Einmalcode' }, { status: 400 })
+      return NextResponse.json({ error: 'Ungültiger oder abgelaufener Einmalcode', code: 'RESET_CODE_INVALID' }, { status: 400 })
     }
 
     // Hash the new password
@@ -54,6 +67,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Use reset code failed:', error)
-    return NextResponse.json({ error: 'Passwort-Reset fehlgeschlagen' }, { status: 500 })
+    return NextResponse.json({ error: 'Passwort-Reset fehlgeschlagen', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }

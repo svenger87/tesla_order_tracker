@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
-import { Order, Settings } from '@/lib/types'
+import { Order } from '@/lib/types'
 import { filterOrdersByPeriod } from '@/lib/statistics'
 import { groupOrdersByQuarter } from '@/lib/groupOrders'
 import { useOptions } from '@/hooks/useOptions'
@@ -17,8 +17,6 @@ import { PasswordPromptModal } from '@/components/PasswordPromptModal'
 import { HeroSection } from '@/components/HeroSection'
 import { VeteransList } from '@/components/VeteransList'
 import { UpdatesFeed } from '@/components/UpdatesFeed'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/button'
 
 const StatisticsDashboard = dynamic(
@@ -50,7 +48,6 @@ export default function Home() {
   const tc = useTranslations('common')
   const tp = useTranslations('prediction')
   const [orders, setOrders] = useState<Order[]>([])
-  const [settings, setSettings] = useState<Settings | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -201,16 +198,6 @@ export default function Home() {
     }
   }, [tc])
 
-  const fetchSettings = useCallback(async () => {
-    try {
-      const res = await fetch('/api/settings')
-      const data = await res.json()
-      setSettings(data)
-    } catch (error) {
-      console.error('Failed to fetch settings:', error)
-    }
-  }, [])
-
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/check')
@@ -222,10 +209,10 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    Promise.all([fetchOrders(), fetchSettings(), checkAuth()]).finally(() => {
+    Promise.all([fetchOrders(), checkAuth()]).finally(() => {
       setLoading(false)
     })
-  }, [fetchOrders, fetchSettings, checkAuth])
+  }, [fetchOrders, checkAuth])
 
   // Initialize accordion with first group open once orders load
   useEffect(() => {
@@ -322,13 +309,11 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header
-        isAdmin={isAdmin}
-        settings={settings}
-      />
-
-      <main className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
+    <div>
+      {/* No Header or Footer here: SiteShell in the locale layout renders both,
+          along with the skip link, for every page. Rendering them again gave the
+          home page two of each. */}
+      <div className="w-full px-3 py-3 space-y-3 sm:px-4 sm:py-6 sm:space-y-5 lg:px-5 2xl:px-6">
         {/* Hero Section */}
         <HeroSection onSearchOpen={() => setShowSearch(true)} onNewOrder={() => setShowAddForm(true)} />
 
@@ -461,13 +446,7 @@ export default function Home() {
             vehicleType: globalFilters.vehicle ?? 'all',
           }}
         />
-      </main>
-
-      <Footer
-        settings={settings}
-        orderCount={orders.length}
-        deliveredCount={orders.filter(o => o.deliveryDate).length}
-      />
+      </div>
 
       {/* Delivery Prediction Dialog */}
       <Dialog open={showPrediction} onOpenChange={setShowPrediction}>

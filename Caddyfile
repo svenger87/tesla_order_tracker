@@ -1,31 +1,40 @@
+# Defined once so the two app vhosts cannot drift. Staging previously served
+# none of these, which meant it could not tell you whether a change was about to
+# violate the policy production enforces — the violation would only surface
+# after release.
+(app_security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-assets.tesla.com; frame-ancestors 'none'"
+	}
+}
+
 www.tff-order-stats.de {
-    redir https://tff-order-stats.de{uri} permanent
+	redir https://tff-order-stats.de{uri} permanent
 }
 
 tff-order-stats.de {
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=()"
-        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-assets.tesla.com; frame-ancestors 'none'"
-    }
-    handle /u/* {
-        uri strip_prefix /u
-        reverse_proxy umami:3000
-    }
-    reverse_proxy app:3000
+	import app_security_headers
+	handle /u/* {
+		uri strip_prefix /u
+		reverse_proxy umami:3000
+	}
+	reverse_proxy app:3000
 }
 
 staging.tff-order-stats.de {
-    reverse_proxy app-staging:3000
+	import app_security_headers
+	reverse_proxy app-staging:3000
 }
 
 status.tff-order-stats.de {
-    reverse_proxy uptime-kuma:3001
+	reverse_proxy uptime-kuma:3001
 }
 
 analytics.tff-order-stats.de {
-    reverse_proxy umami:3000
+	reverse_proxy umami:3000
 }

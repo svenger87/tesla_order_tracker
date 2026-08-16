@@ -7,7 +7,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), var(--font-noto-sc), var(--font-noto-jp), var(--font-noto-kr);
+  /* Geist covers Latin including the extended range; anything beyond it falls
+     to the reader's own system fonts. The three Noto CJK webfonts that used to
+     sit here declared 1047 @font-face rules between them — 770 KB of raw CSS —
+     and every one of those files had to come from Google at build time. They
+     served the Japanese, Korean and Chinese translations of the interface, and
+     every device set to those languages already has a font for them. Not one of
+     2308 real orders contains a CJK character. */
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Malgun Gothic", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -17,6 +24,7 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-chart-6: var(--chart-6);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -44,6 +52,7 @@
   --color-data-light: var(--color-data-light);
   --color-pending: var(--color-pending);
   --color-pending-light: var(--color-pending-light);
+  --color-kicker: var(--color-kicker);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -54,6 +63,10 @@
 }
 
 :root {
+  /* Without this, native controls — date pickers, selects, autofill backgrounds
+     — keep rendering light in dark mode, which is why the scrollbars below had
+     to be rebuilt by hand. */
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
@@ -68,19 +81,38 @@
   --secondary-foreground: oklch(0.35 0 0);
   --muted: oklch(0.96 0 0);
   --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.96 0.02 25);
-  --accent-foreground: oklch(0.55 0.22 25);
+  /* `accent` is the interactive surface — hovered menu items, the selected row
+     in a command palette, focused calendar days. It was the brand colour, so in
+     dark mode every hovered dropdown entry was a solid Tesla-red bar and here
+     every one of them printed red text. A neutral with a trace of the board's
+     warmth instead; the brand keeps `primary`. */
+  --accent: oklch(0.945 0.004 60);
+  --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.90 0 0);
   --input: oklch(0.90 0 0);
   --ring: oklch(0.55 0.22 25);
-  /* Chart colors - Tesla Red first */
-  --chart-1: oklch(0.55 0.22 25);
-  --chart-2: oklch(0.6 0.15 220);
-  --chart-3: oklch(0.65 0.12 160);
-  --chart-4: oklch(0.7 0.15 80);
-  --chart-5: oklch(0.6 0.18 280);
+  /**
+   * Categorical chart palette — six slots, assigned in this fixed order and
+   * never cycled. Anything beyond six folds into an "other" bucket.
+   *
+   * The order is deliberate: red and amber are not neighbours, and neither are
+   * amber and green, because red–green colour blindness collapses exactly those
+   * pairs. Validated for both themes against the lightness band, chroma floor,
+   * adjacent-pair separation under protan/deutan/tritan simulation, the
+   * normal-vision floor and 3:1 contrast against the surface.
+   *
+   * The previous values lived as four separate arrays inside chart components,
+   * had no dark variants, and put teal next to blue at ΔE 13.7 — below the
+   * threshold at which full-colour readers can tell two series apart.
+   */
+  --chart-1: #d40924; /* Tesla red — brand, always first */
+  --chart-2: #2f86c9;
+  --chart-3: #c28500;
+  --chart-4: #6f4fd8;
+  --chart-5: #1f7a3d;
+  --chart-6: #b03e8f;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.55 0.22 25);
@@ -102,12 +134,17 @@
   --color-data-light: oklch(0.92 0.05 245);
   --color-pending: oklch(0.65 0.15 75);
   --color-pending-light: oklch(0.92 0.06 75);
+  /* The small uppercase eyebrow that sits above a section heading. Brand red
+     here, where it measures well clear of the contrast threshold; the dark
+     theme needs it a touch lighter — see below. */
+  --color-kicker: oklch(0.55 0.22 25);
 
   /* Layout */
   --header-height: 56px;
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.12 0 0);
   --foreground: oklch(0.95 0 0);
   --card: oklch(0.16 0 0);
@@ -120,18 +157,21 @@
   --secondary-foreground: oklch(0.92 0 0);
   --muted: oklch(0.22 0 0);
   --muted-foreground: oklch(0.75 0 0); /* Improved contrast */
-  --accent: oklch(0.6 0.2 25);
-  --accent-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.27 0.005 60);
+  --accent-foreground: oklch(0.95 0 0);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.6 0.2 25);
-  --chart-1: oklch(0.6 0.2 25);
-  --chart-2: oklch(0.7 0.15 220);
-  --chart-3: oklch(0.72 0.12 160);
-  --chart-4: oklch(0.78 0.15 80);
-  --chart-5: oklch(0.65 0.18 280);
+  /* Own steps for the dark surface, validated separately — not a flip of the
+     light values, which would fail contrast and the lightness band here. */
+  --chart-1: #ef4d57;
+  --chart-2: #3f95d8;
+  --chart-3: #a67f1c;
+  --chart-4: #8570ea;
+  --chart-5: #3d9459;
+  --chart-6: #cf5fa8;
   --sidebar: oklch(0.16 0 0);
   --sidebar-foreground: oklch(0.95 0 0);
   --sidebar-primary: oklch(0.6 0.2 25);
@@ -153,6 +193,11 @@
   --color-data-light: oklch(0.25 0.05 245);
   --color-pending: oklch(0.72 0.15 75);
   --color-pending-light: oklch(0.25 0.06 75);
+  /* At --primary it measured 4.44:1 on the dark card — the only text anywhere
+     in either theme that came in under the threshold. Lifting lightness by 0.04
+     (chroma unchanged, so the hue is the same red) puts it at 5.25:1, with room
+     to spare rather than sitting on the line. */
+  --color-kicker: oklch(0.64 0.2 25);
 }
 
 @media (min-width: 640px) {
@@ -168,6 +213,66 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/**
+ * The board.
+ *
+ * A departures board is a dark panel in a lit room — not a dark room. So this
+ * is a component, not a theme: the page around it stays light, and the board
+ * stays the board in either theme. That is also what makes it read as an
+ * instrument rather than as "dark mode happened here".
+ *
+ * The off-black is warmed toward the amber rather than being neutral, so the
+ * two state colours sit in the surface instead of on top of it.
+ *
+ * Everything inside is scoped by redefining the design tokens, which means the
+ * badges, muted text and borders that were already there adapt on their own —
+ * no parallel set of board-specific components.
+ */
+.board {
+  --board-bg: #16140f;
+  --board-surface: #1d1a15;
+  --board-line: #302b23;
+
+  background: var(--board-bg);
+  color: #f2ede3;
+
+  --background: var(--board-bg);
+  --foreground: #f2ede3;
+  --card: var(--board-surface);
+  --card-foreground: #f2ede3;
+  --muted: #24211b;
+  --muted-foreground: #a89c8a;
+  --border: var(--board-line);
+  --input: var(--board-line);
+  --secondary: #262219;
+  --secondary-foreground: #e8e0d2;
+
+  /* States carry meaning here; red goes back to being only the brand. */
+  --color-success: #5fbf7f;
+  --color-pending: #e2a338;
+  --color-data: #7fb4d8;
+}
+
+/* In dark mode the page drops toward black, so the board lifts a little to
+   stay a distinct object rather than dissolving into the page. */
+.dark .board {
+  --board-bg: #1b1813;
+  --board-surface: #221e18;
+  --board-line: #363028;
+}
+
+/* Striping and hover are defined globally on bare `table` selectors further
+   down; inside the board they have to follow the board's own surface. */
+.board table tbody tr:nth-child(even),
+.dark .board table tbody tr:nth-child(even) {
+  background-color: color-mix(in oklab, var(--board-surface) 70%, transparent);
+}
+
+.board table tbody tr:hover,
+.dark .board table tbody tr:hover {
+  background-color: color-mix(in oklab, #e2a338 8%, transparent);
 }
 
 .sticky-tabs {
@@ -200,6 +305,22 @@
 :focus-visible {
   outline: 2px solid oklch(0.55 0.22 25 / 50%);
   outline-offset: 2px;
+}
+
+/**
+ * Draw the ring inside where there is no room outside it.
+ *
+ * The offset above puts the ring 2px beyond the element. An element sitting
+ * flush against a container with overflow:hidden therefore loses that part of
+ * it — the search field is the first child of a clipped dialog, so the top of
+ * its ring was sliced off. Same ring, drawn inward.
+ *
+ * This has to live here rather than as a utility class on the component:
+ * the rule above is unlayered, and unlayered styles beat anything Tailwind
+ * emits inside a layer no matter how specific the class is.
+ */
+[data-slot="command-input"]:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Tesla theme utilities */
@@ -350,14 +471,20 @@
   border-color: oklch(1 0 0 / 20%);
 }
 
-/* Dark mode filter bar */
-.dark .bg-muted\/30 {
-  background-color: oklch(0.18 0 0);
+/**
+ * A subtly tinted panel surface — filter bars, form sections, admin panels.
+ *
+ * These declarations used to be attached to the escaped Tailwind utility name
+ * instead, so every element in the project carrying that opacity utility
+ * silently picked them up — and a sibling rule on the card utility even added a
+ * border nobody had asked for. Same values, under a name of our own.
+ */
+.surface-subtle {
+  background-color: oklch(0.97 0.005 25 / 30%);
 }
 
-/* Dark mode card hover */
-.dark .hover\:bg-muted\/50:hover {
-  background-color: oklch(0.22 0.01 25 / 40%);
+.dark .surface-subtle {
+  background-color: oklch(0.18 0 0);
 }
 
 /* Light mode improvements */
@@ -384,17 +511,6 @@
   background: oklch(0.70 0 0);
 }
 
-/* Light mode filter bar */
-.bg-muted\/30 {
-  background-color: oklch(0.97 0.005 25 / 30%);
-}
-
-/* Light mode card subtle styling */
-.bg-card\/50 {
-  background-color: oklch(1 0 0 / 80%);
-  border: 1px solid oklch(0.92 0.01 25);
-}
-
 /* Cross-platform emoji support */
 .emoji,
 [class*="flag"] {
@@ -403,7 +519,7 @@
 
 /* Ensure consistent emoji rendering */
 body {
-  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Malgun Gothic", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /* Hide horizontal scrollbar while keeping scroll functionality */
@@ -451,4 +567,25 @@ body.bg-background {
 /* Table row transition */
 table tbody tr {
   transition: background-color 0.15s ease;
+}
+
+/**
+ * Honour "reduce motion" for real.
+ *
+ * The keyframes above were partly wrapped in a `prefers-reduced-motion:
+ * no-preference` block, which only worked because an undefined animation name
+ * resolves to nothing — and it was never applied to slide-in-up, fade-in or
+ * progress-shine, so those kept animating regardless. This states the intent
+ * directly instead of relying on that side effect. Framer Motion is handled
+ * separately via useReducedMotion().
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

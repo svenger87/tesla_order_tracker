@@ -1,6 +1,11 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import { checkRateLimit, clientKey } from '@/lib/rate-limit'
+
+// Password guessing against individual orders, and bulk probing of which orders
+// still have no password at all, both run through here.
+const VERIFY_RULE = { limit: 30, windowMs: 5 * 60 * 1000 }
 
 // Bcrypt-aware password comparison
 async function comparePassword(input: string, stored: string): Promise<boolean> {
@@ -12,6 +17,14 @@ async function comparePassword(input: string, stored: string): Promise<boolean> 
 
 export async function GET(request: NextRequest) {
   try {
+    const limit = checkRateLimit(clientKey(request, 'verify'), VERIFY_RULE)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Zu viele Versuche. Bitte später erneut versuchen.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const editCode = searchParams.get('editCode')
     const orderId = searchParams.get('orderId')
@@ -25,7 +38,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!order) {
-        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+        return NextResponse.json({ error: 'Bestellung nicht gefunden', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
       const hasPassword = !!(order.editCode && order.editCode !== '')
@@ -44,7 +57,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!order) {
-        return NextResponse.json({ error: 'Bestellung nicht gefunden' }, { status: 404 })
+        return NextResponse.json({ error: 'Bestellung nicht gefunden', code: 'ORDER_NOT_FOUND' }, { status: 404 })
       }
 
       // Legacy order (no editCode) — match by username
@@ -58,7 +71,7 @@ export async function GET(request: NextRequest) {
             message: 'Bestandseintrag gefunden. Bitte setze ein neues Passwort.',
           })
         }
-        return NextResponse.json({ error: 'Ungültiges Passwort oder Benutzername' }, { status: 401 })
+        return NextResponse.json({ error: 'Ungültiges Passwort oder Benutzername', code: 'INVALID_EDIT_CODE' }, { status: 401 })
       }
 
       // Compare password (bcrypt-aware)
@@ -67,7 +80,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ orderId: order.id, isLegacy: false })
       }
 
-      return NextResponse.json({ error: 'Ungültiges Passwort' }, { status: 401 })
+      return NextResponse.json({ error: 'Ungültiges Passwort', code: 'INVALID_EDIT_CODE' }, { status: 401 })
     }
 
     // Legacy flow (no orderId): search by editCode directly (plain-text match via DB unique index)
@@ -99,9 +112,9 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ error: 'Ungültiger Code oder Benutzername' }, { status: 404 })
+    return NextResponse.json({ error: 'Ungültiger Code oder Benutzername', code: 'INVALID_EDIT_CODE' }, { status: 404 })
   } catch (error) {
     console.error('Failed to verify edit code:', error)
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Verification failed', code: 'SERVER_ERROR' }, { status: 500 })
   }
 }

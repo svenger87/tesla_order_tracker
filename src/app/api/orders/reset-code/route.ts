@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const admin = await getAdminFromCookie()
     if (!admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 401 })
+      return NextResponse.json({ error: 'Admin access required', code: 'ADMIN_REQUIRED' }, { status: 401 })
     }
 
     const { orderId } = await request.json()

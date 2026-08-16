@@ -17,7 +17,14 @@ ARG UMAMI_WEBSITE_ID
 ENV UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID}
 ENV NEXT_PRIVATE_WORKER_THREADS=2
 RUN npx prisma generate
-RUN npm run build
+# Retried because the build reaches out to Google Fonts: next/font downloads the
+# five families at build time, and when that fetch fails the whole image fails
+# with a module-not-found for a font stylesheet. It has taken down three
+# otherwise good deploys. Nothing else here is flaky, so a plain second attempt
+# is the cheapest answer that does not mean self-hosting several megabytes of
+# CJK faces. A real failure still fails, just twice.
+RUN npm run build \
+    || (echo ">>> Build failed — retrying once (usually next/font fetching Google Fonts)" && sleep 5 && npm run build)
 RUN DATABASE_URL="file:/app/schema-template.db" npx prisma db push --accept-data-loss
 
 FROM node:22-alpine AS runner
@@ -33,6 +40,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modul
 COPY --from=builder --chown=nextjs:nodejs /app/src/generated ./src/generated
 COPY --from=builder --chown=nextjs:nodejs /app/schema-template.db ./schema-template.db
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate-schema.mjs ./scripts/migrate-schema.mjs
+# Run by the backup-cron service, and usable by hand on the host.
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/backup.mjs ./scripts/backup.mjs
 RUN mkdir -p /app/data /app/data/compositor-cache && chown -R nextjs:nodejs /app/data
 USER nextjs
 EXPOSE 3000

@@ -27,7 +27,7 @@ export function EditCodeModal({ open, onOpenChange }: EditCodeModalProps) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-500" />
+            <CheckCircle className="h-5 w-5 text-success" />
             {t('orderCreated')}
           </DialogTitle>
           <DialogDescription>

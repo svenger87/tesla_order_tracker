@@ -41,7 +41,12 @@
     "projectSupport": "Υποστηρίξτε αυτό το έργο",
     "reset": "Επαναφορά",
     "ordersRefreshed": "{count} παραγγελίες ανανεώθηκαν",
-    "refreshError": "Σφάλμα κατά την ανανέωση"
+    "refreshError": "Σφάλμα κατά την ανανέωση",
+    "hide": "Απόκρυψη",
+    "show": "Εμφάνιση",
+    "only": "Μόνο",
+    "compact": "Συμπαγής",
+    "deleteError": "Η διαγραφή απέτυχε."
   },
   "home": {
     "title": "Παραγγελίες και Στατιστικά Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Εικόνα οχήματος",
     "delivered": "Παραδόθηκε: {date}",
     "errorGeneratingCode": "Σφάλμα δημιουργίας κωδικού",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "παλιά",
+    "staleHint": "Αυτή η παραγγελία δεν έχει ενημερωθεί πάνω από 60 ημέρες — τα δεδομένα ίσως είναι παλιά.",
     "statsTitle": "Στατιστικά",
     "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις",
     "cancelledBadge": "Ακυρώθηκε",
@@ -85,7 +90,9 @@
     "title": "Αναζήτηση Παραγγελιών",
     "description": "Βρείτε μια παραγγελία σε όλα τα τρίμηνα",
     "hint": "Πλοηγηθείτε με τα βέλη, επιλέξτε με Enter",
-    "openSearch": "Αναζήτηση"
+    "openSearch": "Αναζήτηση",
+    "results": "{count} αποτελέσματα",
+    "noResultsHint": "Δοκιμάστε όνομα, VIN, χώρα ή τόπο παράδοσης."
   },
   "form": {
     "personalData": "Προσωπικά στοιχεία",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Κάντε κλικ στο \"Επεξεργασία\" και εισάγετε τον κωδικό σας για να αλλάξετε τα στοιχεία της παραγγελίας σας.",
     "saveCodeWarning": "Αποθηκεύστε αυτόν τον κωδικό για να επεξεργαστείτε την παραγγελία σας αργότερα.",
     "codeShownOnce": "Αυτός ο κωδικός εμφανίζεται μόνο μία φορά!",
-    "codeUsageHint": "Χρησιμοποιήστε αυτόν τον κωδικό στην \"Επεξεργασία παραγγελίας\" για να αλλάξετε τα στοιχεία σας."
+    "codeUsageHint": "Χρησιμοποιήστε αυτόν τον κωδικό στην \"Επεξεργασία παραγγελίας\" για να αλλάξετε τα στοιχεία σας.",
+    "backToOverview": "Επιστροφή στην επισκόπηση",
+    "viewMyOrder": "Δείτε την παραγγελία μου"
   },
   "editByCode": {
     "passwordPromptTitle": "Επεξεργασία παραγγελίας",
@@ -230,11 +239,11 @@
     "typeVariant": "Παρ. τύπου",
     "deliveryDate": "Ημ. παράδοσης",
     "orderToVin": "Π→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Πρ",
+    "productionToPapers": "Πρ→Ε",
     "papersToDelivery": "Έγγρ→Πρ",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Αναμονή",
     "updatedAt": "Ενημερώθηκε",
     "country": "Χώρα",
     "allVehicles": "Όλα τα οχήματα",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Αυτά τα πεδία μπορούν να επεξεργαστούν χειροκίνητα, ακόμα και για παραγγελίες που διαχειρίζεται το TOST.",
     "papersReceivedDate": "Έγγραφα λήφθηκαν στις",
     "saveError": "Σφάλμα αποθήκευσης",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Ημερομηνία παραγωγής",
+    "staleFilter": "Παλιά",
+    "staleTooltip": "Εναλλαγή φίλτρου: όλα / απόκρυψη παλιών / μόνο παλιά (≥60 ημέρες χωρίς ενημέρωση σε ανοιχτές παραγγελίες)",
     "cancelledFilter": "Ακυρωμένες",
-    "cancelledTooltip": "Εναλλαγή φίλτρου: απόκρυψη ακυρωμένων / εμφάνιση / μόνο ακυρωμένες"
+    "cancelledTooltip": "Εναλλαγή φίλτρου: απόκρυψη ακυρωμένων / εμφάνιση / μόνο ακυρωμένες",
+    "incompleteBadge": "ελλιπής",
+    "incompleteHint": "Σε αυτή την παραγγελία λείπει η ημερομηνία παραγγελίας, παρότι υπάρχει μεταγενέστερη ημερομηνία. Κάθε χρόνος αναμονής μετριέται από αυτήν — χωρίς την ημερομηνία η εγγραφή δεν μπορεί να τοποθετηθεί χρονικά και δεν προσμετράται."
   },
   "progress": {
     "ordered": "Παραγγέλθηκε",
@@ -274,7 +285,8 @@
     "papers": "Έγγραφα",
     "production": "Παραγωγή",
     "delivered": "Παραδόθηκε",
-    "deliveryScheduled": "Παράδοση προγραμματισμένη"
+    "deliveryScheduled": "Παράδοση προγραμματισμένη",
+    "stepOfTotal": "Βήμα {current} από {total}"
   },
   "statistics": {
     "overview": "Επισκόπηση",
@@ -365,8 +377,8 @@
     "timelinePapers": "Έγγραφα",
     "timelineDelivery": "Παράδοση",
     "totalWaitTime": "Συνολικός χρόνος αναμονής",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Λεπτομέρειες (ελάχ. / μέγ.)",
+    "pipelineSegment": "Τμήμα",
     "cancelledExcluded": "{count} ακυρωμένες (δεν μετρούν)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Επιλέξτε όχημα και μοντέλο για να διαμορφώσετε περιορισμούς",
     "loadingOptions": "Φόρτωση επιλογών...",
     "loadingConstraints": "Φόρτωση περιορισμών...",
-    "selectValue": "Επιλέξτε τιμή..."
+    "selectValue": "Επιλέξτε τιμή...",
+    "archiveConfirmAction": "Αρχειοθέτηση",
+    "archiveConfirmDescription": "Οι αρχειοθετημένες παραγγελίες εξαφανίζονται από τα δημόσια στατιστικά, αλλά παραμένουν στη βάση δεδομένων. Η αναίρεση γίνεται μόνο μία παραγγελία τη φορά.",
+    "archiveConfirmTitle": "Αρχειοθέτηση {count} παραγγελιών;",
+    "yearlyGoal": "Κόστος διακομιστή ανά έτος (€)",
+    "yearlyGoalHint": "Αφήστε το κενό για να κρύψετε τη μπάρα κόστους.",
+    "yearlyRaised": "Καλυμμένο μέχρι τώρα (€)",
+    "backups": "Αντίγραφα ασφαλείας",
+    "backupsDescription": "Στιγμιότυπα της βάσης παραγγελιών. Κάθε ένα μπορεί να συγκριθεί με τα τρέχοντα δεδομένα και να επαναφερθούν μεμονωμένες εγγραφές.",
+    "createBackup": "Δημιουργία αντιγράφου",
+    "backupCreating": "Δημιουργία…",
+    "backupCreated": "Το αντίγραφο δημιουργήθηκε",
+    "backupFailed": "Αποτυχία αντιγράφου",
+    "backupListFailed": "Αδυναμία φόρτωσης αντιγράφων",
+    "backupDeleted": "Το αντίγραφο διαγράφηκε",
+    "backupDeleteFailed": "Αδυναμία διαγραφής αντιγράφου",
+    "noBackups": "Δεν υπάρχουν αντίγραφα ακόμη.",
+    "backupOrders": "{count} παραγγελίες",
+    "backupKeepHint": "Διατηρούνται τα {count} πιο πρόσφατα αντίγραφα· τα παλαιότερα αφαιρούνται με τη δημιουργία νέου.",
+    "compareBackup": "Σύγκριση",
+    "backupComparing": "Σύγκριση…",
+    "noDifferences": "Καμία διαφορά από τα τρέχοντα δεδομένα.",
+    "diffAdded": "Προστέθηκαν μετά από αυτό το αντίγραφο",
+    "diffRemoved": "Χάθηκαν έκτοτε",
+    "diffChanged": "Άλλαξαν",
+    "restoreHint": "Επαναφέρονται τα δεδομένα της παραγγελίας. Ο κωδικός του κατόχου παραμένει ως έχει — εκτός από εγγραφή που λείπει εντελώς, η οποία δημιουργείται εξ ολοκλήρου.",
+    "restoreOrder": "Επαναφορά",
+    "orderRestored": "Η {name} επαναφέρθηκε",
+    "restoreFailed": "Η επαναφορά απέτυχε",
+    "backupCompareFailed": "Η σύγκριση απέτυχε",
+    "backupAllFields": "Όλα τα πεδία",
+    "backupSortName": "Κατά όνομα",
+    "backupSortChanges": "Περισσότερες αλλαγές",
+    "backupShowing": "{shown} από {total}",
+    "backupNoMatches": "Κανένα αποτέλεσμα με αυτά τα φίλτρα."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Βάσει {count} παραγγελιών",
     "notEnoughData": "Δεν υπάρχουν αρκετά δεδομένα για πρόβλεψη. Επιλέξτε τύπο οχήματος.",
     "lowDataHint": "Λίγα δεδομένα — η πρόβλεψη μπορεί να είναι ανακριβής. Περισσότερες παραγγελίες θα βελτιώσουν την ακρίβεια.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Βάσει {count} παραδόσεων των τελευταίων {days} ημερών",
+    "exceedsPessimisticHint": "Ο χρόνος αναμονής σας ({days} ημέρες) ξεπερνά ήδη τη δυσμενή εκτίμηση (75% των συγκρίσιμων παραδόσεων). Οι τρέχοντες χρόνοι είναι μεγαλύτεροι από την ιστορική κατανομή — αντιμετωπίστε την πρόβλεψη με επιφύλαξη."
   },
   "trend": {
     "title": "Τάση Παράδοσης",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Παραγγελίες και Στατιστικά Tesla",
     "subtitle": "Η μεγαλύτερη κοινοτική βάση δεδομένων για χρονοδιαγράμματα παράδοσης Tesla. Model Y, Model 3 — παγκοσμίως.",
-    "findMyOrder": "Βρείτε την παραγγελία μου"
+    "findMyOrder": "Βρείτε την παραγγελία μου",
+    "claim": "<em>{days}</em> ημέρες από την παραγγελία έως την παράδοση",
+    "claimSub": "Διάμεσος από {delivered} παραδομένες παραγγελίες. {waiting} περιμένουν ακόμη — η μεγαλύτερη {longest} ημέρες.",
+    "kicker": "Βάση δεδομένων κοινότητας · Model Y & Model 3",
+    "ordersLabel": "Παραγγελίες",
+    "deliveredLabel": "παραδόθηκαν",
+    "withVin": "{count} με VIN, αναμονή",
+    "withoutVin": "{count} χωρίς VIN",
+    "stale": "{count} χωρίς ενημέρωση"
   },
   "tracking": {
     "backToOverview": "Πίσω στην επισκόπηση",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Παραγγελία → Παράδοση",
     "orderToPapers": "Παραγγελία → Έγγραφα",
     "papersToDelivery": "Έγγραφα → Παράδοση",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Βάσει {count} παραδόσεων των τελευταίων {days} ημερών",
+    "exceedsPessimisticHint": "Ο χρόνος αναμονής σας ({days} ημέρες) ξεπερνά ήδη τη δυσμενή εκτίμηση. Η πρόβλεψη βασίζεται σε ιστορικούς χρόνους και δεν είναι πλέον αξιόπιστη εδώ — βασιστείτε στο επίσημο παράθυρο παράδοσης της Tesla.",
+    "staleHint": "Αυτή η παραγγελία δεν έχει ενημερωθεί πάνω από 60 ημέρες. Τα παρακάτω δεδομένα ίσως δεν ισχύουν.",
+    "waitedLabel": "Αναμονή",
+    "waitingLabel": "Περιμένει",
+    "daysUnit": "ημέρες",
+    "fasterThanComparable": "{days} ημέρες ταχύτερα από συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "slowerThanComparable": "{days} ημέρες πιο αργά από συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "matchesComparable": "Ακριβώς όπως συγκρίσιμες παραγγελίες (διάμεσος {median})",
+    "comparableTypically": "Συγκρίσιμες παραγγελίες χρειάστηκαν διάμεσο {median} ημερών",
+    "today": "Σήμερα"
   },
   "support": {
     "communityMessage": "Αυτά τα δεδομένα διατηρούνται από την κοινότητα για την κοινότητα. Εάν αυτός ο ιστότοπος σας βοηθά, μπορείτε να υποστηρίξετε τα έξοδα του διακομιστή.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Πίνακας Ελέγχου Διαχειριστή",
     "navigationMenu": "Μενού πλοήγησης",
     "impressum": "Νομικές Πληροφορίες",
-    "privacy": "Privacy"
+    "privacy": "Απόρρητο",
+    "toggleTheme": "Εναλλαγή θέματος",
+    "changeLanguage": "Αλλαγή γλώσσας",
+    "skipToContent": "Μετάβαση στο περιεχόμενο"
   },
   "footer": {
     "operatedBy": "Λειτουργεί από τον Sven",
     "supportDevelopment": "Υποστήριξη φιλοξενίας & ανάπτυξης",
-    "stats": "{orders} παραγγελίες · {delivered} παραδοθείσες"
+    "stats": "{orders} παραγγελίες · {delivered} παραδοθείσες",
+    "serverCostsProgress": "{raised} από {goal} € καλυμμένα",
+    "serverCostsTitle": "Κόστος διακομιστή {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Πρόσφατες ενημερώσεις",
+    "entries": "καταχωρίσεις",
+    "loading": "Φόρτωση…",
+    "loadMore": "Φόρτωση περισσότερων",
+    "empty": "Δεν υπάρχουν ενημερώσεις ακόμη.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Σήμερα",
+      "yesterday": "Χθες",
+      "week": "Αυτή την εβδομάδα",
+      "older": "Παλαιότερα"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "Εκχωρήθηκε VIN",
+      "production": "Σε παραγωγή",
+      "papers": "Παραλήφθηκαν έγγραφα",
+      "delivery": "Παραδόθηκε",
+      "window": "Άλλαξε το παράθυρο παράδοσης",
+      "created": "Νέα παραγγελία"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "πριν {n} λεπτά",
+      "hoursAgo": "πριν {n} ώρες",
+      "yesterday": "χθες",
+      "daysAgo": "πριν {n} ημέρες",
+      "weeksAgo": "πριν {n} εβδ."
     }
+  },
+  "errors": {
+    "rateLimited": "Πάρα πολλά αιτήματα. Δοκιμάστε ξανά αργότερα.",
+    "orderNotFound": "Η παραγγελία δεν βρέθηκε.",
+    "conflict": "Η καταχώριση άλλαξε στο μεταξύ από κάποιον άλλον. Ανανεώστε τη σελίδα και δοκιμάστε ξανά.",
+    "resetCodeInvalid": "Μη έγκυρος ή ληγμένος κωδικός μίας χρήσης.",
+    "resetCodeRequired": "Απαιτείται κωδικός μίας χρήσης.",
+    "tostFieldsRestricted": "Αυτή η παραγγελία διαχειρίζεται από το TOST. Μόνο η ημερομηνία παραγγελίας, η ημερομηνία εγγράφων, η ημερομηνία παραγωγής, η έγκριση τύπου και η παραλλαγή τύπου μπορούν να τροποποιηθούν.",
+    "adminRequired": "Απαιτείται πρόσβαση διαχειριστή.",
+    "orderDateInFuture": "Η ημερομηνία παραγγελίας δεν μπορεί να είναι στο μέλλον.",
+    "datesOutOfOrder": "Οι ημερομηνίες δεν έχουν εύλογη σειρά. Ελέγξτε τις ημερομηνίες παραγγελίας, παραγωγής, εγγράφων και παράδοσης.",
+    "legacyPasswordRequired": "Απαιτείται νέος κωδικός για παλαιότερες καταχωρίσεις.",
+    "backHome": "Στην αρχική σελίδα",
+    "pageErrorBody": "Η σελίδα δεν φορτώθηκε. Μια νέα προσπάθεια συχνά βοηθά.",
+    "pageErrorTitle": "Κάτι πήγε στραβά",
+    "pageNotFoundBody": "Αυτή η διεύθυνση δεν υπάρχει. Ο σύνδεσμος μπορεί να είναι παλιός ή λάθος γραμμένος.",
+    "pageNotFoundTitle": "Η σελίδα δεν βρέθηκε",
+    "retry": "Δοκιμάστε ξανά"
   }
 }

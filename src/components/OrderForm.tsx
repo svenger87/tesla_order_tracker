@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Order, OrderFormData, validateCustomPassword, VEHICLE_TYPES, VehicleType } from '@/lib/types'
+import { Order, OrderFormData, validateCustomPassword, VehicleType } from '@/lib/types'
 import { useOptions } from '@/hooks/useOptions'
 import { useConstraints, ConstraintsForModel } from '@/hooks/useConstraints'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -13,26 +13,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2, Ban } from 'lucide-react'
+import { CalendarIcon, KeyRound, User, Car, Palette, MapPin, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { TwemojiEmoji } from '@/components/TwemojiText'
+import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
@@ -47,8 +36,10 @@ import {
   AppearanceStep,
   DeliveryStep,
   TrackingStep,
+  CancellationStep,
   PasswordStep,
 } from '@/components/form-steps'
+import { useApiError } from '@/hooks/useApiError'
 
 type ValidationMessageKey = Parameters<ReturnType<typeof useTranslations<'form.validation'>>>[0]
 
@@ -158,6 +149,7 @@ const emptyFormData: OrderFormData = {
 export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuccess, mode = 'modal' }: OrderFormProps) {
   const t = useTranslations('form')
   const tv = useTranslations('form.validation')
+  const apiError = useApiError()
   const tc = useTranslations('common')
   const te = useTranslations('editCodeModal')
   const locale = useLocale()
@@ -436,7 +428,9 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       let requestBody
       if (order) {
         if (isLegacy) {
-          requestBody = { id: order.id, isLegacy: true, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
+          // editCode carries the name the user proved they knew in the verify
+          // step; the server re-checks it rather than trusting isLegacy alone.
+          requestBody = { id: order.id, isLegacy: true, editCode, newEditCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         } else {
           requestBody = { id: order.id, editCode, expectedUpdatedAt: order.updatedAt, ...orderData }
         }
@@ -456,7 +450,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || tv('saveError'))
+        throw new Error(apiError(data, tv('saveError')))
       }
 
       if (mode === 'page') {
@@ -625,13 +619,24 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
         icon: ClipboardList,
         label: t('statusTracking'),
         content: (
-          <TrackingStep
-            formData={formData}
-            handleChange={handleChange}
-            t={(key: string) => t(key)}
-            DatePickerField={DatePickerField}
-            dateLocale={dateLocale}
-          />
+          <div className="space-y-4">
+            <TrackingStep
+              formData={formData}
+              handleChange={handleChange}
+              t={(key: string) => t(key)}
+              DatePickerField={DatePickerField}
+              dateLocale={dateLocale}
+            />
+            {/* Reachable on a phone at last — this control existed only in the
+                desktop tree, so wizard users could not cancel their order. */}
+            {order && (
+              <CancellationStep
+                formData={formData}
+                handleChange={handleChange}
+                t={(key: string) => t(key)}
+              />
+            )}
+          </div>
         ),
       },
     ]
@@ -671,7 +676,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
       <Card>
         <CardContent className="flex flex-col items-center gap-6 py-10 px-6 text-center">
           <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-4">
-            <CheckCircle2 className="h-10 w-10 text-green-500" />
+            <CheckCircle2 className="h-10 w-10 text-success" />
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">{te('orderCreated')}</h2>
@@ -679,12 +684,14 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             <p className="text-sm text-muted-foreground">{te('clickEditToChange')}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href={`/${locale}`}>
-              <Button variant="outline">{locale === 'de' ? 'Zur Übersicht' : 'Back to overview'}</Button>
-            </Link>
-            <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
-              <Button>{locale === 'de' ? 'Meine Bestellung ansehen' : 'View my order'}</Button>
-            </Link>
+            <Button variant="outline" asChild>
+              <Link href={`/${locale}`}>{te('backToOverview')}</Link>
+            </Button>
+            <Button asChild>
+              <Link href={`/${locale}?search=${encodeURIComponent(submittedName)}`}>
+                {te('viewMyOrder')}
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -695,7 +702,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   if (mode === 'page') {
     const formHeader = (
       <CardHeader>
-        <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+        {/* h1, not CardTitle: in page mode this heading *is* the page's title,
+                and CardTitle renders a plain div — so /new and the edit page
+                had no heading at all for a screen reader to land on. Same
+                classes CardTitle applies, so nothing moves visually. */}
+            <h1 className="leading-none font-semibold" data-slot="card-title">
+              {order ? t('editOrder') : t('newOrder')}
+            </h1>
         <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
       </CardHeader>
     )
@@ -763,369 +776,90 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
           )}
 
           {/* Section 1: Persönliche Daten */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <User className="h-4 w-4 text-primary" />
               {t('personalData')}
-            </h4>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">{t('name')} *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
-                  placeholder={t('namePlaceholder')}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="orderDate">{t('orderDate')} *</Label>
-                <DatePickerField
-                  value={formData.orderDate}
-                  onChange={(v) => handleChange('orderDate', v)}
-                  placeholder={t('datePlaceholder')}
-                  locale={dateLocale}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="country">{t('country')} *</Label>
-                <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('countrySelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <span className="flex items-center gap-2">
-                          {c.flag && <TwemojiEmoji emoji={c.flag} size={16} />}
-                          {c.label}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <PersonalDataStep
+                formData={formData}
+                handleChange={handleChange}
+                countries={countries}
+                t={(key: string) => t(key)}
+                DatePickerField={DatePickerField}
+                dateLocale={dateLocale}
+                className="contents"
+              />
             </div>
           </div>
 
           {/* Section 2: Fahrzeugkonfiguration */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <Car className="h-4 w-4 text-primary" />
               {t('vehicleConfig')}
-            </h4>
+            </h2>
+            {/* Two steps, one grid. `contents` drops their own wrappers so the
+                ten fields stay a single flowing sequence — split into two grids
+                they would break into a ragged row after the drive select. */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicleType">{t('vehicle')} *</Label>
-                <Select
-                  value={formData.vehicleType}
-                  onValueChange={(v) => handleVehicleTypeChange(v as VehicleType)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('vehicleSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VEHICLE_TYPES.map((vt) => (
-                      <SelectItem key={vt.value} value={vt.value}>
-                        {vt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="model">{t('model')} *</Label>
-                <Select value={formData.model} onValueChange={handleModelChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('modelSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {models.map((m) => (
-                      <SelectItem key={m.value} value={m.value}>
-                        {m.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="range">{t('range')}</Label>
-                <Select
-                  value={formData.range}
-                  onValueChange={(v) => handleChange('range', v)}
-                  disabled={isFieldDisabled(selectedModelValue, 'range')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('rangeSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getFieldOptions('range', ranges).map((r) => (
-                      <SelectItem key={r.value} value={r.value}>
-                        {r.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.range?.type === 'fixed' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: ranges.find(r => r.value === formData.range)?.label ?? formData.range })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="drive">{t('drive')}</Label>
-                <Select
-                  value={formData.drive}
-                  onValueChange={(v) => handleChange('drive', v)}
-                  disabled={isFieldDisabled(selectedModelValue, 'drive')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('driveSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getFieldOptions('drive', drives).map((d) => (
-                      <SelectItem key={d.value} value={d.value}>
-                        {d.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.drive?.type === 'fixed' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: drives.find(d => d.value === formData.drive)?.label ?? formData.drive })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="color">{t('color')} *</Label>
-                <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('colorSelect')}>
-                      {formData.color && (
-                        <div className="flex items-center gap-2">
-                          {(() => {
-                            const colorOpt = colors.find(c => c.value === formData.color)
-                            return colorOpt?.hex ? (
-                              <span
-                                className={cn(
-                                  "w-4 h-4 rounded-full inline-block",
-                                  colorOpt.border && "border border-border"
-                                )}
-                                style={{ backgroundColor: colorOpt.hex }}
-                              />
-                            ) : null
-                          })()}
-                          {colors.find(c => c.value === formData.color)?.label || formData.color}
-                        </div>
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getFieldOptions('color', colors).map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <div className="flex items-center gap-2">
-                          {c.hex && (
-                            <span
-                              className={cn(
-                                "w-4 h-4 rounded-full inline-block",
-                                c.border && "border border-border"
-                              )}
-                              style={{ backgroundColor: c.hex }}
-                            />
-                          )}
-                          {c.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.color?.type === 'allow' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintColorRestricted', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="interior">{t('interior')} *</Label>
-                <Select
-                  value={formData.interior}
-                  onValueChange={(v) => handleChange('interior', v)}
-                  disabled={isFieldDisabled(selectedModelValue, 'interior')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('interiorSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getFieldOptions('interior', interiors).map((i) => (
-                      <SelectItem key={i.value} value={i.value}>
-                        {i.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.interior?.type === 'fixed' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: interiors.find(i => i.value === formData.interior)?.label ?? formData.interior })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="wheels">{t('wheels')} *</Label>
-                <Select
-                  value={formData.wheels}
-                  onValueChange={(v) => handleChange('wheels', v)}
-                  disabled={isFieldDisabled(selectedModelValue, 'wheels')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('wheelsSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getFieldOptions('wheels', wheels).map((w) => (
-                      <SelectItem key={w.value} value={w.value}>
-                        {w.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.wheels?.type === 'fixed' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: wheels.find(w => w.value === formData.wheels)?.label ?? formData.wheels })}
-                  </p>
-                )}
-                {modelConstraints.wheels?.type === 'allow' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintWheelsRestricted', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="towHitch">{t('towHitch')} *</Label>
-                <Select
-                  value={formData.towHitch}
-                  onValueChange={(v) => handleChange('towHitch', v)}
-                  disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('towHitchSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(modelConstraints.towHitch?.type === 'disable'
-                      ? [{ value: 'nein', label: 'Nein' }]
-                      : filterOptions(selectedModelValue, 'towHitch', towHitch)
-                    ).map((th) => (
-                      <SelectItem key={th.value} value={th.value}>
-                        {th.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {modelConstraints.towHitch?.type === 'disable' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintTowHitchUnavailable', { model: models.find(m => m.value === formData.model)?.label ?? formData.model })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="seats">{t('seats')} *</Label>
-                <Select
-                  value={formData.seats}
-                  onValueChange={(v) => handleChange('seats', v)}
-                  disabled={mergedConstraints.seats?.type === 'fixed'}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('seatsSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(() => {
-                      const seatsConstraint = mergedConstraints.seats
-                      if (seatsConstraint?.type === 'fixed' && seatsConstraint.fixedValue) {
-                        const opt = seats.find(s => s.value === seatsConstraint.fixedValue)
-                        return opt ? [opt] : [{ value: seatsConstraint.fixedValue, label: seatsConstraint.fixedValue }]
-                      }
-                      if (seatsConstraint?.type === 'allow' && seatsConstraint.allowedValues) {
-                        return seats.filter(s => seatsConstraint.allowedValues!.includes(s.value))
-                      }
-                      return seats
-                    })().map((s) => (
-                      <SelectItem key={s.value} value={s.value}>
-                        {s.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {mergedConstraints.seats?.type === 'fixed' && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('constraintFixed', { model: models.find(m => m.value === formData.model)?.label ?? formData.model, value: seats.find(s => s.value === formData.seats)?.label ?? formData.seats })}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="autopilot">{t('autopilot')} *</Label>
-                <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('autopilotSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {autopilot.map((a) => (
-                      <SelectItem key={a.value} value={a.value}>
-                        {a.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <VehicleStep
+                formData={formData}
+                handleChange={handleChange}
+                models={models}
+                ranges={ranges}
+                drives={drives}
+                selectedModelValue={selectedModelValue}
+                modelConstraints={modelConstraints}
+                isFieldDisabled={isFieldDisabled}
+                getFieldOptions={getFieldOptions}
+                onModelChange={handleModelChange}
+                onVehicleTypeChange={handleVehicleTypeChange}
+                t={(key: string, values?: Record<string, string>) => t(key, values)}
+                className="contents"
+              />
+              <AppearanceStep
+                formData={formData}
+                handleChange={handleChange}
+                colors={colors}
+                interiors={interiors}
+                wheels={wheels}
+                towHitch={towHitch}
+                seats={seats}
+                autopilot={autopilot}
+                models={models}
+                selectedModelValue={selectedModelValue}
+                modelConstraints={modelConstraints}
+                mergedConstraints={mergedConstraints}
+                isFieldDisabled={isFieldDisabled}
+                getFieldOptions={getFieldOptions}
+                filterOptions={filterOptions}
+                t={(key: string, values?: Record<string, string>) => t(key, values)}
+                className="contents"
+              />
             </div>
           </div>
 
           {/* Section 3: Lieferung */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
-            <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
               <MapPin className="h-4 w-4 text-primary" />
               {t('delivery')}
-            </h4>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="deliveryWindow">{t('deliveryWindow')}</Label>
-                <Input
-                  id="deliveryWindow"
-                  value={formData.deliveryWindow}
-                  onChange={(e) => handleChange('deliveryWindow', e.target.value)}
-                  placeholder={t('deliveryWindowPlaceholder')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="deliveryLocation">{t('deliveryLocation')} *</Label>
-                <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('deliveryLocationSelect')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {deliveryLocations.map((loc) => (
-                      <SelectItem key={loc.value} value={loc.value}>
-                        {loc.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <DeliveryStep
+                formData={formData}
+                handleChange={handleChange}
+                deliveryLocations={deliveryLocations}
+                t={(key: string) => t(key)}
+                className="contents"
+              />
             </div>
           </div>
 
           {/* Section 4: Status & Tracking (collapsible) */}
-          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div className="space-y-3 rounded-lg border surface-subtle p-4">
             <button
               type="button"
               onClick={() => setTrackingOpen(!trackingOpen)}
@@ -1139,184 +873,67 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             </button>
             {trackingOpen && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="vin">{t('vin')}</Label>
-                  <Input
-                    id="vin"
-                    value={formData.vin}
-                    onChange={(e) => handleChange('vin', e.target.value)}
-                    placeholder={t('vinPlaceholder')}
-                    className="font-mono"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="vinReceivedDate">{t('vinReceivedAt')}</Label>
-                  <DatePickerField
-                    value={formData.vinReceivedDate}
-                    onChange={(v) => handleChange('vinReceivedDate', v)}
-                    placeholder={t('datePlaceholder')}
-                    locale={dateLocale}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="papersReceivedDate">{t('papersReceivedAt')}</Label>
-                  <DatePickerField
-                    value={formData.papersReceivedDate}
-                    onChange={(v) => handleChange('papersReceivedDate', v)}
-                    placeholder={t('datePlaceholder')}
-                    locale={dateLocale}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="productionDate">{t('productionDate')}</Label>
-                  <DatePickerField
-                    value={formData.productionDate}
-                    onChange={(v) => handleChange('productionDate', v)}
-                    placeholder={t('datePlaceholder')}
-                    locale={dateLocale}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="typeApproval">{t('typeApproval')}</Label>
-                  <Input
-                    id="typeApproval"
-                    value={formData.typeApproval}
-                    onChange={(e) => handleChange('typeApproval', e.target.value)}
-                    placeholder={t('typeApprovalPlaceholder')}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="typeVariant">{t('typeVariant')}</Label>
-                  <Input
-                    id="typeVariant"
-                    value={formData.typeVariant}
-                    onChange={(e) => handleChange('typeVariant', e.target.value)}
-                    placeholder={t('typeVariantPlaceholder')}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="deliveryDate">{t('deliveryDate')}</Label>
-                  <DatePickerField
-                    value={formData.deliveryDate}
-                    onChange={(v) => handleChange('deliveryDate', v)}
-                    placeholder={t('datePlaceholder')}
-                    locale={dateLocale}
-                  />
-                </div>
+                <TrackingStep
+                  formData={formData}
+                  handleChange={handleChange}
+                  t={(key: string) => t(key)}
+                  DatePickerField={DatePickerField}
+                  dateLocale={dateLocale}
+                  className="contents"
+                />
               </div>
             )}
           </div>
 
           {/* Cancellation — edit mode only; a new order is never born cancelled */}
           {order && (
-            <div className={cn(
-              'mt-4 space-y-3 rounded-lg border p-4 transition-colors',
-              formData.cancelled ? 'border-destructive/40 bg-destructive/5' : 'bg-muted/30'
-            )}>
-              <h4 className="flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <Ban className={cn('h-4 w-4', formData.cancelled ? 'text-destructive' : 'text-muted-foreground')} />
-                {t('cancelledTitle')}
-              </h4>
-              <p className="text-sm text-muted-foreground">{t('cancelledDescription')}</p>
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  id="cancelled"
-                  checked={!!formData.cancelled}
-                  onCheckedChange={(v) => handleChange('cancelled', v === true)}
-                />
-                <Label htmlFor="cancelled" className="cursor-pointer text-sm font-medium">
-                  {t('cancelledLabel')}
-                </Label>
-              </div>
-              {formData.cancelled && (
-                <p className="text-xs text-muted-foreground">{t('cancelledHint')}</p>
-              )}
+            <div className="mt-4">
+              <CancellationStep
+                formData={formData}
+                handleChange={handleChange}
+                t={(key: string) => t(key)}
+              />
             </div>
           )}
 
           {/* New Password for Legacy Orders */}
           {order && isLegacy && (
             <div className="border-t pt-4 mt-4">
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-4 mb-4">
-                <h4 className="font-medium flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                  <KeyRound className="h-4 w-4" />
-                  {t('legacyPasswordTitle')}
-                </h4>
-                <p className="text-sm text-amber-600 dark:text-amber-300 mt-1">
-                  {t('legacyPasswordDescription')}
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newEditCode">{t('newPassword')} *</Label>
-                  <Input
-                    id="newEditCode"
-                    type="password"
-                    value={newEditCode}
-                    onChange={(e) => setNewEditCode(e.target.value)}
-                    placeholder={t('passwordPlaceholder')}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmNewEditCode">{t('confirmNewPassword')} *</Label>
-                  <Input
-                    id="confirmNewEditCode"
-                    type="password"
-                    value={confirmNewEditCode}
-                    onChange={(e) => setConfirmNewEditCode(e.target.value)}
-                    placeholder={t('confirmPasswordPlaceholder')}
-                    required
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {t('legacyPasswordHint')}
-                </p>
-              </div>
+              <PasswordStep
+                formData={formData}
+                handleChange={handleChange}
+                order={order}
+                isLegacy={isLegacy}
+                newEditCode={newEditCode}
+                setNewEditCode={setNewEditCode}
+                confirmNewEditCode={confirmNewEditCode}
+                setConfirmNewEditCode={setConfirmNewEditCode}
+                t={(key: string) => t(key)}
+              />
             </div>
           )}
 
           {/* Password - only for new orders */}
           {!order && (
-            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
-              <h4 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
+            <div className="space-y-3 rounded-lg border surface-subtle p-4">
+              <h2 className="flex items-center gap-2 text-sm font-semibold border-b pb-2">
                 <KeyRound className="h-4 w-4 text-primary" />
                 {t('password')}
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                {t('passwordDescription')}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="customPassword">{t('password')} *</Label>
-                  <Input
-                    id="customPassword"
-                    type="password"
-                    value={formData.customPassword}
-                    onChange={(e) => handleChange('customPassword', e.target.value)}
-                    placeholder={t('passwordPlaceholder')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">{t('confirmPassword')} *</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                    placeholder={t('confirmPasswordPlaceholder')}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t('passwordHint')}
-              </p>
+              </h2>
+              <PasswordStep
+                formData={formData}
+                handleChange={handleChange}
+                order={order}
+                isLegacy={isLegacy}
+                newEditCode={newEditCode}
+                setNewEditCode={setNewEditCode}
+                confirmNewEditCode={confirmNewEditCode}
+                setConfirmNewEditCode={setConfirmNewEditCode}
+                t={(key: string) => t(key)}
+                showHeading={false}
+                className="space-y-3"
+                fieldsClassName="grid grid-cols-1 md:grid-cols-2 gap-4"
+              />
             </div>
           )}
 
@@ -1327,11 +944,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               </Button>
             )}
             {mode === 'page' && (
-              <Link href={`/${locale}`}>
-                <Button type="button" variant="outline">
+              <Button type="button" variant="outline" asChild>
+                <Link href={`/${locale}`}>
                   {tc('cancel')}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
             <Button type="submit" disabled={loading}>
               {loading ? tc('saving') : order ? tc('update') : tc('add')}
@@ -1346,7 +963,13 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{order ? t('editOrder') : t('newOrder')}</CardTitle>
+          {/* h1, not CardTitle: in page mode this heading *is* the page's title,
+                and CardTitle renders a plain div — so /new and the edit page
+                had no heading at all for a screen reader to land on. Same
+                classes CardTitle applies, so nothing moves visually. */}
+            <h1 className="leading-none font-semibold" data-slot="card-title">
+              {order ? t('editOrder') : t('newOrder')}
+            </h1>
           <CardDescription>{order ? t('editOrderDescription') : t('newOrderDescription')}</CardDescription>
         </CardHeader>
         <CardContent>

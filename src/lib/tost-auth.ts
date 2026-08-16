@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ApiErrors } from './api-response'
+import { secretsMatch } from './api-auth'
 import { addTostLog } from './tost-debug-log'
 
 export function validateTostApiKey(request: NextRequest): { valid: boolean; error?: NextResponse } {
@@ -21,7 +22,7 @@ export function validateTostApiKey(request: NextRequest): { valid: boolean; erro
     }
   }
 
-  if (apiKey !== expectedKey) {
+  if (!secretsMatch(apiKey, expectedKey)) {
     return {
       valid: false,
       error: ApiErrors.invalidApiKey(),

@@ -41,7 +41,12 @@
     "projectSupport": "Apoyar este proyecto",
     "reset": "Restablecer",
     "ordersRefreshed": "{count} pedidos actualizados",
-    "refreshError": "Error al actualizar"
+    "refreshError": "Error al actualizar",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "only": "Solo",
+    "compact": "Compacto",
+    "deleteError": "Error al eliminar."
   },
   "home": {
     "title": "Pedidos y estadísticas de Tesla",
@@ -72,8 +77,8 @@
     "vehicleImage": "Imagen del vehículo",
     "delivered": "Entregado: {date}",
     "errorGeneratingCode": "Error al generar el código",
-    "staleBadge": "stale",
-    "staleHint": "This order has not been updated in over 60 days — the data may be outdated.",
+    "staleBadge": "desactualizado",
+    "staleHint": "Este pedido no se ha actualizado en más de 60 días: los datos pueden estar desactualizados.",
     "statsTitle": "Estadísticas",
     "statsSubtitle": "Plazos de entrega, configuraciones y tendencias",
     "cancelledBadge": "Cancelado",
@@ -85,7 +90,9 @@
     "title": "Buscar pedidos",
     "description": "Encontrar un pedido en todos los trimestres",
     "hint": "Navegue con las teclas de flecha, seleccione con Enter",
-    "openSearch": "Buscar"
+    "openSearch": "Buscar",
+    "results": "{count} resultados",
+    "noResultsHint": "Prueba con un nombre, VIN, país o punto de entrega."
   },
   "form": {
     "personalData": "Datos personales",
@@ -177,7 +184,9 @@
     "clickEditToChange": "Haga clic en \"Editar\" e introduzca su contraseña para modificar los datos de su pedido.",
     "saveCodeWarning": "Guarde este código para editar su pedido más adelante.",
     "codeShownOnce": "¡Este código solo se muestra una vez!",
-    "codeUsageHint": "Utilice este código en \"Editar pedido\" para cambiar sus datos."
+    "codeUsageHint": "Utilice este código en \"Editar pedido\" para cambiar sus datos.",
+    "backToOverview": "Volver al resumen",
+    "viewMyOrder": "Ver mi pedido"
   },
   "editByCode": {
     "passwordPromptTitle": "Editar pedido",
@@ -230,11 +239,11 @@
     "typeVariant": "Var. tipo",
     "deliveryDate": "Fecha de entrega",
     "orderToVin": "P→VIN",
-    "vinToProduction": "VIN→P",
-    "productionToPapers": "P→Doc",
+    "vinToProduction": "VIN→Pr",
+    "productionToPapers": "Pr→Doc",
     "papersToDelivery": "Doc→E",
     "orderToDelivery": "O→D",
-    "waitingDays": "Waiting",
+    "waitingDays": "Espera",
     "updatedAt": "Actualizado",
     "country": "País",
     "allVehicles": "Todos los vehículos",
@@ -262,11 +271,13 @@
     "editTostFieldsDescription": "Estos campos pueden editarse manualmente, incluso para pedidos gestionados por TOST.",
     "papersReceivedDate": "Documentos recibidos el",
     "saveError": "Error al guardar",
-    "productionDate": "Production date",
-    "staleFilter": "Stale",
-    "staleTooltip": "Toggle filter: all / hide stale / only stale (≥60 days without update on open orders)",
+    "productionDate": "Fecha de producción",
+    "staleFilter": "Desactualizado",
+    "staleTooltip": "Alternar filtro: todos / ocultar desactualizados / solo desactualizados (≥60 días sin actualizar en pedidos abiertos)",
     "cancelledFilter": "Cancelados",
-    "cancelledTooltip": "Cambiar filtro: ocultar cancelados / incluirlos / solo cancelados"
+    "cancelledTooltip": "Cambiar filtro: ocultar cancelados / incluirlos / solo cancelados",
+    "incompleteBadge": "incompleto",
+    "incompleteHint": "A este pedido le falta la fecha de pedido aunque hay una fecha posterior registrada. Todos los tiempos de espera se miden desde ella: sin la fecha, la entrada no puede situarse en el tiempo y no cuenta en ninguna estadística."
   },
   "progress": {
     "ordered": "Pedido realizado",
@@ -274,13 +285,14 @@
     "papers": "Documentos",
     "production": "Producción",
     "delivered": "Entregado",
-    "deliveryScheduled": "Entrega programada"
+    "deliveryScheduled": "Entrega programada",
+    "stepOfTotal": "Paso {current} de {total}"
   },
   "statistics": {
     "overview": "Resumen",
-    "overviewShort": "Stats",
+    "overviewShort": "Estad.",
     "configuration": "Configuración",
-    "configurationShort": "Config",
+    "configurationShort": "Config.",
     "equipment": "Equipamiento",
     "equipmentShort": "Extras",
     "geo": "Geo",
@@ -365,8 +377,8 @@
     "timelinePapers": "Documentos",
     "timelineDelivery": "Entrega",
     "totalWaitTime": "Tiempo de espera total",
-    "pipelineDetail": "Detail (Min / Max)",
-    "pipelineSegment": "Segment",
+    "pipelineDetail": "Detalle (mín. / máx.)",
+    "pipelineSegment": "Tramo",
     "cancelledExcluded": "{count} cancelados (no contabilizados)"
   },
   "admin": {
@@ -524,7 +536,41 @@
     "selectModelHint": "Seleccione un vehículo y modelo para configurar las restricciones",
     "loadingOptions": "Cargando opciones...",
     "loadingConstraints": "Cargando restricciones...",
-    "selectValue": "Seleccionar valor..."
+    "selectValue": "Seleccionar valor...",
+    "archiveConfirmAction": "Archivar",
+    "archiveConfirmDescription": "Los pedidos archivados desaparecen de las estadísticas públicas, pero permanecen en la base de datos. Deshacerlo solo es posible pedido a pedido.",
+    "archiveConfirmTitle": "¿Archivar {count} pedidos?",
+    "yearlyGoal": "Costes del servidor por año (€)",
+    "yearlyGoalHint": "Déjalo vacío para ocultar la barra de costes.",
+    "yearlyRaised": "Cubierto hasta ahora (€)",
+    "backups": "Copias de seguridad",
+    "backupsDescription": "Instantáneas de la base de datos de pedidos. Cada una puede compararse con los datos actuales y restaurar entradas individuales.",
+    "createBackup": "Crear copia",
+    "backupCreating": "Creando…",
+    "backupCreated": "Copia creada",
+    "backupFailed": "Error al crear la copia",
+    "backupListFailed": "No se pudieron cargar las copias",
+    "backupDeleted": "Copia eliminada",
+    "backupDeleteFailed": "No se pudo eliminar la copia",
+    "noBackups": "Todavía no hay copias.",
+    "backupOrders": "{count} pedidos",
+    "backupKeepHint": "Se conservan las {count} copias más recientes; las anteriores se eliminan al crear una nueva.",
+    "compareBackup": "Comparar",
+    "backupComparing": "Comparando…",
+    "noDifferences": "Sin diferencias respecto a los datos actuales.",
+    "diffAdded": "Añadidos desde esta copia",
+    "diffRemoved": "Desaparecidos desde entonces",
+    "diffChanged": "Modificados",
+    "restoreHint": "Se restauran los datos del pedido. La contraseña del propietario no cambia, salvo en una entrada que falte por completo, que se recrea entera.",
+    "restoreOrder": "Restaurar",
+    "orderRestored": "{name} restaurado",
+    "restoreFailed": "Error al restaurar",
+    "backupCompareFailed": "Error al comparar",
+    "backupAllFields": "Todos los campos",
+    "backupSortName": "Por nombre",
+    "backupSortChanges": "Más cambios",
+    "backupShowing": "{shown} de {total}",
+    "backupNoMatches": "Ningún resultado con estos filtros."
   },
   "options": {
     "country": {
@@ -662,8 +708,8 @@
     "basedOn": "Basado en {count} pedidos",
     "notEnoughData": "Datos insuficientes para la predicción. Seleccione un tipo de vehículo.",
     "lowDataHint": "Pocos datos — la predicción puede ser imprecisa. Más pedidos mejorarán la precisión.",
-    "basedOnRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate (75% of comparable deliveries). Current waiting times are longer than the historical distribution — treat this prediction with caution."
+    "basedOnRecent": "Basado en {count} entregas de los últimos {days} días",
+    "exceedsPessimisticHint": "Tu espera actual ({days} días) ya supera la estimación pesimista (75 % de las entregas comparables). Los tiempos de espera actuales son mayores que la distribución histórica: toma esta previsión con cautela."
   },
   "trend": {
     "title": "Tendencia de entrega",
@@ -701,7 +747,15 @@
   "hero": {
     "title": "Pedidos y estadísticas de Tesla",
     "subtitle": "La mayor base de datos comunitaria para plazos de entrega de Tesla. Model Y, Model 3 — en todo el mundo.",
-    "findMyOrder": "Buscar mi pedido"
+    "findMyOrder": "Buscar mi pedido",
+    "claim": "<em>{days}</em> días del pedido a la entrega",
+    "claimSub": "Mediana de {delivered} pedidos entregados. {waiting} siguen esperando — el más largo, {longest} días.",
+    "kicker": "Base de datos comunitaria · Model Y y Model 3",
+    "ordersLabel": "Pedidos",
+    "deliveredLabel": "entregados",
+    "withVin": "{count} con VIN, esperando",
+    "withoutVin": "{count} sin VIN",
+    "stale": "{count} sin actualizar"
   },
   "tracking": {
     "backToOverview": "Volver al resumen",
@@ -754,9 +808,17 @@
     "orderToDelivery": "Pedido → Entrega",
     "orderToPapers": "Pedido → Documentos",
     "papersToDelivery": "Documentos → Entrega",
-    "predictionSampleRecent": "Based on {count} deliveries from the last {days} days",
-    "exceedsPessimisticHint": "Your current waiting time ({days} days) already exceeds the pessimistic estimate. The prediction is based on historical delivery times and is no longer reliable in this situation — refer to the official Tesla delivery window.",
-    "staleHint": "This order has not been updated in over 60 days. The data below may no longer be current."
+    "predictionSampleRecent": "Basado en {count} entregas de los últimos {days} días",
+    "exceedsPessimisticHint": "Tu espera actual ({days} días) ya supera la estimación pesimista. La previsión se basa en tiempos históricos y deja de ser fiable en esta situación: guíate por la ventana de entrega oficial de Tesla.",
+    "staleHint": "Este pedido no se ha actualizado en más de 60 días. Los datos siguientes pueden no estar vigentes.",
+    "waitedLabel": "Esperado",
+    "waitingLabel": "Esperando",
+    "daysUnit": "días",
+    "fasterThanComparable": "{days} días más rápido que pedidos comparables (mediana {median})",
+    "slowerThanComparable": "{days} días más lento que pedidos comparables (mediana {median})",
+    "matchesComparable": "Justo en la mediana de pedidos comparables ({median})",
+    "comparableTypically": "Los pedidos comparables tardaron una mediana de {median} días",
+    "today": "Hoy"
   },
   "support": {
     "communityMessage": "Estos datos son mantenidos por la comunidad para la comunidad. Si este sitio le ayuda, puede apoyar los costes del servidor.",
@@ -768,39 +830,62 @@
     "adminDashboard": "Panel de administración",
     "navigationMenu": "Menú de navegación",
     "impressum": "Aviso legal",
-    "privacy": "Privacy"
+    "privacy": "Privacidad",
+    "toggleTheme": "Cambiar tema",
+    "changeLanguage": "Cambiar idioma",
+    "skipToContent": "Ir al contenido"
   },
   "footer": {
     "operatedBy": "Operado por Sven",
     "supportDevelopment": "Apoyar el alojamiento y desarrollo",
-    "stats": "{orders} pedidos · {delivered} entregados"
+    "stats": "{orders} pedidos · {delivered} entregados",
+    "serverCostsProgress": "{raised} de {goal} € cubiertos",
+    "serverCostsTitle": "Costes del servidor {year}"
   },
   "updatesFeed": {
-    "title": "Recent updates",
-    "entries": "entries",
-    "loading": "Loading…",
-    "loadMore": "Load more",
-    "empty": "No recent updates yet.",
+    "title": "Últimas actualizaciones",
+    "entries": "entradas",
+    "loading": "Cargando…",
+    "loadMore": "Cargar más",
+    "empty": "Aún no hay actualizaciones.",
     "bucket": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "week": "This week",
-      "older": "Older"
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "week": "Esta semana",
+      "older": "Anteriores"
     },
     "event": {
-      "vin": "VIN assigned",
-      "production": "In production",
-      "papers": "Papers received",
-      "delivery": "Delivered",
-      "window": "Delivery window changed",
-      "created": "New order"
+      "vin": "VIN asignado",
+      "production": "En producción",
+      "papers": "Documentos recibidos",
+      "delivery": "Entregado",
+      "window": "Ventana de entrega modificada",
+      "created": "Nuevo pedido"
     },
     "time": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "yesterday": "yesterday",
-      "daysAgo": "{n} d ago",
-      "weeksAgo": "{n} wk ago"
+      "minutesAgo": "hace {n} min",
+      "hoursAgo": "hace {n} h",
+      "yesterday": "ayer",
+      "daysAgo": "hace {n} d",
+      "weeksAgo": "hace {n} sem"
     }
+  },
+  "errors": {
+    "rateLimited": "Demasiadas solicitudes. Inténtalo de nuevo más tarde.",
+    "orderNotFound": "Pedido no encontrado.",
+    "conflict": "Otra persona modificó esta entrada mientras tanto. Recarga la página e inténtalo de nuevo.",
+    "resetCodeInvalid": "Código de un solo uso no válido o caducado.",
+    "resetCodeRequired": "Se requiere un código de un solo uso.",
+    "tostFieldsRestricted": "Este pedido lo gestiona TOST. Solo se pueden editar la fecha del pedido, la fecha de los documentos, la fecha de producción, la homologación y la variante de tipo.",
+    "adminRequired": "Se requiere acceso de administrador.",
+    "orderDateInFuture": "La fecha del pedido no puede estar en el futuro.",
+    "datesOutOfOrder": "Las fechas no siguen un orden plausible. Revisa las fechas de pedido, producción, documentos y entrega.",
+    "legacyPasswordRequired": "Se requiere una nueva contraseña para las entradas antiguas.",
+    "backHome": "Ir a la página de inicio",
+    "pageErrorBody": "No se pudo cargar la página. Volver a intentarlo suele funcionar.",
+    "pageErrorTitle": "Algo ha salido mal",
+    "pageNotFoundBody": "Esta dirección no existe. Puede que el enlace esté obsoleto o mal escrito.",
+    "pageNotFoundTitle": "Página no encontrada",
+    "retry": "Intentar de nuevo"
   }
 }

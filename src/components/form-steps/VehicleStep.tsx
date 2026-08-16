@@ -27,6 +27,8 @@ interface VehicleStepProps {
   onModelChange: (value: string) => void
   onVehicleTypeChange: (value: VehicleType) => void
   t: (key: string, values?: Record<string, string>) => string
+  /** See PersonalDataStep — `contents` lets the desktop grid own these fields. */
+  className?: string
 }
 
 export function VehicleStep({
@@ -42,9 +44,10 @@ export function VehicleStep({
   onModelChange,
   onVehicleTypeChange,
   t,
+  className = 'space-y-4',
 }: VehicleStepProps) {
   return (
-    <div className="space-y-4">
+    <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="vehicleType">{t('vehicle')} *</Label>
         <Select

@@ -8,9 +8,31 @@ const CACHE_DIR = process.env.NODE_ENV === 'production'
   : join(process.cwd(), '.compositor-cache')
 const MANIFEST_PATH = join(CACHE_DIR, 'manifest.json')
 
-function ensureCacheDir() {
-  if (!existsSync(CACHE_DIR)) {
-    mkdirSync(CACHE_DIR, { recursive: true })
+/**
+ * This endpoint is unauthenticated by design — the browser renders the car and
+ * posts the result back so the next visitor gets it from cache. The limits below
+ * exist because the cache shares a volume with the SQLite database: without them
+ * anyone could fill the disk and take the whole site down.
+ */
+const MAX_UPLOAD_BYTES = 2 * 1024 * 1024
+const MAX_CACHE_ENTRIES = 5_000
+
+/**
+ * Returns whether the cache is usable. The cache is an optimisation — if the
+ * directory cannot be created the car images should still render from Tesla's
+ * compositor, so a failure here degrades instead of turning every request into
+ * a 500. (Which is what happened outside Docker, where /app/data does not
+ * exist, and would happen in production the moment the volume went read-only.)
+ */
+function ensureCacheDir(): boolean {
+  try {
+    if (!existsSync(CACHE_DIR)) {
+      mkdirSync(CACHE_DIR, { recursive: true })
+    }
+    return true
+  } catch (e) {
+    console.error('[compositor-cache] cache directory unavailable:', e)
+    return false
   }
 }
 
@@ -46,8 +68,8 @@ export async function GET(request: NextRequest) {
 
   // Manifest mode: return all cached param keys
   if (searchParams.get('manifest') === 'true') {
-    ensureCacheDir()
-    const manifest = readManifest()
+    // An unusable cache is an empty cache, not an error.
+    const manifest = ensureCacheDir() ? readManifest() : {}
     return NextResponse.json(Object.keys(manifest), {
       headers: { 'Cache-Control': 'public, max-age=10' },
     })
@@ -66,8 +88,7 @@ export async function GET(request: NextRequest) {
   const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
-  ensureCacheDir()
-  if (existsSync(cachePath)) {
+  if (ensureCacheDir() && existsSync(cachePath)) {
     // Lazy-rebuild: ensure this entry is in the manifest (handles pre-manifest cached files)
     const manifest = readManifest()
     if (!manifest[paramKey]) {
@@ -103,10 +124,25 @@ export async function POST(request: NextRequest) {
   const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
-  ensureCacheDir()
+  if (!ensureCacheDir()) {
+    return NextResponse.json({ error: 'Cache unavailable' }, { status: 503 })
+  }
 
   if (existsSync(cachePath)) {
     return NextResponse.json({ cached: true, key: cacheKey })
+  }
+
+  // Reject oversized bodies before reading them into memory
+  const declaredLength = Number(request.headers.get('content-length') ?? 0)
+  if (declaredLength > MAX_UPLOAD_BYTES) {
+    return NextResponse.json({ error: 'Image too large' }, { status: 413 })
+  }
+
+  const manifest = readManifest()
+  if (Object.keys(manifest).length >= MAX_CACHE_ENTRIES) {
+    // Serving keeps working from what is already cached; only new writes stop.
+    console.warn('[compositor-cache] entry limit reached, refusing new uploads')
+    return NextResponse.json({ error: 'Cache full' }, { status: 507 })
   }
 
   try {
@@ -114,6 +150,9 @@ export async function POST(request: NextRequest) {
 
     if (buffer.length < 1024) {
       return NextResponse.json({ error: 'Image too small' }, { status: 400 })
+    }
+    if (buffer.length > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: 'Image too large' }, { status: 413 })
     }
     if (buffer[0] !== 0x89 || buffer[1] !== 0x50 || buffer[2] !== 0x4E || buffer[3] !== 0x47) {
       return NextResponse.json({ error: 'Not a valid PNG' }, { status: 400 })
