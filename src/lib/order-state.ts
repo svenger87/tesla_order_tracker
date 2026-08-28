@@ -72,3 +72,39 @@ export function isStaleOpen(
 
   return today.getTime() - touched.getTime() > thresholdDays * DAY
 }
+
+/**
+ * Days without a change after which a TOST order counts as no longer synced.
+ *
+ * Far shorter than {@link STALE_AFTER_DAYS}, because these two answer different
+ * questions. Staleness asks whether anybody is still tending an order; this asks
+ * whether the TOST sync is still delivering it at all, and a sync that has been
+ * quiet for two weeks has stopped.
+ */
+export const UNSYNCED_AFTER_DAYS = 14
+
+/**
+ * A TOST-managed order the sync appears to have dropped.
+ *
+ * There is no per-order "last synced" stamp, so this reads `updatedAt` — the
+ * closest signal the data has. That makes it a lower bound rather than an exact
+ * answer: an owner editing their own TOST order in the webapp also refreshes
+ * `updatedAt`, so such an order looks synced for the next two weeks. The filter
+ * therefore under-reports and never invents a gap that is not there.
+ *
+ * Orders TOST does not manage are never flagged — a hand-entered order sitting
+ * untouched is what the staleness filter is for, not this one.
+ */
+export function isUnsyncedTostOrder(
+  order: Pick<Order, 'source' | 'updatedAt'>,
+  today: Date = startOfToday(),
+  thresholdDays: number = UNSYNCED_AFTER_DAYS,
+): boolean {
+  if (order.source !== 'tost') return false
+  if (!order.updatedAt) return false
+
+  const synced = new Date(order.updatedAt)
+  if (Number.isNaN(synced.getTime())) return false
+
+  return today.getTime() - synced.getTime() > thresholdDays * DAY
+}

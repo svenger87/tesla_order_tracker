@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isHandedOver, isStaleOpen, startOfToday, STALE_AFTER_DAYS, countsTowardStats } from './order-state'
+import { isHandedOver, isStaleOpen, isUnsyncedTostOrder, startOfToday, STALE_AFTER_DAYS, UNSYNCED_AFTER_DAYS, countsTowardStats } from './order-state'
 
 const TODAY = new Date(2026, 7, 15) // 15.08.2026, local midnight
 const daysAgo = (n: number) => new Date(TODAY.getTime() - n * 86_400_000).toISOString()
@@ -66,6 +66,41 @@ describe('isStaleOpen', () => {
     expect(STALE_AFTER_DAYS).toBe(180)
     expect(isStaleOpen({ deliveryDate: null, updatedAt: daysAgo(179) }, TODAY)).toBe(false)
     expect(isStaleOpen({ deliveryDate: null, updatedAt: daysAgo(181) }, TODAY)).toBe(true)
+  })
+})
+
+describe('isUnsyncedTostOrder', () => {
+  it('flags a TOST order that has not moved for longer than the threshold', () => {
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(30) }, TODAY)).toBe(true)
+  })
+
+  it('leaves a TOST order alone while the sync is still bringing it in', () => {
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(3) }, TODAY)).toBe(false)
+  })
+
+  it('never flags an order TOST does not manage', () => {
+    // The filter answers "which TOST orders has the sync stopped touching",
+    // so a hand-entered order sitting untouched for a year is not an answer.
+    expect(isUnsyncedTostOrder({ source: null, updatedAt: daysAgo(365) }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'sheet', updatedAt: daysAgo(365) }, TODAY)).toBe(false)
+  })
+
+  it('keeps a TOST order whose last change is unknown or unreadable', () => {
+    // Missing metadata is not evidence the sync dropped it.
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: undefined }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: 'kaputt' }, TODAY)).toBe(false)
+  })
+
+  it('takes a caller-supplied threshold', () => {
+    const order = { source: 'tost', updatedAt: daysAgo(20) }
+    expect(isUnsyncedTostOrder(order, TODAY, 7)).toBe(true)
+    expect(isUnsyncedTostOrder(order, TODAY, 30)).toBe(false)
+  })
+
+  it('uses 14 days unless told otherwise', () => {
+    expect(UNSYNCED_AFTER_DAYS).toBe(14)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(13) }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(15) }, TODAY)).toBe(true)
   })
 })
 

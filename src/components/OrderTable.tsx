@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl'
 import { Order, COLORS, COUNTRIES, MODEL_Y_TRIMS, MODEL_3_TRIMS, VehicleType } from '@/lib/types'
 import { calculateDaysBetween, parseGermanDate } from '@/lib/date-utils'
 import { isStaleOrder } from '@/lib/statistics'
+import { isUnsyncedTostOrder } from '@/lib/order-state'
 import { isUnreliable } from '@/lib/order-completeness'
 import { compareNullable, compareDateStrings } from '@/lib/order-sort'
 import { parseDeliveryWindowStart } from '@/lib/delivery-window'
@@ -186,6 +187,8 @@ interface TableLocalFilters {
   hasDelivery: '' | 'yes' | 'no'
   staleness: '' | 'hide' | 'only'
   cancelled: '' | 'show' | 'only'
+  tost: '' | 'yes' | 'no'
+  unsynced: boolean
 }
 
 const emptyLocalFilters: TableLocalFilters = {
@@ -196,6 +199,8 @@ const emptyLocalFilters: TableLocalFilters = {
   // '' hides cancelled orders — the default, so a dead order stops cluttering
   // the list for everyone once its owner flags it.
   cancelled: '',
+  tost: '',
+  unsynced: false,
 }
 
 // Parse date string (DD.MM.YYYY format) to Date for sorting
@@ -622,6 +627,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
       result = result.filter(o => !o.deliveryDate)
     }
 
+    // Apply source filter (TOST-managed vs. entered here)
+    if (localFilters.tost === 'yes') {
+      result = result.filter(o => o.source === 'tost')
+    } else if (localFilters.tost === 'no') {
+      result = result.filter(o => o.source !== 'tost')
+    }
+
+    // Apply sync-gap filter (TOST orders the sync has not touched for 2 weeks)
+    if (localFilters.unsynced) {
+      result = result.filter(o => isUnsyncedTostOrder(o))
+    }
+
     // Apply staleness filter (>60 days without update on still-pending orders)
     if (localFilters.staleness === 'hide') {
       result = result.filter(o => !isStaleOrder(o))
@@ -846,6 +863,29 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           }))}
         >
           {t('cancelledFilter')} {localFilters.cancelled === 'show' ? '+' : localFilters.cancelled === 'only' ? '✓' : ''}
+        </Button>
+        {/* TOST pill: '' (all) → 'yes' (only TOST) → 'no' (only entered here) → '' */}
+        <Button
+          variant={localFilters.tost === 'yes' ? 'default' : localFilters.tost === 'no' ? 'secondary' : 'outline'}
+          size="sm"
+          className="h-9 text-xs sm:h-8"
+          title={t('tostTooltip')}
+          onClick={() => setLocalFilters(f => ({
+            ...f,
+            tost: f.tost === '' ? 'yes' : f.tost === 'yes' ? 'no' : ''
+          }))}
+        >
+          {t('tostFilter')} {localFilters.tost === 'yes' ? '\u2713' : localFilters.tost === 'no' ? '\u2717' : ''}
+        </Button>
+        {/* Sync-gap pill: off → only TOST orders the sync stopped touching */}
+        <Button
+          variant={localFilters.unsynced ? 'default' : 'outline'}
+          size="sm"
+          className="h-9 text-xs sm:h-8"
+          title={t('unsyncedTooltip')}
+          onClick={() => setLocalFilters(f => ({ ...f, unsynced: !f.unsynced }))}
+        >
+          {t('unsyncedFilter')} {localFilters.unsynced ? '\u2713' : ''}
         </Button>
         {/* Column visibility only applies to the desktop table */}
         <Popover>

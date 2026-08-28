@@ -276,6 +276,10 @@
     "saveError": "Fehler beim Speichern",
     "cancelledFilter": "Storniert",
     "cancelledTooltip": "Filter umschalten: storniert ausblenden / mitanzeigen / nur stornierte",
+    "tostFilter": "TOST",
+    "tostTooltip": "Filter umschalten: alle / nur TOST-Bestellungen / nur hier eingetragene",
+    "unsyncedFilter": "Nicht gesynct",
+    "unsyncedTooltip": "Nur TOST-Bestellungen, die seit über 14 Tagen keine Änderung mehr hatten. Bearbeitet der Besitzer die Bestellung hier in der Webapp, gilt sie ebenfalls als aktuell.",
     "incompleteBadge": "unvollständig",
     "incompleteHint": "Bei dieser Bestellung fehlt das Bestelldatum, obwohl ein späteres Datum eingetragen ist. Alle Wartezeiten werden ab dem Bestelldatum gemessen — ohne es lässt sich dieser Eintrag zeitlich nicht einordnen und fließt in keine Wartezeit-Statistik ein."
   },
