@@ -102,6 +102,34 @@ jobs:
 
             # Log in and pull the new image (NEVER build on VPS)
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            # Every deploy pulls a new image and leaves the one it replaced
+            # behind untagged. Nothing ever removed those, so 88 images had
+            # grown to 33GB on a 38GB disk and filled it. What that cost was not
+            # a failed pull: with no space left SQLite could not create the
+            # shared-memory file for WAL, so the app died at boot on
+            # `PRAGMA journal_mode = WAL` — and the rollback image died of the
+            # same thing, which is how a failed deploy became an outage.
+            #
+            # Dangling images only. Anything a container still references is
+            # left alone, including the image running right now, which is the
+            # rollback target a few lines below.
+            echo ">>> Disk before cleanup: $(df -h / | awk 'NR==2 {print $4" free, "$5" used"}')"
+            docker image prune -f
+            echo ">>> Disk after cleanup:  $(df -h / | awk 'NR==2 {print $4" free, "$5" used"}')"
+
+            # Stop while the site is still up rather than half-way through.
+            # A deploy that runs out of disk does not fail cleanly — it takes
+            # the running container with it — so the last safe moment to give up
+            # is before anything gets recreated. One image is ~550MB.
+            AVAIL_MB=$(df -Pm / | awk 'NR==2 {print $4}')
+            if [ "$AVAIL_MB" -lt 3000 ]; then
+              echo ">>> Only ${AVAIL_MB}MB free after cleanup — refusing to deploy."
+              echo ">>> Nothing has been touched; $SERVICE is still serving. Free space on the host."
+              docker logout ghcr.io 2>/dev/null || true
+              exit 1
+            fi
+
             docker compose pull $SERVICE
 
             # Save current image ID for rollback
