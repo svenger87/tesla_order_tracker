@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Alternar filtro: todas / apenas encomendas TOST / apenas introduzidas aqui",
     "unsyncedFilter": "Não sincronizado",
-    "unsyncedTooltip": "Apenas encomendas TOST sem alterações há mais de 14 dias. Se o proprietário editar a encomenda aqui na webapp, também conta como atualizada.",
+    "unsyncedTooltip": "Apenas encomendas TOST em curso sem alterações há mais de 14 dias; as entregues ficam de fora. Se o proprietário editar a encomenda aqui na webapp, também conta como atualizada.",
     "incompleteBadge": "incompleto",
     "incompleteHint": "A esta encomenda falta a data de encomenda embora exista uma data posterior. Todos os tempos de espera são medidos a partir dela — sem a data, a entrada não pode ser situada no tempo e não conta em nenhuma estatística."
   },

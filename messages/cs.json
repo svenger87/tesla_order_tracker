@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Přepnout filtr: vše / jen objednávky z TOST / jen zadané zde",
     "unsyncedFilter": "Nesynchronizováno",
-    "unsyncedTooltip": "Pouze objednávky z TOST bez změny déle než 14 dní. Pokud majitel objednávku upraví zde ve webové aplikaci, počítá se také jako aktuální.",
+    "unsyncedTooltip": "Pouze otevřené objednávky z TOST bez změny déle než 14 dní; doručené se nezapočítávají. Pokud majitel objednávku upraví zde ve webové aplikaci, počítá se také jako aktuální.",
     "incompleteBadge": "neúplné",
     "incompleteHint": "U této objednávky chybí datum objednání, ačkoli je vyplněno pozdější datum. Všechny čekací doby se měří od data objednání — bez něj záznam nelze zařadit v čase a nevstupuje do žádné statistiky."
   },

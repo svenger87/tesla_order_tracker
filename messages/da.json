@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Skift filter: alle / kun TOST-ordrer / kun oprettet her",
     "unsyncedFilter": "Ikke synkroniseret",
-    "unsyncedTooltip": "Kun TOST-ordrer uden ændringer i mere end 14 dage. Hvis ejeren redigerer ordren her i webappen, tæller den også som opdateret.",
+    "unsyncedTooltip": "Kun åbne TOST-ordrer uden ændringer i mere end 14 dage; leverede tælles ikke med. Hvis ejeren redigerer ordren her i webappen, tæller den også som opdateret.",
     "incompleteBadge": "ufuldstændig",
     "incompleteHint": "Denne ordre mangler bestillingsdatoen, selvom en senere dato er angivet. Al ventetid måles fra bestillingsdatoen — uden den kan posten ikke placeres i tid og indgår ikke i nogen ventetidsstatistik."
   },

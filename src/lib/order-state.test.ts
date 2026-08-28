@@ -71,36 +71,50 @@ describe('isStaleOpen', () => {
 
 describe('isUnsyncedTostOrder', () => {
   it('flags a TOST order that has not moved for longer than the threshold', () => {
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(30) }, TODAY)).toBe(true)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(30), deliveryDate: null }, TODAY)).toBe(true)
   })
 
   it('leaves a TOST order alone while the sync is still bringing it in', () => {
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(3) }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(3), deliveryDate: null }, TODAY)).toBe(false)
   })
 
   it('never flags an order TOST does not manage', () => {
     // The filter answers "which TOST orders has the sync stopped touching",
     // so a hand-entered order sitting untouched for a year is not an answer.
-    expect(isUnsyncedTostOrder({ source: null, updatedAt: daysAgo(365) }, TODAY)).toBe(false)
-    expect(isUnsyncedTostOrder({ source: 'sheet', updatedAt: daysAgo(365) }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: null, updatedAt: daysAgo(365), deliveryDate: null }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'sheet', updatedAt: daysAgo(365), deliveryDate: null }, TODAY)).toBe(false)
   })
 
   it('keeps a TOST order whose last change is unknown or unreadable', () => {
     // Missing metadata is not evidence the sync dropped it.
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: undefined }, TODAY)).toBe(false)
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: 'kaputt' }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: undefined, deliveryDate: null }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: 'kaputt', deliveryDate: null }, TODAY)).toBe(false)
+  })
+
+  it('never flags an order that is already with its owner', () => {
+    // Once the car has been handed over there is nothing left for TOST to
+    // send. Silence is the expected end state, not a sync that stopped, and
+    // every delivered order would otherwise fill this filter within a
+    // fortnight and bury the ones actually worth looking at.
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(200), deliveryDate: '01.02.2026' }, TODAY)).toBe(false)
+  })
+
+  it('still flags an order whose delivery is only an appointment', () => {
+    // A future date is a booking, not a handover — TOST should still be
+    // feeding it, so its silence means the same as any other open order's.
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(30), deliveryDate: '01.09.2026' }, TODAY)).toBe(true)
   })
 
   it('takes a caller-supplied threshold', () => {
-    const order = { source: 'tost', updatedAt: daysAgo(20) }
+    const order = { source: 'tost', updatedAt: daysAgo(20), deliveryDate: null }
     expect(isUnsyncedTostOrder(order, TODAY, 7)).toBe(true)
     expect(isUnsyncedTostOrder(order, TODAY, 30)).toBe(false)
   })
 
   it('uses 14 days unless told otherwise', () => {
     expect(UNSYNCED_AFTER_DAYS).toBe(14)
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(13) }, TODAY)).toBe(false)
-    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(15) }, TODAY)).toBe(true)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(13), deliveryDate: null }, TODAY)).toBe(false)
+    expect(isUnsyncedTostOrder({ source: 'tost', updatedAt: daysAgo(15), deliveryDate: null }, TODAY)).toBe(true)
   })
 })
 

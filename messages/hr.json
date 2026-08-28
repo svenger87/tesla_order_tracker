@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Promijeni filtar: sve / samo TOST narudžbe / samo ovdje unesene",
     "unsyncedFilter": "Nije sinkronizirano",
-    "unsyncedTooltip": "Samo TOST narudžbe bez promjene više od 14 dana. Ako vlasnik uredi narudžbu ovdje u web aplikaciji, i ona se smatra ažurnom.",
+    "unsyncedTooltip": "Samo otvorene TOST narudžbe bez promjene više od 14 dana; isporučene se ne uključuju. Ako vlasnik uredi narudžbu ovdje u web aplikaciji, i ona se smatra ažurnom.",
     "incompleteBadge": "nepotpuno",
     "incompleteHint": "Ovoj narudžbi nedostaje datum narudžbe iako je upisan kasniji datum. Sva vremena čekanja mjere se od njega — bez tog datuma unos se ne može smjestiti u vrijeme i ne ulazi ni u jednu statistiku."
   },

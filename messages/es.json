@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Cambiar filtro: todos / solo pedidos de TOST / solo introducidos aquí",
     "unsyncedFilter": "Sin sincronizar",
-    "unsyncedTooltip": "Solo pedidos de TOST sin cambios desde hace más de 14 días. Si el propietario edita el pedido aquí en la webapp, también cuenta como actualizado.",
+    "unsyncedTooltip": "Solo pedidos de TOST abiertos sin cambios desde hace más de 14 días; los entregados quedan fuera. Si el propietario edita el pedido aquí en la webapp, también cuenta como actualizado.",
     "incompleteBadge": "incompleto",
     "incompleteHint": "A este pedido le falta la fecha de pedido aunque hay una fecha posterior registrada. Todos los tiempos de espera se miden desde ella: sin la fecha, la entrada no puede situarse en el tiempo y no cuenta en ninguna estadística."
   },

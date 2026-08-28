@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "切换筛选：全部 / 仅 TOST 订单 / 仅在此录入的订单",
     "unsyncedFilter": "未同步",
-    "unsyncedTooltip": "仅显示超过 14 天没有变更的 TOST 订单。若车主在本网页应用中编辑过订单，同样视为已更新。",
+    "unsyncedTooltip": "仅显示超过 14 天没有变更的未交付 TOST 订单，已交付的不计入。若车主在本网页应用中编辑过订单，同样视为已更新。",
     "incompleteBadge": "不完整",
     "incompleteHint": "此订单虽有后续日期，却没有订单日期。所有等待时间都从订单日期起算 — 没有它，该记录无法在时间上定位，也不计入任何等待时间统计。"
   },

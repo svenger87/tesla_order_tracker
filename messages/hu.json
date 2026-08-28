@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Szűrő váltása: mind / csak TOST-rendelések / csak az itt rögzítettek",
     "unsyncedFilter": "Nincs szinkronizálva",
-    "unsyncedTooltip": "Csak azok a TOST-rendelések, amelyek több mint 14 napja nem változtak. Ha a tulajdonos itt, a webalkalmazásban szerkeszti a rendelést, az is naprakésznek számít.",
+    "unsyncedTooltip": "Csak a nyitott TOST-rendelések, amelyek több mint 14 napja nem változtak; a leszállítottak kimaradnak. Ha a tulajdonos itt, a webalkalmazásban szerkeszti a rendelést, az is naprakésznek számít.",
     "incompleteBadge": "hiányos",
     "incompleteHint": "Ennél a rendelésnél hiányzik a rendelés dátuma, pedig szerepel egy későbbi dátum. Minden várakozási időt ettől mérünk — nélküle a bejegyzés időben nem helyezhető el, és egyetlen statisztikába sem számít bele."
   },

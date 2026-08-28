@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Filtreyi değiştir: tümü / yalnızca TOST siparişleri / yalnızca burada girilenler",
     "unsyncedFilter": "Eşitlenmedi",
-    "unsyncedTooltip": "Yalnızca 14 günden uzun süredir değişmeyen TOST siparişleri. Sahibi siparişi burada web uygulamasında düzenlerse, o da güncel sayılır.",
+    "unsyncedTooltip": "Yalnızca 14 günden uzun süredir değişmeyen açık TOST siparişleri; teslim edilenler kapsam dışıdır. Sahibi siparişi burada web uygulamasında düzenlerse, o da güncel sayılır.",
     "incompleteBadge": "eksik",
     "incompleteHint": "Bu siparişte daha sonraki bir tarih girilmiş olmasına rağmen sipariş tarihi yok. Tüm bekleme süreleri sipariş tarihinden ölçülür — o olmadan kayıt zamana yerleştirilemez ve hiçbir istatistiğe girmez."
   },

@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Comută filtrul: toate / doar comenzile TOST / doar cele introduse aici",
     "unsyncedFilter": "Nesincronizat",
-    "unsyncedTooltip": "Doar comenzile TOST fără modificări de peste 14 zile. Dacă proprietarul editează comanda aici în aplicație, aceasta contează tot ca actualizată.",
+    "unsyncedTooltip": "Doar comenzile TOST deschise fără modificări de peste 14 zile; cele livrate sunt excluse. Dacă proprietarul editează comanda aici în aplicație, aceasta contează tot ca actualizată.",
     "incompleteBadge": "incomplet",
     "incompleteHint": "Acestei comenzi îi lipsește data comenzii, deși există o dată ulterioară. Toți timpii de așteptare se măsoară de la ea — fără această dată intrarea nu poate fi plasată în timp și nu intră în nicio statistică."
   },

@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Växla filter: alla / endast TOST-ordrar / endast inlagda här",
     "unsyncedFilter": "Inte synkad",
-    "unsyncedTooltip": "Endast TOST-ordrar utan ändring på mer än 14 dagar. Om ägaren redigerar ordern här i webbappen räknas den också som aktuell.",
+    "unsyncedTooltip": "Endast öppna TOST-ordrar utan ändring på mer än 14 dagar; levererade räknas inte. Om ägaren redigerar ordern här i webbappen räknas den också som aktuell.",
     "incompleteBadge": "ofullständig",
     "incompleteHint": "Denna order saknar beställningsdatum trots att ett senare datum är ifyllt. All väntetid mäts från det — utan datumet kan posten inte placeras i tiden och räknas inte in i någon statistik."
   },

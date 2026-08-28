@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Changer le filtre : toutes / uniquement les commandes TOST / uniquement celles saisies ici",
     "unsyncedFilter": "Non synchronisé",
-    "unsyncedTooltip": "Uniquement les commandes TOST sans modification depuis plus de 14 jours. Si le propriétaire modifie la commande ici dans l'application, elle compte aussi comme à jour.",
+    "unsyncedTooltip": "Uniquement les commandes TOST en cours sans modification depuis plus de 14 jours ; les livrées sont exclues. Si le propriétaire modifie la commande ici dans l'application, elle compte aussi comme à jour.",
     "incompleteBadge": "incomplet",
     "incompleteHint": "Cette commande n'a pas de date de commande alors qu'une date ultérieure est renseignée. Tous les délais sont mesurés à partir d'elle : sans cette date, l'entrée ne peut être située dans le temps et n'entre dans aucune statistique."
   },

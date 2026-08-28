@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Vaihda suodatinta: kaikki / vain TOST-tilaukset / vain tänne syötetyt",
     "unsyncedFilter": "Ei synkronoitu",
-    "unsyncedTooltip": "Vain TOST-tilaukset, joita ei ole muutettu yli 14 päivään. Jos omistaja muokkaa tilausta täällä verkkosovelluksessa, se lasketaan myös ajantasaiseksi.",
+    "unsyncedTooltip": "Vain avoimet TOST-tilaukset, joita ei ole muutettu yli 14 päivään; toimitetut jäävät pois. Jos omistaja muokkaa tilausta täällä verkkosovelluksessa, se lasketaan myös ajantasaiseksi.",
     "incompleteBadge": "puutteellinen",
     "incompleteHint": "Tästä tilauksesta puuttuu tilauspäivä, vaikka myöhempi päivä on kirjattu. Kaikki odotusajat mitataan tilauspäivästä — ilman sitä merkintää ei voi sijoittaa aikaan eikä se sisälly tilastoihin."
   },

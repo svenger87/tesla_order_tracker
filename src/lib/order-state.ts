@@ -94,13 +94,20 @@ export const UNSYNCED_AFTER_DAYS = 14
  *
  * Orders TOST does not manage are never flagged — a hand-entered order sitting
  * untouched is what the staleness filter is for, not this one.
+ *
+ * Neither is a car that has already been handed over. There is nothing left for
+ * TOST to send about it, so its silence is the expected end state rather than a
+ * sync that stopped; counting those would hand the filter every delivered order
+ * within a fortnight and bury the open ones it exists to surface. A delivery
+ * date still to come is an appointment, not a handover, and stays in scope.
  */
 export function isUnsyncedTostOrder(
-  order: Pick<Order, 'source' | 'updatedAt'>,
+  order: Pick<Order, 'source' | 'updatedAt' | 'deliveryDate'>,
   today: Date = startOfToday(),
   thresholdDays: number = UNSYNCED_AFTER_DAYS,
 ): boolean {
   if (order.source !== 'tost') return false
+  if (isHandedOver(order, today)) return false
   if (!order.updatedAt) return false
 
   const synced = new Date(order.updatedAt)

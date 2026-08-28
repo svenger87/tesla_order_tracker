@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Przełącz filtr: wszystkie / tylko zamówienia z TOST / tylko wprowadzone tutaj",
     "unsyncedFilter": "Niezsynchronizowane",
-    "unsyncedTooltip": "Tylko zamówienia z TOST bez zmian od ponad 14 dni. Jeśli właściciel edytuje zamówienie tutaj w aplikacji, również liczy się jako aktualne.",
+    "unsyncedTooltip": "Tylko otwarte zamówienia z TOST bez zmian od ponad 14 dni; dostarczone są pomijane. Jeśli właściciel edytuje zamówienie tutaj w aplikacji, również liczy się jako aktualne.",
     "incompleteBadge": "niekompletne",
     "incompleteHint": "W tym zamówieniu brakuje daty zamówienia, choć wpisano datę późniejszą. Wszystkie czasy oczekiwania liczone są od niej — bez tej daty wpisu nie da się umiejscowić w czasie i nie wchodzi do statystyk."
   },

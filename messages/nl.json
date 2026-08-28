@@ -279,7 +279,7 @@
     "tostFilter": "TOST",
     "tostTooltip": "Filter wisselen: alle / alleen TOST-bestellingen / alleen hier ingevoerd",
     "unsyncedFilter": "Niet gesynchroniseerd",
-    "unsyncedTooltip": "Alleen TOST-bestellingen die al meer dan 14 dagen niet zijn gewijzigd. Bewerkt de eigenaar de bestelling hier in de webapp, dan telt die ook als actueel.",
+    "unsyncedTooltip": "Alleen open TOST-bestellingen die al meer dan 14 dagen niet zijn gewijzigd; geleverde blijven buiten beschouwing. Bewerkt de eigenaar de bestelling hier in de webapp, dan telt die ook als actueel.",
     "incompleteBadge": "onvolledig",
     "incompleteHint": "Bij deze bestelling ontbreekt de besteldatum terwijl er een latere datum is ingevuld. Alle wachttijden worden vanaf die datum gemeten — zonder haar is de invoer niet in de tijd te plaatsen en telt niet mee in enige statistiek."
   },
