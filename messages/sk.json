@@ -276,6 +276,10 @@
     "staleTooltip": "Prepnúť filter: všetko / skryť neaktuálne / len neaktuálne (≥60 dní bez aktualizácie pri otvorených objednávkach)",
     "cancelledFilter": "Zrušené",
     "cancelledTooltip": "Prepnúť filter: skryť zrušené / zobraziť ich / iba zrušené",
+    "tostFilter": "TOST",
+    "tostTooltip": "Prepnúť filter: všetko / len objednávky z TOST / len zadané tu",
+    "unsyncedFilter": "Nesynchronizované",
+    "unsyncedTooltip": "Iba objednávky z TOST bez zmeny viac ako 14 dní. Ak majiteľ objednávku upraví tu vo webovej aplikácii, počíta sa tiež ako aktuálna.",
     "incompleteBadge": "neúplné",
     "incompleteHint": "Pri tejto objednávke chýba dátum objednania, hoci je vyplnený neskorší dátum. Všetky čakacie doby sa merajú od neho — bez neho záznam nemožno zaradiť v čase a nevstupuje do žiadnej štatistiky."
   },

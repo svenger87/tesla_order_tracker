@@ -276,6 +276,10 @@
     "staleTooltip": "Vaihda suodatin: kaikki / piilota vanhentuneet / vain vanhentuneet (≥60 päivää ilman päivitystä avoimissa tilauksissa)",
     "cancelledFilter": "Peruutetut",
     "cancelledTooltip": "Vaihda suodatinta: piilota peruutetut / näytä ne / vain peruutetut",
+    "tostFilter": "TOST",
+    "tostTooltip": "Vaihda suodatinta: kaikki / vain TOST-tilaukset / vain tänne syötetyt",
+    "unsyncedFilter": "Ei synkronoitu",
+    "unsyncedTooltip": "Vain TOST-tilaukset, joita ei ole muutettu yli 14 päivään. Jos omistaja muokkaa tilausta täällä verkkosovelluksessa, se lasketaan myös ajantasaiseksi.",
     "incompleteBadge": "puutteellinen",
     "incompleteHint": "Tästä tilauksesta puuttuu tilauspäivä, vaikka myöhempi päivä on kirjattu. Kaikki odotusajat mitataan tilauspäivästä — ilman sitä merkintää ei voi sijoittaa aikaan eikä se sisälly tilastoihin."
   },

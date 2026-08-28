@@ -276,6 +276,10 @@
     "saveError": "Error saving",
     "cancelledFilter": "Cancelled",
     "cancelledTooltip": "Toggle filter: hide cancelled / include them / only cancelled",
+    "tostFilter": "TOST",
+    "tostTooltip": "Toggle filter: all / only TOST orders / only entered here",
+    "unsyncedFilter": "Not synced",
+    "unsyncedTooltip": "Only TOST orders with no change for more than 14 days. An owner editing the order here in the webapp also counts as current.",
     "incompleteBadge": "incomplete",
     "incompleteHint": "This order has no order date although a later date is recorded. Every waiting time is measured from the order date — without it the entry cannot be placed in time and counts towards no wait statistic."
   },

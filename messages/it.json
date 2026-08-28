@@ -276,6 +276,10 @@
     "staleTooltip": "Cambia filtro: tutti / nascondi obsoleti / solo obsoleti (≥60 giorni senza aggiornamento sugli ordini aperti)",
     "cancelledFilter": "Annullati",
     "cancelledTooltip": "Cambia filtro: nascondi annullati / includili / solo annullati",
+    "tostFilter": "TOST",
+    "tostTooltip": "Cambia filtro: tutti / solo ordini TOST / solo inseriti qui",
+    "unsyncedFilter": "Non sincronizzato",
+    "unsyncedTooltip": "Solo ordini TOST senza modifiche da più di 14 giorni. Se il proprietario modifica l'ordine qui nella webapp, conta anch'esso come aggiornato.",
     "incompleteBadge": "incompleto",
     "incompleteHint": "A questo ordine manca la data d'ordine benché sia registrata una data successiva. Ogni attesa si misura da quella data: senza, la voce non è collocabile nel tempo e non entra in alcuna statistica."
   },

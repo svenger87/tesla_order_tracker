@@ -276,6 +276,10 @@
     "staleTooltip": "필터 전환: 전체 / 오래된 항목 숨기기 / 오래된 항목만 (미완료 주문이 60일 이상 미갱신)",
     "cancelledFilter": "취소됨",
     "cancelledTooltip": "필터 전환: 취소된 주문 숨기기 / 표시 / 취소된 주문만",
+    "tostFilter": "TOST",
+    "tostTooltip": "필터 전환: 전체 / TOST 주문만 / 여기서 등록한 주문만",
+    "unsyncedFilter": "미동기화",
+    "unsyncedTooltip": "14일 넘게 변경이 없는 TOST 주문만 표시합니다. 소유자가 이 웹앱에서 주문을 수정한 경우도 최신으로 간주됩니다.",
     "incompleteBadge": "정보 부족",
     "incompleteHint": "이 주문에는 이후 날짜가 있는데도 주문일이 없습니다. 모든 대기 기간은 주문일부터 측정하므로, 이 항목은 시간상 위치를 알 수 없고 대기 통계에 포함되지 않습니다."
   },

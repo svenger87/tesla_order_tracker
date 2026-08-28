@@ -276,6 +276,10 @@
     "staleTooltip": "Przełącz filtr: wszystkie / ukryj nieaktualne / tylko nieaktualne (≥60 dni bez aktualizacji przy otwartych zamówieniach)",
     "cancelledFilter": "Anulowane",
     "cancelledTooltip": "Przełącz filtr: ukryj anulowane / pokaż je / tylko anulowane",
+    "tostFilter": "TOST",
+    "tostTooltip": "Przełącz filtr: wszystkie / tylko zamówienia z TOST / tylko wprowadzone tutaj",
+    "unsyncedFilter": "Niezsynchronizowane",
+    "unsyncedTooltip": "Tylko zamówienia z TOST bez zmian od ponad 14 dni. Jeśli właściciel edytuje zamówienie tutaj w aplikacji, również liczy się jako aktualne.",
     "incompleteBadge": "niekompletne",
     "incompleteHint": "W tym zamówieniu brakuje daty zamówienia, choć wpisano datę późniejszą. Wszystkie czasy oczekiwania liczone są od niej — bez tej daty wpisu nie da się umiejscowić w czasie i nie wchodzi do statystyk."
   },

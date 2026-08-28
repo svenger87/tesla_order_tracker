@@ -276,6 +276,10 @@
     "staleTooltip": "Skift filter: alle / skjul forældede / kun forældede (≥60 dage uden opdatering på åbne ordrer)",
     "cancelledFilter": "Annulleret",
     "cancelledTooltip": "Skift filter: skjul annullerede / vis dem / kun annullerede",
+    "tostFilter": "TOST",
+    "tostTooltip": "Skift filter: alle / kun TOST-ordrer / kun oprettet her",
+    "unsyncedFilter": "Ikke synkroniseret",
+    "unsyncedTooltip": "Kun TOST-ordrer uden ændringer i mere end 14 dage. Hvis ejeren redigerer ordren her i webappen, tæller den også som opdateret.",
     "incompleteBadge": "ufuldstændig",
     "incompleteHint": "Denne ordre mangler bestillingsdatoen, selvom en senere dato er angivet. Al ventetid måles fra bestillingsdatoen — uden den kan posten ikke placeres i tid og indgår ikke i nogen ventetidsstatistik."
   },

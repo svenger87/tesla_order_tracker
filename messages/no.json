@@ -276,6 +276,10 @@
     "staleTooltip": "Bytt filter: alle / skjul utdaterte / kun utdaterte (≥60 dager uten oppdatering på åpne bestillinger)",
     "cancelledFilter": "Kansellert",
     "cancelledTooltip": "Bytt filter: skjul kansellerte / vis dem / kun kansellerte",
+    "tostFilter": "TOST",
+    "tostTooltip": "Bytt filter: alle / kun TOST-bestillinger / kun lagt inn her",
+    "unsyncedFilter": "Ikke synkronisert",
+    "unsyncedTooltip": "Kun TOST-bestillinger uten endring på over 14 dager. Hvis eieren redigerer bestillingen her i webappen, teller den også som oppdatert.",
     "incompleteBadge": "ufullstendig",
     "incompleteHint": "Denne bestillingen mangler bestillingsdatoen selv om en senere dato er ført opp. All ventetid måles fra den — uten datoen kan oppføringen ikke plasseres i tid og teller ikke i noen statistikk."
   },
