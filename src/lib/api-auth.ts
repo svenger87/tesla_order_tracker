@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { timingSafeEqual } from 'crypto'
 import { ApiErrors } from './api-response'
+import { secretsMatch } from './secrets'
 
-/** Constant-time comparison that does not leak the length via early return. */
-export function secretsMatch(provided: string, expected: string): boolean {
-  const a = Buffer.from(provided, 'utf8')
-  const b = Buffer.from(expected, 'utf8')
-  if (a.length !== b.length) {
-    // Still burn a comparison so the timing does not depend on length alone.
-    timingSafeEqual(a, a)
-    return false
-  }
-  return timingSafeEqual(a, b)
-}
+export { secretsMatch }
 
 export function validateApiKey(request: NextRequest): { valid: boolean; error?: NextResponse } {
   const apiKey = request.headers.get('X-API-Key')
