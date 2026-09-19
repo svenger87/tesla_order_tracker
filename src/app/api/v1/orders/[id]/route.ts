@@ -45,7 +45,7 @@ const orderSelectFields = {
 } as const
 
 // GET /api/v1/orders/[id] - Get a single order by ID
-export const GET = withApiAuth(
+export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[id]' },
   async (request: NextRequest, context: RouteContext<{ id: string }>) => {
     try {
       const { id } = await context.params
@@ -75,7 +75,7 @@ export const GET = withApiAuth(
 )
 
 // PUT /api/v1/orders/[id] - Update an order (requires editCode)
-export const PUT = withApiAuth(
+export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[id]' },
   async (request: NextRequest, context: RouteContext<{ id: string }>) => {
     try {
       const { id } = await context.params

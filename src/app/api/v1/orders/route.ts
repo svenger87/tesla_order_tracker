@@ -45,7 +45,7 @@ const orderSelectFields = {
 } as const
 
 // GET /api/v1/orders - List all orders with pagination and filtering
-export const GET = withApiAuth(async (request: NextRequest) => {
+export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders' }, async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url)
 
@@ -101,7 +101,7 @@ export const GET = withApiAuth(async (request: NextRequest) => {
 })
 
 // POST /api/v1/orders - Create a new order
-export const POST = withApiAuth(async (request: NextRequest) => {
+export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders' }, async (request: NextRequest) => {
   try {
     const body: CreateOrderRequest = await request.json()
 

@@ -44,7 +44,7 @@ const orderSelectFields = {
 
 // GET /api/v1/orders/by-name/[name] - Get orders by username
 // Returns an array since a user can have multiple orders (different order dates)
-export const GET = withApiAuth(
+export const GET = withApiAuth({ scope: 'orders:read:pii', route: 'GET /v1/orders/by-name/[name]' },
   async (request: NextRequest, context: RouteContext<{ name: string }>) => {
     try {
       const { name } = await context.params

@@ -87,6 +87,15 @@ export const ApiErrors = {
   forbidden: (message = 'Forbidden') =>
     createApiErrorResponse('FORBIDDEN', message, 403),
 
+  insufficientScope: (scope: string) =>
+    createApiErrorResponse('INSUFFICIENT_SCOPE', `This API key lacks the "${scope}" scope`, 403),
+
+  rateLimited: (message: string, retryAfterSeconds: number) => {
+    const response = createApiErrorResponse('RATE_LIMITED', message, 429)
+    response.headers.set('Retry-After', String(retryAfterSeconds))
+    return response
+  },
+
   notFound: (resource = 'Resource') =>
     createApiErrorResponse('NOT_FOUND', `${resource} not found`, 404),
 

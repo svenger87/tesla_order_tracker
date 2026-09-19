@@ -52,7 +52,7 @@ function toApiOptions<T extends { value: string; label: string }>(
 }
 
 // GET /api/v1/options - Get all dropdown options
-export const GET = withApiAuth(async (request: NextRequest) => {
+export const GET = withApiAuth({ scope: 'options:read', route: 'GET /v1/options' }, async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url)
     const typeFilter = searchParams.get('type')
