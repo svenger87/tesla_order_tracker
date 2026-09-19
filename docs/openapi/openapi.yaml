@@ -13,6 +13,22 @@ info:
     X-API-Key: your-api-key-here
     ```
 
+    ## Getting access
+    API keys are issued on request by the site admin. Each key carries scopes:
+
+    | Scope | Allows |
+    |---|---|
+    | `orders:read` | List and fetch orders. Names, VINs, TOST ids and delivery locations are omitted. |
+    | `orders:read:pii` | Adds those fields, and lookup by name. Requires `orders:read`. |
+    | `orders:write` | Create and edit orders. |
+    | `options:read` | Read dropdown options. |
+
+    A key without the scope an operation needs gets `403 INSUFFICIENT_SCOPE`.
+
+    Each key has a per-minute limit and a daily quota (UTC day). Responses carry
+    `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-Quota-Remaining`; when a
+    limit is hit the API answers `429 RATE_LIMITED` with `Retry-After` in seconds.
+
     ## Response Format
     All responses follow a consistent envelope format:
     ```json
@@ -57,8 +73,9 @@ paths:
       tags:
         - Orders
       summary: List all orders
-      description: Returns a paginated list of orders with optional filtering
+      description: Returns a paginated list of orders with optional filtering. Requires scope `orders:read`.
       operationId: listOrders
+      x-required-scope: orders:read
       parameters:
         - name: limit
           in: query
@@ -166,6 +183,10 @@ paths:
                     hasMore: true
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -173,8 +194,9 @@ paths:
       tags:
         - Orders
       summary: Create a new order
-      description: Creates a new order with the provided details
+      description: Creates a new order with the provided details. Requires scope `orders:write`.
       operationId: createOrder
+      x-required-scope: orders:write
       requestBody:
         required: true
         content:
@@ -224,6 +246,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -232,8 +258,9 @@ paths:
       tags:
         - Orders
       summary: Get order by ID
-      description: Returns a single order by its ID
+      description: Returns a single order by its ID. Requires scope `orders:read`.
       operationId: getOrderById
+      x-required-scope: orders:read
       parameters:
         - name: id
           in: path
@@ -257,6 +284,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -264,8 +295,9 @@ paths:
       tags:
         - Orders
       summary: Update an order
-      description: Updates an existing order. Requires the order's edit code for authorization.
+      description: Updates an existing order. Requires the order's edit code for authorization. Requires scope `orders:write`.
       operationId: updateOrder
+      x-required-scope: orders:write
       parameters:
         - name: id
           in: path
@@ -313,6 +345,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -326,6 +362,7 @@ paths:
         a user can have multiple orders with different order dates.
         Username matching is case-insensitive.
       operationId: getOrdersByName
+      x-required-scope: orders:read:pii
       parameters:
         - name: name
           in: path
@@ -380,6 +417,10 @@ paths:
                   count: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -397,6 +438,7 @@ paths:
 
         Filters can be combined. Returns an empty array if no orders match.
       operationId: tostFindOrders
+      x-required-scope: tost
       security:
         - TostApiKeyAuth: []
       parameters:
@@ -454,6 +496,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -478,6 +522,7 @@ paths:
 
         No editCode is required. The order will be exclusively managed by TOST.
       operationId: tostCreateOrder
+      x-required-scope: tost
       security:
         - TostApiKeyAuth: []
       requestBody:
@@ -566,6 +611,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -579,6 +626,7 @@ paths:
         Returns 403 if the order is not TOST-managed — claim it first via `POST /tost/claim/{id}`.
         No editCode is required. Supports optimistic locking via `expectedUpdatedAt`.
       operationId: tostUpdateOrder
+      x-required-scope: tost
       security:
         - TostApiKeyAuth: []
       parameters:
@@ -638,6 +686,7 @@ paths:
         Permanently deletes an order that is owned by TOST (`source = "tost"`).
         Returns 403 if the order is not TOST-managed.
       operationId: tostDeleteOrder
+      x-required-scope: tost
       security:
         - TostApiKeyAuth: []
       parameters:
@@ -692,6 +741,7 @@ paths:
         Returns 409 if the order is already claimed by TOST.
         After claiming, the order can no longer be edited via the webapp.
       operationId: tostClaimOrder
+      x-required-scope: tost
       security:
         - TostApiKeyAuth: []
       parameters:
@@ -757,6 +807,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -765,8 +817,9 @@ paths:
       tags:
         - Options
       summary: Get dropdown options
-      description: Returns all available dropdown options for the order form, grouped by type
+      description: Returns all available dropdown options for the order form, grouped by type. Requires scope `options:read`.
       operationId: getOptions
+      x-required-scope: options:read
       parameters:
         - name: type
           in: query
@@ -854,6 +907,10 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -863,7 +920,10 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
-      description: API key for general API authentication
+      description: |
+        Per-consumer API key, sent as `X-API-Key`. Keys are issued on request
+        by the site admin; each key carries scopes and rate limits (see
+        "Getting access" in the API description).
     TostApiKeyAuth:
       type: apiKey
       in: header
@@ -879,7 +939,7 @@ components:
           description: Unique order identifier
         name:
           type: string
-          description: Customer username
+          description: Customer username. Only present for keys with orders:read:pii.
         vehicleType:
           type: string
           nullable: true
@@ -947,7 +1007,7 @@ components:
         tostUserId:
           type: string
           nullable: true
-          description: TOST's internal user identifier (only set for TOST-managed orders)
+          description: TOST's internal user identifier (only set for TOST-managed orders). Only present for keys with orders:read:pii.
         deliveryWindow:
           type: string
           nullable: true
@@ -955,11 +1015,11 @@ components:
         deliveryLocation:
           type: string
           nullable: true
-          description: Delivery location
+          description: Delivery location. Only present for keys with orders:read:pii.
         vin:
           type: string
           nullable: true
-          description: Vehicle Identification Number
+          description: Vehicle Identification Number. Only present for keys with orders:read:pii.
         vinReceivedDate:
           type: string
           nullable: true
@@ -1415,6 +1475,53 @@ components:
           $ref: '#/components/schemas/Meta'
 
   responses:
+    InsufficientScope:
+      description: The key is valid but lacks the scope this operation requires.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "INSUFFICIENT_SCOPE"
+              message: 'This API key lacks the "orders:write" scope'
+            meta:
+              timestamp: "2026-09-19T12:00:00.000Z"
+              version: "v1"
+
+    RateLimited:
+      description: Per-minute limit or daily quota exceeded.
+      headers:
+        Retry-After:
+          description: Seconds until the request may be retried.
+          schema:
+            type: integer
+        X-RateLimit-Limit:
+          description: Requests allowed per minute for this key.
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: Requests left in the current minute.
+          schema:
+            type: integer
+        X-Quota-Remaining:
+          description: Requests left today (UTC).
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "RATE_LIMITED"
+              message: "Rate limit of 60 requests per minute exceeded"
+            meta:
+              timestamp: "2026-09-19T12:00:00.000Z"
+              version: "v1"
+
     Unauthorized:
       description: API key missing or invalid
       content:

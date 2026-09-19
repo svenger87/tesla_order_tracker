@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "tesla-order-tracker-v1",
     "name": "tff order stats API v1",
-    "description": "External REST API for tff order stats.\n\n## Authentication\nAll requests require an API key in the `X-API-Key` header.\n\n## Setup\n1. Create an environment with `base_url` and `api_key` variables\n2. Set `base_url` to your server URL (e.g., `http://localhost:3000`)\n3. Set `api_key` to your API key\n\n## Date Format\nAll dates use German format: DD.MM.YYYY (e.g., 15.01.2025)",
+    "description": "External REST API for tff order stats.\n\n## Authentication\nAll requests require an API key in the `X-API-Key` header. Keys are issued per consumer on request by the site admin.\n\n## Scopes\nEach key carries scopes: `orders:read` (orders without names, VINs, TOST ids and delivery locations), `orders:read:pii` (adds those fields and lookup by name; requires `orders:read`), `orders:write`, `options:read`. A missing scope answers `403 INSUFFICIENT_SCOPE`.\n\n## Rate limits\nEach key has a per-minute limit and a daily quota (UTC). Responses carry `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-Quota-Remaining`; over a limit the API answers `429 RATE_LIMITED` with `Retry-After`.\n\n## Setup\n1. Create an environment with `base_url` and `api_key` variables\n2. Set `base_url` to your server URL (e.g., `http://localhost:3000`)\n3. Set `api_key` to your API key\n\n## Date Format\nAll dates use German format: DD.MM.YYYY (e.g., 15.01.2025)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -92,6 +92,74 @@
               "code": 200,
               "_postman_previewlanguage": "json",
               "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"clx123abc\",\n      \"name\": \"MaxMustermann\",\n      \"orderDate\": \"15.01.2025\",\n      \"country\": \"de\",\n      \"model\": \"performance\",\n      \"color\": \"ultra_red\"\n    }\n  ],\n  \"meta\": {\n    \"timestamp\": \"2025-02-12T10:30:00.000Z\",\n    \"version\": \"v1\",\n    \"pagination\": {\n      \"total\": 1,\n      \"limit\": 50,\n      \"offset\": 0,\n      \"hasMore\": false\n    }\n  }\n}"
+            },
+            {
+              "name": "Missing scope",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"INSUFFICIENT_SCOPE\",\n    \"message\": \"This API key lacks the \\\"orders:read\\\" scope\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2026-09-19T12:00:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
+            },
+            {
+              "name": "Rate limited",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Retry-After",
+                  "value": "42"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": "60"
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"RATE_LIMITED\",\n    \"message\": \"Rate limit of 60 requests per minute exceeded\"\n  },\n  \"meta\": {\n    \"timestamp\": \"2026-09-19T12:00:00.000Z\",\n    \"version\": \"v1\"\n  }\n}"
             }
           ]
         },
