@@ -39,4 +39,11 @@ describe('checkRateLimit', () => {
     for (let i = 0; i < 3; i++) checkRateLimit('login:1.2.3.4', RULE, i)
     expect(checkRateLimit('claim:1.2.3.4', RULE, 300).allowed).toBe(true)
   })
+
+  test('reports the remaining budget', () => {
+    expect(checkRateLimit('api:k', RULE, 0).remaining).toBe(2)
+    expect(checkRateLimit('api:k', RULE, 1).remaining).toBe(1)
+    expect(checkRateLimit('api:k', RULE, 2).remaining).toBe(0)
+    expect(checkRateLimit('api:k', RULE, 3).remaining).toBe(0)
+  })
 })

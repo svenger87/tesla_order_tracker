@@ -22,6 +22,8 @@ export interface RateLimitResult {
   allowed: boolean
   /** Seconds until the current window resets. Zero when allowed. */
   retryAfterSeconds: number
+  /** Requests still permitted in the current window after this one. */
+  remaining: number
 }
 
 interface Window {
@@ -50,18 +52,19 @@ export function checkRateLimit(
   if (!existing || now - existing.startedAt >= rule.windowMs) {
     if (windows.size >= MAX_TRACKED_KEYS) evictExpired(now, rule.windowMs)
     windows.set(key, { count: 1, startedAt: now })
-    return { allowed: true, retryAfterSeconds: 0 }
+    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit - 1 }
   }
 
   if (existing.count < rule.limit) {
     existing.count++
-    return { allowed: true, retryAfterSeconds: 0 }
+    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit - existing.count }
   }
 
   const msLeft = existing.startedAt + rule.windowMs - now
   return {
     allowed: false,
     retryAfterSeconds: Math.max(1, Math.ceil(msLeft / 1000)),
+    remaining: 0,
   }
 }
 
