@@ -150,3 +150,35 @@ model OrderHistory {
   @@index([orderId, changedAt])
   @@index([field, changedAt])
 }
+
+// A key issued to an external API consumer. The secret itself is never
+// stored: only its SHA-256 hash, and the first characters for recognition.
+// TOST_API_KEY and EXTERNAL_API_KEY are not rows here — they are built-in
+// consumers resolved from the environment (src/lib/api-consumers.ts).
+model ApiKey {
+  id            String    @id @default(cuid())
+  name          String
+  contact       String?
+  keyHash       String    @unique
+  keyPrefix     String
+  scopes        String    // comma list, see src/lib/api-scopes.ts
+  ratePerMinute Int       @default(60)
+  quotaPerDay   Int       @default(5000)
+  revokedAt     DateTime?
+  lastUsedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Daily request counters per consumer and route. `consumer` is an ApiKey id
+// or "builtin:tost" / "builtin:external", hence a plain string, not a relation.
+model ApiUsage {
+  id       String @id @default(cuid())
+  consumer String
+  day      String // UTC, YYYY-MM-DD
+  endpoint String // route label, e.g. "GET /v1/orders/[id]"
+  requests Int    @default(0)
+  errors   Int    @default(0)
+
+  @@unique([consumer, day, endpoint])
+}
