@@ -14,8 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle, Code2, Copy, Check, ExternalLink, Eye, EyeOff } from 'lucide-react'
-import { Link } from '@/i18n/navigation'
+import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export function SettingsTab() {
@@ -42,12 +41,6 @@ export function SettingsTab() {
   const [archiveError, setArchiveError] = useState('')
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false)
 
-  // API Key state
-  const [apiKey, setApiKey] = useState<string | null>(null)
-  const [apiKeyConfigured, setApiKeyConfigured] = useState(false)
-  const [apiKeyCopied, setApiKeyCopied] = useState(false)
-  const [apiKeyVisible, setApiKeyVisible] = useState(false)
-  const [endpoints, setEndpoints] = useState<{ method: string; path: string }[]>([])
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -71,58 +64,12 @@ export function SettingsTab() {
     }
   }, [])
 
-  const fetchApiKey = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/api-key')
-      const data = await res.json()
-      setApiKeyConfigured(data.configured)
-      if (data.configured) {
-        setApiKey(data.apiKey)
-      }
-    } catch (error) {
-      console.error('Failed to fetch API key:', error)
-    }
-  }, [])
-
-  /**
-   * The endpoints this key unlocks, taken from the OpenAPI document.
-   *
-   * Reading them here means the card cannot fall out of step with the API the
-   * way a hand-kept list did. A failure is not worth reporting: the list is
-   * supporting detail beside a link to the full documentation, so it simply
-   * does not render.
-   */
-  const fetchEndpoints = useCallback(async () => {
-    try {
-      const res = await fetch('/api/api-docs')
-      if (!res.ok) return
-      const spec = await res.json()
-      const base = '/api/v1'
-      const rows: { method: string; path: string }[] = []
-      for (const [path, ops] of Object.entries(spec.paths ?? {})) {
-        // The /tost/ routes are in the same document but behind a different
-        // secret (TOST_API_KEY, not EXTERNAL_API_KEY). Listing them under this
-        // key would promise access it does not grant.
-        if (path.startsWith('/tost/')) continue
-        for (const method of Object.keys(ops as object)) {
-          if (!['get', 'post', 'put', 'delete', 'patch'].includes(method)) continue
-          rows.push({ method: method.toUpperCase(), path: base + path })
-        }
-      }
-      setEndpoints(rows.sort((a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method)))
-    } catch {
-      // leaves the list empty, which hides it
-    }
-  }, [])
-
   useEffect(() => {
     fetchSettings().then((settingsData) => {
       if (settingsData) {
         fetchArchiveInfo(settingsData.archiveThreshold ?? 180)
       }
     }).finally(() => setLoading(false))
-    fetchApiKey()
-    fetchEndpoints()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -399,100 +346,6 @@ export function SettingsTab() {
           </CardContent>
         </Card>
 
-        {/* API Key */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Code2 className="h-5 w-5" />
-              {t('apiForDevelopers')}
-            </CardTitle>
-            <CardDescription>
-              {t('apiDescription')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {apiKeyConfigured && apiKey ? (
-              <>
-                <div className="space-y-2">
-                  <Label>{t('apiKey')}</Label>
-                  <div className="flex gap-2">
-                    {/* Hidden by default: the key was previously rendered in
-                        plaintext on a page that gets screenshotted and screen-
-                        shared. Copying still works without revealing it. */}
-                    <Input
-                      value={apiKey}
-                      type={apiKeyVisible ? 'text' : 'password'}
-                      readOnly
-                      className="font-mono text-sm"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setApiKeyVisible(v => !v)}
-                      title={apiKeyVisible ? tc('hide') : tc('show')}
-                      aria-label={apiKeyVisible ? tc('hide') : tc('show')}
-                    >
-                      {apiKeyVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => {
-                        navigator.clipboard.writeText(apiKey)
-                        setApiKeyCopied(true)
-                        setTimeout(() => setApiKeyCopied(false), 2000)
-                      }}
-                      title={tc('copy')}
-                    >
-                      {apiKeyCopied ? (
-                        <Check className="h-4 w-4 text-success" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">{tc('copy')}</span>
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('apiKeyHint')}
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/docs" target="_blank">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      {t('apiDocs')}
-                    </Link>
-                  </Button>
-                </div>
-
-                {endpoints.length > 0 && (
-                  <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                    <p><strong>{t('apiEndpoints')}</strong></p>
-                    {/* Read from the OpenAPI document the docs page already
-                        serves, rather than a copy kept by hand. The copy had
-                        drifted — it was missing GET /orders/:id — and carried
-                        German descriptions in an app that ships 23 languages.
-                        Method and path need no translation; what each one does
-                        is one click away in the docs linked above. */}
-                    <ul className="list-disc list-inside ml-2 font-mono">
-                      {endpoints.map(e => (
-                        <li key={`${e.method} ${e.path}`}>{e.method} {e.path}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                <p>{t('apiNotConfigured')}</p>
-                <p className="mt-2">
-                  {t('apiConfigHint', { envVar: 'EXTERNAL_API_KEY' })}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
 
       {/* Archive Management */}

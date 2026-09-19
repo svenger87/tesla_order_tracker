@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image as ImageIcon, Archive } from 'lucide-react'
+import { LogOut, Home, Settings, ArrowLeftRight, SlidersHorizontal, Image as ImageIcon, Archive, KeyRound } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { SettingsTab } from '@/components/admin/SettingsTab'
@@ -12,6 +12,7 @@ import { ImportExportTab } from '@/components/admin/ImportExportTab'
 import { OptionsTab } from '@/components/admin/OptionsTab'
 import { CompositorTab } from '@/components/admin/CompositorTab'
 import { BackupsTab } from '@/components/admin/BackupsTab'
+import { ApiKeysTab } from '@/components/admin/ApiKeysTab'
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
@@ -110,6 +111,10 @@ export default function AdminDashboard() {
               <Archive className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">{t('backups')}</span>
             </TabsTrigger>
+            <TabsTrigger value="api">
+              <KeyRound className="h-4 w-4 sm:mr-2" />
+              <span className="sr-only sm:not-sr-only">{t('apiTab')}</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="settings">
@@ -130,6 +135,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="backups">
             <BackupsTab locale={locale} />
+          </TabsContent>
+
+          <TabsContent value="api">
+            <ApiKeysTab />
           </TabsContent>
         </Tabs>
       </div>
