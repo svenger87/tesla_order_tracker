@@ -1,48 +1,11 @@
 import { prisma } from '@/lib/db'
 import { NextRequest } from 'next/server'
-import { withApiAuth, RouteContext } from '@/lib/api-auth'
+import { withApiAuth, getApiConsumer, RouteContext } from '@/lib/api-auth'
+import { apiOrderSelect, toApiOrder } from '@/lib/api-order'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
-import { ApiOrder, UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
+import { UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
-
-// Fields to select (excludes editCode for security)
-const orderSelectFields = {
-  id: true,
-  name: true,
-  vehicleType: true,
-  orderDate: true,
-  country: true,
-  model: true,
-  range: true,
-  drive: true,
-  color: true,
-  interior: true,
-  wheels: true,
-  towHitch: true,
-  autopilot: true,
-  seats: true,
-  source: true,
-  tostUserId: true,
-  deliveryWindow: true,
-  deliveryLocation: true,
-  vin: true,
-  vinReceivedDate: true,
-  papersReceivedDate: true,
-  productionDate: true,
-  typeApproval: true,
-  typeVariant: true,
-  deliveryDate: true,
-  orderToProduction: true,
-  orderToVin: true,
-  orderToDelivery: true,
-  orderToPapers: true,
-  papersToDelivery: true,
-  archived: true,
-  archivedAt: true,
-  createdAt: true,
-  updatedAt: true,
-} as const
 
 // GET /api/v1/orders/[id] - Get a single order by ID
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[id]' },
@@ -52,19 +15,14 @@ export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[i
 
       const order = await prisma.order.findUnique({
         where: { id },
-        select: orderSelectFields,
+        select: apiOrderSelect,
       })
 
       if (!order) {
         return ApiErrors.notFound('Order')
       }
 
-      const apiOrder: ApiOrder = {
-        ...order,
-        archivedAt: order.archivedAt?.toISOString() ?? null,
-        createdAt: order.createdAt.toISOString(),
-        updatedAt: order.updatedAt.toISOString(),
-      }
+      const apiOrder = toApiOrder(order, getApiConsumer(request))
 
       return createApiSuccessResponse(apiOrder)
     } catch (error) {

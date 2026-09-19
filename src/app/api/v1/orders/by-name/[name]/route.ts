@@ -1,46 +1,8 @@
 import { prisma } from '@/lib/db'
 import { NextRequest } from 'next/server'
-import { withApiAuth, RouteContext } from '@/lib/api-auth'
+import { withApiAuth, getApiConsumer, RouteContext } from '@/lib/api-auth'
+import { apiOrderSelect, toApiOrder } from '@/lib/api-order'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
-import { ApiOrder } from '@/lib/api-types'
-
-// Fields to select (excludes editCode for security)
-const orderSelectFields = {
-  id: true,
-  name: true,
-  vehicleType: true,
-  orderDate: true,
-  country: true,
-  model: true,
-  range: true,
-  drive: true,
-  color: true,
-  interior: true,
-  wheels: true,
-  towHitch: true,
-  autopilot: true,
-  seats: true,
-  source: true,
-  tostUserId: true,
-  deliveryWindow: true,
-  deliveryLocation: true,
-  vin: true,
-  vinReceivedDate: true,
-  papersReceivedDate: true,
-  productionDate: true,
-  typeApproval: true,
-  typeVariant: true,
-  deliveryDate: true,
-  orderToProduction: true,
-  orderToVin: true,
-  orderToDelivery: true,
-  orderToPapers: true,
-  papersToDelivery: true,
-  archived: true,
-  archivedAt: true,
-  createdAt: true,
-  updatedAt: true,
-} as const
 
 // GET /api/v1/orders/by-name/[name] - Get orders by username
 // Returns an array since a user can have multiple orders (different order dates)
@@ -61,16 +23,12 @@ export const GET = withApiAuth({ scope: 'orders:read:pii', route: 'GET /v1/order
           ...(!includeArchived && { archived: false }),
         },
         orderBy: { createdAt: 'desc' },
-        select: orderSelectFields,
+        select: apiOrderSelect,
       })
 
       // Transform to API response format
-      const apiOrders: ApiOrder[] = orders.map((order) => ({
-        ...order,
-        archivedAt: order.archivedAt?.toISOString() ?? null,
-        createdAt: order.createdAt.toISOString(),
-        updatedAt: order.updatedAt.toISOString(),
-      }))
+      const consumer = getApiConsumer(request)
+      const apiOrders = orders.map((order) => toApiOrder(order, consumer))
 
       return createApiSuccessResponse(apiOrders, { count: apiOrders.length })
     } catch (error) {

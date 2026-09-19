@@ -1,48 +1,11 @@
 import { prisma } from '@/lib/db'
 import { NextRequest } from 'next/server'
-import { withApiAuth } from '@/lib/api-auth'
+import { withApiAuth, getApiConsumer } from '@/lib/api-auth'
+import { apiOrderSelect, toApiOrder } from '@/lib/api-order'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
-import { ApiOrder, CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
+import { CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
-
-// Fields to select (excludes editCode for security)
-const orderSelectFields = {
-  id: true,
-  name: true,
-  vehicleType: true,
-  orderDate: true,
-  country: true,
-  model: true,
-  range: true,
-  drive: true,
-  color: true,
-  interior: true,
-  wheels: true,
-  towHitch: true,
-  autopilot: true,
-  seats: true,
-  source: true,
-  tostUserId: true,
-  deliveryWindow: true,
-  deliveryLocation: true,
-  vin: true,
-  vinReceivedDate: true,
-  papersReceivedDate: true,
-  productionDate: true,
-  typeApproval: true,
-  typeVariant: true,
-  deliveryDate: true,
-  orderToProduction: true,
-  orderToVin: true,
-  orderToDelivery: true,
-  orderToPapers: true,
-  papersToDelivery: true,
-  archived: true,
-  archivedAt: true,
-  createdAt: true,
-  updatedAt: true,
-} as const
 
 // GET /api/v1/orders - List all orders with pagination and filtering
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders' }, async (request: NextRequest) => {
@@ -73,18 +36,14 @@ export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders' }
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: orderSelectFields,
+        select: apiOrderSelect,
       }),
       prisma.order.count({ where }),
     ])
 
     // Transform to API response format
-    const apiOrders: ApiOrder[] = orders.map((order) => ({
-      ...order,
-      archivedAt: order.archivedAt?.toISOString() ?? null,
-      createdAt: order.createdAt.toISOString(),
-      updatedAt: order.updatedAt.toISOString(),
-    }))
+    const consumer = getApiConsumer(request)
+    const apiOrders = orders.map((order) => toApiOrder(order, consumer))
 
     return createApiSuccessResponse(apiOrders, {
       pagination: {
