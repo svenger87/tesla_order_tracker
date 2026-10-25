@@ -113,7 +113,7 @@ export interface SyncResult {
   errors: string[]
 }
 
-// All EU countries + Switzerland, UK, Norway - sorted alphabetically by German label
+// Countries offered in the order form. Options are sorted for display by locale.
 export const COUNTRIES = [
   { value: 'be', label: 'Belgien', flag: '🇧🇪' },
   { value: 'bg', label: 'Bulgarien', flag: '🇧🇬' },
@@ -150,6 +150,8 @@ export const COUNTRIES = [
   { value: 'us', label: 'USA', flag: '🇺🇸' },
   { value: 'ca', label: 'Kanada', flag: '🇨🇦' },
   { value: 'tw', label: 'Taiwan', flag: '🇹🇼' },
+  { value: 'cn', label: 'China', flag: '🇨🇳' },
+  { value: 'il', label: 'Israel', flag: '🇮🇱' },
 ]
 
 // Model Y trims

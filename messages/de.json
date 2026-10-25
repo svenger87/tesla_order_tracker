@@ -134,7 +134,7 @@
     "deliveryWindow": "Lieferfenster",
     "deliveryWindowPlaceholder": "z.B. 11.02.-18.02.2026",
     "deliveryLocation": "Ort (Auslieferung)",
-    "deliveryLocationSelect": "Auslieferungsort wählen",
+    "deliveryLocationSelect": "Auslieferungsort wählen oder eingeben",
     "vin": "VIN",
     "vinPlaceholder": "Fahrzeug-Identnummer",
     "vinReceivedAt": "VIN erhalten am",

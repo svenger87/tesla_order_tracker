@@ -27,6 +27,8 @@ import {
 } from '@/lib/types'
 import { compareOptionLabels } from '@/lib/optionSort'
 import { dedupedJson } from '@/lib/dedupe-fetch'
+import { countryNameFromCode } from '@/lib/country-display'
+import { deliveryCenterOptions } from '@/lib/delivery-centers'
 
 interface OptionMetadata {
   flag?: string
@@ -131,7 +133,7 @@ const VEHICLE_FALLBACK_OPTIONS: Record<VehicleType, Partial<Record<string, FormO
 // Option types that have translations in the message files
 const TRANSLATABLE_TYPES = new Set(['country', 'interior', 'range', 'towHitch', 'autopilot', 'seats'])
 
-export function useOptions(vehicleType?: VehicleType) {
+export function useOptions(vehicleType?: VehicleType, deliveryCountry?: string) {
   const [apiOptions, setApiOptions] = useState<ApiOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -176,7 +178,14 @@ export function useOptions(vehicleType?: VehicleType) {
         (o.vehicleType === null || o.vehicleType === vehicleType)
       )
       if (typeOptions.length > 0) {
-        return apiToFormOptions(typeOptions)
+        const options = apiToFormOptions(typeOptions)
+        if (type !== 'country') return options
+        // Keep newly supported markets available even before an admin updates
+        // the database-backed option list.
+        const values = new Set(options.map(option => option.value))
+        return [...options, ...FALLBACK_OPTIONS.country.filter(option =>
+          ['cn', 'il'].includes(option.value) && !values.has(option.value)
+        )]
       }
       // API returned nothing for this type → fall back to hardcoded defaults
       if (vehicleType && VEHICLE_FALLBACK_OPTIONS[vehicleType]?.[type]) {
@@ -192,7 +201,9 @@ export function useOptions(vehicleType?: VehicleType) {
         const key = `${type}.${opt.value}` as Parameters<typeof to>[0]
         return to.has(key)
           ? { ...opt, label: to(key) }
-          : opt
+          : type === 'country' && ['cn', 'il'].includes(opt.value)
+            ? { ...opt, label: countryNameFromCode(opt.value, locale) ?? opt.label }
+            : opt
       })
     }
 
@@ -203,7 +214,14 @@ export function useOptions(vehicleType?: VehicleType) {
 
     // Delivery locations sort alphabetically too — their sortOrder is unreliable
     // (admin-added entries get appended)
-    const sortedDeliveryLocations = getOptionsForType('deliveryLocation')
+    const dbDeliveryLocations = getOptionsForType('deliveryLocation')
+    const existingLocations = new Set(dbDeliveryLocations.map(option => option.value.toLocaleLowerCase()))
+    const sortedDeliveryLocations = [
+      ...dbDeliveryLocations,
+      ...deliveryCenterOptions(deliveryCountry).filter(option =>
+        !existingLocations.has(option.value.toLocaleLowerCase())
+      ),
+    ]
       .sort((a, b) => compareOptionLabels(a.label, b.label, locale))
 
     return {
@@ -219,7 +237,7 @@ export function useOptions(vehicleType?: VehicleType) {
       seats: translateOptions('seats', getOptionsForType('seats')),
       deliveryLocations: sortedDeliveryLocations,
     }
-  }, [apiOptions, vehicleType, to, locale])
+  }, [apiOptions, vehicleType, deliveryCountry, to, locale])
 
   return {
     options,

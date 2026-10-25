@@ -171,7 +171,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const [wizardStep, setWizardStep] = useState(0)
 
   // Load dynamic options from API (filtered by vehicle type)
-  const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, seats, deliveryLocations } = useOptions(formData.vehicleType)
+  const { countries, models, ranges, drives, colors, interiors, wheels, autopilot, towHitch, seats, deliveryLocations } = useOptions(formData.vehicleType, formData.country)
 
   // Load constraints from database
   const { getConstraintsForModel, getMergedConstraints, isFieldDisabled, filterOptions } = useConstraints(formData.vehicleType)
@@ -294,7 +294,11 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   }, [open, order])
 
   const handleChange = useCallback((field: keyof OrderFormData, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === 'country' && value !== prev.country ? { deliveryLocation: '' } : {}),
+    }))
   }, [])
 
   // Model change handler (shared between mobile/desktop)

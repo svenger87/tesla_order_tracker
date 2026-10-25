@@ -134,7 +134,7 @@
     "deliveryWindow": "Delivery window",
     "deliveryWindowPlaceholder": "e.g. 02/11-02/18/2026",
     "deliveryLocation": "Delivery location",
-    "deliveryLocationSelect": "Select delivery location",
+    "deliveryLocationSelect": "Select or enter delivery location",
     "vin": "VIN",
     "vinPlaceholder": "Vehicle Identification Number",
     "vinReceivedAt": "VIN received on",

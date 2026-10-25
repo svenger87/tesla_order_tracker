@@ -1,0 +1,1100 @@
+{
+  "checkedOn": "2026-10-25",
+  "sources": {
+    "us": "https://www.tesla.com/en_CA/findus/list/deliverycenters/United%2BStates",
+    "ca": "https://www.tesla.com/findus/list/deliverycenters/Canada",
+    "cn": "https://www.tesla.com/findus/list/deliverycenters/China%20Mainland"
+  },
+  "centers": [
+    {
+      "country": "us",
+      "name": "Wind Creek Wetumpka, AL",
+      "city": "Wetumpka"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Mesa",
+      "city": "Mesa"
+    },
+    {
+      "country": "us",
+      "name": "Scottsdale",
+      "city": "Scottsdale"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Tucson",
+      "city": "Tucson"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Santa Rosa",
+      "city": "Santa Rosa"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Aliso Viejo",
+      "city": "Aliso Viejo"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Buena Park",
+      "city": "Buena Park"
+    },
+    {
+      "country": "us",
+      "name": "Camarillo-311 E Daily Dr Camarillo CA",
+      "city": "Camarillo"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Carlsbad",
+      "city": "Carlsbad"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Colma",
+      "city": "Colma"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Corte Madera",
+      "city": "Corte Madera"
+    },
+    {
+      "country": "us",
+      "name": "Fremont Factory",
+      "city": "Fremont"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Gilroy",
+      "city": "Gilroy"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Irvine",
+      "city": "Irvine"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Long Beach",
+      "city": "LONG BEACH"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Monterey",
+      "city": "Seaside"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Norwalk",
+      "city": "Norwalk"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Palm Springs",
+      "city": "Cathedral City"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Riverside",
+      "city": "Riverside"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Rocklin",
+      "city": "Rocklin"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Sacramento Sacramento CA",
+      "city": "Sacramento"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery San Diego - Miramar",
+      "city": "San Diego"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Santa Barbara",
+      "city": "Santa Barbara"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Santa Clarita",
+      "city": "Santa Clarita"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Stockton",
+      "city": "Stockton"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Sunnyvale",
+      "city": "Sunnyvale"
+    },
+    {
+      "country": "us",
+      "name": "Thousand Oaks",
+      "city": "Thousand Oaks"
+    },
+    {
+      "country": "us",
+      "name": "Sacramento Pre-Owned",
+      "city": "McClellan Park"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Dublin",
+      "city": "Dublin"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Fresno",
+      "city": "Fresno"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Los Gatos",
+      "city": "Los Gatos"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery North Hollywood",
+      "city": "North Hollywood"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Upland",
+      "city": "UPLAND"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Vallejo",
+      "city": "Vallejo"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery West Covina",
+      "city": "West Covina"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Aurora",
+      "city": "Aurora"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Colorado Springs",
+      "city": "Colorado Springs"
+    },
+    {
+      "country": "us",
+      "name": "Tesla - Centennial",
+      "city": "Englewood"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Leasing Delivery Stamford",
+      "city": "Stamford"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Mohegan Sun",
+      "city": "Uncasville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Clermont",
+      "city": "Clermont"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Delray Beach",
+      "city": "Delray Beach"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Fort Lauderdale",
+      "city": "Fort Lauderdale"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Fort Myers",
+      "city": "Fort Myers"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Gainesville",
+      "city": "Gainesville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Jacksonville",
+      "city": "Jacksonville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Kissimmee",
+      "city": "Kissimmee"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Merritt Island Delivery Center",
+      "city": "Merritt Island"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Miami Gardens",
+      "city": "Miami Gardens"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Orlando",
+      "city": "Orlando"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Sarasota",
+      "city": "Sarasota"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery St. Petersburg",
+      "city": "Saint Petersburg"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Tallahassee",
+      "city": "Tallahassee"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Tampa",
+      "city": "Tampa"
+    },
+    {
+      "country": "us",
+      "name": "Doral",
+      "city": "DORAL"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Naples",
+      "city": "Naples"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Opa Locka Delivery Center",
+      "city": "Opa Locka"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Pensacola",
+      "city": "Pensacola"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Wesley Chapel - Delivery",
+      "city": "Wesley Chapel"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery West Palm Beach",
+      "city": "West Palm Beach"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Duluth",
+      "city": "Duluth"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Fayetteville",
+      "city": "Fayetteville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Kennesaw",
+      "city": "Kennesaw"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Savannah",
+      "city": "Savannah"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Honolulu",
+      "city": "Honolulu"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Meridian",
+      "city": "Meridian"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Bloomington",
+      "city": "Bloomington"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Chicago",
+      "city": "Chicago"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Chicago Westmont",
+      "city": "Westmont"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Libertyville",
+      "city": "Libertyville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Naperville",
+      "city": "Lisle"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Northbrook",
+      "city": "Northbrook"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Orland Park",
+      "city": "Orland Park"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Batavia",
+      "city": "Batavia"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Buffalo Grove",
+      "city": "Buffalo Grove"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Indianapolis Castleton",
+      "city": "Indianapolis"
+    },
+    {
+      "country": "us",
+      "name": "Greenwood",
+      "city": "Indianapolis"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Baltimore",
+      "city": "Owings Mills"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Rockville",
+      "city": "ROCKVILLE"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Silver Spring",
+      "city": "Silver Spring"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Norwell",
+      "city": "Norwell"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Peabody",
+      "city": "Peabody"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Dedham",
+      "city": "Dedham"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Ann Arbor",
+      "city": "Ann Arbor"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Grand Rapids",
+      "city": "Grand Rapids"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery West Bloomfield Township",
+      "city": "West Bloomfield Township"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Golden Valley",
+      "city": "Golden Valley"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Lake Elmo",
+      "city": "Lake Elmo"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Rogers",
+      "city": "Rogers"
+    },
+    {
+      "country": "us",
+      "name": "Tesla St. Paul Delivery",
+      "city": "Maplewood"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Brandon",
+      "city": "Brandon"
+    },
+    {
+      "country": "us",
+      "name": "Kansas City - MO",
+      "city": "Kansas City"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery St. Louis",
+      "city": "Chesterfield"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Saint Louis",
+      "city": "SAINT LOUIS"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Las Vegas - E. Sahara",
+      "city": "Las Vegas"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Reno",
+      "city": "Reno"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Londonderry",
+      "city": "Londonderry"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Cherry Hill",
+      "city": "Cherry Hill"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Lawrence Township",
+      "city": "Lawrence Township"
+    },
+    {
+      "country": "us",
+      "name": "Totowa",
+      "city": "Totowa"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Oneida",
+      "city": "Verona"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Smithtown-Long Island Nesconset NY",
+      "city": "Nesconset"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Brooklyn",
+      "city": "Brooklyn"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Mount Kisco",
+      "city": "Mount Kisco"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Westbury",
+      "city": "WESTBURY"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Charlotte",
+      "city": "Matthews"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Greensboro - High Point",
+      "city": "High Point"
+    },
+    {
+      "country": "us",
+      "name": "Raleigh",
+      "city": "Raleigh"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Raleigh Sumner Blvd",
+      "city": "Raleigh"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Charlotte Northlake",
+      "city": "Charlotte"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Cincinnati - Oakley",
+      "city": "Cincinnati"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Cleveland - Lyndhurst",
+      "city": "Lyndhurst"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Columbus - Easton",
+      "city": "Columbus"
+    },
+    {
+      "country": "us",
+      "name": "Bend",
+      "city": "BEND"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Salem",
+      "city": "Salem"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Tigard",
+      "city": "TIGARD"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Pittsburgh",
+      "city": "Bridgeville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Devon",
+      "city": "Devon"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Mechanicsburg",
+      "city": "Mechanicsburg"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Warminster",
+      "city": "Warminster"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery West Chester",
+      "city": "West Chester"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Providence",
+      "city": "Providence"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Chattanooga",
+      "city": "Chattanooga"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Knoxville",
+      "city": "Knoxville"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Memphis",
+      "city": "Bartlett"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Nashville",
+      "city": "Franklin"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Pleasant Grove",
+      "city": "Pleasant Grove"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Norfolk",
+      "city": "Norfolk"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Richmond",
+      "city": "Glen Allen"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Tysons Corner",
+      "city": "Vienna"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Fife",
+      "city": "Fife"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Liberty Lake",
+      "city": "Liberty Lake"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Lynnwood",
+      "city": "Lynnwood"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Renton",
+      "city": "Renton"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Hub Seattle",
+      "city": "Seattle"
+    },
+    {
+      "country": "us",
+      "name": "Tesla Delivery Vancouver",
+      "city": "Vancouver"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Calgary-Fairmount",
+      "city": "Calgary"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Edmonton",
+      "city": "Edmonton"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Langford",
+      "city": "Langford"
+    },
+    {
+      "country": "ca",
+      "name": "Richmond",
+      "city": "Richmond"
+    },
+    {
+      "country": "ca",
+      "name": "Surrey - Scott Road",
+      "city": "Surrey"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Port Coquitlam - 1028 Nicola Ave",
+      "city": "Port Coquitlam"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Vancouver-Raymur - Delivery",
+      "city": "Vancouver"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Dartmouth - 236 Brownlow Ave",
+      "city": "Dartmouth"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Barrie",
+      "city": "Innisfil"
+    },
+    {
+      "country": "ca",
+      "name": "Brampton-60 Coachworks Cres Brampton ON",
+      "city": "Brampton"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Etobicoke - Dundas St W",
+      "city": "Etobicoke"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla - Hamilton - 999 Upper Wentworth St Hamilton ON",
+      "city": "Hamilton"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla - London ON",
+      "city": "London"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Oakville",
+      "city": "Oakville"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Ottawa",
+      "city": "Nepean"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Toronto - Kitchener Waterloo",
+      "city": "Kitchener"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Toronto-Lawrence Avenue",
+      "city": "Toronto"
+    },
+    {
+      "country": "ca",
+      "name": "Vaughan",
+      "city": "Vaughan—Woodbridge"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Quebec",
+      "city": "Québec City"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Saint Bruno",
+      "city": "Saint Bruno"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Laval",
+      "city": "Laval"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery West Island",
+      "city": "Kirkland"
+    },
+    {
+      "country": "ca",
+      "name": "Tesla Delivery Saskatoon",
+      "city": "Saskatoon"
+    },
+    {
+      "country": "cn",
+      "name": "天津旺港特斯拉中心",
+      "city": "天津"
+    },
+    {
+      "country": "cn",
+      "name": "三亚特斯拉中心",
+      "city": "三亚"
+    },
+    {
+      "country": "cn",
+      "name": "上海森兰交付中心",
+      "city": "上海"
+    },
+    {
+      "country": "cn",
+      "name": "上海闵行交付中心",
+      "city": "上海"
+    },
+    {
+      "country": "cn",
+      "name": "东莞高埗特斯拉中心",
+      "city": "东莞"
+    },
+    {
+      "country": "cn",
+      "name": "中山城南特斯拉中心",
+      "city": "中山"
+    },
+    {
+      "country": "cn",
+      "name": "义乌北苑特斯拉中心",
+      "city": "金华"
+    },
+    {
+      "country": "cn",
+      "name": "乌鲁木齐高新特斯拉中心",
+      "city": "乌鲁木齐"
+    },
+    {
+      "country": "cn",
+      "name": "佛山顺德北滘特斯拉中心",
+      "city": "佛山"
+    },
+    {
+      "country": "cn",
+      "name": "保定东二环特斯拉中心",
+      "city": "保定"
+    },
+    {
+      "country": "cn",
+      "name": "兰州安宁特斯拉中心",
+      "city": "兰州"
+    },
+    {
+      "country": "cn",
+      "name": "北京亦庄交付中心",
+      "city": "北京"
+    },
+    {
+      "country": "cn",
+      "name": "北京蟹岛特斯拉中心",
+      "city": "北京"
+    },
+    {
+      "country": "cn",
+      "name": "南京禄口交付中心",
+      "city": "南京"
+    },
+    {
+      "country": "cn",
+      "name": "南昌恒望特斯拉中心",
+      "city": "南昌"
+    },
+    {
+      "country": "cn",
+      "name": "南通申成交付中心",
+      "city": "南通"
+    },
+    {
+      "country": "cn",
+      "name": "厦门集美特斯拉中心",
+      "city": "厦门"
+    },
+    {
+      "country": "cn",
+      "name": "台州路桥特斯拉中心",
+      "city": "台州"
+    },
+    {
+      "country": "cn",
+      "name": "哈尔滨机场路特斯拉中心",
+      "city": "哈尔滨"
+    },
+    {
+      "country": "cn",
+      "name": "嘉兴南湖特斯拉中心",
+      "city": "嘉兴"
+    },
+    {
+      "country": "cn",
+      "name": "大理晨光路特斯拉中心",
+      "city": "大理"
+    },
+    {
+      "country": "cn",
+      "name": "大连西山湖特斯拉中心",
+      "city": "大连"
+    },
+    {
+      "country": "cn",
+      "name": "太原特斯拉中心",
+      "city": "太原"
+    },
+    {
+      "country": "cn",
+      "name": "宁波鄞州特斯拉中心",
+      "city": "宁波"
+    },
+    {
+      "country": "cn",
+      "name": "广州黄埔交付中心",
+      "city": "广州"
+    },
+    {
+      "country": "cn",
+      "name": "廊坊安次特斯拉中心",
+      "city": "廊坊"
+    },
+    {
+      "country": "cn",
+      "name": "徐州鼓楼特斯拉中心",
+      "city": "徐州"
+    },
+    {
+      "country": "cn",
+      "name": "德阳八角井特斯拉中心",
+      "city": "德阳"
+    },
+    {
+      "country": "cn",
+      "name": "惠州惠城特斯拉中心",
+      "city": "惠州"
+    },
+    {
+      "country": "cn",
+      "name": "成都龙泉交付中心",
+      "city": "成都"
+    },
+    {
+      "country": "cn",
+      "name": "扬州荷叶特斯拉中心",
+      "city": "扬州"
+    },
+    {
+      "country": "cn",
+      "name": "无锡江海西路特斯拉中心",
+      "city": "无锡"
+    },
+    {
+      "country": "cn",
+      "name": "昆明经开特斯拉中心",
+      "city": "昆明"
+    },
+    {
+      "country": "cn",
+      "name": "杭州城北交付中心",
+      "city": "杭州"
+    },
+    {
+      "country": "cn",
+      "name": "杭州萧山交付中心",
+      "city": "杭州"
+    },
+    {
+      "country": "cn",
+      "name": "榆林高新特斯拉中心",
+      "city": "榆林"
+    },
+    {
+      "country": "cn",
+      "name": "武汉中法新城交付中心",
+      "city": "武汉"
+    },
+    {
+      "country": "cn",
+      "name": "汕头高新特斯拉中心",
+      "city": "汕头"
+    },
+    {
+      "country": "cn",
+      "name": "江门蓬江特斯拉中心",
+      "city": "江门"
+    },
+    {
+      "country": "cn",
+      "name": "泰安特斯拉中心",
+      "city": "泰安"
+    },
+    {
+      "country": "cn",
+      "name": "泸州蓝安特斯拉中心",
+      "city": "泸州"
+    },
+    {
+      "country": "cn",
+      "name": "深圳赤湾交付中心",
+      "city": "深圳"
+    },
+    {
+      "country": "cn",
+      "name": "深圳龙岗交付中心",
+      "city": "深圳"
+    },
+    {
+      "country": "cn",
+      "name": "温州龙湾特斯拉中心",
+      "city": "温州"
+    },
+    {
+      "country": "cn",
+      "name": "湖州吴兴特斯拉中心",
+      "city": "湖州"
+    },
+    {
+      "country": "cn",
+      "name": "潍坊特斯拉中心",
+      "city": "潍坊"
+    },
+    {
+      "country": "cn",
+      "name": "烟台机场路特斯拉中心",
+      "city": "烟台"
+    },
+    {
+      "country": "cn",
+      "name": "福州仓山特斯拉中心",
+      "city": "福州"
+    },
+    {
+      "country": "cn",
+      "name": "绍兴袍江特斯拉中心",
+      "city": "绍兴"
+    },
+    {
+      "country": "cn",
+      "name": "苏州相城交付中心",
+      "city": "苏州"
+    },
+    {
+      "country": "cn",
+      "name": "荆州特斯拉中心",
+      "city": "荆州"
+    },
+    {
+      "country": "cn",
+      "name": "衡水振华新路特斯拉中心 衡水 河北",
+      "city": "衡水"
+    },
+    {
+      "country": "cn",
+      "name": "西安交付中心",
+      "city": "西安"
+    },
+    {
+      "country": "cn",
+      "name": "郑州前程交付中心",
+      "city": "郑州"
+    },
+    {
+      "country": "cn",
+      "name": "重庆礼嘉交付中心",
+      "city": "重庆"
+    },
+    {
+      "country": "cn",
+      "name": "银川金凤特斯拉中心",
+      "city": "银川"
+    },
+    {
+      "country": "cn",
+      "name": "长春兴隆交付中心",
+      "city": "长春"
+    },
+    {
+      "country": "cn",
+      "name": "长沙青竹湖交付中心",
+      "city": "长沙"
+    },
+    {
+      "country": "cn",
+      "name": "青岛银川西路特斯拉中心",
+      "city": "青岛"
+    }
+  ]
+}

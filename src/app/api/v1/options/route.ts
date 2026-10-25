@@ -4,6 +4,7 @@ import { withApiAuth } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { ApiOptions, ApiOption } from '@/lib/api-types'
 import { ALPHABETICAL_OPTION_TYPES, compareOptionLabels } from '@/lib/optionSort'
+import { deliveryCenterOptions } from '@/lib/delivery-centers'
 import {
   COUNTRIES,
   MODELS,
@@ -97,7 +98,24 @@ export const GET = withApiAuth({ scope: 'options:read', route: 'GET /v1/options'
       type: string,
       fallback: ApiOption[]
     ): ApiOption[] => {
-      const options = dbOptionsByType[type]?.length > 0 ? dbOptionsByType[type] : fallback
+      const dbOptions = dbOptionsByType[type] || []
+      const options = dbOptions.length > 0 ? [...dbOptions] : [...fallback]
+      if (type === 'country' && dbOptions.length > 0) {
+        const values = new Set(options.map(option => option.value))
+        options.push(...fallback.filter(option =>
+          ['cn', 'il'].includes(option.value) && !values.has(option.value)
+        ))
+      }
+      if (type === 'deliveryLocation') {
+        const values = new Set(options.map(option => option.value.toLocaleLowerCase()))
+        options.push(...deliveryCenterOptions().filter(center =>
+          !values.has(center.value.toLocaleLowerCase())
+        ).map(center => ({
+          value: center.value,
+          label: center.label,
+          metadata: { country: center.country, city: center.city },
+        })))
+      }
       // Countries and delivery locations sort alphabetically (German umlaut handling)
       if (ALPHABETICAL_OPTION_TYPES.has(type)) {
         return options.sort((a, b) => compareOptionLabels(a.label, b.label))

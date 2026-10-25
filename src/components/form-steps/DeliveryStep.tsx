@@ -1,14 +1,8 @@
+import { useId } from 'react'
 import { OrderFormData } from '@/lib/types'
 import { FormOption } from '@/hooks/useOptions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface DeliveryStepProps {
   formData: OrderFormData
@@ -26,6 +20,7 @@ export function DeliveryStep({
   t,
   className = 'space-y-4',
 }: DeliveryStepProps) {
+  const locationListId = useId()
   return (
     <div className={className}>
       <div className="space-y-2">
@@ -40,18 +35,18 @@ export function DeliveryStep({
 
       <div className="space-y-2">
         <Label htmlFor="deliveryLocation">{t('deliveryLocation')} *</Label>
-        <Select value={formData.deliveryLocation} onValueChange={(v) => handleChange('deliveryLocation', v)}>
-          <SelectTrigger>
-            <SelectValue placeholder={t('deliveryLocationSelect')} />
-          </SelectTrigger>
-          <SelectContent>
-            {deliveryLocations.map((loc) => (
-              <SelectItem key={loc.value} value={loc.value}>
-                {loc.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Input
+          id="deliveryLocation"
+          list={locationListId}
+          value={formData.deliveryLocation}
+          onChange={(event) => handleChange('deliveryLocation', event.target.value)}
+          placeholder={t('deliveryLocationSelect')}
+        />
+        <datalist id={locationListId}>
+          {deliveryLocations.map(loc => (
+            <option key={loc.value} value={loc.value} label={loc.label} />
+          ))}
+        </datalist>
       </div>
     </div>
   )
