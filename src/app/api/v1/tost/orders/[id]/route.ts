@@ -7,6 +7,7 @@ import { calculateTimePeriods } from '@/lib/tost-helpers'
 import { normalizeDateFields } from '@/lib/date-utils'
 import { trackApiEvent } from '@/lib/umami'
 import { recordOrderChanges } from '@/lib/order-history'
+import { fillFixedValues } from '@/lib/vehicle-constraints'
 
 // DELETE /api/v1/tost/orders/[id] - Delete a TOST-owned order
 export const DELETE = withTostAuth(
@@ -84,6 +85,11 @@ export const PUT = withTostAuth(
         if (field in body) {
           updateData[field] = body[field] || null
         }
+      }
+
+      // A full update names the trim; fill what it fixes where TOST sent nothing.
+      if (updateData.vehicleType && updateData.model) {
+        Object.assign(updateData, fillFixedValues(updateData))
       }
 
       // Recalculate time periods

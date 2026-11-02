@@ -8,6 +8,7 @@ import { normalizeCountryCode } from '@/lib/country-code'
 import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 import { recordOrderChanges } from '@/lib/order-history'
+import { fillFixedValues } from '@/lib/vehicle-constraints'
 
 type TostOrderBody = Record<string, unknown> & {
   id?: unknown
@@ -22,7 +23,8 @@ function asOptionalString(value: unknown): string | null {
 // Build the data fields from a TOST request body
 function buildOrderData(body: TostOrderBody) {
   normalizeDateFields(body)
-  return {
+  // Some older Tesla trim codes map without a range; the trim fixes it anyway.
+  return fillFixedValues({
     name: asOptionalString(body.name)?.trim() ?? '',
     vehicleType: asOptionalString(body.vehicleType) ?? 'Model Y',
     orderDate: asOptionalString(body.orderDate),
@@ -47,7 +49,7 @@ function buildOrderData(body: TostOrderBody) {
     typeVariant: asOptionalString(body.typeVariant),
     deliveryDate: asOptionalString(body.deliveryDate),
     tostUserId: asOptionalString(body.tostUserId),
-  }
+  })
 }
 
 // Drop null/empty fields so an auto-claim doesn't wipe values the user already

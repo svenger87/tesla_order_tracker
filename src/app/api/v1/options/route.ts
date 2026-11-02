@@ -76,6 +76,7 @@ export const GET = withApiAuth({ scope: 'options:read', route: 'GET /v1/options'
         type: true,
         value: true,
         label: true,
+        vehicleType: true,
         metadata: true,
       },
     })
@@ -89,6 +90,9 @@ export const GET = withApiAuth({ scope: 'options:read', route: 'GET /v1/options'
       dbOptionsByType[opt.type].push({
         value: opt.value,
         label: opt.label,
+        // Model 3 and Model Y each have their own trims and wheels; without
+        // this a client cannot tell which list a value belongs to.
+        vehicleType: opt.vehicleType,
         metadata: opt.metadata ? JSON.parse(opt.metadata) : undefined,
       })
     }
