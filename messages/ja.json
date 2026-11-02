@@ -82,7 +82,8 @@
     "statsTitle": "統計",
     "statsSubtitle": "納期、構成、トレンド",
     "cancelledBadge": "キャンセル済み",
-    "cancelledHint": "この注文はキャンセルされたため、統計には含まれません。"
+    "cancelledHint": "この注文はキャンセルされたため、統計には含まれません。",
+    "apiSourceHint": "{source} 経由で追加"
   },
   "search": {
     "placeholder": "名前、VIN、国で注文を検索...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "この利用者に必要な権限だけを付与してください。",
     "apiKeysName": "名前",
     "apiKeysContact": "連絡先",
+    "apiKeysSource": "バッジ",
+    "apiKeysSourceHint": "このキーで作成されたすべての注文に表示されます（例：アプリ名）。不要な場合は空欄のままにします。",
     "apiKeysScopes": "権限",
     "apiKeysLimits": "制限",
     "apiKeysLimitValues": "{perMinute}/分 · {perDay}/日",

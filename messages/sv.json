@@ -82,7 +82,8 @@
     "statsTitle": "Statistik",
     "statsSubtitle": "Leveranstider, konfigurationer och trender",
     "cancelledBadge": "Avbeställd",
-    "cancelledHint": "Den här beställningen är avbeställd och ingår inte i statistiken."
+    "cancelledHint": "Den här beställningen är avbeställd och ingår inte i statistiken.",
+    "apiSourceHint": "Tillagd via {source}"
   },
   "search": {
     "placeholder": "Sök beställningar efter namn, VIN, land...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Ge bara de behörigheter som den här användaren behöver.",
     "apiKeysName": "Namn",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Märke",
+    "apiKeysSourceHint": "Visas på varje beställning som nyckeln skapar, t.ex. appens namn. Lämna tomt för inget.",
     "apiKeysScopes": "Behörigheter",
     "apiKeysLimits": "Gränser",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dag",

@@ -82,7 +82,8 @@
     "statsTitle": "Statistikk",
     "statsSubtitle": "Leveringstider, konfigurasjoner og trender",
     "cancelledBadge": "Kansellert",
-    "cancelledHint": "Denne bestillingen er kansellert og er utelatt fra statistikken."
+    "cancelledHint": "Denne bestillingen er kansellert og er utelatt fra statistikken.",
+    "apiSourceHint": "Lagt til via {source}"
   },
   "search": {
     "placeholder": "Søk bestillinger etter navn, VIN, land...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Gi bare tilgangene denne brukeren trenger.",
     "apiKeysName": "Navn",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Merke",
+    "apiKeysSourceHint": "Vises på hver bestilling denne nøkkelen oppretter, f.eks. appens navn. La feltet stå tomt for ingen.",
     "apiKeysScopes": "Tilganger",
     "apiKeysLimits": "Grenser",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dag",

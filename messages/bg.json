@@ -82,7 +82,8 @@
     "statsTitle": "Статистики",
     "statsSubtitle": "Време за доставка, конфигурации и тенденции",
     "cancelledBadge": "Отказана",
-    "cancelledHint": "Тази поръчка е отказана и не се включва в статистиката."
+    "cancelledHint": "Тази поръчка е отказана и не се включва в статистиката.",
+    "apiSourceHint": "Добавена чрез {source}"
   },
   "search": {
     "placeholder": "Търсете поръчки по име, VIN, държава...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Давайте само правата, от които този потребител се нуждае.",
     "apiKeysName": "Име",
     "apiKeysContact": "Контакт",
+    "apiKeysSource": "Значка",
+    "apiKeysSourceHint": "Показва се на всяка поръчка, създадена с този ключ, напр. името на приложението. Оставете празно, ако не е нужна.",
     "apiKeysScopes": "Права",
     "apiKeysLimits": "Лимити",
     "apiKeysLimitValues": "{perMinute}/мин · {perDay}/ден",

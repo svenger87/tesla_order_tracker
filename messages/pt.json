@@ -82,7 +82,8 @@
     "statsTitle": "Estatísticas",
     "statsSubtitle": "Prazos de entrega, configurações e tendências",
     "cancelledBadge": "Cancelada",
-    "cancelledHint": "Esta encomenda foi cancelada e está excluída das estatísticas."
+    "cancelledHint": "Esta encomenda foi cancelada e está excluída das estatísticas.",
+    "apiSourceHint": "Adicionada via {source}"
   },
   "search": {
     "placeholder": "Pesquisar encomendas por nome, VIN, país...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Conceda apenas as permissões de que este consumidor precisa.",
     "apiKeysName": "Nome",
     "apiKeysContact": "Contacto",
+    "apiKeysSource": "Selo",
+    "apiKeysSourceHint": "Mostrado em cada encomenda criada por esta chave, p. ex. o nome da app. Deixe vazio para nenhum.",
     "apiKeysScopes": "Permissões",
     "apiKeysLimits": "Limites",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dia",

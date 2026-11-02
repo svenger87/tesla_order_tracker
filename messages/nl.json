@@ -82,7 +82,8 @@
     "statsTitle": "Statistieken",
     "statsSubtitle": "Levertijden, configuraties en trends",
     "cancelledBadge": "Geannuleerd",
-    "cancelledHint": "Deze bestelling is geannuleerd en telt niet mee in de statistieken."
+    "cancelledHint": "Deze bestelling is geannuleerd en telt niet mee in de statistieken.",
+    "apiSourceHint": "Toegevoegd via {source}"
   },
   "search": {
     "placeholder": "Bestellingen zoeken op naam, VIN, land...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Geef alleen de rechten die deze gebruiker nodig heeft.",
     "apiKeysName": "Naam",
     "apiKeysContact": "Contact",
+    "apiKeysSource": "Badge",
+    "apiKeysSourceHint": "Getoond bij elke bestelling die deze sleutel aanmaakt, bijv. de naam van de app. Leeg laten voor geen.",
     "apiKeysScopes": "Rechten",
     "apiKeysLimits": "Limieten",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dag",

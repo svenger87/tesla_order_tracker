@@ -82,7 +82,8 @@
     "statsTitle": "Statistics",
     "statsSubtitle": "Delivery times, configurations and trends",
     "cancelledBadge": "Cancelled",
-    "cancelledHint": "This order was cancelled and is excluded from the statistics."
+    "cancelledHint": "This order was cancelled and is excluded from the statistics.",
+    "apiSourceHint": "Added via {source}"
   },
   "search": {
     "placeholder": "Search orders by name, VIN, country...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Grant only the scopes this consumer needs.",
     "apiKeysName": "Name",
     "apiKeysContact": "Contact",
+    "apiKeysSource": "Badge",
+    "apiKeysSourceHint": "Shown on every order this key creates, e.g. the app's name. Leave empty for none.",
     "apiKeysScopes": "Scopes",
     "apiKeysLimits": "Limits",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/day",

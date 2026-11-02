@@ -82,7 +82,8 @@
     "statsTitle": "Στατιστικά",
     "statsSubtitle": "Χρόνοι παράδοσης, διαμορφώσεις και τάσεις",
     "cancelledBadge": "Ακυρώθηκε",
-    "cancelledHint": "Αυτή η παραγγελία ακυρώθηκε και εξαιρείται από τα στατιστικά."
+    "cancelledHint": "Αυτή η παραγγελία ακυρώθηκε και εξαιρείται από τα στατιστικά.",
+    "apiSourceHint": "Προστέθηκε μέσω {source}"
   },
   "search": {
     "placeholder": "Αναζήτηση παραγγελιών κατά όνομα, VIN, χώρα...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Δώστε μόνο τα δικαιώματα που χρειάζεται αυτός ο καταναλωτής.",
     "apiKeysName": "Όνομα",
     "apiKeysContact": "Επικοινωνία",
+    "apiKeysSource": "Σήμα",
+    "apiKeysSourceHint": "Εμφανίζεται σε κάθε παραγγελία που δημιουργεί αυτό το κλειδί, π.χ. το όνομα της εφαρμογής. Αφήστε κενό για κανένα.",
     "apiKeysScopes": "Δικαιώματα",
     "apiKeysLimits": "Όρια",
     "apiKeysLimitValues": "{perMinute}/λεπτό · {perDay}/ημέρα",

@@ -82,7 +82,8 @@
     "statsTitle": "Statistici",
     "statsSubtitle": "Termene de livrare, configurații și tendințe",
     "cancelledBadge": "Anulată",
-    "cancelledHint": "Această comandă a fost anulată și este exclusă din statistici."
+    "cancelledHint": "Această comandă a fost anulată și este exclusă din statistici.",
+    "apiSourceHint": "Adăugată prin {source}"
   },
   "search": {
     "placeholder": "Căutați comenzi după nume, VIN, țară...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Acordă doar permisiunile de care are nevoie acest consumator.",
     "apiKeysName": "Nume",
     "apiKeysContact": "Contact",
+    "apiKeysSource": "Insignă",
+    "apiKeysSourceHint": "Afișată pe fiecare comandă creată de această cheie, de ex. numele aplicației. Lăsați gol pentru niciuna.",
     "apiKeysScopes": "Permisiuni",
     "apiKeysLimits": "Limite",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/zi",

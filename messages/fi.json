@@ -82,7 +82,8 @@
     "statsTitle": "Tilastot",
     "statsSubtitle": "Toimitusajat, kokoonpanot ja trendit",
     "cancelledBadge": "Peruutettu",
-    "cancelledHint": "Tämä tilaus on peruutettu eikä sitä lasketa tilastoihin."
+    "cancelledHint": "Tämä tilaus on peruutettu eikä sitä lasketa tilastoihin.",
+    "apiSourceHint": "Lisätty palvelun {source} kautta"
   },
   "search": {
     "placeholder": "Hae tilauksia nimellä, VIN-numerolla, maalla...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Anna vain ne oikeudet, joita tämä käyttäjä tarvitsee.",
     "apiKeysName": "Nimi",
     "apiKeysContact": "Yhteystieto",
+    "apiKeysSource": "Merkki",
+    "apiKeysSourceHint": "Näytetään jokaisessa tilauksessa, jonka tämä avain luo, esim. sovelluksen nimi. Jätä tyhjäksi, jos ei merkkiä.",
     "apiKeysScopes": "Oikeudet",
     "apiKeysLimits": "Rajat",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/päivä",

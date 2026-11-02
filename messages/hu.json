@@ -82,7 +82,8 @@
     "statsTitle": "Statisztikák",
     "statsSubtitle": "Szállítási idők, konfigurációk és trendek",
     "cancelledBadge": "Törölve",
-    "cancelledHint": "Ezt a rendelést törölték, és nem számít bele a statisztikába."
+    "cancelledHint": "Ezt a rendelést törölték, és nem számít bele a statisztikába.",
+    "apiSourceHint": "Hozzáadva: {source}"
   },
   "search": {
     "placeholder": "Rendelések keresése név, VIN, ország alapján...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Csak azokat a jogosultságokat add meg, amelyekre ennek a felhasználónak szüksége van.",
     "apiKeysName": "Név",
     "apiKeysContact": "Kapcsolat",
+    "apiKeysSource": "Jelvény",
+    "apiKeysSourceHint": "Minden rendelésen megjelenik, amelyet ez a kulcs hoz létre, pl. az alkalmazás neve. Hagyja üresen, ha nem kell.",
     "apiKeysScopes": "Jogosultságok",
     "apiKeysLimits": "Korlátok",
     "apiKeysLimitValues": "{perMinute}/perc · {perDay}/nap",

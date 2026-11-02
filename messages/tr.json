@@ -82,7 +82,8 @@
     "statsTitle": "İstatistikler",
     "statsSubtitle": "Teslimat süreleri, konfigürasyonlar ve trendler",
     "cancelledBadge": "İptal edildi",
-    "cancelledHint": "Bu sipariş iptal edildi ve istatistiklere dahil edilmiyor."
+    "cancelledHint": "Bu sipariş iptal edildi ve istatistiklere dahil edilmiyor.",
+    "apiSourceHint": "{source} üzerinden eklendi"
   },
   "search": {
     "placeholder": "Siparişlerde isim, VIN, ülke ile ara...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Yalnızca bu kullanıcının ihtiyaç duyduğu yetkileri verin.",
     "apiKeysName": "Ad",
     "apiKeysContact": "İletişim",
+    "apiKeysSource": "Rozet",
+    "apiKeysSourceHint": "Bu anahtarın oluşturduğu her siparişte gösterilir, ör. uygulamanın adı. Hiçbiri için boş bırakın.",
     "apiKeysScopes": "Yetkiler",
     "apiKeysLimits": "Limitler",
     "apiKeysLimitValues": "{perMinute}/dk · {perDay}/gün",

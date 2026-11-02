@@ -82,7 +82,8 @@
     "statsTitle": "Statistiken",
     "statsSubtitle": "Lieferzeiten, Konfigurationen und Trends",
     "cancelledBadge": "Storniert",
-    "cancelledHint": "Diese Bestellung wurde storniert und zählt nicht in die Statistik."
+    "cancelledHint": "Diese Bestellung wurde storniert und zählt nicht in die Statistik.",
+    "apiSourceHint": "Eingetragen über {source}"
   },
   "search": {
     "placeholder": "Bestellungen nach Name, VIN, Land suchen...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Vergib nur die Berechtigungen, die dieser Nutzer braucht.",
     "apiKeysName": "Name",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Badge",
+    "apiKeysSourceHint": "Erscheint an jeder Bestellung, die dieser Schlüssel anlegt, z. B. der Name der App. Leer lassen für keins.",
     "apiKeysScopes": "Berechtigungen",
     "apiKeysLimits": "Limits",
     "apiKeysLimitValues": "{perMinute}/Min. · {perDay}/Tag",

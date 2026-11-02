@@ -82,7 +82,8 @@
     "statsTitle": "Štatistiky",
     "statsSubtitle": "Dodacie lehoty, konfigurácie a trendy",
     "cancelledBadge": "Zrušené",
-    "cancelledHint": "Táto objednávka bola zrušená a nie je zahrnutá do štatistík."
+    "cancelledHint": "Táto objednávka bola zrušená a nie je zahrnutá do štatistík.",
+    "apiSourceHint": "Pridané cez {source}"
   },
   "search": {
     "placeholder": "Hľadajte objednávky podľa mena, VIN, krajiny...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Udeľte len oprávnenia, ktoré tento používateľ potrebuje.",
     "apiKeysName": "Názov",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Odznak",
+    "apiKeysSourceHint": "Zobrazí sa pri každej objednávke vytvorenej týmto kľúčom, napr. názov aplikácie. Nechajte prázdne, ak nemá byť žiadny.",
     "apiKeysScopes": "Oprávnenia",
     "apiKeysLimits": "Limity",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/deň",

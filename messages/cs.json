@@ -82,7 +82,8 @@
     "statsTitle": "Statistiky",
     "statsSubtitle": "Dodací lhůty, konfigurace a trendy",
     "cancelledBadge": "Zrušeno",
-    "cancelledHint": "Tato objednávka byla zrušena a není zahrnuta do statistik."
+    "cancelledHint": "Tato objednávka byla zrušena a není zahrnuta do statistik.",
+    "apiSourceHint": "Přidáno přes {source}"
   },
   "search": {
     "placeholder": "Hledat objednávky podle jména, VIN, země...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Udělte jen oprávnění, která tento uživatel potřebuje.",
     "apiKeysName": "Název",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Odznak",
+    "apiKeysSourceHint": "Zobrazí se u každé objednávky vytvořené tímto klíčem, např. název aplikace. Ponechte prázdné, pokud nemá být žádný.",
     "apiKeysScopes": "Oprávnění",
     "apiKeysLimits": "Limity",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/den",

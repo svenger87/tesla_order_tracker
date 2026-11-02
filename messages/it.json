@@ -82,7 +82,8 @@
     "statsTitle": "Statistiche",
     "statsSubtitle": "Tempi di consegna, configurazioni e tendenze",
     "cancelledBadge": "Annullato",
-    "cancelledHint": "Questo ordine è stato annullato ed è escluso dalle statistiche."
+    "cancelledHint": "Questo ordine è stato annullato ed è escluso dalle statistiche.",
+    "apiSourceHint": "Aggiunto tramite {source}"
   },
   "search": {
     "placeholder": "Cerca ordini per nome, VIN, paese...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Concedi solo i permessi di cui questo consumatore ha bisogno.",
     "apiKeysName": "Nome",
     "apiKeysContact": "Contatto",
+    "apiKeysSource": "Badge",
+    "apiKeysSourceHint": "Mostrato su ogni ordine creato da questa chiave, ad es. il nome dell'app. Lascia vuoto per nessuno.",
     "apiKeysScopes": "Permessi",
     "apiKeysLimits": "Limiti",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/giorno",

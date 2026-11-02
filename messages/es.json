@@ -82,7 +82,8 @@
     "statsTitle": "Estadísticas",
     "statsSubtitle": "Plazos de entrega, configuraciones y tendencias",
     "cancelledBadge": "Cancelado",
-    "cancelledHint": "Este pedido fue cancelado y queda excluido de las estadísticas."
+    "cancelledHint": "Este pedido fue cancelado y queda excluido de las estadísticas.",
+    "apiSourceHint": "Añadido mediante {source}"
   },
   "search": {
     "placeholder": "Buscar pedidos por nombre, VIN, país...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Concede solo los permisos que este consumidor necesita.",
     "apiKeysName": "Nombre",
     "apiKeysContact": "Contacto",
+    "apiKeysSource": "Distintivo",
+    "apiKeysSourceHint": "Se muestra en cada pedido que crea esta clave, p. ej. el nombre de la app. Déjalo vacío para no mostrar ninguno.",
     "apiKeysScopes": "Permisos",
     "apiKeysLimits": "Límites",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/día",

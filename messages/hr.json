@@ -82,7 +82,8 @@
     "statsTitle": "Statistike",
     "statsSubtitle": "Vremena isporuke, konfiguracije i trendovi",
     "cancelledBadge": "Otkazano",
-    "cancelledHint": "Ova narudžba je otkazana i isključena je iz statistike."
+    "cancelledHint": "Ova narudžba je otkazana i isključena je iz statistike.",
+    "apiSourceHint": "Dodano putem {source}"
   },
   "search": {
     "placeholder": "Pretražite narudžbe po imenu, VIN-u, državi...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Dodijelite samo ovlasti koje ovaj korisnik treba.",
     "apiKeysName": "Naziv",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Oznaka",
+    "apiKeysSourceHint": "Prikazuje se na svakoj narudžbi koju stvori ovaj ključ, npr. naziv aplikacije. Ostavite prazno ako ne želite oznaku.",
     "apiKeysScopes": "Ovlasti",
     "apiKeysLimits": "Ograničenja",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dan",

@@ -82,7 +82,8 @@
     "statsTitle": "통계",
     "statsSubtitle": "배송 시간, 구성 및 트렌드",
     "cancelledBadge": "취소됨",
-    "cancelledHint": "이 주문은 취소되어 통계에서 제외됩니다."
+    "cancelledHint": "이 주문은 취소되어 통계에서 제외됩니다.",
+    "apiSourceHint": "{source}을(를) 통해 추가됨"
   },
   "search": {
     "placeholder": "이름, VIN, 국가로 주문 검색...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "이 사용자에게 필요한 권한만 부여하세요.",
     "apiKeysName": "이름",
     "apiKeysContact": "연락처",
+    "apiKeysSource": "배지",
+    "apiKeysSourceHint": "이 키로 생성된 모든 주문에 표시됩니다(예: 앱 이름). 필요 없으면 비워 두세요.",
     "apiKeysScopes": "권한",
     "apiKeysLimits": "한도",
     "apiKeysLimitValues": "{perMinute}/분 · {perDay}/일",

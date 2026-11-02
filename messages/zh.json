@@ -82,7 +82,8 @@
     "statsTitle": "统计",
     "statsSubtitle": "交货时间、配置和趋势",
     "cancelledBadge": "已取消",
-    "cancelledHint": "该订单已取消，不计入统计数据。"
+    "cancelledHint": "该订单已取消，不计入统计数据。",
+    "apiSourceHint": "通过 {source} 添加"
   },
   "search": {
     "placeholder": "按名称、VIN、国家搜索订单...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "只授予该使用方所需的权限。",
     "apiKeysName": "名称",
     "apiKeysContact": "联系方式",
+    "apiKeysSource": "徽章",
+    "apiKeysSourceHint": "显示在此密钥创建的每个订单上，例如应用名称。留空则不显示。",
     "apiKeysScopes": "权限",
     "apiKeysLimits": "限额",
     "apiKeysLimitValues": "{perMinute}/分钟 · {perDay}/天",

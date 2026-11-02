@@ -82,7 +82,8 @@
     "statsTitle": "Statistik",
     "statsSubtitle": "Leveringstider, konfigurationer og trends",
     "cancelledBadge": "Annulleret",
-    "cancelledHint": "Denne ordre er annulleret og indgår ikke i statistikken."
+    "cancelledHint": "Denne ordre er annulleret og indgår ikke i statistikken.",
+    "apiSourceHint": "Tilføjet via {source}"
   },
   "search": {
     "placeholder": "Søg bestillinger efter navn, VIN, land...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Giv kun de rettigheder, denne bruger har brug for.",
     "apiKeysName": "Navn",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Mærke",
+    "apiKeysSourceHint": "Vises på hver ordre, denne nøgle opretter, f.eks. appens navn. Lad feltet stå tomt for intet.",
     "apiKeysScopes": "Rettigheder",
     "apiKeysLimits": "Grænser",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dag",

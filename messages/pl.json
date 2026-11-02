@@ -82,7 +82,8 @@
     "statsTitle": "Statystyki",
     "statsSubtitle": "Czasy dostaw, konfiguracje i trendy",
     "cancelledBadge": "Anulowane",
-    "cancelledHint": "To zamówienie zostało anulowane i nie jest wliczane do statystyk."
+    "cancelledHint": "To zamówienie zostało anulowane i nie jest wliczane do statystyk.",
+    "apiSourceHint": "Dodano przez {source}"
   },
   "search": {
     "placeholder": "Szukaj zamówień po nazwie, VIN, kraju...",
@@ -438,6 +439,8 @@
     "apiKeysFormDescription": "Nadaj tylko te uprawnienia, których ten użytkownik potrzebuje.",
     "apiKeysName": "Nazwa",
     "apiKeysContact": "Kontakt",
+    "apiKeysSource": "Plakietka",
+    "apiKeysSourceHint": "Wyświetlana przy każdym zamówieniu utworzonym tym kluczem, np. nazwa aplikacji. Pozostaw puste, aby jej nie było.",
     "apiKeysScopes": "Uprawnienia",
     "apiKeysLimits": "Limity",
     "apiKeysLimitValues": "{perMinute}/min · {perDay}/dzień",
