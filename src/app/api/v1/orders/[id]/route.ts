@@ -7,7 +7,7 @@ import { UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 import { editCodeMatches } from '@/lib/edit-code'
-import { dateSequenceProblem } from '@/lib/api-order-write'
+import { dateSequenceProblem, failedCodeLock, recordFailedCode, writeBrake } from '@/lib/api-order-write'
 
 // GET /api/v1/orders/[id] - Get a single order by ID
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[id]' },
@@ -39,6 +39,9 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
   async (request: NextRequest, context: RouteContext<{ id: string }>) => {
     try {
       const { id } = await context.params
+      const throttled = writeBrake(request, getApiConsumer(request))
+      if (throttled) return throttled
+
       const body: UpdateOrderRequest = await request.json()
 
       // Validate editCode is provided
@@ -58,8 +61,14 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
         return ApiErrors.notFound('Order')
       }
 
+      // Checked before the code, so a locked order answers the same whether
+      // or not the guess was right.
+      const locked = failedCodeLock(id)
+      if (locked) return locked
+
       // Bcrypt-aware, so codes stored in plain text before hashing still work
       if (!(await editCodeMatches(body.editCode, order.editCode))) {
+        recordFailedCode(id)
         return ApiErrors.unauthorized('Invalid edit code')
       }
 

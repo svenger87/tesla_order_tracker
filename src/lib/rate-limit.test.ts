@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { checkRateLimit, resetRateLimits } from './rate-limit'
+import { checkRateLimit, peekRateLimit, resetRateLimits } from './rate-limit'
 
 const RULE = { limit: 3, windowMs: 60_000 }
 
@@ -45,5 +45,16 @@ describe('checkRateLimit', () => {
     expect(checkRateLimit('api:k', RULE, 1).remaining).toBe(1)
     expect(checkRateLimit('api:k', RULE, 2).remaining).toBe(0)
     expect(checkRateLimit('api:k', RULE, 3).remaining).toBe(0)
+  })
+})
+
+describe('peekRateLimit', () => {
+  test('reports a spent window without counting', () => {
+    const rule = { limit: 2, windowMs: 1000 }
+    expect(peekRateLimit('peek', rule, 0).allowed).toBe(true)
+    checkRateLimit('peek', rule, 0)
+    checkRateLimit('peek', rule, 0)
+    expect(peekRateLimit('peek', rule, 0)).toMatchObject({ allowed: false, remaining: 0 })
+    expect(peekRateLimit('peek', rule, 1000).allowed).toBe(true)
   })
 })

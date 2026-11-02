@@ -2,7 +2,7 @@ import type { NextResponse } from 'next/server'
 import type { ApiConsumer } from './api-consumers'
 import { ApiErrors } from './api-response'
 import { findDateSequenceError } from './date-utils'
-import { checkRateLimit, clientKey } from './rate-limit'
+import { checkRateLimit, clientKey, peekRateLimit } from './rate-limit'
 
 /**
  * New orders per client address per key and hour. A key built into an app is
@@ -22,6 +22,39 @@ export function createBrake(request: Request, consumer: ApiConsumer | null, now 
     `At most ${V1_CREATE_RULE.limit} new orders per hour from one address`,
     limit.retryAfterSeconds,
   )
+}
+
+/** Updates per client address per key, the web form's write budget. */
+export const V1_WRITE_RULE = { limit: 60, windowMs: 15 * 60 * 1000 }
+
+/**
+ * Wrong edit codes per order and hour, from anyone. A shared key lets anyone
+ * try codes, so the budget belongs to the order being guessed at, not to the
+ * caller: switching addresses or keys does not buy more guesses. An honest app
+ * holds the right code and never gets near it.
+ */
+export const V1_FAILED_CODE_RULE = { limit: 10, windowMs: 60 * 60 * 1000 }
+
+/** A 429 when this caller has sent too many updates lately, else null. Built-in keys are never braked. */
+export function writeBrake(request: Request, consumer: ApiConsumer | null, now = Date.now()): NextResponse | null {
+  if (!consumer || consumer.builtin) return null
+  const limit = checkRateLimit(clientKey(request, `v1-write:${consumer.id}`), V1_WRITE_RULE, now)
+  if (limit.allowed) return null
+  return ApiErrors.rateLimited(
+    `At most ${V1_WRITE_RULE.limit} updates per ${V1_WRITE_RULE.windowMs / 60_000} minutes from one address`,
+    limit.retryAfterSeconds,
+  )
+}
+
+/** A 429 while the order is locked after too many wrong codes, else null. Does not count. */
+export function failedCodeLock(orderId: string, now = Date.now()): NextResponse | null {
+  const limit = peekRateLimit(`v1-bad-code:${orderId}`, V1_FAILED_CODE_RULE, now)
+  if (limit.allowed) return null
+  return ApiErrors.rateLimited('Too many wrong edit codes for this order; try again later', limit.retryAfterSeconds)
+}
+
+export function recordFailedCode(orderId: string, now = Date.now()) {
+  checkRateLimit(`v1-bad-code:${orderId}`, V1_FAILED_CODE_RULE, now)
 }
 
 /**

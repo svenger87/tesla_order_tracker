@@ -68,6 +68,23 @@ export function checkRateLimit(
   }
 }
 
+/** Whether `key` still has budget, without spending any. For limits that count only failures. */
+export function peekRateLimit(
+  key: string,
+  rule: RateLimitRule,
+  now: number = Date.now(),
+): RateLimitResult {
+  const existing = windows.get(key)
+  if (!existing || now - existing.startedAt >= rule.windowMs) {
+    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit }
+  }
+  if (existing.count < rule.limit) {
+    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit - existing.count }
+  }
+  const msLeft = existing.startedAt + rule.windowMs - now
+  return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(msLeft / 1000)), remaining: 0 }
+}
+
 /** Test seam — production code never needs this. */
 export function resetRateLimits() {
   windows.clear()

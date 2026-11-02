@@ -316,6 +316,8 @@ paths:
       description: |
         Updates an existing order. Requires the order's edit code for authorization. Requires scope `orders:write`.
         The merged dates must stay in a plausible order (see create).
+        At most 60 updates per 15 minutes from one address. After 10 wrong edit codes
+        within an hour, the order answers `429` to everyone until the hour is over.
       operationId: updateOrder
       x-required-scope: orders:write
       parameters:
