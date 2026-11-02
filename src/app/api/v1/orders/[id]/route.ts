@@ -7,7 +7,7 @@ import { UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 import { editCodeMatches } from '@/lib/edit-code'
-import { dateSequenceProblem, failedCodeLock, recordFailedCode, writeBrake } from '@/lib/api-order-write'
+import { dateSequenceProblem, refundCodeAttempt, reserveCodeAttempt, writeBrake } from '@/lib/api-order-write'
 
 // GET /api/v1/orders/[id] - Get a single order by ID
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[id]' },
@@ -61,16 +61,18 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
         return ApiErrors.notFound('Order')
       }
 
-      // Checked before the code, so a locked order answers the same whether
-      // or not the guess was right.
-      const locked = failedCodeLock(id)
-      if (locked) return locked
+      // Reserved before the compare, so a parallel burst cannot outrun the
+      // count, and a spent budget answers the same whether the guess was right.
+      const consumer = getApiConsumer(request)
+      const reservedAt = Date.now()
+      const exhausted = reserveCodeAttempt(request, consumer, id, reservedAt)
+      if (exhausted) return exhausted
 
       // Bcrypt-aware, so codes stored in plain text before hashing still work
       if (!(await editCodeMatches(body.editCode, order.editCode))) {
-        recordFailedCode(id)
         return ApiErrors.unauthorized('Invalid edit code')
       }
+      refundCodeAttempt(request, consumer, id, reservedAt)
 
       // Optimistic locking: check if order was modified since user loaded it
       if (body.expectedUpdatedAt) {
@@ -151,7 +153,7 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
           where: { id },
           data: updateData,
         })
-        await recordOrderChanges(id, before, u, { tx, source: getApiConsumer(request)?.source ?? null })
+        await recordOrderChanges(id, before, u, { tx, source: consumer?.source ?? null })
         return u
       })
 

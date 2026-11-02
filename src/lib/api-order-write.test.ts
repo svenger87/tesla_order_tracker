@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import {
-  createBrake, dateSequenceProblem, failedCodeLock, recordFailedCode, writeBrake,
-  V1_CREATE_RULE, V1_FAILED_CODE_RULE, V1_WRITE_RULE,
+  createBrake, dateSequenceProblem, refundCodeAttempt, reserveCodeAttempt, writeBrake,
+  V1_CALLER_CODE_RULE, V1_CREATE_RULE, V1_ORDER_CODE_RULE, V1_WRITE_RULE,
 } from './api-order-write'
 import { BUILTIN_CONSUMERS, type ApiConsumer } from './api-consumers'
 
@@ -42,23 +42,40 @@ describe('dateSequenceProblem', () => {
 })
 
 describe('edit-code guessing', () => {
-  const order = 'order-guess-test'
-
-  test('locks an order after too many wrong codes, and only that order', () => {
+  test('one caller runs out of guesses; another caller and the owner do not', () => {
     const now = 5_000_000
-    for (let i = 0; i < V1_FAILED_CODE_RULE.limit; i++) {
-      expect(failedCodeLock(order, now)).toBeNull()
-      recordFailedCode(order, now)
-    }
-    const res = failedCodeLock(order, now)
-    expect(res?.status).toBe(429)
-    expect(failedCodeLock('another-order', now)).toBeNull()
-    // The lock lifts when the window has passed.
-    expect(failedCodeLock(order, now + V1_FAILED_CODE_RULE.windowMs)).toBeNull()
+    const order = 'order-a'
+    for (let i = 0; i < V1_CALLER_CODE_RULE.limit; i++) expect(reserveCodeAttempt(req('6.6.6.6'), key, order, now)).toBeNull()
+    expect(reserveCodeAttempt(req('6.6.6.6'), key, order, now)?.status).toBe(429)
+    // The order itself is not locked by one caller.
+    expect(reserveCodeAttempt(req('7.7.7.7'), key, order, now)).toBeNull()
   })
 
-  test('checking the lock does not count as an attempt', () => {
-    for (let i = 0; i < V1_FAILED_CODE_RULE.limit * 3; i++) expect(failedCodeLock('peek-only', 0)).toBeNull()
+  test('the order locks only when many callers fail on it', () => {
+    const now = 6_000_000
+    const order = 'order-b'
+    let n = 0
+    for (let ip = 0; n < V1_ORDER_CODE_RULE.limit; ip++) {
+      for (let i = 0; i < V1_CALLER_CODE_RULE.limit && n < V1_ORDER_CODE_RULE.limit; i++, n++) {
+        expect(reserveCodeAttempt(req(`10.0.0.${ip}`), key, order, now)).toBeNull()
+      }
+    }
+    expect(reserveCodeAttempt(req('10.0.1.1'), key, order, now)?.status).toBe(429)
+    expect(reserveCodeAttempt(req('10.0.1.1'), key, 'order-c', now)).toBeNull()
+  })
+
+  test('the attempt is reserved before the code is checked, so a parallel burst cannot overrun it', () => {
+    const now = 7_000_000
+    const results = Array.from({ length: V1_CALLER_CODE_RULE.limit + 5 }, () => reserveCodeAttempt(req('8.8.4.4'), key, 'order-d', now))
+    expect(results.filter(r => r === null)).toHaveLength(V1_CALLER_CODE_RULE.limit)
+  })
+
+  test('a right code gives the attempt back', () => {
+    const now = 8_000_000
+    for (let i = 0; i < V1_CALLER_CODE_RULE.limit * 3; i++) {
+      expect(reserveCodeAttempt(req('9.9.4.4'), key, 'order-e', now)).toBeNull()
+      refundCodeAttempt(req('9.9.4.4'), key, 'order-e', now)
+    }
   })
 })
 

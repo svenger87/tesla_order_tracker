@@ -68,21 +68,14 @@ export function checkRateLimit(
   }
 }
 
-/** Whether `key` still has budget, without spending any. For limits that count only failures. */
-export function peekRateLimit(
-  key: string,
-  rule: RateLimitRule,
-  now: number = Date.now(),
-): RateLimitResult {
+/**
+ * Gives back one request taken at `takenAt`, for limits that should only count
+ * failures but must reserve the slot before the outcome is known. A window that
+ * has rolled over since is left alone.
+ */
+export function refundRateLimit(key: string, takenAt: number) {
   const existing = windows.get(key)
-  if (!existing || now - existing.startedAt >= rule.windowMs) {
-    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit }
-  }
-  if (existing.count < rule.limit) {
-    return { allowed: true, retryAfterSeconds: 0, remaining: rule.limit - existing.count }
-  }
-  const msLeft = existing.startedAt + rule.windowMs - now
-  return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(msLeft / 1000)), remaining: 0 }
+  if (existing && existing.startedAt <= takenAt && existing.count > 0) existing.count--
 }
 
 /** Test seam — production code never needs this. */

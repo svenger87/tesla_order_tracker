@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { checkRateLimit, peekRateLimit, resetRateLimits } from './rate-limit'
+import { checkRateLimit, refundRateLimit, resetRateLimits } from './rate-limit'
 
 const RULE = { limit: 3, windowMs: 60_000 }
 
@@ -48,13 +48,19 @@ describe('checkRateLimit', () => {
   })
 })
 
-describe('peekRateLimit', () => {
-  test('reports a spent window without counting', () => {
-    const rule = { limit: 2, windowMs: 1000 }
-    expect(peekRateLimit('peek', rule, 0).allowed).toBe(true)
-    checkRateLimit('peek', rule, 0)
-    checkRateLimit('peek', rule, 0)
-    expect(peekRateLimit('peek', rule, 0)).toMatchObject({ allowed: false, remaining: 0 })
-    expect(peekRateLimit('peek', rule, 1000).allowed).toBe(true)
+describe('refundRateLimit', () => {
+  test('gives back a slot of the window it was taken from', () => {
+    const rule = { limit: 1, windowMs: 1000 }
+    checkRateLimit('refund', rule, 0)
+    refundRateLimit('refund', 0)
+    expect(checkRateLimit('refund', rule, 10).allowed).toBe(true)
+  })
+
+  test('does not touch a newer window', () => {
+    const rule = { limit: 1, windowMs: 1000 }
+    checkRateLimit('refund-old', rule, 0)
+    checkRateLimit('refund-old', rule, 1500) // new window
+    refundRateLimit('refund-old', 0)
+    expect(checkRateLimit('refund-old', rule, 1600).allowed).toBe(false)
   })
 })
