@@ -28,6 +28,14 @@ info:
     Each key has a per-minute limit and a daily quota (UTC day). Responses carry
     `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-Quota-Remaining`; when a
     limit is hit the API answers `429 RATE_LIMITED` with `Retry-After` in seconds.
+    Creating orders is also limited per client address: at most 10 new orders an
+    hour from one address per key, since a key built into an app is shared by all
+    of its users.
+
+    ## Badges
+    A key can carry a badge (e.g. the name of the app using it). Orders created
+    with that key get the badge as their `source` and show it on the site, the
+    way TOST orders show the TOST logo. The admin sets it when issuing the key.
 
     ## Response Format
     All responses follow a consistent envelope format:
@@ -194,7 +202,17 @@ paths:
       tags:
         - Orders
       summary: Create a new order
-      description: Creates a new order with the provided details. Requires scope `orders:write`.
+      description: |
+        Creates a new order with the provided details. Requires scope `orders:write`.
+
+        Send an `editCode` and keep it: it is the only way to update the order later,
+        and it is stored hashed, so it cannot be recovered. The response echoes it back.
+        If the key has a badge, the order's `source` is set to it.
+
+        Dates must be in a plausible order (no order date in the future, production,
+        papers and delivery not before the order date); otherwise `400 VALIDATION_ERROR`
+        with the reason in `details.dates`. Answers `429` after 10 new orders an hour
+        from one address.
       operationId: createOrder
       x-required-scope: orders:write
       requestBody:
@@ -295,7 +313,9 @@ paths:
       tags:
         - Orders
       summary: Update an order
-      description: Updates an existing order. Requires the order's edit code for authorization. Requires scope `orders:write`.
+      description: |
+        Updates an existing order. Requires the order's edit code for authorization. Requires scope `orders:write`.
+        The merged dates must stay in a plausible order (see create).
       operationId: updateOrder
       x-required-scope: orders:write
       parameters:
@@ -1002,8 +1022,7 @@ components:
         source:
           type: string
           nullable: true
-          enum: [tost]
-          description: Order source — "tost" for TOST-managed orders, null for manually created orders
+          description: Order source — "tost" for TOST-managed orders, the badge of the API key that created the order (e.g. "Tostrr"), or null for manually created orders
         tostUserId:
           type: string
           nullable: true
@@ -1148,7 +1167,7 @@ components:
           type: string
         editCode:
           type: string
-          description: Custom edit password (min 6 chars, must contain a number)
+          description: Custom edit password (min 6 chars, must contain a number). Required to update the order later; stored hashed.
 
     UpdateOrderRequest:
       type: object
