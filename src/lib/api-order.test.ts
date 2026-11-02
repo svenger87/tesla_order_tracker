@@ -14,7 +14,7 @@ const order = {
 } satisfies SelectedOrder
 
 const consumer = (scopes: ApiConsumer['scopes']): ApiConsumer => ({
-  id: 'k', name: 'k', builtin: false, scopes, ratePerMinute: 60, quotaPerDay: 5000,
+  id: 'k', name: 'k', builtin: false, scopes, source: null, ratePerMinute: 60, quotaPerDay: 5000,
 })
 
 describe('toApiOrder', () => {

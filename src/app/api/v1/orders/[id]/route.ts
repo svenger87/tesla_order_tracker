@@ -6,6 +6,8 @@ import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
+import { editCodeMatches } from '@/lib/edit-code'
+import { dateSequenceProblem } from '@/lib/api-order-write'
 
 // GET /api/v1/orders/[id] - Get a single order by ID
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders/[id]' },
@@ -56,8 +58,8 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
         return ApiErrors.notFound('Order')
       }
 
-      // Verify editCode matches
-      if (order.editCode !== body.editCode) {
+      // Bcrypt-aware, so codes stored in plain text before hashing still work
+      if (!(await editCodeMatches(body.editCode, order.editCode))) {
         return ApiErrors.unauthorized('Invalid edit code')
       }
 
@@ -109,6 +111,14 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
         }
       }
 
+      // Check the merged chronology, as the web form does
+      const stored = await prisma.order.findUnique({
+        where: { id },
+        select: { orderDate: true, productionDate: true, papersReceivedDate: true, deliveryDate: true },
+      })
+      const sequenceProblem = dateSequenceProblem({ ...stored, ...updateData })
+      if (sequenceProblem) return sequenceProblem
+
       // Recalculate time periods if any date fields changed
       const timePeriods = calculateTimePeriods({
         orderDate: (updateData.orderDate as string) ?? undefined,
@@ -132,7 +142,7 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
           where: { id },
           data: updateData,
         })
-        await recordOrderChanges(id, before, u, { tx })
+        await recordOrderChanges(id, before, u, { tx, source: getApiConsumer(request)?.source ?? null })
         return u
       })
 

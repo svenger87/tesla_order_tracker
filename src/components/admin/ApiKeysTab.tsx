@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Code2, Copy, Check, ExternalLink, Eye, EyeOff, KeyRound, Plus, Pencil, Ban, BarChart3 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Link } from '@/i18n/navigation'
+import { ApiSourceBadge } from '@/components/ApiSourceBadge'
 import { API_SCOPES, type ApiScope } from '@/lib/api-scopes'
 import type { UsageSummary } from '@/lib/api-usage'
 
@@ -30,6 +31,7 @@ interface KeyView {
   id: string
   name: string
   contact: string | null
+  source: string | null
   keyPrefix: string
   scopes: ApiScope[]
   ratePerMinute: number
@@ -43,12 +45,13 @@ interface KeyView {
 interface FormState {
   name: string
   contact: string
+  source: string
   scopes: ApiScope[]
   ratePerMinute: string
   quotaPerDay: string
 }
 
-const EMPTY_FORM: FormState = { name: '', contact: '', scopes: ['orders:read'], ratePerMinute: '60', quotaPerDay: '5000' }
+const EMPTY_FORM: FormState = { name: '', contact: '', source: '', scopes: ['orders:read'], ratePerMinute: '60', quotaPerDay: '5000' }
 
 export function ApiKeysTab() {
   const t = useTranslations('admin')
@@ -167,6 +170,7 @@ export function ApiKeysTab() {
     setForm({
       name: key.name,
       contact: key.contact ?? '',
+      source: key.source ?? '',
       scopes: key.scopes,
       ratePerMinute: String(key.ratePerMinute),
       quotaPerDay: String(key.quotaPerDay),
@@ -192,6 +196,7 @@ export function ApiKeysTab() {
       const body = {
         name: form.name,
         contact: form.contact,
+        source: form.source.trim() || null,
         scopes: form.scopes,
         ratePerMinute: Number(form.ratePerMinute),
         quotaPerDay: Number(form.quotaPerDay),
@@ -308,6 +313,7 @@ export function ApiKeysTab() {
                       <div className="text-xs text-muted-foreground">
                         <span className="font-mono">{k.keyPrefix}…</span>
                         {k.contact && <span className="ml-2">{k.contact}</span>}
+                        {k.source && <ApiSourceBadge source={k.source} className="ml-2 text-[10px]" />}
                         {k.revokedAt && <Badge variant="outline" className="ml-2 border-destructive text-destructive">{t('apiKeysRevokedBadge')}</Badge>}
                       </div>
                     </TableCell>
@@ -508,6 +514,12 @@ export function ApiKeysTab() {
               <Label htmlFor="apiKeyContact">{t('apiKeysContact')}</Label>
               <Input id="apiKeyContact" value={form.contact} onChange={e => setForm(f => ({ ...f, contact: e.target.value }))} />
               {formErrors.contact && <p className="text-xs text-destructive">{formErrors.contact}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="apiKeySource">{t('apiKeysSource')}</Label>
+              <Input id="apiKeySource" maxLength={20} placeholder="Tostrr" value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))} />
+              <p className="text-xs text-muted-foreground">{t('apiKeysSourceHint')}</p>
+              {formErrors.source && <p className="text-xs text-destructive">{formErrors.source}</p>}
             </div>
             <fieldset className="space-y-2">
               <legend className="text-sm font-medium">{t('apiKeysScopes')}</legend>

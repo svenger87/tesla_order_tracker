@@ -9,6 +9,8 @@ export interface ApiConsumer {
   name: string
   builtin: boolean
   scopes: ApiScope[]
+  /** Stamped on Order.source for orders this consumer creates; null = none. */
+  source: string | null
   /** null = not limited. */
   ratePerMinute: number | null
   quotaPerDay: number | null
@@ -24,12 +26,12 @@ export const BUILTIN_EXTERNAL_ID = 'builtin:external'
 export const BUILTIN_CONSUMERS: { tost: ApiConsumer; external: ApiConsumer } = {
   tost: {
     id: BUILTIN_TOST_ID, name: 'TOST', builtin: true,
-    scopes: ['tost'], ratePerMinute: null, quotaPerDay: null,
+    scopes: ['tost'], source: null, ratePerMinute: null, quotaPerDay: null,
   },
   external: {
     id: BUILTIN_EXTERNAL_ID, name: 'External (legacy)', builtin: true,
     scopes: ['orders:read', 'orders:read:pii', 'orders:write', 'options:read'],
-    ratePerMinute: null, quotaPerDay: null,
+    source: null, ratePerMinute: null, quotaPerDay: null,
   },
 }
 
@@ -68,6 +70,7 @@ function fromRecord(record: ApiKeyRecord): ApiConsumer {
     name: record.name,
     builtin: false,
     scopes: parseScopes(record.scopes),
+    source: record.source,
     ratePerMinute: record.ratePerMinute,
     quotaPerDay: record.quotaPerDay,
   }

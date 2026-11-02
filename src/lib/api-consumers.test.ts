@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
   resolveConsumer, invalidateKeyCache, generateApiKey, hashApiKey,
-  BUILTIN_TOST_ID, BUILTIN_EXTERNAL_ID,
+  BUILTIN_TOST_ID, BUILTIN_EXTERNAL_ID, BUILTIN_CONSUMERS,
 } from './api-consumers'
 import type { ApiKeyLookup, ApiKeyRecord } from './api-key-store'
 
@@ -16,7 +16,7 @@ function lookupWith(records: Record<string, ApiKeyRecord>) {
 
 const dbKey = generateApiKey()
 const record: ApiKeyRecord = {
-  id: 'key1', name: 'Canada', scopes: 'orders:read,options:read',
+  id: 'key1', name: 'Canada', scopes: 'orders:read,options:read', source: 'Canada App',
   ratePerMinute: 60, quotaPerDay: 5000, revokedAt: null,
 }
 
@@ -32,6 +32,11 @@ describe('generateApiKey', () => {
 })
 
 describe('resolveConsumer', () => {
+  test('built-in keys carry no badge', () => {
+    expect(BUILTIN_CONSUMERS.tost.source).toBeNull()
+    expect(BUILTIN_CONSUMERS.external.source).toBeNull()
+  })
+
   test('TOST_API_KEY resolves to the unlimited built-in with the tost scope', async () => {
     const { lookup, findByHash } = lookupWith({})
     const c = await resolveConsumer('tost-secret', 'tost', { env, lookup, now: 0 })
@@ -58,12 +63,12 @@ describe('resolveConsumer', () => {
     expect(await resolveConsumer('tost-secret', 'tost', { env: {}, lookup, now: 0 })).toBeNull()
   })
 
-  test('a DB key resolves by hash with its scopes and limits', async () => {
+  test('a DB key resolves by hash with its scopes, badge and limits', async () => {
     const { lookup } = lookupWith({ [dbKey.hash]: record })
     const c = await resolveConsumer(dbKey.secret, 'orders:read', { env, lookup, now: 0 })
     expect(c).toEqual({
       id: 'key1', name: 'Canada', builtin: false,
-      scopes: ['orders:read', 'options:read'], ratePerMinute: 60, quotaPerDay: 5000,
+      scopes: ['orders:read', 'options:read'], source: 'Canada App', ratePerMinute: 60, quotaPerDay: 5000,
     })
   })
 

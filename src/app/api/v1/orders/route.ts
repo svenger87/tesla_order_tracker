@@ -6,6 +6,8 @@ import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
+import { editCodeError, hashEditCode } from '@/lib/edit-code'
+import { createBrake, dateSequenceProblem } from '@/lib/api-order-write'
 
 // GET /api/v1/orders - List all orders with pagination and filtering
 export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders' }, async (request: NextRequest) => {
@@ -62,6 +64,10 @@ export const GET = withApiAuth({ scope: 'orders:read', route: 'GET /v1/orders' }
 // POST /api/v1/orders - Create a new order
 export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders' }, async (request: NextRequest) => {
   try {
+    const consumer = getApiConsumer(request)
+    const throttled = createBrake(request, consumer)
+    if (throttled) return throttled
+
     const body: CreateOrderRequest = await request.json()
 
     // Validate required fields
@@ -71,35 +77,22 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
       })
     }
 
-    // Validate editCode if provided
+    // Stored as a bcrypt hash, like the web form's. Never checked against the
+    // other orders' codes: answering "already in use" would let any key holder
+    // test guesses of someone else's password.
     let editCode: string | undefined = undefined
     if (body.editCode) {
-      if (body.editCode.length < 6) {
-        return ApiErrors.validationError('Validation failed', {
-          editCode: 'Password must be at least 6 characters',
-        })
+      const problem = editCodeError(body.editCode)
+      if (problem) {
+        return ApiErrors.validationError('Validation failed', { editCode: problem })
       }
-      if (!/\d/.test(body.editCode)) {
-        return ApiErrors.validationError('Validation failed', {
-          editCode: 'Password must contain at least one number',
-        })
-      }
-
-      // Check uniqueness
-      const existing = await prisma.order.findUnique({
-        where: { editCode: body.editCode },
-      })
-      if (existing) {
-        return ApiErrors.validationError('Validation failed', {
-          editCode: 'This password is already in use',
-        })
-      }
-
-      editCode = body.editCode
+      editCode = await hashEditCode(body.editCode)
     }
 
     // Normalize date fields
     normalizeDateFields(body)
+    const sequenceProblem = dateSequenceProblem(body as unknown as Record<string, unknown>)
+    if (sequenceProblem) return sequenceProblem
 
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(body)
@@ -131,14 +124,17 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
         deliveryDate: body.deliveryDate || null,
         ...timePeriods,
         ...(editCode && { editCode }),
+        // The key's badge, so its orders show where they came from.
+        ...(consumer?.source && { source: consumer.source }),
       },
     })
 
-    await recordOrderChanges(order.id, null, order)
+    await recordOrderChanges(order.id, null, order, { source: consumer?.source ?? null })
 
     const response: CreateOrderResponse = {
       id: order.id,
-      editCode: order.editCode,
+      // The code as the caller sent it; only its hash is stored.
+      editCode: body.editCode || null,
       message: 'Order created successfully',
     }
 

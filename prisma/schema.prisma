@@ -25,7 +25,7 @@ model Order {
   towHitch              String?  // AHK (ja/nein)
   autopilot             String?  // Autopilot
   seats                 String?  // Sitze (5/7)
-  source                String?  // "tost" for TOST-managed orders, null for manual
+  source                String?  // "tost" for TOST-managed orders, an API key's badge (e.g. "Tostrr") for orders that key created, null for manual
   tostUserId            String?  // TOST's internal user identifier
   deliveryWindow        String?  // Lieferfenster
   deliveryLocation      String?  // Ort (Auslieferung)
@@ -162,6 +162,9 @@ model ApiKey {
   keyHash       String    @unique
   keyPrefix     String
   scopes        String    // comma list, see src/lib/api-scopes.ts
+  // Badge text stamped on Order.source for orders this key creates, e.g. "Tostrr".
+  // null = orders created through this key look like any web order.
+  source        String?
   ratePerMinute Int       @default(60)
   quotaPerDay   Int       @default(5000)
   revokedAt     DateTime?

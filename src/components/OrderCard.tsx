@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Order, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import type { FormOption } from '@/hooks/useOptions'
 import { TeslaCarThumbnail } from './TeslaCarImage'
+import { ApiSourceBadge } from './ApiSourceBadge'
 import { cn } from '@/lib/utils'
 import { calculateDaysBetween, getOrderStatus, isStaleOrder, parseGermanDate } from '@/lib/statistics'
 import { Card, CardContent } from '@/components/ui/card'
@@ -185,6 +186,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
               {order.source === 'tost' && (
                 <Image src="/tost-badge.svg" alt="TOST" width={42} height={21} className="h-4 w-auto shrink-0" />
               )}
+              <ApiSourceBadge source={order.source} className="text-[9px]" />
             </div>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">
               {[order.vehicleType, modelLabel || rangeLabel, driveLabel].filter(Boolean).join(' · ')}

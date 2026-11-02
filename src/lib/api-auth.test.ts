@@ -11,7 +11,7 @@ vi.mock('./db', () => ({ prisma: {} }))
 const NOON = Date.UTC(2026, 8, 19, 12, 0, 0)
 const key = generateApiKey()
 const baseRecord: ApiKeyRecord = {
-  id: 'key1', name: 'Canada', scopes: 'orders:read,options:read',
+  id: 'key1', name: 'Canada', scopes: 'orders:read,options:read', source: null,
   ratePerMinute: 2, quotaPerDay: 1000, revokedAt: null,
 }
 

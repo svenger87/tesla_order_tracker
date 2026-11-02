@@ -23,8 +23,24 @@ export interface ApiKeyInput {
   name?: string
   contact?: string | null
   scopes?: ApiScope[]
+  source?: string | null
   ratePerMinute?: number
   quotaPerDay?: number
+}
+
+/**
+ * Sources the app itself writes. A key may not borrow one: its orders would
+ * look like TOST's (and lose the edit button), or like a plain web order.
+ */
+const RESERVED_SOURCES = ['tost', 'web', 'restore']
+
+/** Shown as a badge on the order, so it is display text, kept short and plain. */
+const SOURCE_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} ._-]{0,19}$/u
+
+export function sourceError(source: string): string | null {
+  if (!SOURCE_PATTERN.test(source)) return 'Badge must be 1–20 letters, digits, spaces, dots, dashes or underscores'
+  if (RESERVED_SOURCES.includes(source.toLowerCase())) return `"${source}" is reserved`
+  return null
 }
 
 const LIMITS = {
@@ -71,6 +87,17 @@ export function parseApiKeyInput(
     }
   } else if (mode === 'create') {
     errors.scopes = 'Scopes are required'
+  }
+
+  if (b.source !== undefined) {
+    const source = typeof b.source === 'string' ? b.source.trim() : b.source
+    if (source === null || source === '') value.source = null
+    else if (typeof source !== 'string') errors.source = 'Badge must be text'
+    else {
+      const err = sourceError(source)
+      if (err) errors.source = err
+      else value.source = source
+    }
   }
 
   for (const field of ['ratePerMinute', 'quotaPerDay'] as const) {

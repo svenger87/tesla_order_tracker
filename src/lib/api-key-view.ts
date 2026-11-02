@@ -9,6 +9,7 @@ export function toKeyView(key: ApiKey, requestsToday = 0) {
     contact: key.contact,
     keyPrefix: key.keyPrefix,
     scopes: parseScopes(key.scopes),
+    source: key.source,
     ratePerMinute: key.ratePerMinute,
     quotaPerDay: key.quotaPerDay,
     revokedAt: key.revokedAt?.toISOString() ?? null,

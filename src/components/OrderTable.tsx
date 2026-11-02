@@ -44,6 +44,7 @@ function formatRelativeTime(
 import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
 import { TeslaCarImage } from './TeslaCarImage'
+import { ApiSourceBadge } from './ApiSourceBadge'
 import { cn } from '@/lib/utils'
 
 // Pre-build color lookup map for O(1) access
@@ -1147,6 +1148,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                           <Image src="/tost-badge.svg" alt="TOST" width={64} height={32} className="h-8 w-auto" />
                         </a>
                       )}
+                      <ApiSourceBadge source={order.source} className="text-[10px]" />
                     </div>
                   </TableCell>
                 )}

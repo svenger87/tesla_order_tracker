@@ -5,6 +5,7 @@ export interface ApiKeyRecord {
   id: string
   name: string
   scopes: string
+  source: string | null
   ratePerMinute: number
   quotaPerDay: number
   revokedAt: Date | null
@@ -18,7 +19,7 @@ export const prismaApiKeyLookup: ApiKeyLookup = {
   findByHash: (hash) =>
     prisma.apiKey.findUnique({
       where: { keyHash: hash },
-      select: { id: true, name: true, scopes: true, ratePerMinute: true, quotaPerDay: true, revokedAt: true },
+      select: { id: true, name: true, scopes: true, source: true, ratePerMinute: true, quotaPerDay: true, revokedAt: true },
     }),
 }
 

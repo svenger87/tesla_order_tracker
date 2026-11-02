@@ -39,6 +39,7 @@ function normalize(v: unknown): string | null {
  * Where a change came from.
  * - 'tost'  — synced from the TOST system
  * - 'web'   — typed in here, by an anonymous visitor or the order's owner
+ * - any other value — an API key's badge (ApiKey.source), e.g. "Tostrr"
  * - null    — the sheet import and older rows written before this was tracked
  */
 /**
@@ -46,7 +47,7 @@ function normalize(v: unknown): string | null {
  * backup — a real edit to the data, so it belongs in the history and in the
  * public feed like any other, rather than appearing as if nobody did it.
  */
-export type ChangeSource = 'tost' | 'web' | 'restore' | null
+export type ChangeSource = 'tost' | 'web' | 'restore' | (string & {}) | null
 
 export interface RecordChangesOpts {
   source?: ChangeSource

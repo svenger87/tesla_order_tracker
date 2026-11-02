@@ -66,3 +66,29 @@ describe('parseApiKeyInput', () => {
     expect(parseApiKeyInput('x', 'update').ok).toBe(false)
   })
 })
+
+describe('badge (source)', () => {
+  const base = { name: 'Tostrr', scopes: ['orders:write'] }
+
+  test('accepts and trims display text', () => {
+    expect(parseApiKeyInput({ ...base, source: '  Tostrr ' }, 'create')).toEqual({
+      ok: true, value: { name: 'Tostrr', scopes: ['orders:write'], source: 'Tostrr' },
+    })
+  })
+
+  test('empty or null clears it', () => {
+    expect(parseApiKeyInput({ source: '' }, 'update')).toEqual({ ok: true, value: { source: null } })
+    expect(parseApiKeyInput({ source: null }, 'update')).toEqual({ ok: true, value: { source: null } })
+  })
+
+  test.each(['tost', 'TOST', 'Web', 'restore'])('refuses the reserved source %s', source => {
+    const r = parseApiKeyInput({ source }, 'update')
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.source).toMatch(/reserved/)
+  })
+
+  test.each(['<b>x</b>', 'a'.repeat(21), '-dash', 42])('refuses %s', source => {
+    expect(parseApiKeyInput({ source }, 'update').ok).toBe(false)
+  })
+})
+

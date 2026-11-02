@@ -53,12 +53,13 @@ export async function POST(request: NextRequest) {
 
   try {
     const { secret, hash, prefix } = generateApiKey()
-    const { name, contact, scopes, ratePerMinute, quotaPerDay } = parsed.value
+    const { name, contact, scopes, source, ratePerMinute, quotaPerDay } = parsed.value
     const key = await prisma.apiKey.create({
       data: {
         name: name!,
         contact: contact ?? null,
         scopes: serializeScopes(scopes!),
+        source: source ?? null,
         keyHash: hash,
         keyPrefix: prefix,
         ...(ratePerMinute !== undefined && { ratePerMinute }),
