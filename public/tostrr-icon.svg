@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- Tostrr's launcher icon (github.com/ArnaudPiroelle/tostrr, app/src/main/res/drawable/ic_launcher.xml), converted from the Android vector drawable. Corners rounded the way launchers mask it. -->
+  <rect width="108" height="108" rx="22" fill="#0A0A0B"/>
+  <circle cx="54" cy="30" r="10" fill="#E31937"/>
+  <path fill="#EDEDEF" d="M24 52h60v8H24zM50 60h8v28h-8z"/>
+</svg>
