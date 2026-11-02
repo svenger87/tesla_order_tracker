@@ -1137,9 +1137,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                            on the entry is unmeasurable. */
                         <span
                           className="shrink-0 rounded-sm border border-pending/40 bg-pending/10 px-1 py-px text-[10px] font-medium text-pending"
-                          title={th('incompleteHint')}
+                          title={t('incompleteHint')}
                         >
-                          {th('incompleteBadge')}
+                          {t('incompleteBadge')}
                         </span>
                       )}
                       {order.source === 'tost' && (
