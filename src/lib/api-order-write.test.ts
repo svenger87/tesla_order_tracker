@@ -42,25 +42,21 @@ describe('dateSequenceProblem', () => {
 })
 
 describe('edit-code guessing', () => {
-  test('one caller runs out of guesses; another caller and the owner do not', () => {
+  test('one caller runs out of guesses, on every order', () => {
     const now = 5_000_000
-    const order = 'order-a'
-    for (let i = 0; i < V1_CALLER_CODE_RULE.limit; i++) expect(reserveCodeAttempt(req('6.6.6.6'), key, order, now)).toBeNull()
-    expect(reserveCodeAttempt(req('6.6.6.6'), key, order, now)?.status).toBe(429)
-    // The order itself is not locked by one caller.
-    expect(reserveCodeAttempt(req('7.7.7.7'), key, order, now)).toBeNull()
+    for (let i = 0; i < V1_CALLER_CODE_RULE.limit; i++) {
+      expect(reserveCodeAttempt(req('6.6.6.6'), key, `order-a${i}`, now)).toBeNull()
+    }
+    expect(reserveCodeAttempt(req('6.6.6.6'), key, 'order-a-next', now)?.status).toBe(429)
+    expect(reserveCodeAttempt(req('7.7.7.7'), key, 'order-a-next', now)).toBeNull()
   })
 
-  test('the order locks only when many callers fail on it', () => {
+  test('guesses from many addresses share one budget per order', () => {
     const now = 6_000_000
-    const order = 'order-b'
-    let n = 0
-    for (let ip = 0; n < V1_ORDER_CODE_RULE.limit; ip++) {
-      for (let i = 0; i < V1_CALLER_CODE_RULE.limit && n < V1_ORDER_CODE_RULE.limit; i++, n++) {
-        expect(reserveCodeAttempt(req(`10.0.0.${ip}`), key, order, now)).toBeNull()
-      }
+    for (let i = 0; i < V1_ORDER_CODE_RULE.limit; i++) {
+      expect(reserveCodeAttempt(req(`10.0.0.${i}`), key, 'order-b', now)).toBeNull()
     }
-    expect(reserveCodeAttempt(req('10.0.1.1'), key, order, now)?.status).toBe(429)
+    expect(reserveCodeAttempt(req('10.0.1.1'), key, 'order-b', now)?.status).toBe(429)
     expect(reserveCodeAttempt(req('10.0.1.1'), key, 'order-c', now)).toBeNull()
   })
 

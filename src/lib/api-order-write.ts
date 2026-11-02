@@ -45,11 +45,13 @@ export function writeBrake(request: Request, consumer: ApiConsumer | null, now =
 export const V1_CALLER_CODE_RULE = { limit: 10, windowMs: 60 * 60 * 1000 }
 
 /**
- * Wrong edit codes per order and hour, from everyone together: the backstop
- * for guesses spread over many addresses. Set well above the per-caller limit,
- * so one caller alone cannot lock an owner out of their own order.
+ * Wrong edit codes per order and hour, from everyone together, so guesses
+ * spread over many addresses get no more tries than one caller. Someone can
+ * use it to block an order's API updates for an hour; the owner can still edit
+ * on the website, and an admin can reset the code. A bigger guess budget would
+ * cost more than that.
  */
-export const V1_ORDER_CODE_RULE = { limit: 50, windowMs: 60 * 60 * 1000 }
+export const V1_ORDER_CODE_RULE = { limit: 10, windowMs: 60 * 60 * 1000 }
 
 function codeKeys(request: Request, consumer: ApiConsumer | null, orderId: string) {
   return {
