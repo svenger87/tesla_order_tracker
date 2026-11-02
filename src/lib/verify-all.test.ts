@@ -81,7 +81,7 @@ it.skipIf(!SOURCE)('every published figure survives an independent recount', () 
   check('Stichprobe Bestellung→Papiere', handed.filter(o => between(o.orderDate, o.papersReceivedDate) !== null).length, stats.sampleSizes.orderToPapers)
 
   check('TOST-Bestellungen', live.filter(o => o.source === 'tost').length, stats.tostOrders)
-  check('Webapp-Bestellungen', live.filter(o => o.source !== 'tost').length, stats.manualOrders)
+  check('Webapp-Bestellungen', live.filter(o => !o.source).length, stats.manualOrders)
   check('ohne gültiges Datum', live.filter(o => d(o.orderDate) === null).length, stats.ordersWithoutDate)
 
   // Every duration the app reports must be non-negative and derived from dates

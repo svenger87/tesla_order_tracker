@@ -108,7 +108,10 @@ export interface OrderStatistics {
   /** `country` is an ISO country code (lowercase, e.g. 'de'), the UNKNOWN_COUNTRY sentinel, or a raw fallback string. Resolve at display time via a useOptions() lookup. */
   countryDeliveryStats: { country: string; avgDays: number; medianDays: number; count: number }[]
   tostOrders: number
+  /** Typed in on the site (source null). */
   manualOrders: number
+  /** Orders created through an API key, per badge (ApiKey.source), largest first. */
+  apiSourceOrders: { source: string; count: number }[]
   vinsThisWeek: number
   avgVinToProduction: number | null
   avgProductionToPapers: number | null
@@ -679,7 +682,14 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
 
   // Source distribution
   const tostOrders = filteredOrders.filter(o => o.source === 'tost').length
-  const manualOrders = totalOrders - tostOrders
+  const manualOrders = filteredOrders.filter(o => !o.source).length
+  const apiSourceCounts = new Map<string, number>()
+  for (const o of filteredOrders) {
+    if (o.source && o.source !== 'tost') apiSourceCounts.set(o.source, (apiSourceCounts.get(o.source) ?? 0) + 1)
+  }
+  const apiSourceOrders = [...apiSourceCounts]
+    .map(([source, count]) => ({ source, count }))
+    .sort((a, b) => b.count - a.count || a.source.localeCompare(b.source))
 
   // VINs this week (ISO week) — use local time to match parseGermanDate
   const now = new Date()
@@ -747,6 +757,7 @@ export function calculateStatistics(orders: Order[], period?: StatsPeriod, vehic
     countryDeliveryStats,
     tostOrders,
     manualOrders,
+    apiSourceOrders,
     vinsThisWeek,
     avgVinToProduction,
     avgProductionToPapers,

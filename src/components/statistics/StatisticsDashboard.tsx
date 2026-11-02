@@ -249,7 +249,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     minimal
                     delay={0.7}
                   />
-                  {/* Order Sources: Webapp + TOST stacked bar */}
+                  {/* Order Sources: Webapp, TOST and each API badge, stacked */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -260,30 +260,37 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                       <Users className="h-4 w-4" />
                       {t('orderSources')}
                     </div>
-                    {stats.totalOrders > 0 && (
-                      <>
-                        <div className="flex h-4 w-full overflow-hidden rounded-full">
-                          <div
-                            className="bg-primary transition-all"
-                            style={{ width: `${Math.round((stats.manualOrders / stats.totalOrders) * 100)}%` }}
-                          />
-                          <div
-                            className="bg-primary/40 transition-all"
-                            style={{ width: `${Math.round((stats.tostOrders / stats.totalOrders) * 100)}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" />
-                            {t('manualOrders')} {stats.manualOrders} ({Math.round((stats.manualOrders / stats.totalOrders) * 100)}%)
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary/40" />
-                            {t('tostOrders')} {stats.tostOrders} ({Math.round((stats.tostOrders / stats.totalOrders) * 100)}%)
-                          </span>
-                        </div>
-                      </>
-                    )}
+                    {stats.totalOrders > 0 && (() => {
+                      // Webapp and TOST first, then one segment per API badge (e.g. Tostrr).
+                      const SHADES = ['bg-primary', 'bg-primary/40', 'bg-primary/70', 'bg-primary/20', 'bg-primary/55', 'bg-primary/30']
+                      const segments = [
+                        { key: 'web', label: t('manualOrders'), count: stats.manualOrders },
+                        { key: 'tost', label: t('tostOrders'), count: stats.tostOrders },
+                        ...stats.apiSourceOrders.map(s => ({ key: `api:${s.source}`, label: s.source, count: s.count })),
+                      ].filter(s => s.count > 0)
+                      const pct = (n: number) => Math.round((n / stats.totalOrders) * 100)
+                      return (
+                        <>
+                          <div className="flex h-4 w-full overflow-hidden rounded-full">
+                            {segments.map((s, i) => (
+                              <div
+                                key={s.key}
+                                className={`${SHADES[i % SHADES.length]} transition-all`}
+                                style={{ width: `${(s.count / stats.totalOrders) * 100}%` }}
+                              />
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                            {segments.map((s, i) => (
+                              <span key={s.key} className="flex items-center gap-1.5">
+                                <span className={`inline-block h-2.5 w-2.5 rounded-full ${SHADES[i % SHADES.length]}`} />
+                                {s.label} {s.count} ({pct(s.count)}%)
+                              </span>
+                            ))}
+                          </div>
+                        </>
+                      )
+                    })()}
                   </motion.div>
                 </div>
               </div>

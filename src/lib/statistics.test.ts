@@ -108,3 +108,20 @@ describe('calculateStatistics — segment detail', () => {
     expect(stats.segmentPapersToDelivery.min).toBe(0)
   })
 })
+
+describe('order sources', () => {
+  it('counts web, TOST and each API badge separately, largest badge first', () => {
+    const stats = calculateStatistics([
+      order({ source: null }), order({ source: null }),
+      order({ source: 'tost' }),
+      order({ source: 'Tostrr' }), order({ source: 'Tostrr' }), order({ source: 'Tostrr' }),
+      order({ source: 'Other App' }),
+    ])
+    expect(stats.manualOrders).toBe(2)
+    expect(stats.tostOrders).toBe(1)
+    expect(stats.apiSourceOrders).toEqual([
+      { source: 'Tostrr', count: 3 },
+      { source: 'Other App', count: 1 },
+    ])
+  })
+})
