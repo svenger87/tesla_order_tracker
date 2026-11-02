@@ -6,6 +6,7 @@ import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
+import { fillFixedValues } from '@/lib/vehicle-constraints'
 import { editCodeError, hashEditCode } from '@/lib/edit-code'
 import { createBrake, dateSequenceProblem } from '@/lib/api-order-write'
 
@@ -97,6 +98,17 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
     // Calculate time periods from dates
     const timePeriods = calculateTimePeriods(body)
 
+    // What the trim fixes, where the caller sent nothing — as for TOST orders.
+    const fixed = fillFixedValues({
+      vehicleType: body.vehicleType || 'Model Y',
+      model: body.model || null,
+      range: body.range || null,
+      drive: body.drive || null,
+      interior: body.interior || null,
+      wheels: body.wheels || null,
+      seats: body.seats || null,
+    })
+
     // Create order
     const order = await prisma.order.create({
       data: {
@@ -105,14 +117,14 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
         orderDate: body.orderDate || null,
         country: body.country || null,
         model: body.model || null,
-        range: body.range || null,
-        drive: body.drive || null,
+        range: fixed.range,
+        drive: fixed.drive,
         color: body.color || null,
-        interior: body.interior || null,
-        wheels: body.wheels || null,
+        interior: fixed.interior,
+        wheels: fixed.wheels,
         towHitch: body.towHitch || null,
         autopilot: body.autopilot || null,
-        seats: body.seats || null,
+        seats: fixed.seats,
         deliveryWindow: body.deliveryWindow || null,
         deliveryLocation: body.deliveryLocation || null,
         vin: body.vin || null,
