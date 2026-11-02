@@ -4,9 +4,10 @@ import { withApiAuth, getApiConsumer, RouteContext } from '@/lib/api-auth'
 import { apiOrderSelect, toApiOrder } from '@/lib/api-order'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
 import { UpdateOrderRequest, UpdateOrderResponse } from '@/lib/api-types'
-import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
+import { normalizeDateFields } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 import { editCodeMatches } from '@/lib/edit-code'
+import { normalizeCountryIn, timePeriodsAfterUpdate } from '@/lib/order-update'
 import { dateSequenceProblem, refundCodeAttempt, reserveCodeAttempt, writeBrake } from '@/lib/api-order-write'
 
 // GET /api/v1/orders/[id] - Get a single order by ID
@@ -130,28 +131,14 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
       const sequenceProblem = dateSequenceProblem({ ...stored, ...updateData })
       if (sequenceProblem) return sequenceProblem
 
-      // Recalculate time periods if any date fields changed
-      const timePeriods = calculateTimePeriods({
-        orderDate: (updateData.orderDate as string) ?? undefined,
-        productionDate: (updateData.productionDate as string) ?? undefined,
-        vinReceivedDate: (updateData.vinReceivedDate as string) ?? undefined,
-        deliveryDate: (updateData.deliveryDate as string) ?? undefined,
-        papersReceivedDate: (updateData.papersReceivedDate as string) ?? undefined,
-      })
+      const data = normalizeCountryIn(updateData)
 
-      // Only include time periods that are not null
-      for (const [key, value] of Object.entries(timePeriods)) {
-        if (value !== null) {
-          updateData[key] = value
-        }
-      }
-
-      // Update the order
+      // Update the order, with waiting times worked out from the merged dates
       const updated = await prisma.$transaction(async (tx) => {
         const before = await tx.order.findUnique({ where: { id } })
         const u = await tx.order.update({
           where: { id },
-          data: updateData,
+          data: { ...data, ...timePeriodsAfterUpdate(before, data) },
         })
         await recordOrderChanges(id, before, u, { tx, source: consumer?.source ?? null })
         return u

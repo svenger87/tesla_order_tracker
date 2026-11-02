@@ -9,6 +9,7 @@ import { trackApiEvent } from '@/lib/umami'
 import { ApiOrder } from '@/lib/api-types'
 import { recordOrderChanges } from '@/lib/order-history'
 import { fillFixedValues } from '@/lib/vehicle-constraints'
+import { keepStoredWhenEmpty, timePeriodsAfterUpdate, TOST_KEEP_WHEN_EMPTY } from '@/lib/order-update'
 
 type TostOrderBody = Record<string, unknown> & {
   id?: unknown
@@ -125,13 +126,12 @@ export const POST = withTostAuth(async (request: NextRequest) => {
           select: { id: true, source: true },
         })
         if (existing?.source === 'tost') {
-          const orderData = buildOrderData(body)
-          const timePeriods = calculateTimePeriods(orderData)
+          const orderData = keepStoredWhenEmpty(buildOrderData(body), TOST_KEEP_WHEN_EMPTY)
           await prisma.$transaction(async (tx) => {
             const before = await tx.order.findUnique({ where: { id: bodyId } })
             const u = await tx.order.update({
               where: { id: bodyId },
-              data: { ...orderData, ...timePeriods },
+              data: { ...orderData, ...timePeriodsAfterUpdate(before, orderData) },
             })
             await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
             return u
@@ -152,7 +152,6 @@ export const POST = withTostAuth(async (request: NextRequest) => {
         })
         if (existing) {
           const orderData = buildOrderData(body)
-          const timePeriods = calculateTimePeriods(orderData)
           const newId = typeof body.id === 'string' && body.id ? body.id : undefined
 
           // On auto-claim, only apply TOST fields that have an actual value —
@@ -175,7 +174,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
                     ...claimData,
                     id: newId,
                     source: 'tost',
-                    ...timePeriods,
+                    ...timePeriodsAfterUpdate(oldData, claimData),
                     createdAt,
                   },
                 })
@@ -197,7 +196,7 @@ export const POST = withTostAuth(async (request: NextRequest) => {
                 data: {
                   ...claimData,
                   source: 'tost',
-                  ...timePeriods,
+                  ...timePeriodsAfterUpdate(before, claimData),
                 },
               })
               await recordOrderChanges(u.id, before, u, { source: 'tost', tx })

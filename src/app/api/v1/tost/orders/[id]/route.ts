@@ -3,11 +3,11 @@ import { NextRequest } from 'next/server'
 import { withTostAuth } from '@/lib/tost-auth'
 import { RouteContext } from '@/lib/api-auth'
 import { createApiSuccessResponse, ApiErrors } from '@/lib/api-response'
-import { calculateTimePeriods } from '@/lib/tost-helpers'
 import { normalizeDateFields } from '@/lib/date-utils'
 import { trackApiEvent } from '@/lib/umami'
 import { recordOrderChanges } from '@/lib/order-history'
 import { fillFixedValues } from '@/lib/vehicle-constraints'
+import { keepStoredWhenEmpty, normalizeCountryIn, timePeriodsAfterUpdate, TOST_KEEP_WHEN_EMPTY } from '@/lib/order-update'
 
 // DELETE /api/v1/tost/orders/[id] - Delete a TOST-owned order
 export const DELETE = withTostAuth(
@@ -92,26 +92,15 @@ export const PUT = withTostAuth(
         Object.assign(updateData, fillFixedValues(updateData))
       }
 
-      // Recalculate time periods
-      const dateFields = {
-        orderDate: (updateData.orderDate as string) ?? undefined,
-        productionDate: (updateData.productionDate as string) ?? undefined,
-        vinReceivedDate: (updateData.vinReceivedDate as string) ?? undefined,
-        deliveryDate: (updateData.deliveryDate as string) ?? undefined,
-        papersReceivedDate: (updateData.papersReceivedDate as string) ?? undefined,
-      }
-      const timePeriods = calculateTimePeriods(dateFields)
-      for (const [key, value] of Object.entries(timePeriods)) {
-        if (value !== null) {
-          updateData[key] = value
-        }
-      }
+      // Dates people entered on the webapp survive a sync that has none, and
+      // gb is stored as uk, as on create.
+      const data = normalizeCountryIn(keepStoredWhenEmpty(updateData, TOST_KEEP_WHEN_EMPTY))
 
       const updated = await prisma.$transaction(async (tx) => {
         const before = await tx.order.findUnique({ where: { id } })
         const u = await tx.order.update({
           where: { id },
-          data: updateData,
+          data: { ...data, ...timePeriodsAfterUpdate(before, data) },
         })
         await recordOrderChanges(u.id, before, u, { source: 'tost', tx })
         return u

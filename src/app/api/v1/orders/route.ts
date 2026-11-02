@@ -7,6 +7,7 @@ import { CreateOrderRequest, CreateOrderResponse } from '@/lib/api-types'
 import { normalizeDateFields, calculateTimePeriods } from '@/lib/date-utils'
 import { recordOrderChanges } from '@/lib/order-history'
 import { fillFixedValues } from '@/lib/vehicle-constraints'
+import { normalizeCountryCode } from '@/lib/country-code'
 import { editCodeError, hashEditCode } from '@/lib/edit-code'
 import { createBrake, dateSequenceProblem } from '@/lib/api-order-write'
 
@@ -115,7 +116,7 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
         name: body.name.trim(),
         vehicleType: body.vehicleType || 'Model Y',
         orderDate: body.orderDate || null,
-        country: body.country || null,
+        country: normalizeCountryCode(body.country),
         model: body.model || null,
         range: fixed.range,
         drive: fixed.drive,
