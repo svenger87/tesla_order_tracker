@@ -262,6 +262,7 @@ export function PasswordPromptModal({
               <Input
                 id="newPassword"
                 type="password"
+                autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={tf('passwordPlaceholder')}
@@ -273,6 +274,7 @@ export function PasswordPromptModal({
               <Input
                 id="confirmNewPassword"
                 type="password"
+                autoComplete="new-password"
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 placeholder={tf('confirmPasswordPlaceholder')}

@@ -12,10 +12,10 @@ describe('messageKeyForCode', () => {
     expect(messageKeyForCode('NAME_TOO_SHORT')).toBe('form.validation.nameMinLength')
   })
 
-  test('collapses the six ordering failures onto one message', () => {
+  test('collapses the ordering failures onto one message', () => {
     expect(messageKeyForCode('DELIVERY_BEFORE_ORDER')).toBe('errors.datesOutOfOrder')
     expect(messageKeyForCode('PAPERS_BEFORE_PRODUCTION')).toBe('errors.datesOutOfOrder')
-    expect(messageKeyForCode('PRODUCTION_BEFORE_ORDER')).toBe('errors.datesOutOfOrder')
+    expect(messageKeyForCode('PAPERS_BEFORE_ORDER')).toBe('errors.datesOutOfOrder')
   })
 
   test('keeps the future order date separate, since the fix differs', () => {

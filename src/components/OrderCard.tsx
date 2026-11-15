@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Order, VEHICLE_TYPES, VehicleType } from '@/lib/types'
 import type { FormOption } from '@/hooks/useOptions'
 import { TeslaCarThumbnail } from './TeslaCarImage'
+import { STATUS_DOT_CLASS } from './StatusLegend'
 import { ApiSourceBadge } from './ApiSourceBadge'
 import { cn } from '@/lib/utils'
 import { calculateDaysBetween, getOrderStatus, isStaleOrder, parseGermanDate } from '@/lib/statistics'
@@ -74,14 +75,7 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
   const driveLabel = getLabel(drives, order.drive)
   const countryOpt = countries.find(c => c.value === order.country)
 
-  const statusClass = {
-    ordered: 'bg-neutral-400',
-    vin_received: 'bg-blue-500',
-    production: 'bg-amber-500',
-    papers_received: 'bg-cyan-500',
-    delivery_scheduled: 'bg-amber-500',
-    delivered: 'bg-green-500',
-  }[status]
+  const statusClass = STATUS_DOT_CLASS[status]
 
   // The dot used to expose the raw enum key ("papers_received") as its tooltip.
   const statusLabel = tp({

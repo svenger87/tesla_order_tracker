@@ -26,7 +26,7 @@ function getLocalesByRegion() {
 }
 
 function saveLocalePreference(locale: string) {
-  // Cookie for server-side middleware (next-intl reads NEXT_LOCALE)
+  // Cookie for the server-side proxy (next-intl reads NEXT_LOCALE)
   document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`
   // localStorage as backup
   try { localStorage.setItem('preferred-locale', locale) } catch {}

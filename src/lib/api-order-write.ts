@@ -1,7 +1,8 @@
 import type { NextResponse } from 'next/server'
 import type { ApiConsumer } from './api-consumers'
 import { ApiErrors } from './api-response'
-import { findDateSequenceError } from './date-utils'
+import { describeViolation } from './date-order'
+import { dateViolationsAfterUpdate } from './order-update'
 import { checkRateLimit, clientKey, refundRateLimit } from './rate-limit'
 
 /**
@@ -88,10 +89,23 @@ export function refundCodeAttempt(request: Request, consumer: ApiConsumer | null
 }
 
 /**
- * The chronology check the web form applies. Pass the merged order on update:
- * a single new date only becomes implausible next to the stored ones.
+ * The chronology check the web form applies, as a 400. Pass what is stored
+ * (null on create) and the fields being written; they are judged merged, since
+ * a single new date only becomes implausible next to the stored ones, and a
+ * conflict between two dates the write leaves alone is not this caller's to fix.
+ *
+ * `details.dates` keeps carrying the first code, as documented; each offending
+ * field also gets its own entry naming what it conflicts with.
  */
-export function dateSequenceProblem(data: Record<string, unknown>): NextResponse | null {
-  const code = findDateSequenceError(data)
-  return code ? ApiErrors.validationError('Dates are not in a plausible order', { dates: code }) : null
+export function dateSequenceProblem(stored: Record<string, unknown> | null, update: Record<string, unknown>): NextResponse | null {
+  const violations = dateViolationsAfterUpdate(stored, update)
+  if (violations.length === 0) return null
+  const details: Record<string, string> = { dates: violations[0].code }
+  for (const v of violations) {
+    details[v.field] = details[v.field] ? `${details[v.field]}; ${describeViolation(v)}` : describeViolation(v)
+  }
+  return ApiErrors.validationError(
+    `Dates are not in a plausible order: ${violations.map(describeViolation).join('; ')}`,
+    details,
+  )
 }

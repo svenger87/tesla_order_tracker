@@ -83,51 +83,7 @@ export function normalizeDate(input: string | null | undefined): string | null {
   return `${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}.${year}`
 }
 
-/** Milestones in the order a vehicle actually passes through them. */
-const DATE_SEQUENCE = [
-  { field: 'orderDate', code: 'ORDER' },
-  { field: 'productionDate', code: 'PRODUCTION' },
-  { field: 'papersReceivedDate', code: 'PAPERS' },
-  { field: 'deliveryDate', code: 'DELIVERY' },
-] as const
-
-/**
- * Check a set of date fields for chronological plausibility.
- * Returns an error code, or null when the dates are consistent.
- *
- * `vinReceivedDate` is deliberately excluded from the ordering check — a VIN is
- * regularly assigned after production has already started, so it has no fixed
- * position in the chain. Future dates are allowed for everything except the
- * order date, because planned deliveries are the normal case.
- */
-export function findDateSequenceError(
-  data: Record<string, unknown>,
-): string | null {
-  const parsed = DATE_SEQUENCE.map(({ field, code }) => ({
-    code,
-    date: typeof data[field] === 'string' ? parseGermanDate(data[field] as string) : null,
-  }))
-
-  const order = parsed[0].date
-  if (order) {
-    const endOfToday = new Date()
-    endOfToday.setHours(23, 59, 59, 999)
-    if (order.getTime() > endOfToday.getTime()) return 'ORDER_DATE_IN_FUTURE'
-  }
-
-  for (let i = 0; i < parsed.length; i++) {
-    for (let j = i + 1; j < parsed.length; j++) {
-      const earlier = parsed[i]
-      const later = parsed[j]
-      if (!earlier.date || !later.date) continue
-      if (later.date.getTime() < earlier.date.getTime()) {
-        return `${later.code}_BEFORE_${earlier.code}`
-      }
-    }
-  }
-
-  return null
-}
+// The chronology check lives in date-order.ts.
 
 const DATE_FIELDS = [
   'orderDate', 'vinReceivedDate', 'papersReceivedDate',

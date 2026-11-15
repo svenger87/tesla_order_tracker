@@ -59,6 +59,7 @@ export function PasswordStep({
           <Input
             id="newEditCode"
             type="password"
+            autoComplete="new-password"
             value={newEditCode}
             onChange={(e) => setNewEditCode(e.target.value)}
             placeholder={t('passwordPlaceholder')}
@@ -70,6 +71,7 @@ export function PasswordStep({
           <Input
             id="confirmNewEditCode"
             type="password"
+            autoComplete="new-password"
             value={confirmNewEditCode}
             onChange={(e) => setConfirmNewEditCode(e.target.value)}
             placeholder={t('confirmPasswordPlaceholder')}
@@ -102,6 +104,7 @@ export function PasswordStep({
             <Input
               id="customPassword"
               type="password"
+              autoComplete="new-password"
               value={formData.customPassword}
               onChange={(e) => handleChange('customPassword', e.target.value)}
               placeholder={t('passwordPlaceholder')}
@@ -112,6 +115,7 @@ export function PasswordStep({
             <Input
               id="confirmPassword"
               type="password"
+              autoComplete="new-password"
               value={formData.confirmPassword}
               onChange={(e) => handleChange('confirmPassword', e.target.value)}
               placeholder={t('confirmPasswordPlaceholder')}

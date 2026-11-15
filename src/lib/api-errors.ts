@@ -31,10 +31,11 @@ export const API_ERROR_KEYS: Record<string, string> = {
   ORDER_DATE_IN_FUTURE: 'errors.orderDateInFuture',
   LEGACY_PASSWORD_REQUIRED: 'errors.legacyPasswordRequired',
 
-  // The six ordering failures share one message: naming the offending pair
-  // would need six more strings in every language, and the user's next step is
-  // the same either way — look at the four dates.
-  PRODUCTION_BEFORE_ORDER: 'errors.datesOutOfOrder',
+  // The ordering failures share one message: naming the offending pair would
+  // need a string per pair in every language, and the user's next step is the
+  // same either way — look at the dates. The form names the pair itself, on
+  // the field, before the request is ever sent.
+  DELIVERY_BEFORE_VIN: 'errors.datesOutOfOrder',
   PAPERS_BEFORE_ORDER: 'errors.datesOutOfOrder',
   PAPERS_BEFORE_PRODUCTION: 'errors.datesOutOfOrder',
   DELIVERY_BEFORE_ORDER: 'errors.datesOutOfOrder',

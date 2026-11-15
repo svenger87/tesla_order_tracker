@@ -1,3 +1,5 @@
+// Next.js 16 calls this file `proxy` (it was `middleware`); next-intl's
+// handler works unchanged as the default export.
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 

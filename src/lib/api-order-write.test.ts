@@ -33,11 +33,29 @@ describe('createBrake', () => {
 })
 
 describe('dateSequenceProblem', () => {
-  test('rejects delivery before order', () => {
-    expect(dateSequenceProblem({ orderDate: '10.05.2026', deliveryDate: '01.05.2026' })?.status).toBe(400)
+  test('rejects delivery before order, naming both fields', async () => {
+    const res = dateSequenceProblem(null, { orderDate: '10.05.2026', deliveryDate: '01.05.2026' })
+    expect(res?.status).toBe(400)
+    const body = await res!.json()
+    expect(body.error.code).toBe('VALIDATION_ERROR')
+    expect(body.error.details.dates).toBe('DELIVERY_BEFORE_ORDER')
+    expect(body.error.details.deliveryDate).toBe('deliveryDate (01.05.2026) is before orderDate (10.05.2026)')
+    expect(body.error.message).toContain('deliveryDate (01.05.2026) is before orderDate (10.05.2026)')
   })
   test('accepts a plausible chain', () => {
-    expect(dateSequenceProblem({ orderDate: '01.05.2026', deliveryDate: '10.06.2026' })).toBeNull()
+    expect(dateSequenceProblem(null, { orderDate: '01.05.2026', deliveryDate: '10.06.2026' })).toBeNull()
+  })
+  test('rejects an update whose new delivery date precedes the stored order date', () => {
+    const stored = { orderDate: '10.05.2026', deliveryDate: null }
+    expect(dateSequenceProblem(stored, { ...stored, deliveryDate: '01.05.2026' })?.status).toBe(400)
+  })
+  test('accepts a VIN before the order date (stock cars)', () => {
+    const stored = { orderDate: '10.05.2026', vinReceivedDate: null }
+    expect(dateSequenceProblem(stored, { ...stored, vinReceivedDate: '01.05.2026' })).toBeNull()
+  })
+  test('lets an update through that leaves a stored conflict alone', () => {
+    const stored = { orderDate: '10.05.2026', deliveryDate: '01.05.2026', vinReceivedDate: null }
+    expect(dateSequenceProblem(stored, { name: 'renamed', orderDate: '10.05.2026' })).toBeNull()
   })
 })
 

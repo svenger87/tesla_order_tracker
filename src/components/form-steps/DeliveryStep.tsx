@@ -3,6 +3,7 @@ import { OrderFormData } from '@/lib/types'
 import { FormOption } from '@/hooks/useOptions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DeliveryWindowField } from '@/components/DeliveryWindowField'
 
 interface DeliveryStepProps {
   formData: OrderFormData
@@ -25,11 +26,17 @@ export function DeliveryStep({
     <div className={className}>
       <div className="space-y-2">
         <Label htmlFor="deliveryWindow">{t('deliveryWindow')}</Label>
-        <Input
+        <DeliveryWindowField
           id="deliveryWindow"
           value={formData.deliveryWindow}
-          onChange={(e) => handleChange('deliveryWindow', e.target.value)}
+          onChange={(v) => handleChange('deliveryWindow', v)}
+          orderDate={formData.orderDate}
           placeholder={t('deliveryWindowPlaceholder')}
+          labels={{
+            openCalendar: t('deliveryWindowPick'),
+            pickStart: t('deliveryWindowPickStart'),
+            pickEnd: t('deliveryWindowPickEnd'),
+          }}
         />
       </div>
 

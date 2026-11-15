@@ -68,6 +68,8 @@ export default function AdminLogin() {
               <Label htmlFor="username">{t('username')}</Label>
               <Input
                 id="username"
+                name="username"
+                autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="admin"
@@ -79,7 +81,9 @@ export default function AdminLogin() {
               <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

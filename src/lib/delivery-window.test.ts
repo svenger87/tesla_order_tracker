@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { parseDeliveryWindowStart } from './delivery-window'
+import {
+  formatDeliveryWindow,
+  parseDeliveryWindowRange,
+  parseDeliveryWindowStart,
+} from './delivery-window'
 
 /** Shorthand: the parsed start as YYYY-MM-DD, or null. */
 function start(window: string, orderDate: string | null = '01.06.2026'): string | null {
@@ -144,5 +148,94 @@ describe('parseDeliveryWindowStart — the separator says which world a value co
 
   it('still lets an impossible month override the separator', () => {
     expect(start('05.30.2026 - 06.15.2026')).toBe('2026-05-30')
+  })
+})
+
+describe('parseDeliveryWindowStart — the canonical format the form writes', () => {
+  it('reads a same-year window, year written once at the end', () => {
+    expect(start('11.02.-18.02.2026', '01.01.2026')).toBe('2026-02-11')
+    expect(start('13.12.-31.12.2026')).toBe('2026-12-13')
+  })
+
+  it('reads a window that crosses into the next year', () => {
+    expect(start('28.12.2026-05.01.2027')).toBe('2026-12-28')
+  })
+})
+
+/** Shorthand: the parsed range as "YYYY-MM-DD..YYYY-MM-DD", or null. */
+function range(window: string, orderDate: string | null = '01.06.2026'): string | null {
+  const r = parseDeliveryWindowRange(window, orderDate)
+  if (!r) return null
+  const p = (n: number) => String(n).padStart(2, '0')
+  const iso = (d: Date) => `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+  return `${iso(r.start)}..${iso(r.end)}`
+}
+
+describe('parseDeliveryWindowRange', () => {
+  it('reads both canonical shapes', () => {
+    expect(range('11.02.-18.02.2026', '01.01.2026')).toBe('2026-02-11..2026-02-18')
+    expect(range('28.12.2026-05.01.2027')).toBe('2026-12-28..2027-01-05')
+  })
+
+  it('reads the other day-precise shapes in the live data', () => {
+    expect(range('13.12.-31.12.2026')).toBe('2026-12-13..2026-12-31')
+    expect(range('17.10.2026 - 21.12.2026')).toBe('2026-10-17..2026-12-21')
+    expect(range('03.-30.09.2026')).toBe('2026-09-03..2026-09-30')
+    expect(range('29.08-20.09.2026')).toBe('2026-08-29..2026-09-20')
+    expect(range('09/01-09/30/2026')).toBe('2026-09-01..2026-09-30')
+  })
+
+  it('places year-less windows after the order', () => {
+    expect(range('03.12.-31.12.', '10.11.2026')).toBe('2026-12-03..2026-12-31')
+    expect(range('22 Dezember - 29 Dezember', '10.11.2026')).toBe('2026-12-22..2026-12-29')
+  })
+
+  it('rolls a year-less end into the next year when it falls before the start', () => {
+    expect(range('22 Dezember - 5 Januar', '10.11.2026')).toBe('2026-12-22..2027-01-05')
+  })
+
+  it('refuses windows it cannot read to the day', () => {
+    expect(range('November 2026')).toBeNull()
+    expect(range('Nov - Dez 2026')).toBeNull()
+    expect(range('01/2027-02/2027')).toBeNull()
+    expect(range('17.10.2026')).toBeNull()
+    expect(range('GrosserMeister')).toBeNull()
+    expect(range('')).toBeNull()
+  })
+
+  it('refuses an end before its start', () => {
+    // Live value: the end lies a day before the start.
+    expect(range('01/02/2027 - 31/01/2027')).toBeNull()
+  })
+
+  it('refuses a year-less window without an order date to anchor it', () => {
+    expect(range('03.12.-31.12.', null)).toBeNull()
+  })
+
+  it('refuses when the convention stays ambiguous', () => {
+    expect(range('04/10-08/12/2026', '01.01.2026')).toBeNull()
+    expect(range('04/10-08/12/2026', '01.06.2026')).toBe('2026-10-04..2026-12-08')
+  })
+})
+
+describe('formatDeliveryWindow', () => {
+  it('writes the year once when both ends share it', () => {
+    expect(formatDeliveryWindow(new Date(2026, 1, 11), new Date(2026, 1, 18))).toBe('11.02.-18.02.2026')
+  })
+
+  it('writes both years when the window crosses one', () => {
+    expect(formatDeliveryWindow(new Date(2026, 11, 28), new Date(2027, 0, 5))).toBe('28.12.2026-05.01.2027')
+  })
+
+  it('round-trips through the range parser', () => {
+    for (const [a, b] of [
+      [new Date(2026, 8, 1), new Date(2026, 8, 30)],
+      [new Date(2026, 11, 28), new Date(2027, 0, 5)],
+      [new Date(2026, 9, 4), new Date(2026, 9, 4)],
+    ] as const) {
+      const r = parseDeliveryWindowRange(formatDeliveryWindow(a, b), null)
+      expect(r?.start.getTime()).toBe(a.getTime())
+      expect(r?.end.getTime()).toBe(b.getTime())
+    }
   })
 })

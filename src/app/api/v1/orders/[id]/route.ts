@@ -126,9 +126,9 @@ export const PUT = withApiAuth({ scope: 'orders:write', route: 'PUT /v1/orders/[
       // Check the merged chronology, as the web form does
       const stored = await prisma.order.findUnique({
         where: { id },
-        select: { orderDate: true, productionDate: true, papersReceivedDate: true, deliveryDate: true },
+        select: { orderDate: true, vinReceivedDate: true, productionDate: true, papersReceivedDate: true, deliveryDate: true },
       })
-      const sequenceProblem = dateSequenceProblem({ ...stored, ...updateData })
+      const sequenceProblem = dateSequenceProblem(stored, updateData)
       if (sequenceProblem) return sequenceProblem
 
       const data = normalizeCountryIn(updateData)

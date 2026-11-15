@@ -47,6 +47,10 @@ export const CHART_TOOLTIP_STYLE = {
     fontSize: '12px',
     padding: '6px 10px',
     boxShadow: '0 4px 12px rgb(0 0 0 / 0.12)',
+    // Narrow enough that Recharts can always flip it inside the chart; at
+    // full width the tooltip on the last bar of a phone chart ran past the card.
+    maxWidth: 'min(220px, 60vw)',
+    whiteSpace: 'normal' as const,
   },
   itemStyle: { color: 'var(--card-foreground)', padding: 0 },
   labelStyle: { color: 'var(--card-foreground)', fontWeight: 600, marginBottom: 2 },

@@ -164,6 +164,59 @@ function readStart(text: string, convention: 'day-first' | 'month-first'): Parse
   return null
 }
 
+type Convention = 'day-first' | 'month-first'
+
+/**
+ * A parsed start or end as a date. A part without a year takes `fallbackYear`
+ * when given, otherwise the first year that places it on or after `notBefore`.
+ */
+function resolveParsed(parsed: Parsed | null, notBefore: Date | null): Date | null {
+  if (!parsed) return null
+  const day = parsed.day ?? 1
+
+  if (parsed.year !== null) {
+    return isRealDate(day, parsed.month, parsed.year)
+      ? new Date(parsed.year, parsed.month - 1, day)
+      : null
+  }
+
+  if (!notBefore) return null
+  for (let year = notBefore.getFullYear(); year <= notBefore.getFullYear() + 1; year++) {
+    if (!isRealDate(day, parsed.month, year)) continue
+    const candidate = new Date(year, parsed.month - 1, day)
+    if (candidate.getTime() >= notBefore.getTime()) return candidate
+  }
+  return null
+}
+
+/**
+ * Which conventions a window can be read in, given only its own text: the one
+ * it gives away, or both when every number pair fits either.
+ */
+function candidateConventions(window: string): Convention[] {
+  const detected = detectConvention(window)
+  return detected ? [detected] : ['day-first', 'month-first']
+}
+
+/**
+ * When the text alone left both conventions standing, the order settles it: a
+ * delivery window is a forecast, so a reading that lands before the order was
+ * placed is not a reading of this window. When exactly one survives, it is the
+ * answer; when both do, nothing decides and the value is refused.
+ */
+function pickUnique<T>(
+  readings: T[],
+  key: (r: T) => string,
+  startOf: (r: T) => Date,
+  ordered: Date | null,
+): T | null {
+  const unique = [...new Map(readings.map(r => [key(r), r])).values()]
+  if (unique.length === 1) return unique[0]
+  if (unique.length === 0 || !ordered) return null
+  const after = unique.filter(r => startOf(r).getTime() >= ordered.getTime())
+  return after.length === 1 ? after[0] : null
+}
+
 /**
  * The first day a delivery window covers, for sorting a column of them.
  *
@@ -177,50 +230,82 @@ function readStart(text: string, convention: 'day-first' | 'month-first'): Parse
  * When the text carries no year — half the values do not — it is taken from the
  * order the window belongs to: the first year that places the window after the
  * order was placed. A window is a forecast, so it cannot precede its own order.
+ *
+ * The form now writes "DD.MM.-DD.MM.YYYY" (same year) or
+ * "DD.MM.YYYY-DD.MM.YYYY" (across years); both are read here.
  */
 export function parseDeliveryWindowStart(
   window: string | null | undefined,
   orderDate: string | null | undefined,
 ): Date | null {
   if (!window) return null
-
   const ordered = parseGermanDate(orderDate)
 
-  const resolve = (parsed: Parsed | null): Date | null => {
-    if (!parsed) return null
-    const day = parsed.day ?? 1
-
-    if (parsed.year !== null) {
-      return isRealDate(day, parsed.month, parsed.year)
-        ? new Date(parsed.year, parsed.month - 1, day)
-        : null
-    }
-
-    if (!ordered) return null
-    for (let year = ordered.getFullYear(); year <= ordered.getFullYear() + 1; year++) {
-      if (!isRealDate(day, parsed.month, year)) continue
-      const candidate = new Date(year, parsed.month - 1, day)
-      if (candidate.getTime() >= ordered.getTime()) return candidate
-    }
-    return null
-  }
-
-  const detected = detectConvention(window)
-  if (detected) return resolve(readStart(window, detected))
-
-  // Both conventions fit every pair in the string — "04/10-08/12/2026" is either
-  // 4 October or 10 April — so the text alone cannot settle it. The order can:
-  // a delivery window is a forecast, so a reading that lands before the order
-  // was placed is not a reading of this window. When exactly one survives that,
-  // it is the answer; when both do, nothing decides and the value is refused.
-  const readings = (['day-first', 'month-first'] as const)
-    .map(c => resolve(readStart(window, c)))
+  // "04/10-08/12/2026" is either 4 October or 10 April when nothing in the text
+  // decides it; both readings are taken and the order picks between them.
+  const readings = candidateConventions(window)
+    .map(c => resolveParsed(readStart(window, c), ordered))
     .filter((d): d is Date => d !== null)
 
-  const unique = [...new Map(readings.map(d => [d.getTime(), d])).values()]
-  if (unique.length === 1) return unique[0]
-  if (unique.length === 0 || !ordered) return null
+  return pickUnique(readings, d => String(d.getTime()), d => d, ordered)
+}
 
-  const after = unique.filter(d => d.getTime() >= ordered.getTime())
-  return after.length === 1 ? after[0] : null
+export interface DeliveryWindowRange {
+  start: Date
+  end: Date
+}
+
+/**
+ * Both ends of a delivery window, when the text names two days.
+ *
+ * Used by the form's range picker to preselect what is stored. Stricter than
+ * the start parser on purpose: a window it cannot read to the day — "November
+ * 2026", "Nov - Dez 2026", a single date — returns null, and the form leaves
+ * the text as typed rather than replacing it with a guess.
+ *
+ * An end without a year is placed in the first year that keeps it on or after
+ * the start, so "22 Dezember - 5 Januar" crosses into the next year.
+ */
+export function parseDeliveryWindowRange(
+  window: string | null | undefined,
+  orderDate: string | null | undefined,
+): DeliveryWindowRange | null {
+  if (!window) return null
+  const parts = window.trim().split(/\s*[-–]\s*/)
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return null
+  const ordered = parseGermanDate(orderDate)
+
+  const readings: DeliveryWindowRange[] = []
+  for (const convention of candidateConventions(window)) {
+    const startParsed = readStart(window, convention)
+    const endParsed = readStart(parts[1], convention)
+    if (!startParsed || startParsed.day === null) continue
+    if (!endParsed || endParsed.day === null) continue
+
+    const start = resolveParsed(startParsed, ordered)
+    if (!start) continue
+    const end = resolveParsed(endParsed, start)
+    if (!end || end.getTime() < start.getTime()) continue
+    readings.push({ start, end })
+  }
+
+  return pickUnique(
+    readings,
+    r => `${r.start.getTime()}-${r.end.getTime()}`,
+    r => r.start,
+    ordered,
+  )
+}
+
+/**
+ * The canonical text for a picked range: "DD.MM.-DD.MM.YYYY" when both ends
+ * share a year, "DD.MM.YYYY-DD.MM.YYYY" when the window crosses one.
+ */
+export function formatDeliveryWindow(start: Date, end: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0')
+  const dm = (d: Date) => `${p(d.getDate())}.${p(d.getMonth() + 1)}.`
+  if (start.getFullYear() === end.getFullYear()) {
+    return `${dm(start)}-${dm(end)}${end.getFullYear()}`
+  }
+  return `${dm(start)}${start.getFullYear()}-${dm(end)}${end.getFullYear()}`
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo, memo, useEffect, useRef, useCallback } from 'react'
+import { useState, useMemo, memo, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import Image from 'next/image'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useVirtualizer, useWindowVirtualizer } from '@tanstack/react-virtual'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
@@ -44,6 +44,7 @@ function formatRelativeTime(
 import { OrderProgressBar } from './OrderProgressBar'
 import { OrderCard } from './OrderCard'
 import { TeslaCarImage } from './TeslaCarImage'
+import { StatusLegend } from './StatusLegend'
 import { ApiSourceBadge } from './ApiSourceBadge'
 import { cn } from '@/lib/utils'
 
@@ -384,7 +385,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   // Essential (always visible, not toggleable)
   { key: 'status',             label: 'status',             group: 'essential',     width: 150 },
   { key: 'name',               label: 'name',               group: 'essential',     width: 180 },
-  { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 110 },
+  { key: 'vehicleType',        label: 'vehicle',            group: 'essential',     width: 80  },
   { key: 'carImage',           label: 'image',              group: 'configuration', width: 72  },
   { key: 'orderDate',          label: 'orderDate',          group: 'essential',     width: 120 },
   // Configuration
@@ -422,10 +423,14 @@ const COLUMN_DEFS: ColumnDef[] = [
 // status. Both are essential columns, so these never shift.
 const PIN_LEFT = { status: 42, name: 42 + 150 } as const
 
-// All columns visible by default
-const DEFAULT_VISIBLE_COLUMNS = new Set(
-  COLUMN_DEFS.map(c => c.key)
-)
+// Default columns: what people look at first, about 1,300px in all, so the
+// table fits a laptop screen without scrolling sideways. Every column used to
+// be on (34 of them, ~3,800px). The rest stay one click away under Columns.
+const DEFAULT_VISIBLE_COLUMNS = new Set([
+  'status', 'name', 'vehicleType', 'carImage', 'orderDate',
+  'country', 'model', 'color', 'deliveryWindow', 'waitingDays',
+])
+const ALL_COLUMN_KEYS = COLUMN_DEFS.map(c => c.key)
 
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
 // v2: only a sort the visitor picked is stored. The first key saved the
@@ -453,6 +458,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const [searchInput, setSearchInput] = useState('')
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(DEFAULT_VISIBLE_COLUMNS)
+  const columnsCustomizedRef = useRef(false)
+  const resetColumns = useCallback(() => {
+    columnsCustomizedRef.current = false
+    try { localStorage.removeItem(COLUMNS_STORAGE_KEY) } catch {}
+    setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMNS))
+  }, [])
+  const showAllColumns = useCallback(() => {
+    columnsCustomizedRef.current = true
+    setVisibleColumns(new Set(ALL_COLUMN_KEYS))
+  }, [])
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Car image modal
@@ -518,10 +533,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         const parsed = JSON.parse(savedColumns) as { visible?: string[]; schema?: string }
         if (parsed && Array.isArray(parsed.visible) && typeof parsed.schema === 'string') {
           const visible = new Set(parsed.visible)
-          if (parsed.schema === COLUMNS_SCHEMA) {
+          // Every column of its own schema switched on means the visitor never
+          // customised anything: the old default was "all", saved on every
+          // visit. Those visitors get the new default instead.
+          const savedKeys = parsed.schema.split(',').filter(Boolean)
+          if (savedKeys.length > 0 && savedKeys.every(k => visible.has(k))) {
+            // keep DEFAULT_VISIBLE_COLUMNS
+          } else if (parsed.schema === COLUMNS_SCHEMA) {
+            columnsCustomizedRef.current = true
             setVisibleColumns(visible)
           } else {
             // Schema changed: add ONLY columns that didn't exist when prefs were saved
+            columnsCustomizedRef.current = true
             const previousKeys = new Set(parsed.schema.split(',').filter(Boolean))
             for (const c of COLUMN_DEFS) {
               if (!previousKeys.has(c.key)) visible.add(c.key)
@@ -544,9 +567,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     }
   }, [sortField, sortDirection, isHydrated])
 
-  // Save column visibility to localStorage whenever it changes
+  // Save column visibility once the visitor has changed it
   useEffect(() => {
-    if (isHydrated) {
+    if (isHydrated && columnsCustomizedRef.current) {
       localStorage.setItem(
         COLUMNS_STORAGE_KEY,
         JSON.stringify({ visible: [...visibleColumns], schema: COLUMNS_SCHEMA }),
@@ -557,6 +580,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const isColumnVisible = useCallback((key: string) => visibleColumns.has(key), [visibleColumns])
 
   const toggleColumn = useCallback((key: string) => {
+    columnsCustomizedRef.current = true
     setVisibleColumns(prev => {
       const next = new Set(prev)
       if (next.has(key)) {
@@ -709,14 +733,35 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     overscan: 15,
   })
 
-  // Virtualizer for mobile cards
+  // Virtualizer for mobile cards. It follows the page's own scroll: the list
+  // used to sit in a box 70% of the screen tall, so a swipe moved either the
+  // list or the page depending on where the thumb landed.
   const mobileContainerRef = useRef<HTMLDivElement>(null)
   const CARD_HEIGHT = 58
-  const mobileVirtualizer = useVirtualizer({
-    count: filteredAndSortedOrders.length,
-    getScrollElement: () => mobileContainerRef.current,
+  const [mobileScrollMargin, setMobileScrollMargin] = useState(0)
+  useLayoutEffect(() => {
+    if (!isMobile) return
+    const el = mobileContainerRef.current
+    if (!el) return
+    // Where the list starts on the page; shifts when panels above it open.
+    const measure = () => setMobileScrollMargin(el.getBoundingClientRect().top + window.scrollY)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(document.body)
+    return () => ro.disconnect()
+  }, [isMobile, filteredAndSortedOrders.length])
+  // The list scrolls with the page, so its length is the page's length: all
+  // ~4,400 orders put Recent updates and the footer a quarter of a million
+  // pixels down. Phones get the first page and ask for more.
+  const MOBILE_PAGE = 50
+  const [mobileLimit, setMobileLimit] = useState(MOBILE_PAGE)
+  useEffect(() => { setMobileLimit(MOBILE_PAGE) }, [sortField, sortDirection, localFilters, orders])
+  const mobileCount = Math.min(mobileLimit, filteredAndSortedOrders.length)
+  const mobileVirtualizer = useWindowVirtualizer({
+    count: isMobile ? mobileCount : 0,
     estimateSize: () => CARD_HEIGHT,
-    overscan: 5,
+    overscan: 8,
+    scrollMargin: mobileScrollMargin,
   })
 
   // Scroll virtualizer to a specific order when requested (e.g. from global search)
@@ -724,10 +769,18 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     if (!scrollToOrderId) return
     const index = filteredAndSortedOrders.findIndex(o => o.id === scrollToOrderId)
     if (index === -1) return
+    // Beyond the phone list's current page: grow it first; this effect runs
+    // again once the row exists.
+    if (isMobile && index >= mobileCount) {
+      setMobileLimit(index + 10)
+      return
+    }
 
-    const virtualizer = isMobile ? mobileVirtualizer : tableVirtualizer
-    virtualizer.scrollToIndex(index, { align: 'center', behavior: 'smooth' })
-  }, [scrollToOrderId, filteredAndSortedOrders, isMobile, tableVirtualizer, mobileVirtualizer])
+    // Phones scroll the whole page, where a smooth scroll can cover a hundred
+    // thousand pixels and visibly wander; jump there instead.
+    if (isMobile) mobileVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' })
+    else tableVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'smooth' })
+  }, [scrollToOrderId, filteredAndSortedOrders, isMobile, mobileCount, tableVirtualizer, mobileVirtualizer])
 
   const renderRowAction = (order: Order, compact = false) => {
     const buttonClassName = compact ? 'h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground' : 'h-8 w-8 shrink-0'
@@ -921,7 +974,13 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </PopoverTrigger>
           <PopoverContent className="w-[240px] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto p-3" align="start" collisionPadding={12}>
             <div className="space-y-3">
-              <p className="text-sm font-medium">{tc('visibleColumns')}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium">{tc('visibleColumns')}</p>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={showAllColumns}>{tc('all')}</Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={resetColumns}>{tc('reset')}</Button>
+                </div>
+              </div>
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tc('configuration')}</p>
                 {COLUMN_DEFS.filter(c => c.group === 'configuration').map(col => (
@@ -963,12 +1022,12 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             {orders.length === 0 ? th('noOrders') : th('noFilterResults')}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border bg-card">
+          <div className="rounded-xl border bg-card">
             {/* Track widths must stay in sync with OrderCard's grid, or the
                 labels sit over the wrong column (they used to: "Wartezeit"
                 landed above the car image and "Bild" above the chevron). */}
-            <div className="grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 border-b bg-muted/30 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-              <span />
+            <div className="sticky top-[var(--header-height)] z-10 grid grid-cols-[14px_minmax(0,1fr)_76px_52px_36px] items-center gap-1.5 rounded-t-xl border-b bg-muted px-3 py-2 text-[11px] font-medium text-muted-foreground">
+              <StatusLegend variant="dots" className="-ml-1" />
               <span className="truncate">{t('name')}</span>
               <button
                 type="button"
@@ -990,11 +1049,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
               <span className="sr-only">{t('image')}</span>
               <span className="sr-only">{tc('actions')}</span>
             </div>
-            <div
-              ref={mobileContainerRef}
-              className="overflow-auto"
-              style={{ maxHeight: '70dvh' }}
-            >
+            <div ref={mobileContainerRef} className="overflow-hidden rounded-b-xl">
               <div
                 style={{
                   height: mobileVirtualizer.getTotalSize(),
@@ -1019,7 +1074,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                         top: 0,
                         left: 0,
                         width: '100%',
-                        transform: `translateY(${virtualItem.start}px)`,
+                        transform: `translateY(${virtualItem.start - mobileVirtualizer.options.scrollMargin}px)`,
                       }}
                     >
                       <OrderCard
@@ -1038,6 +1093,20 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 })}
               </div>
             </div>
+            {mobileCount < filteredAndSortedOrders.length && (
+              <div className="flex flex-col items-center gap-1.5 border-t px-3 py-3">
+                <Button
+                  variant="outline"
+                  className="h-10 w-full"
+                  onClick={() => setMobileLimit(l => l + MOBILE_PAGE * 2)}
+                >
+                  {t('showMore', { count: Math.min(MOBILE_PAGE * 2, filteredAndSortedOrders.length - mobileCount) })}
+                </Button>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  {t('shownOfTotal', { shown: mobileCount, total: filteredAndSortedOrders.length })}
+                </span>
+              </div>
+            )}
           </div>
         )
       ) : null}
@@ -1060,7 +1129,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
             <TableHead data-noclip className="pin-col font-bold whitespace-nowrap bg-muted dark:bg-muted text-center" style={{ left: 0 }} title={tc('actions')}>
               <span className="sr-only">{tc('actions')}</span>
             </TableHead>
-            {isColumnVisible('status') && <TableHead data-noclip className="pin-col font-bold whitespace-nowrap bg-muted dark:bg-muted" style={{ left: PIN_LEFT.status }}>{t('status')}</TableHead>}
+            {isColumnVisible('status') && <TableHead data-noclip className="pin-col font-bold whitespace-nowrap bg-muted dark:bg-muted" style={{ left: PIN_LEFT.status }}><span className="inline-flex items-center gap-1">{t('status')}<StatusLegend variant="steps" /></span></TableHead>}
             {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort} className="pin-col pin-col-last" style={{ left: PIN_LEFT.name }}>{t('name')}</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
             {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('image')}</TableHead>}

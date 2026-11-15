@@ -40,11 +40,58 @@ import {
   PasswordStep,
 } from '@/components/form-steps'
 import { useApiError } from '@/hooks/useApiError'
+import {
+  blamedField,
+  changedDateFields,
+  dateOrderViolationsIntroduced,
+  type DateOrderField,
+  type DateOrderViolation,
+} from '@/lib/date-order'
 
 type ValidationMessageKey = Parameters<ReturnType<typeof useTranslations<'form.validation'>>>[0]
 
 function getPasswordValidationMessageKey(errorKey: string | undefined): ValidationMessageKey {
   return (errorKey || 'invalidPassword') as ValidationMessageKey
+}
+
+/** Wizard order: personal, vehicle, appearance, delivery, tracking, (password). */
+const TRACKING_STEP_INDEX = 4
+
+/** Wizard step that holds each date. Everything but the order date is on the tracking step. */
+const DATE_FIELD_STEP: Record<DateOrderField, 'personal' | 'tracking'> = {
+  orderDate: 'personal',
+  vinReceivedDate: 'tracking',
+  productionDate: 'tracking',
+  papersReceivedDate: 'tracking',
+  deliveryDate: 'tracking',
+}
+
+const NOT_BEFORE_KEY = {
+  orderDate: 'dateNotBeforeOrder',
+  vinReceivedDate: 'dateNotBeforeVin',
+  productionDate: 'dateNotBeforeProduction',
+  papersReceivedDate: 'dateNotBeforePapers',
+} as const satisfies Partial<Record<DateOrderField, ValidationMessageKey>>
+
+const NOT_AFTER_KEY = {
+  vinReceivedDate: 'dateNotAfterVin',
+  productionDate: 'dateNotAfterProduction',
+  papersReceivedDate: 'dateNotAfterPapers',
+  deliveryDate: 'dateNotAfterDelivery',
+} as const satisfies Partial<Record<DateOrderField, ValidationMessageKey>>
+
+/** The translation key and date for a violation, worded for the field it is shown on. */
+function dateViolationMessage(
+  v: DateOrderViolation,
+  shownOn: DateOrderField,
+): { key: ValidationMessageKey; date: string } | null {
+  if (v.before === null) return null
+  if (shownOn === v.field) {
+    const key = NOT_BEFORE_KEY[v.before as keyof typeof NOT_BEFORE_KEY]
+    return key ? { key, date: v.beforeValue ?? '' } : null
+  }
+  const key = NOT_AFTER_KEY[v.field as keyof typeof NOT_AFTER_KEY]
+  return key ? { key, date: v.fieldValue } : null
 }
 
 interface OrderFormProps {
@@ -76,12 +123,18 @@ function DatePickerField({
   value,
   onChange,
   placeholder,
-  locale: calendarLocale
+  locale: calendarLocale,
+  id,
+  invalid,
+  describedBy,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder: string
   locale?: Locale
+  id?: string
+  invalid?: boolean
+  describedBy?: string
 }) {
   const [open, setOpen] = useState(false)
   const date = parseGermanDate(value)
@@ -90,10 +143,14 @@ function DatePickerField({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
+          aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
           className={cn(
             "w-full justify-start text-left font-normal",
-            !value && "text-muted-foreground"
+            !value && "text-muted-foreground",
+            invalid && "border-destructive"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -152,6 +209,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
   const apiError = useApiError()
   const tc = useTranslations('common')
   const te = useTranslations('editCodeModal')
+  const terr = useTranslations('errors')
   const locale = useLocale()
   const dateLocale = locale === 'de' ? de : enUS
   const isMobile = useIsMobile()
@@ -293,6 +351,50 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     }
   }, [open, order])
 
+  // Dates that contradict each other, worded for the field they are shown on.
+  // Same rule as the server (date-order.ts): on an edit only conflicts that
+  // involve a date the person changed count, so an order that was stored wrong
+  // can still be saved without touching those dates.
+  const dateFieldErrors = useMemo(() => {
+    const stored = order
+      ? {
+          orderDate: order.orderDate,
+          vinReceivedDate: order.vinReceivedDate,
+          productionDate: order.productionDate,
+          papersReceivedDate: order.papersReceivedDate,
+          deliveryDate: order.deliveryDate,
+        }
+      : null
+    const next = formData as unknown as Record<string, unknown>
+    const changed = changedDateFields(stored, next)
+    const out: Partial<Record<DateOrderField, string>> = {}
+    for (const v of dateOrderViolationsIntroduced(stored, next)) {
+      const field = blamedField(v, changed)
+      if (out[field]) continue
+      if (v.before === null) {
+        out[field] = terr('orderDateInFuture')
+        continue
+      }
+      const msg = dateViolationMessage(v, field)
+      out[field] = msg ? tv(msg.key, { date: msg.date }) : terr('datesOutOfOrder')
+    }
+    return out
+  }, [formData, order, tv, terr])
+
+  /** Banner text for the date errors: specific when the only problem is a future order date. */
+  const dateErrorBanner = useMemo(() => {
+    const fields = Object.keys(dateFieldErrors)
+    const future = terr('orderDateInFuture')
+    return fields.length === 1 && dateFieldErrors.orderDate === future ? future : terr('datesOutOfOrder')
+  }, [dateFieldErrors, terr])
+
+  /** The first wizard step holding a contradicting date, or null. */
+  const firstDateErrorStep = useMemo((): 'personal' | 'tracking' | null => {
+    const fields = Object.keys(dateFieldErrors) as DateOrderField[]
+    if (fields.length === 0) return null
+    return fields.some(f => DATE_FIELD_STEP[f] === 'personal') ? 'personal' : 'tracking'
+  }, [dateFieldErrors])
+
   const handleChange = useCallback((field: keyof OrderFormData, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -365,6 +467,17 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
     if (!formData.orderDate.trim()) {
       setError(tv('orderDateRequired'))
+      setLoading(false)
+      return
+    }
+
+    // Dates that contradict each other: the message is on the field, so take
+    // the person to it — the wizard step that holds it, or the folded-away
+    // tracking section on desktop.
+    if (firstDateErrorStep) {
+      setError(dateErrorBanner)
+      if (firstDateErrorStep === 'tracking') setTrackingOpen(true)
+      setWizardStep(firstDateErrorStep === 'personal' ? 0 : TRACKING_STEP_INDEX)
       setLoading(false)
       return
     }
@@ -483,6 +596,12 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
 
     const stepId = stepIds[stepIndex]
 
+    // A contradicting date on this step holds the person here, like a missing field.
+    if ((Object.keys(dateFieldErrors) as DateOrderField[]).some(f => DATE_FIELD_STEP[f] === stepId)) {
+      setError(dateErrorBanner)
+      return dateErrorBanner
+    }
+
     switch (stepId) {
       case 'personal':
         if (!formData.name.trim()) {
@@ -539,7 +658,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     }
     setError('')
     return ''
-  }, [formData, order, showPasswordStep, tv, t])
+  }, [formData, order, showPasswordStep, tv, t, dateFieldErrors, dateErrorBanner])
 
   // Build wizard steps
   const wizardSteps: WizardStep[] = useMemo(() => {
@@ -556,6 +675,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
             t={(key: string) => t(key)}
             DatePickerField={DatePickerField}
             dateLocale={dateLocale}
+            errors={dateFieldErrors}
           />
         ),
       },
@@ -630,6 +750,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
               t={(key: string) => t(key)}
               DatePickerField={DatePickerField}
               dateLocale={dateLocale}
+              errors={dateFieldErrors}
             />
             {/* Reachable on a phone at last — this control existed only in the
                 desktop tree, so wizard users could not cancel their order. */}
@@ -671,7 +792,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
     formData, handleChange, countries, models, ranges, drives, colors, interiors,
     wheels, towHitch, seats, autopilot, deliveryLocations, selectedModelValue, modelConstraints, mergedConstraints,
     isFieldDisabled, getFieldOptions, filterOptions, handleModelChange, handleVehicleTypeChange,
-    dateLocale, order, isLegacy, newEditCode, confirmNewEditCode, showPasswordStep, t,
+    dateLocale, order, isLegacy, newEditCode, confirmNewEditCode, showPasswordStep, t, dateFieldErrors,
   ])
 
   // ─── Page Mode: Success View ─────────────────────────────────
@@ -793,6 +914,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                 t={(key: string) => t(key)}
                 DatePickerField={DatePickerField}
                 dateLocale={dateLocale}
+                errors={dateFieldErrors}
                 className="contents"
               />
             </div>
@@ -883,6 +1005,7 @@ export function OrderForm({ open, onOpenChange, order, editCode, isLegacy, onSuc
                   t={(key: string) => t(key)}
                   DatePickerField={DatePickerField}
                   dateLocale={dateLocale}
+                  errors={dateFieldErrors}
                   className="contents"
                 />
               </div>

@@ -209,9 +209,12 @@ paths:
         and it is stored hashed, so it cannot be recovered. The response echoes it back.
         If the key has a badge, the order's `source` is set to it.
 
-        Dates must be in a plausible order (no order date in the future, production,
-        papers and delivery not before the order date); otherwise `400 VALIDATION_ERROR`
-        with the reason in `details.dates`. Answers `429` after 10 new orders an hour
+        Dates must be in a plausible order (no order date in the future; papers and
+        delivery not before the order date; delivery not before the VIN, production or
+        papers date; papers not before production). VIN and production may precede the
+        order date, as they do for stock cars; otherwise `400 VALIDATION_ERROR` with the first
+        reason code in `details.dates` and one entry per offending field. On update the
+        merged order is checked, but only conflicts involving a field the request changes. Answers `429` after 10 new orders an hour
         from one address.
       operationId: createOrder
       x-required-scope: orders:write

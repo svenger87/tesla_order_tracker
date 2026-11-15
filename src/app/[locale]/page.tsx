@@ -296,7 +296,10 @@ export default function Home() {
     setHighlightOrderId(orderId)
 
     requestAnimationFrame(() => {
-      const triggers = document.querySelectorAll('[data-state="open"]')
+      // Phones list every order without quarter headers, so there is no
+      // section to scroll to; the list scrolls to the row itself.
+      const isPhone = window.matchMedia('(max-width: 767px)').matches
+      const triggers = isPhone ? [] : document.querySelectorAll('[data-state="open"]')
       const section = Array.from(triggers).find(el => el.textContent?.includes(quarterLabel))
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -411,7 +414,7 @@ export default function Home() {
         {/* Orders Section */}
         {/* gap-0/py-0: the card's default 24px padding stacked on the header's
             own, which left ~45px of blank space above the title. */}
-        <Card className="gap-0 overflow-hidden border-0 bg-transparent py-0 shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
+        <Card className="gap-0 border-0 bg-transparent py-0 shadow-none sm:overflow-hidden sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
           <CardHeader className="border-b bg-transparent px-0 pb-3 pt-0 sm:bg-card sm:px-4 sm:py-4 [.border-b]:pb-3 sm:[.border-b]:pb-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>

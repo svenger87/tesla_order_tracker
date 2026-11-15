@@ -190,9 +190,11 @@ export function predictDelivery(
     filtersUsed.push(segment.segmentLabel)
   } else {
     // Default: order date → delivery date
+    // A negative wait is a date typed or synced wrong, not a fast delivery —
+    // the same rule every average in statistics.ts applies.
     deliveryDays = candidates
       .map(o => calculateDaysBetween(o.orderDate, o.deliveryDate))
-      .filter((d): d is number => d !== null)
+      .filter((d): d is number => d !== null && d >= 0)
       .sort((a, b) => a - b)
 
     const baseDate = orderDate ? parseGermanDate(orderDate) : new Date()
@@ -236,7 +238,10 @@ export function calculateDeliveryTrend(orders: Order[]): DeliveryTrend | null {
   delivered.forEach(o => {
     const date = parseGermanDate(o.deliveryDate)
     const days = calculateDaysBetween(o.orderDate, o.deliveryDate)
-    if (date && days !== null) {
+    // Negative: handed over before it was ordered, which is a wrong date (one
+    // live order shows −240 days). TOST writes are not checked, so these keep
+    // arriving; they must not pull a month's average down.
+    if (date && days !== null && days >= 0) {
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
       if (!monthMap[key]) monthMap[key] = []
       monthMap[key].push(days)
@@ -266,8 +271,16 @@ export function calculateDeliveryTrend(orders: Order[]): DeliveryTrend | null {
     return { monthlyAverages, currentTrend: 'stable', trendChangePercent: 0 }
   }
 
-  const recentAvg = recent3.reduce((s, m) => s + m.avgDays, 0) / recent3.length
-  const previousAvg = previous3.reduce((s, m) => s + m.avgDays, 0) / previous3.length
+  // Average over the deliveries in each window, not over the monthly means: a
+  // month with 19 handovers used to count as much as one with 326, so a single
+  // thin month could swing the headline by itself. Raw days, not the rounded
+  // monthly figures, so rounding cannot accumulate either.
+  const windowMean = (window: typeof monthlyAverages) => {
+    const all = window.flatMap(m => monthMap[m.monthKey])
+    return all.reduce((s, d) => s + d, 0) / all.length
+  }
+  const recentAvg = windowMean(recent3)
+  const previousAvg = windowMean(previous3)
 
   const changePercent = previousAvg > 0 ? Math.round(((recentAvg - previousAvg) / previousAvg) * 100) : 0
 
@@ -291,7 +304,7 @@ export function calculateConfigInsights(
 
   delivered.forEach(o => {
     const days = calculateDaysBetween(o.orderDate, o.deliveryDate)
-    if (days === null) return
+    if (days === null || days < 0) return
 
     let rawKey: string | null = null
     switch (dimension) {

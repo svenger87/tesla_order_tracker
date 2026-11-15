@@ -691,3 +691,11 @@ tbody tr:hover > td.pin-col:first-child {
   background: oklch(0.45 0 0);
   border-color: oklch(0.2 0 0);
 }
+
+/* Date pickers are tables too (react-day-picker). The row striping and hover
+   above are meant for data tables; on a calendar they banded every other week. */
+[data-slot="calendar"] table tbody tr,
+[data-slot="calendar"] table tbody tr:hover {
+  background-color: transparent !important;
+  --row-tint: transparent;
+}

@@ -134,6 +134,9 @@
     "autopilotSelect": "Autopilot wählen",
     "deliveryWindow": "Lieferfenster",
     "deliveryWindowPlaceholder": "z.B. 11.02.-18.02.2026",
+    "deliveryWindowPick": "Lieferfenster im Kalender wählen",
+    "deliveryWindowPickStart": "Ersten Tag des Lieferfensters wählen",
+    "deliveryWindowPickEnd": "Jetzt den letzten Tag wählen",
     "deliveryLocation": "Ort (Auslieferung)",
     "deliveryLocationSelect": "Auslieferungsort wählen oder eingeben",
     "vin": "VIN",
@@ -170,7 +173,15 @@
       "passwordNeedsNumber": "Passwort muss mindestens eine Zahl enthalten",
       "passwordMismatch": "Passwörter stimmen nicht überein",
       "saveError": "Fehler beim Speichern",
-      "nameMinLength": "Benutzername muss mindestens 3 Zeichen lang sein"
+      "nameMinLength": "Benutzername muss mindestens 3 Zeichen lang sein",
+      "dateNotBeforeOrder": "Darf nicht vor dem Bestelldatum ({date}) liegen",
+      "dateNotBeforeVin": "Darf nicht vor dem Datum der VIN-Zuteilung ({date}) liegen",
+      "dateNotBeforeProduction": "Darf nicht vor dem Produktionsdatum ({date}) liegen",
+      "dateNotBeforePapers": "Darf nicht vor dem Datum der Papiere ({date}) liegen",
+      "dateNotAfterVin": "Darf nicht nach dem Datum der VIN-Zuteilung ({date}) liegen",
+      "dateNotAfterProduction": "Darf nicht nach dem Produktionsdatum ({date}) liegen",
+      "dateNotAfterPapers": "Darf nicht nach dem Datum der Papiere ({date}) liegen",
+      "dateNotAfterDelivery": "Darf nicht nach dem Auslieferungsdatum ({date}) liegen"
     },
     "cancelledTitle": "Bestellung storniert?",
     "cancelledDescription": "Wenn du deine Bestellung bei Tesla storniert hast, markiere sie hier. Sie verschwindet aus der Liste und fließt nicht mehr in die Statistik ein — dein Eintrag bleibt aber erhalten.",
@@ -216,6 +227,8 @@
     "passwordNeedsNumber": "Passwort muss mindestens eine Zahl enthalten"
   },
   "table": {
+    "showMore": "{count} weitere anzeigen",
+    "shownOfTotal": "{shown} von {total} angezeigt",
     "status": "Status",
     "name": "Name",
     "vehicle": "Fahrzeug",
@@ -291,7 +304,12 @@
     "production": "Produktion",
     "delivered": "Geliefert",
     "deliveryScheduled": "Lieferung geplant",
-    "stepOfTotal": "Schritt {current} von {total}"
+    "stepOfTotal": "Schritt {current} von {total}",
+    "legendTitle": "Was der Status zeigt",
+    "legendDone": "Schritt erledigt",
+    "legendCurrent": "Aktueller Schritt",
+    "legendPending": "Steht noch aus",
+    "legendOpen": "Status erklären"
   },
   "statistics": {
     "overview": "Übersicht",
@@ -934,7 +952,7 @@
     "tostFieldsRestricted": "Diese Bestellung wird von TOST verwaltet. Nur Bestelldatum, Papierdatum, Produktionsdatum, Typgenehmigung und Typ-Variante können bearbeitet werden.",
     "adminRequired": "Admin-Zugriff erforderlich.",
     "orderDateInFuture": "Das Bestelldatum kann nicht in der Zukunft liegen.",
-    "datesOutOfOrder": "Die Datumsangaben ergeben keine plausible Reihenfolge. Prüfe Bestell-, Produktions-, Papier- und Auslieferungsdatum.",
+    "datesOutOfOrder": "Die Datumsangaben ergeben keine plausible Reihenfolge. Prüfe Bestell-, VIN-, Produktions-, Papier- und Auslieferungsdatum.",
     "legacyPasswordRequired": "Neues Passwort erforderlich für Bestandseinträge.",
     "pageNotFoundTitle": "Seite nicht gefunden",
     "pageNotFoundBody": "Diese Adresse gibt es nicht. Möglicherweise ist der Link veraltet oder hat sich vertippt.",

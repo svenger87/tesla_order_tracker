@@ -134,6 +134,9 @@
     "autopilotSelect": "Select autopilot",
     "deliveryWindow": "Delivery window",
     "deliveryWindowPlaceholder": "e.g. 11.02.-18.02.2026",
+    "deliveryWindowPick": "Pick delivery window in calendar",
+    "deliveryWindowPickStart": "Pick the first day of the window",
+    "deliveryWindowPickEnd": "Now pick the last day",
     "deliveryLocation": "Delivery location",
     "deliveryLocationSelect": "Select or enter delivery location",
     "vin": "VIN",
@@ -170,7 +173,15 @@
       "passwordNeedsNumber": "Password must contain at least one number",
       "passwordMismatch": "Passwords do not match",
       "saveError": "Error saving",
-      "nameMinLength": "Username must be at least 3 characters"
+      "nameMinLength": "Username must be at least 3 characters",
+      "dateNotBeforeOrder": "Can't be before the order date ({date})",
+      "dateNotBeforeVin": "Can't be before the VIN date ({date})",
+      "dateNotBeforeProduction": "Can't be before the production date ({date})",
+      "dateNotBeforePapers": "Can't be before the papers date ({date})",
+      "dateNotAfterVin": "Can't be after the VIN date ({date})",
+      "dateNotAfterProduction": "Can't be after the production date ({date})",
+      "dateNotAfterPapers": "Can't be after the papers date ({date})",
+      "dateNotAfterDelivery": "Can't be after the delivery date ({date})"
     },
     "cancelledTitle": "Order cancelled?",
     "cancelledDescription": "If you cancelled your order at Tesla, flag it here. It disappears from the list and stops counting towards the statistics — your entry is kept either way.",
@@ -216,6 +227,8 @@
     "passwordNeedsNumber": "Password must contain at least one number"
   },
   "table": {
+    "showMore": "Show {count} more",
+    "shownOfTotal": "{shown} of {total} shown",
     "status": "Status",
     "name": "Name",
     "vehicle": "Vehicle",
@@ -291,7 +304,12 @@
     "production": "Production",
     "delivered": "Delivered",
     "deliveryScheduled": "Delivery scheduled",
-    "stepOfTotal": "Step {current} of {total}"
+    "stepOfTotal": "Step {current} of {total}",
+    "legendTitle": "What the status shows",
+    "legendDone": "Step done",
+    "legendCurrent": "Current step",
+    "legendPending": "Still to come",
+    "legendOpen": "Explain the status"
   },
   "statistics": {
     "overview": "Overview",
@@ -934,7 +952,7 @@
     "tostFieldsRestricted": "This order is managed by TOST. Only order date, papers date, production date, type approval and type variant can be edited.",
     "adminRequired": "Admin access required.",
     "orderDateInFuture": "The order date cannot be in the future.",
-    "datesOutOfOrder": "These dates are not in a plausible order. Check the order, production, papers and delivery dates.",
+    "datesOutOfOrder": "These dates are not in a plausible order. Check the order, VIN, production, papers and delivery dates.",
     "legacyPasswordRequired": "A new password is required for legacy entries.",
     "pageNotFoundTitle": "Page not found",
     "pageNotFoundBody": "This address does not exist. The link may be outdated or mistyped.",

@@ -11,19 +11,17 @@ import {
 } from '@/components/ui/select'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { Locale } from 'date-fns'
+import { DateField, DatePickerFieldComponent, FieldErrors } from './DateField'
 
 interface PersonalDataStepProps {
   formData: OrderFormData
   handleChange: (field: keyof OrderFormData, value: string | boolean) => void
   countries: FormOption[]
   t: (key: string) => string
-  DatePickerField: React.ComponentType<{
-    value: string
-    onChange: (value: string) => void
-    placeholder: string
-    locale?: Locale
-  }>
+  DatePickerField: DatePickerFieldComponent
   dateLocale: Locale
+  /** Messages for fields whose value contradicts another, shown under the field. */
+  errors?: FieldErrors
   /**
    * Container class for the fields. Defaults to the wizard's single column.
    *
@@ -41,6 +39,7 @@ export function PersonalDataStep({
   t,
   DatePickerField,
   dateLocale,
+  errors,
   className = 'space-y-4',
 }: PersonalDataStepProps) {
   return (
@@ -56,15 +55,16 @@ export function PersonalDataStep({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="orderDate">{t('orderDate')} *</Label>
-        <DatePickerField
-          value={formData.orderDate}
-          onChange={(v) => handleChange('orderDate', v)}
-          placeholder={t('datePlaceholder')}
-          locale={dateLocale}
-        />
-      </div>
+      <DateField
+        id="orderDate"
+        label={`${t('orderDate')} *`}
+        value={formData.orderDate}
+        onChange={(v) => handleChange('orderDate', v)}
+        placeholder={t('datePlaceholder')}
+        DatePickerField={DatePickerField}
+        dateLocale={dateLocale}
+        error={errors?.orderDate}
+      />
 
       <div className="space-y-2">
         <Label htmlFor="country">{t('country')} *</Label>

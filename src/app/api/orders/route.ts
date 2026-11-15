@@ -2,7 +2,9 @@ import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminFromCookie } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
-import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween, findDateSequenceError } from '@/lib/date-utils'
+import { normalizeDateFields, calculateTimePeriods, calculateDaysBetween } from '@/lib/date-utils'
+import { DATE_ORDER_FIELDS } from '@/lib/date-order'
+import { dateViolationsAfterUpdate } from '@/lib/order-update'
 import { checkRateLimit, clientKey } from '@/lib/rate-limit'
 import { canClaimLegacyOrder } from '@/lib/legacy-claim'
 import { computeETag, isNotModified } from '@/lib/http-cache'
@@ -88,24 +90,40 @@ function rateLimited(request: NextRequest, bucket: string, rule: { limit: number
  * Reject chronologically impossible dates. These fields are community-editable
  * and feed the public wait-time medians, so this is the only defence the numbers
  * on the front page have.
+ *
+ * `stored` is the row before the edit (null on create) and `update` the dates
+ * being written; they are judged merged. Only conflicts involving a date the
+ * edit changed are refused — see dateOrderViolationsIntroduced — so an order
+ * that already broke a rule stays editable. `fields` names every offending field for the form.
  */
-function dateSequenceError(data: Record<string, unknown>) {
-  const code = findDateSequenceError(data)
-  if (!code) return null
+function dateSequenceError(stored: Record<string, unknown> | null, update: Record<string, unknown>) {
+  const violations = dateViolationsAfterUpdate(stored, update)
+  if (violations.length === 0) return null
+  const code = violations[0].code
   const messages: Record<string, string> = {
     ORDER_DATE_IN_FUTURE: 'Das Bestelldatum kann nicht in der Zukunft liegen.',
-    PRODUCTION_BEFORE_ORDER: 'Das Produktionsdatum kann nicht vor dem Bestelldatum liegen.',
     PAPERS_BEFORE_ORDER: 'Das Papierdatum kann nicht vor dem Bestelldatum liegen.',
-    PAPERS_BEFORE_PRODUCTION: 'Das Papierdatum kann nicht vor dem Produktionsdatum liegen.',
     DELIVERY_BEFORE_ORDER: 'Das Auslieferungsdatum kann nicht vor dem Bestelldatum liegen.',
+    DELIVERY_BEFORE_VIN: 'Das Auslieferungsdatum kann nicht vor dem VIN-Datum liegen.',
+    PAPERS_BEFORE_PRODUCTION: 'Das Papierdatum kann nicht vor dem Produktionsdatum liegen.',
     DELIVERY_BEFORE_PRODUCTION: 'Das Auslieferungsdatum kann nicht vor dem Produktionsdatum liegen.',
     DELIVERY_BEFORE_PAPERS: 'Das Auslieferungsdatum kann nicht vor dem Papierdatum liegen.',
   }
+  const fields = [...new Set(violations.flatMap(v => (v.before ? [v.field, v.before] : [v.field])))]
   return NextResponse.json(
-    { error: messages[code] ?? 'Die Datumsangaben sind nicht plausibel.', code },
+    { error: messages[code] ?? 'Die Datumsangaben sind nicht plausibel.', code, fields },
     { status: 400 }
   )
 }
+
+/** The dates a full-form write will store: an absent field is written as null. */
+function datesAsWritten(data: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(DATE_ORDER_FIELDS.map(f => [f, data[f] || null]))
+}
+
+const DATE_SELECT = {
+  orderDate: true, vinReceivedDate: true, productionDate: true, papersReceivedDate: true, deliveryDate: true,
+} as const
 
 /**
  * "Storniert" is owner-driven: whoever holds the edit code can flag their order
@@ -222,7 +240,7 @@ export async function POST(request: NextRequest) {
     // Normalize date fields (fix missing leading zeros, reject garbage)
     normalizeDateFields(normalizedBody)
 
-    const sequenceError = dateSequenceError(normalizedBody)
+    const sequenceError = dateSequenceError(null, normalizedBody)
     if (sequenceError) return sequenceError
 
     // Calculate time periods from dates
@@ -311,12 +329,12 @@ export async function PUT(request: NextRequest) {
         // Fetch existing dates for recalculation
         const existingOrder = await prisma.order.findUnique({
           where: { id },
-          select: { orderDate: true, deliveryDate: true, vinReceivedDate: true, productionDate: true, papersReceivedDate: true },
+          select: DATE_SELECT,
         })
 
         // Validate the merged chronology, not just the submitted fields — a
         // single new date only becomes implausible next to the stored ones.
-        const tostSequenceError = dateSequenceError({ ...existingOrder, ...updateData })
+        const tostSequenceError = dateSequenceError(existingOrder, updateData)
         if (tostSequenceError) return tostSequenceError
 
         // Recalculate papersToDelivery if papersReceivedDate changed
@@ -394,7 +412,7 @@ export async function PUT(request: NextRequest) {
           return NextResponse.json({ error: 'Passwort muss mindestens eine Zahl enthalten', code: 'PASSWORD_NEEDS_DIGIT' }, { status: 400 })
         }
 
-        const legacySequenceError = dateSequenceError(data)
+        const legacySequenceError = dateSequenceError(order, datesAsWritten(data))
         if (legacySequenceError) return legacySequenceError
 
         // Hash the new password
@@ -458,7 +476,8 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    const putSequenceError = dateSequenceError(data)
+    const storedDates = await prisma.order.findUnique({ where: { id }, select: DATE_SELECT })
+    const putSequenceError = dateSequenceError(storedDates, datesAsWritten(data))
     if (putSequenceError) return putSequenceError
 
     // Optimistic locking: check if order was modified since user loaded it

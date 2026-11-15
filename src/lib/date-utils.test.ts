@@ -1,5 +1,5 @@
 import { describe, test, expect, it } from 'vitest'
-import { normalizeDate, findDateSequenceError, parseGermanDate } from './date-utils'
+import { normalizeDate, parseGermanDate } from './date-utils'
 
 describe('normalizeDate', () => {
   test('accepts a valid German date', () => {
@@ -30,50 +30,6 @@ describe('normalizeDate', () => {
 
   test('rejects implausibly old years', () => {
     expect(normalizeDate('01.06.1999')).toBeNull()
-  })
-})
-
-describe('findDateSequenceError', () => {
-  test('accepts a plausible chronology', () => {
-    expect(findDateSequenceError({
-      orderDate: '01.01.2026',
-      productionDate: '01.03.2026',
-      vinReceivedDate: '15.02.2026',
-      papersReceivedDate: '10.03.2026',
-      deliveryDate: '20.03.2026',
-    })).toBeNull()
-  })
-
-  test('rejects production before the order', () => {
-    expect(findDateSequenceError({
-      orderDate: '01.03.2026',
-      productionDate: '01.01.2026',
-    })).toBe('PRODUCTION_BEFORE_ORDER')
-  })
-
-  test('rejects delivery before the order', () => {
-    expect(findDateSequenceError({
-      orderDate: '01.03.2026',
-      deliveryDate: '01.01.2026',
-    })).toBe('DELIVERY_BEFORE_ORDER')
-  })
-
-  test('rejects an order date in the future', () => {
-    const nextYear = new Date().getFullYear() + 1
-    expect(findDateSequenceError({ orderDate: `01.06.${nextYear}` })).toBe('ORDER_DATE_IN_FUTURE')
-  })
-
-  test('allows a delivery date in the future', () => {
-    // Planned deliveries are the normal case and must stay valid.
-    const nextYear = new Date().getFullYear() + 1
-    expect(findDateSequenceError({
-      orderDate: '01.01.2026',
-      deliveryDate: `01.06.${nextYear}`,
-    })).toBeNull()
-  })
-
-  test('ignores fields that are absent', () => {
-    expect(findDateSequenceError({})).toBeNull()
   })
 })
 

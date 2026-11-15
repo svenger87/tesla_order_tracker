@@ -93,7 +93,7 @@ export const POST = withApiAuth({ scope: 'orders:write', route: 'POST /v1/orders
 
     // Normalize date fields
     normalizeDateFields(body)
-    const sequenceProblem = dateSequenceProblem(body as unknown as Record<string, unknown>)
+    const sequenceProblem = dateSequenceProblem(null, body as unknown as Record<string, unknown>)
     if (sequenceProblem) return sequenceProblem
 
     // Calculate time periods from dates

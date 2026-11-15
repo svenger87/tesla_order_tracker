@@ -156,6 +156,18 @@ health() { # health <url>; prints ok/unreachable
   curl -fsS --max-time 10 "$1/api/health" 2>/dev/null | grep -q '"ok"' && echo ok || echo unreachable
 }
 
+# The deploy run for <branch>@<sha>, as {"workflow_runs": [...]}. Prefers the
+# gh CLI when it is logged in: without a token file the REST API allows 60
+# requests an hour, and polling every 10s ran a second deploy out of quota —
+# the script then saw nothing and "gave up" on a run that had long succeeded.
+run_payload() { # run_payload <branch> <sha>
+  if command -v gh >/dev/null && gh auth status >/dev/null 2>&1; then
+    gh api "repos/$SLUG/actions/workflows/deploy.yml/runs?branch=$1&head_sha=$2&per_page=1" 2>/dev/null || true
+  else
+    gh_api "actions/workflows/deploy.yml/runs?branch=$1&head_sha=$2&per_page=1"
+  fi
+}
+
 wait_for_run() { # wait_for_run <branch> <sha> <url>
   local branch="$1" sha="$2" url="$3"
   [ "$NO_WAIT" -eq 1 ] && { info "not waiting for the run (--no-wait)"; return 0; }
@@ -169,7 +181,7 @@ wait_for_run() { # wait_for_run <branch> <sha> <url>
     # workflow. With CI running alongside it, the answer became a coin flip, and
     # a green CI run once reported "workflow succeeded" for a deploy that had
     # failed and rolled back. The deploy is the only run this command is about.
-    payload=$(gh_api "actions/workflows/deploy.yml/runs?branch=$branch&head_sha=$sha&per_page=1")
+    payload=$(run_payload "$branch" "$sha")
     if [ -n "$payload" ]; then
       status=$(printf '%s' "$payload" | json_field "d['workflow_runs'][0]['status'] if d.get('workflow_runs') else ''")
       conclusion=$(printf '%s' "$payload" | json_field "d['workflow_runs'][0]['conclusion'] or '' if d.get('workflow_runs') else ''")
@@ -187,8 +199,8 @@ wait_for_run() { # wait_for_run <branch> <sha> <url>
         in_progress|queued|waiting|requested|pending) printf '  %s… (%ss)\r' "$status" "$waited" ;;
       esac
     fi
-    sleep 10
-    waited=$((waited + 10))
+    sleep 20
+    waited=$((waited + 20))
   done
   warn "gave up waiting after 15 min — check https://github.com/$SLUG/actions"
 }

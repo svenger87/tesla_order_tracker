@@ -41,8 +41,10 @@ const CompactProgressBar = memo(function CompactProgressBar({ order }: { order: 
   const currentIndex = STEP_INDEX[currentStatus]
   const isScheduled = currentStatus === 'delivery_scheduled'
 
+  // One accessible name for the whole bar; the dots themselves are hover-only.
+  const currentLabel = t(currentStatus === 'delivery_scheduled' ? 'deliveryScheduled' : STEPS[currentIndex].labelKey)
   return (
-    <div className="flex items-center gap-0">
+    <div className="flex items-center gap-0" role="img" aria-label={`${currentLabel} (${t('stepOfTotal', { current: currentIndex + 1, total: STEPS.length })})`}>
       {STEPS.map((step, index) => {
         const isCompleted = index <= currentIndex
         const isCurrent = index === currentIndex
