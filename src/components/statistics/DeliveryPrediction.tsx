@@ -68,10 +68,11 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
 
   return (
     <div className="space-y-4">
-      {/* Form */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* Form: 2 columns, 3 on wide dialogs, with the order date taking the
+          rest of the last row so its "(DD.MM.YYYY)" hint is never cut off. */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         <Select value={vehicleType} onValueChange={(v) => { setVehicleType(v); setModel('') }}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full min-w-0">
             <SelectValue placeholder={t('selectVehicle')} />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -82,7 +83,7 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
         </Select>
 
         <Select value={model} onValueChange={setModel} disabled={!vehicleType}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full min-w-0">
             <SelectValue placeholder={t('selectModel')} />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -94,7 +95,7 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
         </Select>
 
         <Select value={country} onValueChange={setCountry}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full min-w-0">
             <SelectValue placeholder={t('selectCountry')} />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -106,7 +107,7 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
         </Select>
 
         <Select value={drive} onValueChange={setDrive}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full min-w-0">
             <SelectValue placeholder={t('selectDrive')} />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -119,10 +120,12 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
 
         <input
           type="text"
+          inputMode="numeric"
+          aria-label={t('orderDatePlaceholder')}
           placeholder={t('orderDatePlaceholder')}
           value={orderDate}
           onChange={(e) => setOrderDate(e.target.value)}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="col-span-2 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -163,39 +166,39 @@ export function DeliveryPrediction({ orders }: DeliveryPredictionProps) {
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div className={cn(
-                "rounded-lg border bg-green-50 dark:bg-green-900/10 p-3 text-center",
+                "rounded-lg border bg-green-50 dark:bg-green-900/10 p-2 sm:p-3 text-center",
                 isPast(prediction.optimisticDays, prediction.daysElapsedFromReference) && "opacity-50",
               )}>
                 <Zap className="h-4 w-4 text-green-600 dark:text-green-400 mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('optimistic')}</p>
                 <p className={cn(
-                  "text-lg font-bold tabular-nums",
+                  "text-base sm:text-lg font-bold tabular-nums whitespace-nowrap",
                   isPast(prediction.optimisticDays, prediction.daysElapsedFromReference) && "line-through",
                 )}>{prediction.optimisticDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.optimisticDate}</p>
               </div>
               <div className={cn(
-                "rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center",
+                "rounded-lg border-2 border-primary/30 bg-primary/5 p-2 sm:p-3 text-center",
                 isPast(prediction.expectedDays, prediction.daysElapsedFromReference) && "opacity-50",
               )}>
                 <Clock className="h-4 w-4 text-primary mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('expected')}</p>
                 <p className={cn(
-                  "text-xl font-bold tabular-nums text-primary",
+                  "text-lg sm:text-xl font-bold tabular-nums whitespace-nowrap text-primary",
                   isPast(prediction.expectedDays, prediction.daysElapsedFromReference) && "line-through",
                 )}>{prediction.expectedDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.expectedDate}</p>
               </div>
               <div className={cn(
-                "rounded-lg border bg-amber-50 dark:bg-amber-900/10 p-3 text-center",
+                "rounded-lg border bg-amber-50 dark:bg-amber-900/10 p-2 sm:p-3 text-center",
                 isPast(prediction.pessimisticDays, prediction.daysElapsedFromReference) && "opacity-50",
               )}>
                 <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mx-auto mb-1" />
                 <p className="text-xs text-muted-foreground mb-1">{t('pessimistic')}</p>
                 <p className={cn(
-                  "text-lg font-bold tabular-nums",
+                  "text-base sm:text-lg font-bold tabular-nums whitespace-nowrap",
                   isPast(prediction.pessimisticDays, prediction.daysElapsedFromReference) && "line-through",
                 )}>{prediction.pessimisticDays} {tc('days')}</p>
                 <p className="text-xs text-muted-foreground">{prediction.pessimisticDate}</p>

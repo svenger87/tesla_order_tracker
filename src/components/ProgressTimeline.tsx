@@ -52,7 +52,7 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
     >
       <div className="flex items-start justify-between relative">
         {/* Connecting lines behind circles */}
-        <div className="absolute top-6 sm:top-7 left-0 right-0 flex px-6 sm:px-7" aria-hidden="true">
+        <div className="absolute top-5 sm:top-7 left-0 right-0 flex px-[10%]" aria-hidden="true">
           {STEPS.slice(0, -1).map((_, index) => (
             <div
               key={index}
@@ -91,21 +91,21 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
                 : ''
 
           return (
-            <div key={step.key} className="flex flex-col items-center flex-1 relative z-10">
+            <div key={step.key} className="relative z-10 flex min-w-0 flex-1 flex-col items-center px-0.5">
               <motion.div
                 initial={prefersReducedMotion ? false : { scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: index * 0.1, type: 'spring', stiffness: 300, damping: 20 }}
                 className={cn(
-                  'relative flex items-center justify-center rounded-full h-12 w-12 sm:h-14 sm:w-14 transition-colors',
+                  'relative flex items-center justify-center rounded-full h-10 w-10 sm:h-14 sm:w-14 transition-colors',
                   circleColor,
                   ringStyle,
                 )}
               >
                 {isCompleted && index < currentIndex && !isScheduledDelivery ? (
-                  <Check className="h-6 w-6" />
+                  <Check className="h-5 w-5 sm:h-6 sm:w-6" />
                 ) : (
-                  <Icon className="h-6 w-6" />
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                 )}
                 {/* Pulse animation for current step */}
                 {isCurrent && !prefersReducedMotion && (
@@ -129,7 +129,10 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 + 0.1 }}
                 className={cn(
-                  'mt-2 text-xs sm:text-sm font-medium text-center',
+                  // On a phone five labels share ~60px each. At 10px the longest
+                  // single word still fits; multi-word labels wrap between words
+                  // inside their own column instead of running into the next one.
+                  'mt-2 max-w-full text-[10px] leading-tight min-[400px]:text-[11px] sm:text-sm font-medium text-center',
                   isCompleted ? 'text-foreground' : 'text-muted-foreground'
                 )}
               >
@@ -141,7 +144,7 @@ export function ProgressTimeline({ order }: ProgressTimelineProps) {
                   initial={prefersReducedMotion ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.2 }}
-                  className="mt-0.5 text-[11px] text-muted-foreground"
+                  className="mt-0.5 text-[10px] sm:text-[11px] tabular-nums text-muted-foreground"
                 >
                   {dateValue}
                 </motion.span>

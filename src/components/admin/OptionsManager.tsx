@@ -389,7 +389,7 @@ export function OptionsManager() {
                 value={formData.vehicleType}
                 onValueChange={(v) => setFormData(f => ({ ...f, vehicleType: v }))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder={t('allVehicles')} />
                 </SelectTrigger>
                 <SelectContent>

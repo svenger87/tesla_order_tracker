@@ -84,8 +84,7 @@ const ColorCell = memo(function ColorCell({ color }: { color: string | null }) {
         {colorInfo && (
           <span
             className={cn(
-              "w-4 h-4 rounded-full inline-block shrink-0",
-              colorInfo.border && "border border-border"
+              "color-swatch w-4 h-4 rounded-full inline-block shrink-0"
             )}
             style={{ backgroundColor: colorInfo.hex }}
           />
@@ -334,30 +333,39 @@ interface SortableHeaderProps {
   onSort: (field: SortField) => void
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
-function SortableHeader({ field, currentField, direction, onSort, children, className }: SortableHeaderProps) {
+function SortableHeader({ field, currentField, direction, onSort, children, className, style }: SortableHeaderProps) {
   const isActive = currentField === field
 
+  // The sort control is a real button so it can be reached and used from the
+  // keyboard; the header cell only carries aria-sort. The hover tint is an
+  // opaque colour because the header is sticky and rows scroll beneath it.
   return (
     <TableHead
-      className={cn("font-bold whitespace-nowrap cursor-pointer select-none hover:bg-muted/80 transition-colors bg-muted dark:bg-muted", className)}
-      onClick={() => onSort(field)}
+      className={cn("font-bold whitespace-nowrap p-0 bg-muted dark:bg-muted", className)}
+      style={style}
+      aria-sort={isActive ? (direction === 'asc' ? 'ascending' : 'descending') : undefined}
     >
-      <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className="flex h-10 w-full items-center gap-1 px-2 text-left font-bold select-none transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+      >
         <span className="truncate">{children}</span>
         <span className="ml-1 shrink-0">
           {isActive ? (
             direction === 'asc' ? (
-              <ArrowUp className="h-3 w-3" />
+              <ArrowUp className="h-3 w-3 text-primary" />
             ) : (
-              <ArrowDown className="h-3 w-3" />
+              <ArrowDown className="h-3 w-3 text-primary" />
             )
           ) : (
             <ArrowUpDown className="h-3 w-3 opacity-30" />
           )}
         </span>
-      </div>
+      </button>
     </TableHead>
   )
 }
@@ -410,13 +418,19 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: 'updatedAt',          label: 'updatedAt',          group: 'detail',        width: 130 },
 ]
 
+// Left offsets of the pinned leading columns: the 42px action column, then
+// status. Both are essential columns, so these never shift.
+const PIN_LEFT = { status: 42, name: 42 + 150 } as const
+
 // All columns visible by default
 const DEFAULT_VISIBLE_COLUMNS = new Set(
   COLUMN_DEFS.map(c => c.key)
 )
 
 const COLUMNS_STORAGE_KEY = 'tesla-tracker-table-columns-v2'
-const SORT_STORAGE_KEY = 'tesla-tracker-table-sort'
+// v2: only a sort the visitor picked is stored. The first key saved the
+// default on every visit, which would pin phones to oldest-first for good.
+const SORT_STORAGE_KEY = 'tesla-tracker-table-sort-v2'
 const COLUMNS_SCHEMA = COLUMN_DEFS.map(c => c.key).sort().join(',')
 
 export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, onDelete, onGenerateResetCode, onEditByCode, onEditTostFields, highlightOrderId, options: optionsProp, scrollToOrderId }: OrderTableProps) {
@@ -425,9 +439,16 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   const tc = useTranslations('common')
   const th = useTranslations('home')
 
-  // Default sort: orderDate ascending (oldest first, newest at bottom)
+  // Default sort: orderDate ascending (oldest first, newest at bottom) within a
+  // quarter on desktop. Phones get one flat list of every order instead, where
+  // oldest-first put this week's orders thousands of rows down, so they start
+  // newest-first until the visitor picks a sort themselves.
   const [sortField, setSortField] = useState<SortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const userSortedRef = useRef(false)
+  useEffect(() => {
+    if (!userSortedRef.current) setSortDirection(isMobile ? 'desc' : 'asc')
+  }, [isMobile])
   const [localFilters, setLocalFilters] = useState<TableLocalFilters>(emptyLocalFilters)
   const [searchInput, setSearchInput] = useState('')
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -484,6 +505,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         const parsed = JSON.parse(savedSort)
         if (parsed.field) setSortField(parsed.field)
         if (parsed.direction) setSortDirection(parsed.direction)
+        userSortedRef.current = true
       } catch (e) {
         console.error('Failed to parse saved sort:', e)
       }
@@ -515,9 +537,9 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
     setIsHydrated(true)
   }, [])
 
-  // Save sorting to localStorage whenever it changes
+  // Save sorting to localStorage once the visitor has chosen one
   useEffect(() => {
-    if (isHydrated) {
+    if (isHydrated && userSortedRef.current) {
       localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify({ field: sortField, direction: sortDirection }))
     }
   }, [sortField, sortDirection, isHydrated])
@@ -587,6 +609,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
   }, [])
 
   const handleSort = (field: SortField) => {
+    userSortedRef.current = true
     if (sortField === field) {
       // Toggle direction if same field
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
@@ -896,7 +919,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
               {tc('columns')}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[240px] p-3" align="start">
+          <PopoverContent className="w-[240px] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto p-3" align="start" collisionPadding={12}>
             <div className="space-y-3">
               <p className="text-sm font-medium">{tc('visibleColumns')}</p>
               <div className="space-y-2">
@@ -1034,11 +1057,11 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
           </colgroup>
         <TableHeader className="sticky top-0 z-20 bg-background">
           <TableRow className="bg-muted/70 dark:bg-muted hover:bg-muted dark:hover:bg-muted">
-            <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted text-center" title={tc('actions')}>
+            <TableHead data-noclip className="pin-col font-bold whitespace-nowrap bg-muted dark:bg-muted text-center" style={{ left: 0 }} title={tc('actions')}>
               <span className="sr-only">{tc('actions')}</span>
             </TableHead>
-            {isColumnVisible('status') && <TableHead data-noclip className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('status')}</TableHead>}
-            {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('name')}</SortableHeader>}
+            {isColumnVisible('status') && <TableHead data-noclip className="pin-col font-bold whitespace-nowrap bg-muted dark:bg-muted" style={{ left: PIN_LEFT.status }}>{t('status')}</TableHead>}
+            {isColumnVisible('name') && <SortableHeader field="name" currentField={sortField} direction={sortDirection} onSort={handleSort} className="pin-col pin-col-last" style={{ left: PIN_LEFT.name }}>{t('name')}</SortableHeader>}
             {isColumnVisible('vehicleType') && <SortableHeader field="vehicleType" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('vehicle')}</SortableHeader>}
             {isColumnVisible('carImage') && <TableHead className="font-bold whitespace-nowrap bg-muted dark:bg-muted">{t('image')}</TableHead>}
             {isColumnVisible('orderDate') && <SortableHeader field="orderDate" currentField={sortField} direction={sortDirection} onSort={handleSort}>{t('orderDate')}</SortableHeader>}
@@ -1093,26 +1116,29 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                 data-index={virtualRow.index}
                 ref={tableVirtualizer.measureElement}
                 className={cn(
-                  "border-b hover:bg-muted/40 border-l-2 border-l-transparent",
+                  // The hover accent is drawn by the pinned first cell (see
+                  // .pin-col in globals.css); as a row border it left a 2px gap
+                  // that scrolled-away cells showed through.
+                  "border-b hover:bg-muted/40",
                   order.deliveryDate
-                    ? "hover:border-l-green-500"
-                    : "hover:border-l-amber-500",
+                    ? "[--row-accent:var(--color-green-500)]"
+                    : "[--row-accent:var(--color-amber-500)]",
                   (isStale || order.cancelled) && "opacity-60 hover:opacity-100 transition-opacity",
-                  isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25",
-                  isSearchHighlighted && "bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
+                  isHighlighted && "bg-primary/10 hover:bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/25 [--row-tint:color-mix(in_oklab,var(--primary)_15%,transparent)]!",
+                  isSearchHighlighted && "[--row-tint:color-mix(in_oklab,var(--color-yellow-300)_40%,transparent)]! bg-yellow-100/80 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/40 animate-pulse"
                 )}
                 title={isStale ? th('staleHint') : undefined}
               >
-                <TableCell data-noclip className="px-2 py-1 text-center">
+                <TableCell data-noclip className="pin-col px-2 py-1 text-center" style={{ left: 0 }}>
                   {renderRowAction(order, true)}
                 </TableCell>
                 {isColumnVisible('status') && (
-                  <TableCell data-noclip className="whitespace-nowrap px-2 py-1">
+                  <TableCell data-noclip className="pin-col whitespace-nowrap px-2 py-1" style={{ left: PIN_LEFT.status }}>
                     <OrderProgressBar order={order} compact />
                   </TableCell>
                 )}
                 {isColumnVisible('name') && (
-                  <TableCell className="font-medium overflow-hidden px-2 py-1">
+                  <TableCell className="pin-col pin-col-last font-medium overflow-hidden px-2 py-1" style={{ left: PIN_LEFT.name }}>
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Link
                         href={`/track/${encodeURIComponent(order.name)}`}
@@ -1145,7 +1171,7 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
                       )}
                       {order.source === 'tost' && (
                         <a href="https://www.tesla-order-status-tracker.de/" target="_blank" rel="noopener noreferrer" className="shrink-0 inline-block align-middle hover:opacity-70 transition-opacity">
-                          <Image src="/tost-badge.svg" alt="TOST" width={64} height={32} className="h-8 w-auto" />
+                          <Image src="/tost-badge.svg" alt="TOST" width={48} height={24} className="h-6 w-12" />
                         </a>
                       )}
                       <ApiSourceBadge source={order.source} className="text-[10px]" />
@@ -1372,8 +1398,8 @@ export const OrderTable = memo(function OrderTable({ orders, isAdmin, onEdit, on
         <div
           ref={scrollbarRef}
           onScroll={handleScrollbarScroll}
-          className="sticky bottom-0 z-30 overflow-x-auto overflow-y-hidden bg-background/80 backdrop-blur-sm border-t"
-          style={{ height: '16px' }}
+          className="table-scrollbar sticky bottom-0 z-30 overflow-x-auto overflow-y-hidden bg-background/80 backdrop-blur-sm border-t"
+          style={{ height: '14px' }}
         >
           <div style={{ width: scrollWidth, height: '1px' }} />
         </div>

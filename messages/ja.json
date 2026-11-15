@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "Autopilot を選択",
     "deliveryWindow": "納車予定期間",
-    "deliveryWindowPlaceholder": "例：02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "例：11.02.-18.02.2026",
     "deliveryLocation": "納車場所",
     "deliveryLocationSelect": "納車場所を選択",
     "vin": "VIN",

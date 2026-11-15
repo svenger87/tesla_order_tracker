@@ -9,6 +9,7 @@ import { getOrderStatus } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import type { OrderTableOptions } from '@/components/OrderTable'
 import { cn } from '@/lib/utils'
+import { useCommandState } from 'cmdk'
 import {
   CommandDialog,
   CommandInput,
@@ -48,6 +49,22 @@ const STATUS_LABEL: Record<string, string> = {
   production: 'production',
   vin_received: 'vinReceived',
   ordered: 'ordered',
+}
+
+/**
+ * How many rows match what has been typed. Rendered inside the dialog so it
+ * can read cmdk's filter state; it used to print the total order count, so
+ * "bjo" with three hits still said 4489 results.
+ */
+function ResultCount({ total }: { total: number }) {
+  const t = useTranslations('search')
+  const search = useCommandState(state => state.search)
+  const filtered = useCommandState(state => state.filtered.count)
+  return (
+    <span className="tabular-nums" aria-live="polite">
+      {t('results', { count: search ? filtered : total })}
+    </span>
+  )
 }
 
 export function OrderSearch({
@@ -185,8 +202,7 @@ export function OrderSearch({
                   <span
                     aria-hidden
                     className={cn(
-                      'row-span-2 h-3.5 w-3.5 rounded-full',
-                      color?.border && 'border border-border',
+                      'color-swatch row-span-2 h-3.5 w-3.5 rounded-full',
                       !color && 'bg-muted',
                     )}
                     style={color ? { backgroundColor: color.hex } : undefined}
@@ -230,7 +246,7 @@ export function OrderSearch({
 
       <div className="flex items-center justify-between border-t px-4 py-2.5 text-[11px] text-muted-foreground">
         <span>{t('hint')}</span>
-        <span className="tabular-nums">{t('results', { count: totalOrders })}</span>
+        <ResultCount total={totalOrders} />
       </div>
     </CommandDialog>
   )

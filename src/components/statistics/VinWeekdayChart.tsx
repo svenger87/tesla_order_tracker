@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations, useLocale } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
+import { CHART_AXIS_LINE, CHART_AXIS_TICK, CHART_BAR_CURSOR, CHART_GRID_STROKE, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface VinWeekdayChartProps {
   data: { dayOfWeek: number; count: number }[]
@@ -32,12 +33,12 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="h-[300px] w-full"
+      className="h-[300px] w-full [&_:focus:not(:focus-visible)]:outline-none"
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <BarChart
           data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          margin={{ top: 10, right: 8, left: -12, bottom: 0 }}
         >
           <defs>
             <linearGradient id="vinWeekdayGradient" x1="0" y1="0" x2="0" y2="1">
@@ -45,39 +46,26 @@ export function VinWeekdayChart({ data }: VinWeekdayChartProps) {
               <stop offset="100%" stopColor="oklch(0.55 0.18 260)" stopOpacity={0.6} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} vertical={false} />
           <XAxis
             dataKey="dayOfWeek"
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={CHART_AXIS_TICK}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
             tickFormatter={formatWeekday}
+            interval={0}
           />
           <YAxis
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={CHART_AXIS_TICK}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
             allowDecimals={false}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-              color: 'hsl(var(--foreground))',
-            }}
-            itemStyle={{
-              color: 'hsl(var(--foreground))',
-            }}
-            labelStyle={{
-              color: 'hsl(var(--foreground))',
-              fontWeight: 600,
-            }}
+            {...CHART_TOOLTIP_STYLE}
             formatter={(value) => [t('vinWeekdayCount', { value: String(value) }), t('count')]}
             labelFormatter={(label) => formatWeekday(label as number)}
-            cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
+            cursor={CHART_BAR_CURSOR}
           />
           <Bar
             dataKey="count"

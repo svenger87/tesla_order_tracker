@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CHART_SEGMENT_STROKE, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 export interface DistributionData {
   name: string
@@ -46,20 +47,21 @@ interface MiniPieChartProps {
   title: string
   delay?: number
   maxItems?: number  // Max items before combining into "Andere"
+  className?: string
 }
 
-export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieChartProps) {
+export function MiniPieChart({ data, title, delay = 0, maxItems = 6, className = '' }: MiniPieChartProps) {
   const t = useTranslations('statistics')
   // Filter out "Unbekannt" if there are other values
   const filteredData = data.filter(d => d.name !== 'Unbekannt' || data.length === 1)
 
   if (filteredData.length === 0) {
     return (
-      <Card className="h-full">
-        <CardHeader className="pb-2">
+      <Card className={`h-full gap-2 py-4 shadow-[var(--shadow-card)] ${className}`}>
+        <CardHeader className="px-4">
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-[180px] text-muted-foreground text-sm">
+        <CardContent className="flex items-center justify-center h-[140px] px-4 text-muted-foreground text-sm">
           {t('noData')}
         </CardContent>
       </Card>
@@ -75,27 +77,33 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
   }
 
   const total = displayData.reduce((sum, item) => sum + item.count, 0)
+  const pct = (count: number) => (total > 0 ? ((count / total) * 100).toFixed(1) : '0.0')
+  const colorOf = (entry: DistributionData, index: number) => entry.fill || COLORS[index % COLORS.length]
 
+  // The legend is plain HTML under the donut rather than Recharts' <Legend>,
+  // which lives inside the fixed-height SVG box: there it was either clipped
+  // (a narrow phone card) or left a gap (a wide desktop one). Out here the card
+  // grows with its own content.
   return (
-    <Card className="h-full min-h-[280px] overflow-hidden">
-      <CardHeader className="pb-2">
+    <Card className={`h-full gap-2 py-4 shadow-[var(--shadow-card)] ${className}`}>
+      <CardHeader className="px-4">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="p-2 overflow-hidden">
+      <CardContent className="px-3 sm:px-4 flex flex-col gap-3">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay }}
-          className="h-[240px]"
+          className="h-[130px] sm:h-[170px] w-full [&_:focus:not(:focus-visible)]:outline-none"
         >
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <Pie
                 data={displayData}
                 cx="50%"
                 cy="50%"
-                innerRadius={35}
-                outerRadius={60}
+                innerRadius="58%"
+                outerRadius="95%"
                 paddingAngle={0}
                 dataKey="count"
                 nameKey="name"
@@ -104,47 +112,36 @@ export function MiniPieChart({ data, title, delay = 0, maxItems = 6 }: MiniPieCh
                 {displayData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={entry.fill || COLORS[index % COLORS.length]}
-                    stroke="#71717a"
+                    fill={colorOf(entry, index)}
+                    stroke={CHART_SEGMENT_STROKE}
                     strokeWidth={1}
                   />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  color: 'hsl(var(--foreground))',
-                }}
-                itemStyle={{
-                  color: 'hsl(var(--foreground))',
-                }}
-                labelStyle={{
-                  color: 'hsl(var(--foreground))',
-                  fontWeight: 600,
-                }}
+                {...CHART_TOOLTIP_STYLE}
                 formatter={(value, _name, props) => {
                   const numValue = typeof value === 'number' ? value : 0
                   const itemName = (props.payload as DistributionData)?.name || ''
-                  return [`${numValue} (${((numValue / total) * 100).toFixed(1)}%)`, itemName]
-                }}
-              />
-              <Legend
-                verticalAlign="bottom"
-                height={80}
-                wrapperStyle={{ fontSize: '11px', overflow: 'hidden', maxHeight: '90px', paddingTop: '4px' }}
-                formatter={(value, entry) => {
-                  const count = (entry.payload as DistributionData)?.count || 0
-                  const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0'
-                  const truncatedValue = typeof value === 'string' && value.length > 16 ? value.slice(0, 16) + '…' : value
-                  return <span className="text-foreground text-xs">{truncatedValue} ({percentage}%)</span>
+                  return [`${numValue} (${pct(numValue)}%)`, itemName]
                 }}
               />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>
+        <ul className="space-y-1 text-xs">
+          {displayData.map((entry, index) => (
+            <li key={`${entry.name}-${index}`} className="flex items-start gap-1.5 min-w-0">
+              <span
+                aria-hidden
+                className="mt-[3px] h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: colorOf(entry, index), boxShadow: `inset 0 0 0 1px ${CHART_SEGMENT_STROKE}` }}
+              />
+              <span className="min-w-0 break-words leading-tight text-foreground">{entry.name}</span>
+              <span className="ml-auto pl-1 shrink-0 leading-tight tabular-nums text-muted-foreground">{pct(entry.count)}%</span>
+            </li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   )

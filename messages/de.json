@@ -785,6 +785,10 @@
     "title": "VIN-Aktivität",
     "description": "Wöchentliche VIN-Zuweisungen",
     "thisWeek": "diese Woche",
+    "lastWeek": "{count} letzte Woche",
+    "vsWeekBefore": "ggü. Vorwoche",
+    "weekOf": "Woche ab {date}",
+    "soFar": "bisher",
     "assigned": "zugewiesen"
   },
   "countryDelivery": {

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface RangeDistributionChartProps {
   data: { name: string; count: number; fill: string }[]
@@ -60,17 +61,7 @@ export function RangeDistributionChart({ data }: RangeDistributionChartProps) {
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-            }}
-            itemStyle={{
-              color: 'hsl(var(--foreground))',
-            }}
-            labelStyle={{
-              color: 'hsl(var(--foreground))',
-            }}
+            {...CHART_TOOLTIP_STYLE}
             formatter={(value) => {
               const numValue = typeof value === 'number' ? value : 0
               return [`${numValue} (${((numValue / total) * 100).toFixed(1)}%)`, '']

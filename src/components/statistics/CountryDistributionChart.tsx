@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts'
+import { CHART_AXIS_LINE, CHART_AXIS_TICK, CHART_BAR_CURSOR, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface CountryDistributionChartProps {
   data: { name: string; count: number; fill: string }[]
@@ -37,57 +38,45 @@ export function CountryDistributionChart({ data }: CountryDistributionChartProps
 
   // Size the YAxis label gutter to the longest label so long names (e.g. delivery
   // locations like "München-Parsdorf") don't collide with the bars.
-  // ~9px per char at text-xs to cover wide caps + umlauts; clamped to [90, 200].
+  // ~7px per char at the shared 11px tick size covers wide caps + umlauts;
+  // clamped to [70, 170] so a phone keeps most of its width for the bars.
   const MAX_LABEL_CHARS = 22
   const truncate = (s: string) => (s.length > MAX_LABEL_CHARS ? s.slice(0, MAX_LABEL_CHARS - 1) + '…' : s)
   const longest = data.reduce((m, d) => Math.max(m, truncate(d.name).length), 0)
-  const yAxisWidth = Math.min(200, Math.max(90, longest * 9 + 10))
+  const yAxisWidth = Math.min(170, Math.max(70, longest * 7 + 10))
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full"
+      className="w-full [&_:focus:not(:focus-visible)]:outline-none"
       style={{ height: chartHeight }}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+          margin={{ top: 5, right: 16, left: 0, bottom: 5 }}
         >
           <XAxis
             type="number"
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={CHART_AXIS_TICK}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
           />
           <YAxis
             type="category"
             dataKey="name"
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={CHART_AXIS_TICK}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
             width={yAxisWidth}
             tickFormatter={truncate}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-              color: 'hsl(var(--foreground))',
-            }}
-            itemStyle={{
-              color: 'hsl(var(--foreground))',
-            }}
-            labelStyle={{
-              color: 'hsl(var(--foreground))',
-              fontWeight: 600,
-            }}
+            {...CHART_TOOLTIP_STYLE}
+            cursor={CHART_BAR_CURSOR}
             formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
           />
           <Bar dataKey="count" radius={[0, 4, 4, 0]} animationDuration={400} animationEasing="ease-out">

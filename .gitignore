@@ -77,3 +77,6 @@ CREDENTIALS.md
 
 # Arbeitsliste dieser Überarbeitung (lokal)
 todo.md
+
+# Dev-mode compositor image cache (src/app/api/compositor-image)
+.compositor-cache/

@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useState, useEffect, useRef } from 'react'
+import { Car } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { COLORS, VehicleType } from '@/lib/types'
 import { useCompositorCodes, lookupCode, type CompositorCodeMap } from '@/lib/CompositorCodesContext'
@@ -179,8 +180,11 @@ function buildOptionsString(
 }
 
 function buildTeslaUrl(modelSlug: string, optionsStr: string, view: string, size: number): string {
+  // bkba_opt=1 is a transparent PNG. Option 2 is a JPEG on a white canvas:
+  // it showed as a white box on the dark theme, and the cache below only
+  // accepts PNGs, so none of those images were ever cached.
   const params = new URLSearchParams({
-    bkba_opt: '2',
+    bkba_opt: '1',
     model: modelSlug,
     options: optionsStr,
     size: size.toString(),
@@ -317,27 +321,28 @@ export const TeslaCarImage = memo(function TeslaCarImage({
     }
   }
 
-  // Collect missing fields for debug display in error fallback
+  // Which fields were missing is useful when debugging compositor codes, but
+  // it is not something a visitor can act on; it goes into the tooltip only.
   const missing: string[] = []
-  if (!color) missing.push('Farbe')
-  if (!wheels) missing.push('Felgen')
-  if (!model) missing.push('Modell')
-  if (!drive) missing.push('Antrieb')
-  if (!interior) missing.push('Interieur')
+  if (!color) missing.push('color')
+  if (!wheels) missing.push('wheels')
+  if (!model) missing.push('model')
+  if (!drive) missing.push('drive')
+  if (!interior) missing.push('interior')
 
   if (hasError) {
     return (
       <div
         className={cn(
-          "flex flex-col items-center justify-center gap-1 bg-muted rounded-lg text-muted-foreground",
+          "flex items-center justify-center rounded-md bg-muted/60 text-muted-foreground",
           className
         )}
-        style={{ width: size, height: size * 0.5 }}
+        style={{ width: size, height: Math.round(size * 0.5625) }}
+        role="img"
+        aria-label={vehicleType}
+        title={missing.length > 0 ? `${vehicleType} (${missing.join(', ')}?)` : vehicleType}
       >
-        <span className="text-sm font-medium">{vehicleType}</span>
-        {missing.length > 0 && (
-          <span className="text-[10px] opacity-70">Fehlt: {missing.join(', ')}</span>
-        )}
+        <Car className="h-1/2 max-h-8 w-auto opacity-60" aria-hidden />
       </div>
     )
   }
@@ -346,11 +351,10 @@ export const TeslaCarImage = memo(function TeslaCarImage({
     <div className={cn("relative", className)}>
       {isLoading && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg"
-          style={{ width: size, height: size * 0.5 }}
-        >
-          <div className="animate-pulse text-muted-foreground text-xs">Loading...</div>
-        </div>
+          className="absolute inset-0 animate-pulse rounded-md bg-muted/50"
+          style={{ width: size, height: Math.round(size * 0.5625) }}
+          aria-hidden
+        />
       )}
       {imgSrc && (
         // Dynamic Tesla compositor URLs are already remote/lazy/fallback controlled;
@@ -393,8 +397,11 @@ export const TeslaCarThumbnail = memo(function TeslaCarThumbnail({
       drive={drive}
       interior={interior}
       view="STUD_3QTR"
-      size={200}
-      fetchSize={800}
+      // Drawn into a 48px slot on the phone order list. It used to lay out at
+      // 200px and rely on the slot clipping it, which also made the fallback
+      // label wrap; 400px is what the desktop table fetches, so both share cache.
+      size={48}
+      fetchSize={400}
       className={className}
     />
   )

@@ -6,6 +6,7 @@ import { Order, VehicleType, VEHICLE_TYPES, COLORS, DRIVES, WHEELS, INTERIORS, R
 import { getAvailablePeriods, StatsPeriod } from '@/lib/statistics'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -261,7 +262,7 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                       <span className="flex items-center gap-2">
                         {COLORS.find(c => c.value === o.value)?.hex && (
                           <span
-                            className="w-3 h-3 rounded-full inline-block shrink-0 border border-border"
+                            className="color-swatch w-3 h-3 rounded-full inline-block shrink-0"
                             style={{ backgroundColor: COLORS.find(c => c.value === o.value)?.hex }}
                           />
                         )}
@@ -334,10 +335,10 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 onValueChange={(v) => onChange({ ...filters, country: v === '_all' ? '' : v })}
               >
                 <SelectTrigger className="sm:w-[176px]">
-                  <SelectValue placeholder={t('countryDistribution')} />
+                  <SelectValue placeholder={tt('country')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="_all">{t('countryDistribution')}: {tc('all')}</SelectItem>
+                  <SelectItem value="_all">{tt('country')}: {tc('all')}</SelectItem>
                   {filterOptions.countryOptions.map((o) => (
                     <SelectItem key={o.value} value={o.value}>
                       <span className="flex items-center gap-2">
@@ -367,24 +368,23 @@ export function GlobalFilterBar({ orders, filters, onChange }: GlobalFilterBarPr
                 </SelectContent>
               </Select>
             )}
-        </div>
 
-        <div className="flex min-h-6 flex-wrap items-center gap-2">
-          {totalActiveCount > 0 && (
-            <>
-              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
-                <Filter className="h-3 w-3 mr-1" />
-                {totalActiveCount} {totalActiveCount === 1 ? 'Filter' : 'Filter'}
-              </Badge>
-              <button
-                onClick={clearFilters}
-                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
-                <X className="h-3 w-3" />
-                {tc('reset')}
-              </button>
-            </>
-          )}
+            {/* Active-filter summary sits in the grid's free cells. It used to
+                be a row of its own below the grid with a reserved min-height,
+                which left an empty strip under the filters most of the time. */}
+            {totalActiveCount > 0 && (
+              <div className="col-span-2 flex items-center gap-2 sm:col-span-1">
+                <Badge variant="outline" className="h-9 gap-1 border-primary/30 bg-primary/5 px-2.5 text-primary">
+                  <Filter className="h-3 w-3" />
+                  <span className="tabular-nums">{totalActiveCount}</span>
+                  <span className="sr-only">{tc('filter')}</span>
+                </Badge>
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 gap-1 px-2 text-muted-foreground">
+                  <X className="h-3.5 w-3.5" />
+                  {tc('resetFilters')}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
     </div>

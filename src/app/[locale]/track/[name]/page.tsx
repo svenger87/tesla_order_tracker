@@ -28,7 +28,9 @@ function findCountryInfo(country: string | null, locale: string) {
   const known = COUNTRIES.find(
     c => c.value === country || c.label.toLowerCase() === country.toLowerCase(),
   )
-  if (known) return known
+  // COUNTRIES carries German names; the reader gets theirs. "Deutschland"
+  // used to appear on the English page beside an otherwise English summary.
+  if (known) return { ...known, label: countryNameFromCode(known.value, locale) ?? known.label }
 
   const flag = flagFromCode(country)
   if (!flag) return null

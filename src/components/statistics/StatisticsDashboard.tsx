@@ -1,11 +1,12 @@
 'use client'
 
 import { useCallback, useMemo, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Order, VehicleType } from '@/lib/types'
 import { calculateStatistics, StatsPeriod, UNKNOWN_COUNTRY, UNKNOWN_OPTION } from '@/lib/statistics'
 import { useOptions } from '@/hooks/useOptions'
+import { countryNameFromCode, flagFromCode } from '@/lib/country-display'
 import { TwemojiEmoji } from '@/components/TwemojiText'
 import { StatCard } from './StatCard'
 import { DeliveryTimeline } from './DeliveryTimeline'
@@ -48,6 +49,8 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const t = useTranslations('statistics')
   const tcd = useTranslations('countryDelivery')
   const tCommon = useTranslations('common')
+  const tOptions = useTranslations('options')
+  const locale = useLocale()
   const { countries, ranges, interiors, autopilot, towHitch, seats } = useOptions()
 
   const tabsRef = useRef<HTMLDivElement>(null)
@@ -73,9 +76,16 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   const resolveCountry = useCallback(
     (value: string): { label: string; flag?: string } => {
       if (value === UNKNOWN_COUNTRY) return { label: tCommon('unknown') }
-      return countryByKey.get(value.toLowerCase()) ?? { label: value }
+      const known = countryByKey.get(value.toLowerCase())
+      if (known) return known.flag ? known : { ...known, flag: flagFromCode(value) ?? undefined }
+      // Codes the synced data carries but the admin option list does not (us,
+      // ca, tw, …): derive name and flag from the code rather than show it raw.
+      return {
+        label: countryNameFromCode(value, locale) ?? value,
+        flag: flagFromCode(value) ?? undefined,
+      }
     },
-    [countryByKey, tCommon]
+    [countryByKey, tCommon, locale]
   )
 
   const localizedCountryDistribution = useMemo(
@@ -88,12 +98,22 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
   // for translatable types. The UNKNOWN_OPTION slice is hidden unless it's the
   // only entry (mirrors MiniPieChart) and otherwise shown as the localized
   // "unknown" label — kept locale-consistent here rather than in the chart.
+  //
+  // optionType names the `options.<type>` message group to fall back on for a
+  // value the option list does not carry — the admin list has no tow hitch
+  // "nv" (not available), so it reached the legend as a bare "nv".
   const localizeDistribution = useCallback(
     (
       dist: { name: string; count: number; fill: string }[],
       optionList: { value: string; label: string }[],
+      optionType?: string,
     ) => {
       const labelByValue = new Map(optionList.map(o => [o.value.toLowerCase(), o.label]))
+      const translated = (value: string): string | undefined => {
+        if (!optionType) return undefined
+        const key = `${optionType}.${value}` as Parameters<typeof tOptions>[0]
+        return tOptions.has(key) ? tOptions(key) : undefined
+      }
       const hasReal = dist.some(d => d.name !== UNKNOWN_OPTION)
       return dist
         .filter(d => d.name !== UNKNOWN_OPTION || !hasReal)
@@ -102,30 +122,30 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
           name:
             d.name === UNKNOWN_OPTION
               ? tCommon('unknown')
-              : labelByValue.get(d.name.toLowerCase()) ?? d.name,
+              : labelByValue.get(d.name.toLowerCase()) ?? translated(d.name) ?? d.name,
         }))
     },
-    [tCommon],
+    [tCommon, tOptions],
   )
 
   const localizedRangeDistribution = useMemo(
-    () => localizeDistribution(stats.rangeDistribution, ranges),
+    () => localizeDistribution(stats.rangeDistribution, ranges, 'range'),
     [stats.rangeDistribution, ranges, localizeDistribution],
   )
   const localizedInteriorDistribution = useMemo(
-    () => localizeDistribution(stats.interiorDistribution, interiors),
+    () => localizeDistribution(stats.interiorDistribution, interiors, 'interior'),
     [stats.interiorDistribution, interiors, localizeDistribution],
   )
   const localizedTowHitchDistribution = useMemo(
-    () => localizeDistribution(stats.towHitchDistribution, towHitch),
+    () => localizeDistribution(stats.towHitchDistribution, towHitch, 'towHitch'),
     [stats.towHitchDistribution, towHitch, localizeDistribution],
   )
   const localizedSeatsDistribution = useMemo(
-    () => localizeDistribution(stats.seatsDistribution, seats),
+    () => localizeDistribution(stats.seatsDistribution, seats, 'seats'),
     [stats.seatsDistribution, seats, localizeDistribution],
   )
   const localizedAutopilotDistribution = useMemo(
-    () => localizeDistribution(stats.autopilotDistribution, autopilot),
+    () => localizeDistribution(stats.autopilotDistribution, autopilot, 'autopilot'),
     [stats.autopilotDistribution, autopilot, localizeDistribution],
   )
   // Tesla color names are universal brand names (not translated) — pass an empty
@@ -180,29 +200,32 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
           tabsRef.current?.querySelector('[role="tabpanel"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
         }, 50)
       }}>
-        <TabsList className="sticky-tabs flex h-auto w-full overflow-x-auto overflow-y-hidden flex-nowrap gap-1 sm:grid sm:grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
+        {/* Five equal columns at every width: on a phone each tab stacks its icon
+            over a short label, so all five fit at 390px with nothing scrolled
+            off the edge. */}
+        <TabsList className="sticky-tabs grid h-auto group-data-[orientation=horizontal]/tabs:h-auto w-full grid-cols-5 gap-0.5 sm:gap-1">
+          <TabsTrigger value="overview" className="flex min-w-0 flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 text-[11px] sm:text-sm px-1 sm:px-4 py-1.5 sm:py-2.5 whitespace-nowrap">
             <BarChart3 className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">{t('overviewShort')}</span>
+            <span className="sm:hidden max-w-full truncate">{t('overviewShort')}</span>
             <span className="hidden sm:inline">{t('overview')}</span>
           </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
+          <TabsTrigger value="config" className="flex min-w-0 flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 text-[11px] sm:text-sm px-1 sm:px-4 py-1.5 sm:py-2.5 whitespace-nowrap">
             <Car className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">{t('configurationShort')}</span>
+            <span className="sm:hidden max-w-full truncate">{t('configurationShort')}</span>
             <span className="hidden sm:inline">{t('configuration')}</span>
           </TabsTrigger>
-          <TabsTrigger value="ausstattung" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
+          <TabsTrigger value="ausstattung" className="flex min-w-0 flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 text-[11px] sm:text-sm px-1 sm:px-4 py-1.5 sm:py-2.5 whitespace-nowrap">
             <Settings2 className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">{t('equipmentShort')}</span>
+            <span className="sm:hidden max-w-full truncate">{t('equipmentShort')}</span>
             <span className="hidden sm:inline">{t('equipment')}</span>
           </TabsTrigger>
-          <TabsTrigger value="geo" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
+          <TabsTrigger value="geo" className="flex min-w-0 flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 text-[11px] sm:text-sm px-1 sm:px-4 py-1.5 sm:py-2.5 whitespace-nowrap">
             <Globe className="h-4 w-4 shrink-0" />
-            <span>{t('geo')}</span>
+            <span className="max-w-full truncate">{t('geo')}</span>
           </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2.5 whitespace-nowrap">
+          <TabsTrigger value="timeline" className="flex min-w-0 flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 text-[11px] sm:text-sm px-1 sm:px-4 py-1.5 sm:py-2.5 whitespace-nowrap">
             <TrendingUp className="h-4 w-4 shrink-0" />
-            <span className="sm:hidden">{t('timelineShort')}</span>
+            <span className="sm:hidden max-w-full truncate">{t('timelineShort')}</span>
             <span className="hidden sm:inline">{t('timeline')}</span>
           </TabsTrigger>
         </TabsList>
@@ -254,7 +277,7 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: 0.8 }}
-                    className="rounded-xl border bg-card p-4 space-y-2"
+                    className="col-span-2 lg:col-span-1 rounded-xl border bg-card p-4 space-y-2 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
                   >
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                       <Users className="h-4 w-4" />
@@ -323,12 +346,15 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} />
-              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.05} />
-              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} />
-              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} />
-              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} />
+            {/* Five charts: one row of five on wide screens, 3 + 2 filling the
+                row on mid-size ones, and 2 + 2 + one full-width on phones — no
+                card left alone on half a row. */}
+            <div className="grid grid-cols-2 lg:grid-cols-6 xl:grid-cols-5 gap-4">
+              <MiniPieChart data={localizedInteriorDistribution} title={t('interiorDistribution')} delay={0} className="lg:col-span-2 xl:col-span-1" />
+              <MiniPieChart data={localizedWheelsDistribution} title={t('wheelsDistribution')} delay={0.05} className="lg:col-span-2 xl:col-span-1" />
+              <MiniPieChart data={localizedTowHitchDistribution} title={t('towHitchDistribution')} delay={0.1} className="lg:col-span-2 xl:col-span-1" />
+              <MiniPieChart data={localizedSeatsDistribution} title={t('seatsDistribution')} delay={0.15} className="lg:col-span-3 xl:col-span-1" />
+              <MiniPieChart data={localizedAutopilotDistribution} title={t('autopilotDistribution')} delay={0.2} className="col-span-2 lg:col-span-3 xl:col-span-1" />
             </div>
           </motion.div>
         </TabsContent>
@@ -391,10 +417,10 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>#</TableHead>
-                          <TableHead>{tcd('country')}</TableHead>
-                          <TableHead className="text-right tabular-nums">{tcd('medianWait')}</TableHead>
-                          <TableHead className="text-right tabular-nums">{tcd('orders')}</TableHead>
+                          <TableHead className="w-8 sm:w-10 px-1 sm:px-2 text-center">#</TableHead>
+                          <TableHead className="px-1 sm:px-2">{tcd('country')}</TableHead>
+                          <TableHead className="w-px px-1 sm:px-2 text-right tabular-nums">{tcd('medianWait')}</TableHead>
+                          <TableHead className="w-px px-1 sm:px-2 text-right tabular-nums">{tcd('orders')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -402,17 +428,17 @@ export function StatisticsDashboard({ orders, selectedPeriod, selectedVehicle }:
                           const info = resolveCountry(row.country)
                           return (
                             <TableRow key={row.country} style={{ borderLeft: `3px solid oklch(${0.55 + (i / total) * 0.15} ${0.16 - (i / total) * 0.06} ${145 - (i / total) * 70})` }}>
-                              <TableCell className="font-medium tabular-nums">
+                              <TableCell className="px-1 sm:px-2 text-center font-medium tabular-nums">
                                 {i === 0 ? '\u{1F947}' : i === 1 ? '\u{1F948}' : i === 2 ? '\u{1F949}' : i + 1}
                               </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-1.5">
+                              <TableCell className="px-1 sm:px-2 max-w-0 w-full">
+                                <div className="flex items-center gap-1.5 min-w-0">
                                   {info.flag && <TwemojiEmoji emoji={info.flag} size={16} className="shrink-0" />}
-                                  <span>{info.label}</span>
+                                  <span className="truncate" title={info.label}>{info.label}</span>
                                 </div>
                               </TableCell>
-                              <TableCell className="text-right tabular-nums font-medium">{row.medianDays}d</TableCell>
-                              <TableCell className="text-right tabular-nums">{row.count}</TableCell>
+                              <TableCell className="px-1 sm:px-2 text-right tabular-nums font-medium">{row.medianDays}d</TableCell>
+                              <TableCell className="px-1 sm:px-2 text-right tabular-nums">{row.count}</TableCell>
                             </TableRow>
                           )
                         })}

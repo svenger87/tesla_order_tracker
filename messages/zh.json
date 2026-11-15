@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "选择 Autopilot",
     "deliveryWindow": "交付窗口",
-    "deliveryWindowPlaceholder": "例如 02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "例如 11.02.-18.02.2026",
     "deliveryLocation": "交付地点",
     "deliveryLocationSelect": "选择交付地点",
     "vin": "VIN",

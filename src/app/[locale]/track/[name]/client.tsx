@@ -241,8 +241,7 @@ export function TrackingPageClient({
                       <Badge variant="outline" className="gap-1.5">
                         <span
                           className={cn(
-                            "w-3 h-3 rounded-full inline-block",
-                            colorInfo.border && "border border-border"
+                            "color-swatch w-3 h-3 rounded-full inline-block shrink-0"
                           )}
                           style={{ backgroundColor: colorInfo.hex }}
                         />

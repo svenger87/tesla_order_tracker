@@ -267,12 +267,14 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
   )
 
   return (
-    <Card aria-label={t('title')}>
+    // gap-0/py-0: the card's default padding sat above and below the header
+    // button's own, so the collapsed card was a tall box with the title off-centre.
+    <Card aria-label={t('title')} className="gap-0 overflow-hidden py-0">
         <CardHeader className="p-0">
           <button
             type="button"
             onClick={toggleExpanded}
-            className="flex w-full items-center justify-between px-4 py-4 font-semibold sm:px-6"
+            className="flex w-full items-center justify-between px-4 py-4 font-semibold transition-colors hover:bg-muted/30 sm:px-6"
             aria-expanded={expanded}
           >
             <span>{t('title')} {entries.length > 0 && <span className="ml-2 rounded-full bg-muted px-2 text-xs">{entries.length}</span>}</span>
@@ -280,7 +282,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
           </button>
         </CardHeader>
         {expanded && (
-          <CardContent className="border-t px-2 pt-3 space-y-4 sm:px-6">
+          <CardContent className="border-t px-2 pb-4 pt-3 space-y-4 sm:px-6">
             {/* Horizontally scrollable on phones so the chips never wrap into a tall block */}
             <div className="-mx-2 flex gap-1.5 overflow-x-auto px-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {ALL_EVENT_TYPES.map((ev) => {
@@ -292,7 +294,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                     onClick={() => toggleEvent(ev)}
                     aria-pressed={on}
                     aria-label={`${t('title')}: ${t(`event.${ev}`)}`}
-                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${on ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${on ? 'bg-primary/10 text-primary border-primary/40 font-medium' : 'bg-background text-muted-foreground border-border'}`}
                   >
                     {t(`event.${ev}`)}
                   </button>
@@ -303,7 +305,7 @@ export function UpdatesFeed({ globalFilters }: UpdatesFeedProps) {
                 onClick={() => setIncludeTost(v => !v)}
                 aria-pressed={includeTost}
                 aria-label={`${t('title')}: TOST`}
-                className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${includeTost ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-muted-foreground border-border'}`}
+                className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs sm:px-2.5 sm:py-0.5 ${includeTost ? 'bg-primary/10 text-primary border-primary/40 font-medium' : 'bg-background text-muted-foreground border-border'}`}
               >
                 TOST
               </button>

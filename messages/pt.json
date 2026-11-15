@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "Selecionar autopilot",
     "deliveryWindow": "Janela de entrega",
-    "deliveryWindowPlaceholder": "ex. 02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "ex. 11.02.-18.02.2026",
     "deliveryLocation": "Local de entrega",
     "deliveryLocationSelect": "Selecionar local de entrega",
     "vin": "VIN",

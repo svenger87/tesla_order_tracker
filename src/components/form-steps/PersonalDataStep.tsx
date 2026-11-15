@@ -69,7 +69,7 @@ export function PersonalDataStep({
       <div className="space-y-2">
         <Label htmlFor="country">{t('country')} *</Label>
         <Select value={formData.country} onValueChange={(v) => handleChange('country', v)}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('countrySelect')} />
           </SelectTrigger>
           <SelectContent>

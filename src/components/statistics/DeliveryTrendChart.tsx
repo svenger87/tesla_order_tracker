@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Order } from '@/lib/types'
 import { calculateDeliveryTrend } from '@/lib/prediction'
+import { parseGermanDate } from '@/lib/date-utils'
+import { CHART_AXIS_LINE, CHART_AXIS_TICK, CHART_GRID_STROKE, CHART_LINE_CURSOR, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 import { useMonthKeyFormatter } from '@/hooks/useMonthKeyFormatter'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +29,18 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
   const tc = useTranslations('common')
   const formatMonth = useMonthKeyFormatter()
 
-  const trend = useMemo(() => calculateDeliveryTrend(orders), [orders])
+  // A delivery date after today is an appointment, not a delivery: it opened
+  // a month on the axis that has not happened (Dec while it was still Nov) and
+  // let a handful of booked dates stand in for a whole month in the
+  // "last 3 months" comparison.
+  const trend = useMemo(() => {
+    const now = new Date()
+    const happened = orders.filter(o => {
+      const d = parseGermanDate(o.deliveryDate)
+      return !d || d <= now
+    })
+    return calculateDeliveryTrend(happened)
+  }, [orders])
 
   if (!trend || trend.monthlyAverages.length < 3) return null
 
@@ -67,20 +80,27 @@ export function DeliveryTrendChart({ orders }: DeliveryTrendChartProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
-        <div className="h-[250px]">
+        <div className="h-[250px] [&_:focus:not(:focus-visible)]:outline-none">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={trend.monthlyAverages}>
+            <AreaChart data={trend.monthlyAverages} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="monthKey" tick={{ fontSize: 11 }} tickFormatter={formatMonth} />
-              <YAxis tick={{ fontSize: 11 }} label={{ value: tc('days'), angle: -90, position: 'insideLeft', style: { fontSize: 11 } }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} vertical={false} />
+              <XAxis dataKey="monthKey" tick={CHART_AXIS_TICK} tickLine={CHART_AXIS_LINE} axisLine={CHART_AXIS_LINE} tickFormatter={formatMonth} />
+              <YAxis
+                tick={CHART_AXIS_TICK}
+                tickLine={CHART_AXIS_LINE}
+                axisLine={CHART_AXIS_LINE}
+                width={44}
+                label={{ value: tc('days'), angle: -90, position: 'insideLeft', style: { ...CHART_AXIS_TICK, textAnchor: 'middle' } }}
+              />
               <Tooltip
-                contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
+                {...CHART_TOOLTIP_STYLE}
+                cursor={CHART_LINE_CURSOR}
                 formatter={(value) => [`${value} ${tc('days')}`, t('avgDeliveryTime')]}
                 labelFormatter={(label) => formatMonth(label as string)}
               />

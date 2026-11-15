@@ -2,12 +2,48 @@
 
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
+import { CHART_AXIS_LINE, CHART_AXIS_TICK, CHART_BAR_CURSOR, CHART_GRID_STROKE, CHART_TOOLTIP_STYLE } from '@/lib/chart-colors'
 
 interface WaitTimeDistributionChartProps {
   data: { range: string; count: number; min: number; max: number }[]
 }
 
+const BAR_COLOR = 'oklch(0.65 0.18 40)'
+
+interface RangeTickProps {
+  x?: number | string
+  y?: number | string
+  payload?: { value: string }
+}
+
+/**
+ * "121-150" set as two short lines ("121–" over "150"): seven buckets on one
+ * line ran into each other on a phone, and recharts' own answer — dropping
+ * every other label — hides which bar is which.
+ */
+function RangeTick({ x = 0, y = 0, payload }: RangeTickProps) {
+  const value = payload?.value ?? ''
+  const [from, to] = value.split('-')
+  return (
+    <text x={Number(x)} y={Number(y) + 4} textAnchor="middle" {...CHART_AXIS_TICK}>
+      {to === undefined ? (
+        <tspan x={Number(x)} dy="0.71em">{value}</tspan>
+      ) : (
+        <>
+          <tspan x={Number(x)} dy="0.71em">{from}–</tspan>
+          <tspan x={Number(x)} dy="1.2em">{to}</tspan>
+        </>
+      )}
+    </text>
+  )
+}
+
+/**
+ * A histogram of order-to-delivery days. The buckets are categories (0-30,
+ * 31-60, …, 180+), so they are drawn as bars: an area between them implied
+ * values on a continuous axis that the data does not have.
+ */
 export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartProps) {
   const t = useTranslations('statistics')
   const tc = useTranslations('common')
@@ -24,69 +60,55 @@ export function WaitTimeDistributionChart({ data }: WaitTimeDistributionChartPro
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="h-[300px] w-full"
+      className="h-[300px] w-full [&_:focus:not(:focus-visible)]:outline-none"
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-        <AreaChart
+        <BarChart
           data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          margin={{ top: 10, right: 8, left: -12, bottom: 16 }}
+          barCategoryGap="12%"
         >
           <defs>
             <linearGradient id="colorWaitTime" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="oklch(0.65 0.18 40)" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="oklch(0.65 0.18 40)" stopOpacity={0.1} />
+              <stop offset="0%" stopColor={BAR_COLOR} stopOpacity={1} />
+              <stop offset="100%" stopColor={BAR_COLOR} stopOpacity={0.6} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} vertical={false} />
           <XAxis
             dataKey="range"
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={<RangeTick />}
+            height={44}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
+            interval={0}
             label={{
               value: tc('days'),
-              position: 'insideBottomRight',
-              offset: -5,
-              className: 'fill-muted-foreground text-xs'
+              position: 'insideBottom',
+              offset: -10,
+              style: { ...CHART_AXIS_TICK },
             }}
           />
           <YAxis
-            className="text-xs"
-            tick={{ className: 'fill-foreground' }}
-            tickLine={{ className: 'stroke-muted-foreground' }}
-            axisLine={{ className: 'stroke-muted-foreground' }}
+            tick={CHART_AXIS_TICK}
+            tickLine={CHART_AXIS_LINE}
+            axisLine={CHART_AXIS_LINE}
+            allowDecimals={false}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-              color: 'hsl(var(--foreground))',
-            }}
-            itemStyle={{
-              color: 'hsl(var(--foreground))',
-            }}
-            labelStyle={{
-              color: 'hsl(var(--foreground))',
-              fontWeight: 600,
-            }}
-            formatter={(value, _name, props) => {
-              const item = props.payload
-              return [t('ordersCount', { value: String(value) }), t('daysRange', { range: item.range })]
-            }}
+            {...CHART_TOOLTIP_STYLE}
+            cursor={CHART_BAR_CURSOR}
+            labelFormatter={(label) => t('daysRange', { range: String(label) })}
+            formatter={(value) => [t('ordersCount', { value: String(value) }), t('count')]}
           />
-          <Area
-            type="monotone"
+          <Bar
             dataKey="count"
-            stroke="oklch(0.65 0.18 40)"
-            strokeWidth={2}
-            fillOpacity={1}
             fill="url(#colorWaitTime)"
+            radius={[4, 4, 0, 0]}
             animationDuration={400}
             animationEasing="ease-out"
           />
-        </AreaChart>
+        </BarChart>
       </ResponsiveContainer>
     </motion.div>
   )

@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "Autopilot 선택",
     "deliveryWindow": "인도 예정 기간",
-    "deliveryWindowPlaceholder": "예: 02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "예: 11.02.-18.02.2026",
     "deliveryLocation": "인도 장소",
     "deliveryLocationSelect": "인도 장소 선택",
     "vin": "VIN",

@@ -396,7 +396,7 @@ export function ConstraintManager() {
                 setSelectedDrive('')
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -438,7 +438,7 @@ export function ConstraintManager() {
                 value={selectedModel}
                 onValueChange={setSelectedModel}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder={t('modelSelect')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -454,7 +454,7 @@ export function ConstraintManager() {
                 value={selectedDrive}
                 onValueChange={setSelectedDrive}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder={tf('driveSelect')} />
                 </SelectTrigger>
                 <SelectContent>

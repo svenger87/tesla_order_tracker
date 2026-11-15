@@ -93,27 +93,27 @@ export default function AdminDashboard() {
           <TabsList className="mb-6 w-full justify-start overflow-x-auto sm:w-fit group-data-[orientation=horizontal]/tabs:h-12 sm:group-data-[orientation=horizontal]/tabs:h-9">
             <TabsTrigger value="settings">
               <Settings className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('settings')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('settings')}</span>
             </TabsTrigger>
             <TabsTrigger value="import-export">
               <ArrowLeftRight className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('importExport')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('importExport')}</span>
             </TabsTrigger>
             <TabsTrigger value="options">
               <SlidersHorizontal className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('options')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('options')}</span>
             </TabsTrigger>
             <TabsTrigger value="compositor">
               <ImageIcon className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('compositor')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('compositor')}</span>
             </TabsTrigger>
             <TabsTrigger value="backups">
               <Archive className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('backups')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('backups')}</span>
             </TabsTrigger>
             <TabsTrigger value="api">
               <KeyRound className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">{t('apiTab')}</span>
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap!">{t('apiTab')}</span>
             </TabsTrigger>
           </TabsList>
 

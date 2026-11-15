@@ -43,8 +43,45 @@ export const CHART_TOOLTIP_STYLE = {
     backgroundColor: 'var(--card)',
     border: '1px solid var(--border)',
     borderRadius: '8px',
-    color: 'var(--foreground)',
+    color: 'var(--card-foreground)',
+    fontSize: '12px',
+    padding: '6px 10px',
+    boxShadow: '0 4px 12px rgb(0 0 0 / 0.12)',
   },
-  itemStyle: { color: 'var(--foreground)' },
-  labelStyle: { color: 'var(--foreground)', fontWeight: 600 },
+  itemStyle: { color: 'var(--card-foreground)', padding: 0 },
+  labelStyle: { color: 'var(--card-foreground)', fontWeight: 600, marginBottom: 2 },
+  // Above sibling axis labels, so a tooltip on a phone never reads as text
+  // printed over the chart.
+  wrapperStyle: { zIndex: 20, outline: 'none' },
 } as const
+
+/**
+ * Hover cursor for bar charts: a faint band, not the default solid grey block
+ * that covered the bar and its neighbours on a narrow screen.
+ */
+export const CHART_BAR_CURSOR = { fill: 'var(--muted-foreground)', fillOpacity: 0.08 } as const
+
+/** Hover cursor for line/area charts. */
+export const CHART_LINE_CURSOR = { stroke: 'var(--muted-foreground)', strokeOpacity: 0.4, strokeDasharray: '3 3' } as const
+
+/** One tick size and colour for every axis, so charts side by side match. */
+export const CHART_AXIS_FONT_SIZE = 11
+
+export const CHART_AXIS_TICK = {
+  fontSize: CHART_AXIS_FONT_SIZE,
+  fill: 'var(--muted-foreground)',
+} as const
+
+/** Axis line and tick marks: present but quiet. */
+export const CHART_AXIS_LINE = { stroke: 'var(--border)' } as const
+
+/** Grid lines, for charts that draw one. */
+export const CHART_GRID_STROKE = 'var(--border)'
+
+/**
+ * Outline for pie segments and legend swatches. Data colours include white
+ * (Pearl White, a white interior) and near-black (Diamond Black), which vanish
+ * against the card in one theme or the other; a thin foreground-tinted edge
+ * keeps every slice visible in both.
+ */
+export const CHART_SEGMENT_STROKE = 'color-mix(in oklab, var(--foreground) 28%, transparent)'

@@ -54,7 +54,7 @@ export function VehicleStep({
           value={formData.vehicleType}
           onValueChange={(v) => onVehicleTypeChange(v as VehicleType)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('vehicleSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -70,7 +70,7 @@ export function VehicleStep({
       <div className="space-y-2">
         <Label htmlFor="model">{t('model')} *</Label>
         <Select value={formData.model} onValueChange={onModelChange}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('modelSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -90,7 +90,7 @@ export function VehicleStep({
           onValueChange={(v) => handleChange('range', v)}
           disabled={isFieldDisabled(selectedModelValue, 'range')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('rangeSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -115,7 +115,7 @@ export function VehicleStep({
           onValueChange={(v) => handleChange('drive', v)}
           disabled={isFieldDisabled(selectedModelValue, 'drive')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('driveSelect')} />
           </SelectTrigger>
           <SelectContent>

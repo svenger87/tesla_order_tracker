@@ -72,7 +72,9 @@ function CommandInput({
   return (
     <div
       data-slot="command-input-wrapper"
-      className="flex h-9 items-center gap-2 border-b px-4"
+      // pr-12 keeps typed text clear of the dialog's close button, which sits
+      // over the right end of this row.
+      className="flex h-9 items-center gap-2 border-b pl-4 pr-12"
     >
       <SearchIcon className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input

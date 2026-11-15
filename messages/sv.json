@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "Välj autopilot",
     "deliveryWindow": "Leveransfönster",
-    "deliveryWindowPlaceholder": "t.ex. 02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "t.ex. 11.02.-18.02.2026",
     "deliveryLocation": "Leveransplats",
     "deliveryLocationSelect": "Välj leveransplats",
     "vin": "VIN",

@@ -326,37 +326,55 @@ export default function Home() {
           />
         )}
 
-        <div className="flex flex-col gap-2 sm:rounded-xl sm:border sm:bg-card/90 sm:p-2 sm:shadow-[var(--shadow-card)] sm:backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowStats(!showStats)}
-            className="h-10 justify-between gap-2 px-4 text-base sm:h-8 sm:justify-center sm:px-3 sm:text-sm"
-          >
-            <BarChart3 className="h-4 w-4" />
-            <span className="mr-auto sm:mr-0">{showStats ? t('hideStats') : t('showStats')}</span>
-            <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
-          </Button>
-        </div>
-
-        {showStats && !loading && (
+        {/* One panel: the show/hide control lives in the statistics header.
+            It used to be a card of its own holding a single button, above a
+            second card that repeated the title. */}
+        {!loading && (
           <section className="overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)]">
-            <div className="border-b bg-card">
-              <div className="flex items-center justify-between border-b px-4 py-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</p>
-                  <h3 className="text-base font-semibold tracking-tight">{t('statsSubtitle')}</h3>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPrediction(true)}
-                  className="hidden gap-2 sm:inline-flex"
+            <div className={showStats ? 'border-b bg-card' : 'bg-card'}>
+              <div className="flex items-center gap-2 px-3 py-3 sm:px-4">
+                {/* The title is a mouse/touch shortcut for the toggle on the right,
+                    which is the one keyboard and screen-reader control. */}
+                <div
+                  onClick={() => setShowStats(!showStats)}
+                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
                 >
-                  <Calculator className="h-4 w-4" />
-                  {tp('title')}
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <BarChart3 className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{t('statsTitle')}</span>
+                    <span className="block text-[15px] font-semibold leading-snug tracking-tight sm:text-base">{t('statsSubtitle')}</span>
+                  </span>
+                </div>
+                {showStats && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPrediction(true)}
+                    className="shrink-0 gap-2"
+                    aria-label={tp('title')}
+                  >
+                    <Calculator className="h-4 w-4" />
+                    <span className="hidden sm:inline">{tp('title')}</span>
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowStats(!showStats)}
+                  aria-expanded={showStats}
+                  aria-controls="stats-panel"
+                  className="shrink-0 gap-1.5 text-muted-foreground"
+                >
+                  <span className="hidden sm:inline">{showStats ? t('hideStats') : t('showStats')}</span>
+                  <span className="sr-only sm:hidden">{showStats ? t('hideStats') : t('showStats')}</span>
+                  <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${showStats ? '' : 'rotate-180'}`} />
                 </Button>
               </div>
+            </div>
+            {showStats && (
+              <div id="stats-panel">
               <div className="px-3 py-3 sm:px-4">
                 <div className="space-y-4">
                   <StatisticsDashboard
@@ -385,13 +403,16 @@ export default function Home() {
                   </Collapsible>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
           </section>
         )}
 
         {/* Orders Section */}
-        <Card className="overflow-hidden border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
-          <CardHeader className="border-b bg-transparent px-0 pb-2 pt-0 sm:bg-card sm:px-4 sm:py-5">
+        {/* gap-0/py-0: the card's default 24px padding stacked on the header's
+            own, which left ~45px of blank space above the title. */}
+        <Card className="gap-0 overflow-hidden border-0 bg-transparent py-0 shadow-none sm:border sm:bg-card sm:shadow-[var(--shadow-card)]">
+          <CardHeader className="border-b bg-transparent px-0 pb-3 pt-0 sm:bg-card sm:px-4 sm:py-4 [.border-b]:pb-3 sm:[.border-b]:pb-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2 text-[22px] sm:text-xl">
@@ -413,7 +434,7 @@ export default function Home() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="px-0 sm:px-4">
+          <CardContent className="px-0 pt-3 sm:p-4">
             {loading ? (
               <div className="space-y-4">
                 <Skeleton className="h-16 w-full animate-shimmer" />
@@ -468,6 +489,7 @@ export default function Home() {
         onOpenChange={setShowSearch}
         orderGroups={orderGroups}
         onSelectOrder={handleSearchSelect}
+        options={tableOptions}
       />
 
       {/* Modals */}

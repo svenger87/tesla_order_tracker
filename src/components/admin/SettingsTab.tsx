@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Save, Key, Heart, Archive, RotateCcw, AlertTriangle } from 'lucide-react'
+import { Save, Key, Heart, Archive, RotateCcw, Info } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export function SettingsTab() {
@@ -384,7 +384,7 @@ export function SettingsTab() {
           {settings?.archiveEnabled && (
             <>
               <div className="flex items-start gap-2 p-3 bg-data/10 border border-data/20 rounded-md">
-                <AlertTriangle className="h-5 w-5 text-data shrink-0 mt-0.5" />
+                <Info className="h-5 w-5 text-data shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-700 dark:text-blue-400">
                   <p className="font-medium">Info</p>
                   {/* Rendered as elements rather than injected as HTML: these

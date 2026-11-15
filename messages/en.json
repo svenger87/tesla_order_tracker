@@ -133,7 +133,7 @@
     "autopilot": "Autopilot",
     "autopilotSelect": "Select autopilot",
     "deliveryWindow": "Delivery window",
-    "deliveryWindowPlaceholder": "e.g. 02/11-02/18/2026",
+    "deliveryWindowPlaceholder": "e.g. 11.02.-18.02.2026",
     "deliveryLocation": "Delivery location",
     "deliveryLocationSelect": "Select or enter delivery location",
     "vin": "VIN",
@@ -785,6 +785,10 @@
     "title": "VIN Activity",
     "description": "Weekly VIN assignments",
     "thisWeek": "this week",
+    "lastWeek": "{count} last week",
+    "vsWeekBefore": "vs. week before",
+    "weekOf": "Week of {date}",
+    "soFar": "so far",
     "assigned": "assigned"
   },
   "countryDelivery": {

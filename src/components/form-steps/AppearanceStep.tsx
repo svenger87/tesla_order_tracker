@@ -60,7 +60,7 @@ export function AppearanceStep({
       <div className="space-y-2">
         <Label htmlFor="color">{t('color')} *</Label>
         <Select value={formData.color} onValueChange={(v) => handleChange('color', v)}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('colorSelect')}>
               {formData.color && (
                 <div className="flex items-center gap-2">
@@ -69,8 +69,7 @@ export function AppearanceStep({
                     return colorOpt?.hex ? (
                       <span
                         className={cn(
-                          "w-4 h-4 rounded-full inline-block",
-                          colorOpt.border && "border border-border"
+                          "color-swatch w-4 h-4 rounded-full inline-block shrink-0"
                         )}
                         style={{ backgroundColor: colorOpt.hex }}
                       />
@@ -88,8 +87,7 @@ export function AppearanceStep({
                   {c.hex && (
                     <span
                       className={cn(
-                        "w-4 h-4 rounded-full inline-block",
-                        c.border && "border border-border"
+                        "color-swatch w-4 h-4 rounded-full inline-block shrink-0"
                       )}
                       style={{ backgroundColor: c.hex }}
                     />
@@ -114,7 +112,7 @@ export function AppearanceStep({
           onValueChange={(v) => handleChange('interior', v)}
           disabled={isFieldDisabled(selectedModelValue, 'interior')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('interiorSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -139,7 +137,7 @@ export function AppearanceStep({
           onValueChange={(v) => handleChange('wheels', v)}
           disabled={isFieldDisabled(selectedModelValue, 'wheels')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('wheelsSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -169,7 +167,7 @@ export function AppearanceStep({
           onValueChange={(v) => handleChange('towHitch', v)}
           disabled={isFieldDisabled(selectedModelValue, 'towHitch')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('towHitchSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -197,7 +195,7 @@ export function AppearanceStep({
           onValueChange={(v) => handleChange('seats', v)}
           disabled={mergedConstraints.seats?.type === 'fixed'}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('seatsSelect')} />
           </SelectTrigger>
           <SelectContent>
@@ -228,7 +226,7 @@ export function AppearanceStep({
       <div className="space-y-2">
         <Label htmlFor="autopilot">{t('autopilot')} *</Label>
         <Select value={formData.autopilot} onValueChange={(v) => handleChange('autopilot', v)}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('autopilotSelect')} />
           </SelectTrigger>
           <SelectContent>
