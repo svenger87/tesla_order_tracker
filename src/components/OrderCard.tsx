@@ -63,7 +63,10 @@ export function OrderCard({ order, isAdmin, onEdit, onDelete, onGenerateResetCod
   const currentWaitingDays = orderDate
     ? Math.max(0, Math.floor((nowMs - orderDate.getTime()) / 86_400_000))
     : null
-  const waitingDays = order.orderToDelivery ?? calculateDaysBetween(order.orderDate, order.deliveryDate) ?? currentWaitingDays
+  // A duration below zero means the entry's dates contradict each other
+  // (delivered before it was ordered); "~ -240 days" is worse than no number.
+  const recorded = order.orderToDelivery ?? calculateDaysBetween(order.orderDate, order.deliveryDate)
+  const waitingDays = recorded != null && recorded >= 0 ? recorded : recorded == null ? currentWaitingDays : null
   const modelLabel = getLabel(models, order.model)
   const rangeLabel = order.range === 'maximale_reichweite'
     ? to('range.maxRangeShort')

@@ -199,6 +199,8 @@ function buildCacheUrl(modelSlug: string, optionsStr: string, view: string, size
     options: optionsStr,
     size: size.toString(),
     view,
+    // Must match buildParamKey's suffix and the bg handling in the route.
+    bg: 'transparent',
   })
   return `/api/compositor-image?${params.toString()}`
 }
@@ -224,7 +226,8 @@ function fetchManifest(): Promise<Set<string>> {
 }
 
 function buildParamKey(modelSlug: string, optionsStr: string, view: string, size: number): string {
-  return `${modelSlug}_${optionsStr}_${view}_${size}`
+  // `_transparent`: entries cached without it are opaque white images.
+  return `${modelSlug}_${optionsStr}_${view}_${size}_transparent`
 }
 
 // Try to fetch image from Tesla via CORS and upload to our cache (fire-and-forget)

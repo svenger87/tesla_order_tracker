@@ -36,8 +36,20 @@ function ensureCacheDir(): boolean {
   }
 }
 
-function buildParamKey(model: string, options: string, view: string, size: string): string {
-  return `${model}_${options}_${view}_${size}`
+/**
+ * `bg` marks the background variant. Entries cached before it existed are
+ * opaque white PNGs, which showed as white boxes on the dark theme once the
+ * client switched to Tesla's transparent images; keying the transparent ones
+ * separately leaves those old entries unused instead of serving them forever.
+ */
+function buildParamKey(model: string, options: string, view: string, size: string, bg: string | null): string {
+  const base = `${model}_${options}_${view}_${size}`
+  return bg ? `${base}_${bg}` : base
+}
+
+/** Only the one known variant; anything else would let callers mint new keys. */
+function readBg(searchParams: URLSearchParams): string | null {
+  return searchParams.get('bg') === 'transparent' ? 'transparent' : null
 }
 
 function buildCacheKey(paramKey: string): string {
@@ -84,7 +96,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing model or options' }, { status: 400 })
   }
 
-  const paramKey = buildParamKey(model, options, view, size)
+  const paramKey = buildParamKey(model, options, view, size, readBg(searchParams))
   const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
@@ -120,7 +132,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing model or options' }, { status: 400 })
   }
 
-  const paramKey = buildParamKey(model, options, view, size)
+  const paramKey = buildParamKey(model, options, view, size, readBg(searchParams))
   const cacheKey = buildCacheKey(paramKey)
   const cachePath = join(CACHE_DIR, `${cacheKey}.png`)
 
