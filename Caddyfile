@@ -9,7 +9,11 @@
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-assets.tesla.com; frame-ancestors 'none'"
+		# worker-src blob: lets canvas-confetti (the delivery celebration) draw in
+		# a worker it builds from a blob URL. Without it the worker fell back to
+		# default-src 'self', was refused, and every delivered order's page
+		# logged a CSP violation; the confetti then drew on the main thread.
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-assets.tesla.com; frame-ancestors 'none'"
 	}
 }
 
