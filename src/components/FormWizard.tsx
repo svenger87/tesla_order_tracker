@@ -87,8 +87,18 @@ export function FormWizard({
     }),
   }
 
+  // A real <form>, so the last step ends in a genuine submit. Password
+  // managers save on form submission; with formless fields and a click handler
+  // they had to guess, and often saved nothing or the wrong thing. Enter on an
+  // earlier step moves on instead of submitting.
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (isLastStep) handleSubmit()
+    else goNext()
+  }
+
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <form onSubmit={handleFormSubmit} noValidate className="flex flex-col h-full min-h-0">
       {/* Step Indicator */}
       <div className="flex-shrink-0 px-2 pt-1 pb-3">
         <div className="flex items-center justify-center gap-0">
@@ -178,9 +188,12 @@ export function FormWizard({
           {tc('back')}
         </Button>
         {isLastStep ? (
+          // Distinct keys: React would otherwise reuse the Next button's
+          // element and flip it to type="submit" during the click that reaches
+          // this step, and the browser would then submit the form at once.
           <Button
-            type="button"
-            onClick={handleSubmit}
+            key="submit"
+            type="submit"
             disabled={loading}
             className="flex-1"
           >
@@ -188,6 +201,7 @@ export function FormWizard({
           </Button>
         ) : (
           <Button
+            key="next"
             type="button"
             onClick={goNext}
             className="flex-1"
@@ -196,6 +210,6 @@ export function FormWizard({
           </Button>
         )}
       </div>
-    </div>
+    </form>
   )
 }

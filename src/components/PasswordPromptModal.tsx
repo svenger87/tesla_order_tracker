@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { AlertCircle, ChevronDown, Info, KeyRound, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useApiError } from '@/hooks/useApiError'
+import { PasswordManagerUsername } from './PasswordManagerUsername'
 
 interface PasswordPromptModalProps {
   open: boolean
@@ -193,13 +194,16 @@ export function PasswordPromptModal({
 
         {!showReset ? (
           <form onSubmit={handleVerify} className="space-y-4">
+            {!isLegacy && <PasswordManagerUsername value={order.name} />}
             <div className="space-y-2">
               <Label htmlFor="password">
                 {isLegacy ? t('usernameLabel') : tf('password')}
               </Label>
               <Input
                 id="password"
+                name={isLegacy ? undefined : 'password'}
                 type={isLegacy ? 'text' : 'password'}
+                autoComplete={isLegacy ? 'off' : 'current-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={isLegacy ? t('usernamePlaceholder') : tf('passwordPlaceholder')}
@@ -241,6 +245,7 @@ export function PasswordPromptModal({
           </div>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
+            <PasswordManagerUsername value={order.name} />
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3 text-sm text-amber-700 dark:text-amber-400">
               {t('forgotPasswordHelp')}
             </div>
@@ -249,6 +254,8 @@ export function PasswordPromptModal({
               <Label htmlFor="resetCode">{t('resetCodeLabel')}</Label>
               <Input
                 id="resetCode"
+                autoComplete="one-time-code"
+                inputMode="numeric"
                 value={resetCode}
                 onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder={t('resetCodePlaceholder')}
@@ -261,6 +268,7 @@ export function PasswordPromptModal({
               <Label htmlFor="newPassword">{t('newPasswordLabel')}</Label>
               <Input
                 id="newPassword"
+                name="new-password"
                 type="password"
                 autoComplete="new-password"
                 value={newPassword}

@@ -2,6 +2,7 @@ import { OrderFormData, Order } from '@/lib/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { KeyRound } from 'lucide-react'
+import { PasswordManagerUsername } from '@/components/PasswordManagerUsername'
 
 interface PasswordStepProps {
   formData: OrderFormData
@@ -54,10 +55,12 @@ export function PasswordStep({
             {t('legacyPasswordDescription')}
           </p>
         </div>
+        <PasswordManagerUsername value={order.name} />
         <div className="space-y-2">
           <Label htmlFor="newEditCode">{t('newPassword')} *</Label>
           <Input
             id="newEditCode"
+            name="new-password"
             type="password"
             autoComplete="new-password"
             value={newEditCode}
@@ -98,11 +101,13 @@ export function PasswordStep({
         <p className="text-sm text-muted-foreground">
           {t('passwordDescription')}
         </p>
+        <PasswordManagerUsername value={formData.name} />
         <div className={fieldsClassName}>
           <div className="space-y-2">
             <Label htmlFor="customPassword">{t('password')} *</Label>
             <Input
               id="customPassword"
+              name="new-password"
               type="password"
               autoComplete="new-password"
               value={formData.customPassword}
